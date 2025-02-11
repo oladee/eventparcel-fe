@@ -21,6 +21,8 @@ const Verification = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [onSuccess, setOnSuccess] = useState<boolean>(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  console.log(setOnSuccess);
+  
 
   useEffect(() => {
     inputRefs.current[0]?.focus();
