@@ -7,6 +7,10 @@ body {
   height: 100%;
 }
 
+#checkbox {
+  accent-color : #751423;
+}
+
 @layer base {
   html {
     font-family: var(--font-open-sans), sans-serif;

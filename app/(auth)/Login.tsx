@@ -83,7 +83,7 @@ const Login: React.FC = () => {
                         {/* Remember Me & Forgot Password */}
                         <div className="flex justify-between items-center mb-6">
                             <label className="flex items-center text-sm text-black-100">
-                                <input type="checkbox" className="mr-2 bg-primary-100" />
+                                <input type="checkbox" className="mr-2 outline-none" id="checkbox" />
                                 Remember me
                             </label>
                             <a href="#" className="text-primary text-sm">Forgot Password?</a>

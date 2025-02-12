@@ -177,7 +177,7 @@ const Signup: React.FC = () => {
 
               {/* Terms and conditions Link */}
               <div className="text-left text-black-100 mb-4 text-sm md:text-base">
-                By proceeding, you agree to the <a href="#" className="text-primary font-bold">Terms and Conditions</a>
+                By proceeding, you agree to the <a href="/terms" className="text-primary font-bold">Terms and Conditions</a>
               </div>
 
               {/* Signup Button */}
