@@ -22,6 +22,7 @@ const Verification = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [onSuccess, setOnSuccess] = useState<boolean>(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+  const myEmail = localStorage.getItem("email");
 
 
   useEffect(() => {
@@ -125,7 +126,7 @@ const Verification = () => {
                 Enter verification code
               </h1>
               <p className="text-[#718096] font-normal mt-2">
-                We have just sent a verification code to <br /> david*****@mail.com
+                We have just sent a verification code to <br /> {myEmail}
               </p>
             </div>
 
