@@ -18,7 +18,7 @@ const otpSchema = z
 
 const Verification = () => {
   const router = useRouter();
-  const [otp, setOtp] = useState<string[]>(["", "", "", "", "",""]);
+  const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState<boolean>(false);
   const [onSuccess, setOnSuccess] = useState<boolean>(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
@@ -131,6 +131,7 @@ const Verification = () => {
 
   return (
     <>
+      <ToastContainer />
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#F9FAFB] px-4">
         {
           !onSuccess && <div className="bg-white p-6 rounded-[24px]">
@@ -193,7 +194,6 @@ const Verification = () => {
         }
 
       </div>
-      <ToastContainer />
     </>
   );
 };
