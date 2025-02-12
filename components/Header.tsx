@@ -28,9 +28,9 @@ const Header: React.FC = () => {
     <header className={`w-full py-4 px-12 fixed right-0 top-0 z-10 ${isTransparentBg ? 'bg-transparent' : 'bg-white shadow-md'} ${isScrolled ? "bg-white shadow-lg" : "bg-transparent"}`}>
       <div className="container mx-auto grid grid-cols-2 md:grid-cols-2 items-center">
         {/* Logo Section */}
-        <div className="flex items-center space-x-2">
+        <div className="flex items-center space-x-2 w-max">
           <Logo width={40} height={40} />
-          <span className="text-xl font-bold text-black-100">Event Parcel</span>
+          <span className="text-base md:text-xl font-bold text-black-100 ">Event Parcel</span>
         </div>
 
         {/* Navigation Links (hidden on small screens) */}
