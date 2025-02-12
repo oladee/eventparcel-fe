@@ -37,7 +37,10 @@ const Login: React.FC = () => {
         } catch (error: any) {
             if (error.response?.status === 403) {
                 localStorage.setItem("email", email);
-                router.push("/otp-verification");
+                toast.error(error.response?.data?.message || "User not verified. Please verify OTP first");
+                setTimeout(() => {
+                    router.push("/otp-verification");
+                }, 3000);
             } else {
                 toast.error(error.response?.data?.message || "Login failed. Try again.");
             }
