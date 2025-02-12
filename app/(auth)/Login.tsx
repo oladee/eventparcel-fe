@@ -33,9 +33,14 @@ const Login: React.FC = () => {
             toast.success("Login successful!");
             localStorage.setItem("authToken", response.data.token); // Adjust based on API response
 
-            router.push("/dashboard"); // Redirect after successful login
+            // router.push("/dashboard"); // Redirect after successful login
         } catch (error: any) {
-            toast.error(error.response?.data?.message || "Login failed. Try again.");
+            if (error.response?.status === 403) {
+                localStorage.setItem("email", email);
+                router.push("/otp-verification");
+            } else {
+                toast.error(error.response?.data?.message || "Login failed. Try again.");
+            }
         } finally {
             setLoading(false);
         }
