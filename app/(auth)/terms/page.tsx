@@ -8,7 +8,7 @@ const TermsAndConditions = () => {
 
       <h2>Introduction</h2>
       <p>
-        These Terms and Conditions govern your use of [Your Project Name] ("Service"). By accessing or using our service, you agree to be bound by these terms. If you do not agree with these terms, please do not use our Service.
+        These Terms and Conditions govern your use of [Your Project Name] (&quot;Service&quot;). By accessing or using our service, you agree to be bound by these terms. If you do not agree with these terms, please do not use our Service.
       </p>
 
       <h2>Use of the Service</h2>
@@ -32,7 +32,7 @@ const TermsAndConditions = () => {
       <h2>Disclaimers</h2>
       <ul>
         <li>
-          <strong>Service "As Is":</strong> The Service is provided on an "as is" and "as available" basis without warranties of any kind.
+          <strong>Service &quot;As Is&quot;:</strong> The Service is provided on an &quot;as is&quot; and &quot;as available&quot; basis without warranties of any kind.
         </li>
         <li>
           <strong>No Guarantee:</strong> We do not guarantee that the Service will always be safe, secure, or error-free.
