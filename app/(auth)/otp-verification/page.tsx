@@ -30,6 +30,7 @@ const Verification = () => {
   const [onSuccess, setOnSuccess] = useState<boolean>(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [myEmail, setMyEmail] = useState<string | null>(null);
+  const [countdown, setCountdown] = useState<number>(120); // 2 minutes countdown
 
 
   useEffect(() => {
@@ -38,6 +39,12 @@ const Verification = () => {
       setMyEmail(email);
     }
     inputRefs.current[0]?.focus();
+
+    const timer = setInterval(() => {
+      setCountdown((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+
+    return () => clearInterval(timer);
   }, []);
 
 
@@ -116,6 +123,8 @@ const Verification = () => {
       });
 
       toast.success(response?.data?.message || "New OTP has been sent to your email/SMS");
+      setOtp(["", "", "", "", "", ""]); // Clear the OTP inputs
+      setCountdown(120); // Reset the countdown timer
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         toast.error(error.response?.data?.message || "OTP resend failed");
@@ -164,7 +173,7 @@ const Verification = () => {
               <div className="flex justify-between items-center mb-6">
                 <p className="text-xs text-[#43564B]">
                   Resend code in{" "}
-                  <span className="text-primary font-medium">2 min</span>
+                  <span className="text-primary font-medium">{countdown}</span>
                 </p>
                 <button
                   onClick={handleResendCode}

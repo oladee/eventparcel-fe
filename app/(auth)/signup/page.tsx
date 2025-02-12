@@ -61,7 +61,13 @@ const Signup: React.FC = () => {
                     name="firstName"
                     control={control}
                     defaultValue=""
-                    rules={{ required: "First name is required" }}
+                    rules={{
+                      required: "First name is required",
+                      pattern: {
+                        value: /^[A-Za-z]+$/,
+                        message: "First name can only contain letters"
+                      }
+                    }}
                     render={({ field }) => (
                       <input
                         {...field}
@@ -80,7 +86,13 @@ const Signup: React.FC = () => {
                     name="lastName"
                     control={control}
                     defaultValue=""
-                    rules={{ required: "Last name is required" }}
+                    rules={{
+                      required: "Last name is required",
+                      pattern: {
+                        value: /^[A-Za-z]+$/,
+                        message: "Last name can only contain letters"
+                      }
+                    }}
                     render={({ field }) => (
                       <input
                         {...field}
