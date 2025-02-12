@@ -33,6 +33,7 @@ const Signup: React.FC = () => {
     try {
       const response = await axiosInstance.post('/signup', data);
       toast.success(response.data.message || "Signup successful!");
+      localStorage.setItem("email", data.email);
       router.push("/otp-verification");
     } catch (error: any) {
 

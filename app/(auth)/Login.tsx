@@ -43,7 +43,7 @@ const Login: React.FC = () => {
 
     return (
         <>
-            <div className="grid lg:grid-cols-2 min-h-screen mt-12 md:mt-4 lg:mt-0">
+            <div className="grid lg:grid-cols-2 min-h-screen mt-8 md:mt-4 lg:mt-0">
                 {/* Left Side - Login Form */}
                 <div className="flex items-center justify-center px-6 py-10">
                     <div className="max-w-md w-full">
@@ -106,7 +106,7 @@ const Login: React.FC = () => {
 
                         {/* Signup Link */}
                         <div className="text-left text-sm text-gray-500 mt-6">
-                            Don’t have an account? <a href="#" className="text-primary font-bold">Get Started</a>
+                            Don’t have an account? <a href="#" className="text-primary font-bold" onClick={() => router.push("/signup")}>Get Started</a>
                         </div>
                     </div>
                 </div>

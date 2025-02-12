@@ -8,8 +8,9 @@ import "react-toastify/dist/ReactToastify.css";
 import { BiLoaderCircle } from "react-icons/bi";
 import axiosInstance from "@/lib/axiosInstance";
 import axios from "axios";
-import { Checked } from "@/components/icons/Icons";
 import { z } from "zod";
+import Success from "@/components/auth/Success";
+
 
 const otpSchema = z
   .array(z.string().length(1, "Each digit must be 1 character"))
@@ -17,12 +18,12 @@ const otpSchema = z
 
 const Verification = () => {
   const router = useRouter();
-  const [otp, setOtp] = useState<string[]>(["", "", "", "", ""]);
+  const [otp, setOtp] = useState<string[]>(["", "", "", "", "",""]);
   const [loading, setLoading] = useState<boolean>(false);
   const [onSuccess, setOnSuccess] = useState<boolean>(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   console.log(setOnSuccess);
-  
+
 
   useEffect(() => {
     inputRefs.current[0]?.focus();
@@ -51,6 +52,7 @@ const Verification = () => {
   };
 
   const handleVerify = async () => {
+    console.log("hello world")
     try {
       setLoading(true);
       otpSchema.parse(otp);
@@ -67,25 +69,32 @@ const Verification = () => {
         otp: otpCode
       });
 
-      toast.success("OTP verified successfully!");
-      localStorage.setItem("authToken", response.data.token);
-      localStorage.setItem("loggedInUser", JSON.stringify(response.data));
+      setOnSuccess(true);
+      console.log(response);
 
-      const storedData = localStorage.getItem("loggedInUser");
-      const userData = storedData ? JSON.parse(storedData) : null;
+      setTimeout(() => {
+        router.push("/");
+      }, 3000);
 
-      if (!userData || !userData.data) {
-        toast.error("User data not found. Please try again.");
-        return;
-      }
+      // toast.success("OTP verified successfully!");
+      // localStorage.setItem("authToken", response.data.token);
+      // localStorage.setItem("loggedInUser", JSON.stringify(response.data));
 
-      console.log("User Data:", userData);
+      // const storedData = localStorage.getItem("loggedInUser");
+      // const userData = storedData ? JSON.parse(storedData) : null;
 
-      if (userData.data.isAdmin) {
-        router.push("/admin-dashboard");
-      } else {
-        router.push("/dashboard");
-      }
+      // if (!userData || !userData.data) {
+      //   toast.error("User data not found. Please try again.");
+      //   return;
+      // }
+
+      // console.log("User Data:", userData);
+
+      // if (userData.data.isAdmin) {
+      //   router.push("/admin-dashboard");
+      // } else {
+      //   router.push("/dashboard");
+      // }
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         toast.error(error.response?.data?.message || "OTP verification failed");
@@ -124,7 +133,7 @@ const Verification = () => {
     <>
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#F9FAFB] px-4">
         {
-          onSuccess && <div className="bg-white p-6 rounded-[24px]">
+          !onSuccess && <div className="bg-white p-6 rounded-[24px]">
             <div className="text-left mb-8">
               <h1 className="text-xl md:text-2xl font-bold text-[#0D0E0D]">
                 Enter verification code
@@ -135,7 +144,7 @@ const Verification = () => {
             </div>
 
             <div className="w-full max-w-md ">
-              <div className="grid grid-cols-5 gap-4 mb-4">
+              <div className="grid grid-cols-6 gap-4 mb-4">
                 {otp.map((value, index) => (
                   <input
                     key={index}
@@ -148,7 +157,7 @@ const Verification = () => {
                     ref={(el) => {
                       inputRefs.current[index] = el;
                     }}
-                    className="w-[43px] h-[53px] md:w-[63px] md:h-[73px] text-center text-xl border rounded-[10px] focus:ring-2 focus:ring-primary focus:outline-none"
+                    className="w-[43px] h-[43px] md:w-[53px] md:h-[63px] text-center text-xl border rounded-[10px] focus:ring-2 focus:ring-primary focus:outline-none"
                   />
                 ))}
               </div>
@@ -179,12 +188,10 @@ const Verification = () => {
           </div>
         }
 
-        <div className="bg-white p-6 rounded-[24px] w-full max-w-md grid place-items-center text-center gap-4">
-          <Checked width={100} height={100} />
-          <p className="font-bold text-3xl">Account created successfully</p>
-          <p className="font-medium text-[#718096]">You have successfully created an account on Event <br /> Parcel, you can now sell Aso Ebi with ease</p>
-          <button className="button_v1">Continue</button>
-        </div>
+        {
+          onSuccess && <Success />
+        }
+
       </div>
       <ToastContainer />
     </>
