@@ -22,10 +22,14 @@ const Verification = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [onSuccess, setOnSuccess] = useState<boolean>(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  const myEmail = localStorage.getItem("email");
+  const [myEmail, setMyEmail] = useState<string | null>(null);
 
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const email = localStorage.getItem("email");
+      setMyEmail(email);
+    }
     inputRefs.current[0]?.focus();
   }, []);
 
