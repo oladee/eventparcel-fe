@@ -14,7 +14,7 @@ import Success from "@/components/auth/Success";
 
 const otpSchema = z
   .array(z.string().length(1, "Each digit must be 1 character"))
-  .length(5, "OTP must be exactly 5 digits");
+  .length(6, "OTP must be exactly 6 digits");
 
 const Verification = () => {
   const router = useRouter();
@@ -22,7 +22,6 @@ const Verification = () => {
   const [loading, setLoading] = useState<boolean>(false);
   const [onSuccess, setOnSuccess] = useState<boolean>(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
-  console.log(setOnSuccess);
 
 
   useEffect(() => {
@@ -51,58 +50,44 @@ const Verification = () => {
     }
   };
 
+
   const handleVerify = async () => {
-    console.log("hello world")
     try {
       setLoading(true);
       otpSchema.parse(otp);
       const otpCode = otp.join("");
       const email = localStorage.getItem("email");
-
+  
       if (!email) {
         toast.error("Email not found. Please try again.");
+        setLoading(false); // Ensure loading is set to false
         return;
       }
-
+  
       const response = await axiosInstance.post("/verify-otp", {
         email,
         otp: otpCode
       });
-
+  
       setOnSuccess(true);
       console.log(response);
-
+  
       setTimeout(() => {
         router.push("/");
       }, 3000);
-
-      // toast.success("OTP verified successfully!");
-      // localStorage.setItem("authToken", response.data.token);
-      // localStorage.setItem("loggedInUser", JSON.stringify(response.data));
-
-      // const storedData = localStorage.getItem("loggedInUser");
-      // const userData = storedData ? JSON.parse(storedData) : null;
-
-      // if (!userData || !userData.data) {
-      //   toast.error("User data not found. Please try again.");
-      //   return;
-      // }
-
-      // console.log("User Data:", userData);
-
-      // if (userData.data.isAdmin) {
-      //   router.push("/admin-dashboard");
-      // } else {
-      //   router.push("/dashboard");
-      // }
+  
     } catch (error: unknown) {
+      console.error("Verification error:", error); // Log the error for debugging
       if (axios.isAxiosError(error)) {
         toast.error(error.response?.data?.message || "OTP verification failed");
+      } else {
+        toast.error("An unexpected error occurred");
       }
     } finally {
       setLoading(false);
     }
   };
+
   const handleResendCode = async () => {
     try {
       setLoading(true);
@@ -177,7 +162,7 @@ const Verification = () => {
               <button
                 onClick={handleVerify}
                 disabled={loading}
-                className="w-full bg-primary text-white py-2 px-4 rounded-[8px]  transition flex justify-center items-center"
+                className="button_v1"
               >
                 {loading ? (
                   <BiLoaderCircle className="mr-2 animate-spin" size={22} />

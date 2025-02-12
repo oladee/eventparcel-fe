@@ -25,7 +25,7 @@ body {
 }
 
 .button_v1 {
-  @apply w-full bg-primary text-white py-3 rounded-[12px] hover:bg-red-800 transition;
+  @apply w-full bg-primary text-white py-3 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center;
 }
 
 .authInput {

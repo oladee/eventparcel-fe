@@ -31,7 +31,7 @@ const Login: React.FC = () => {
             const response = await axiosInstance.post("/login", { email, password });
 
             toast.success("Login successful!");
-            localStorage.setItem("token", response.data.token); // Adjust based on API response
+            localStorage.setItem("authToken", response.data.token); // Adjust based on API response
 
             router.push("/dashboard"); // Redirect after successful login
         } catch (error: any) {
@@ -91,7 +91,7 @@ const Login: React.FC = () => {
 
                         {/* Sign In Button */}
                         <button
-                            className="button_v1 mb-4 flex items-center justify-center"
+                            className="button_v1 mb-4"
                             onClick={handleLogin}
                             disabled={loading}
                         >

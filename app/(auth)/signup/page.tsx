@@ -144,7 +144,17 @@ const Signup: React.FC = () => {
                   name="password"
                   control={control}
                   defaultValue=""
-                  rules={{ required: "Password is required" }}
+                  rules={{
+                    required: "Password is required",
+                    minLength: {
+                      value: 8,
+                      message: "Password must be at least 8 characters long"
+                    },
+                    pattern: {
+                      value: /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[@$!%*?&])[A-Za-z\d@$!%*?&]{8,}$/,
+                      message: "Password must contain uppercase, lowercase, number, and special character"
+                    }
+                  }}
                   render={({ field }) => (
                     <input
                       {...field}
@@ -171,7 +181,7 @@ const Signup: React.FC = () => {
               </div>
 
               {/* Signup Button */}
-              <button type="submit" className="button_v1 mb-4 w-full" disabled={loading}>
+              <button type="submit" className="button_v1 mb-4" disabled={loading}>
                 {loading ? <BiLoaderCircle className="animate-spin text-center" /> : "Sign up"}
               </button>
             </form>
