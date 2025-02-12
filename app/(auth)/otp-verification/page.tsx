@@ -16,6 +16,13 @@ const otpSchema = z
   .array(z.string().length(1, "Each digit must be 1 character"))
   .length(6, "OTP must be exactly 6 digits");
 
+const maskEmail = (email: string) => {
+  const [name, domain] = email.split("@");
+  const maskedName = name.slice(0, 5) + "*****";
+  return `${maskedName}@${domain}`;
+};
+
+
 const Verification = () => {
   const router = useRouter();
   const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
@@ -33,18 +40,6 @@ const Verification = () => {
     inputRefs.current[0]?.focus();
   }, []);
 
-  const handleChange = (value: string, index: number) => {
-    if (!/\d/.test(value) && value !== "") return;
-    const updatedOtp = [...otp];
-    updatedOtp[index] = value;
-    setOtp(updatedOtp);
-
-    if (value && index < otp.length - 1) {
-      inputRefs.current[index + 1]?.focus();
-    } else if (index === otp.length - 1 && value) {
-      handleVerify();
-    }
-  };
 
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>,
@@ -56,42 +51,107 @@ const Verification = () => {
   };
 
 
-  const handleVerify = async () => {
+
+  const handleChange = (value: string, index: number) => {
+    if (!/\d/.test(value) && value !== "") return;
+    const updatedOtp = [...otp];
+    updatedOtp[index] = value;
+    setOtp(updatedOtp);
+
+    if (value && index < otp.length - 1) {
+      inputRefs.current[index + 1]?.focus();
+    } else if (index === otp.length - 1 && value) {
+      handleVerify(updatedOtp); // Pass the updated array here
+    }
+  };
+
+  const handleVerify = async (otpArray?: string[]) => {
     try {
       setLoading(true);
-      otpSchema.parse(otp);
-      const otpCode = otp.join("");
+      const currentOtp = otpArray || otp; // Use the passed array or state
+      otpSchema.parse(currentOtp);
+      const otpCode = currentOtp.join("");
       const email = localStorage.getItem("email");
-  
+
       if (!email) {
         toast.error("Email not found. Please try again.");
-        setLoading(false); // Ensure loading is set to false
+        setLoading(false);
         return;
       }
-  
+
       const response = await axiosInstance.post("/verify-otp", {
         email,
-        otp: otpCode
+        otp: otpCode,
       });
-  
+
       setOnSuccess(true);
       console.log(response);
-  
+
       setTimeout(() => {
         router.push("/");
       }, 3000);
-  
     } catch (error: unknown) {
-      console.error("Verification error:", error); // Log the error for debugging
+      console.error("Verification error:", error);
       if (axios.isAxiosError(error)) {
         toast.error(error.response?.data?.message || "OTP verification failed");
-      } else {
-        toast.error("An unexpected error occurred");
       }
     } finally {
       setLoading(false);
     }
   };
+
+  // const handleChange = (value: string, index: number) => {
+  //   if (!/\d/.test(value) && value !== "") return;
+  //   const updatedOtp = [...otp];
+  //   updatedOtp[index] = value;
+  //   setOtp(updatedOtp);
+
+  //   if (value && index < otp.length - 1) {
+  //     inputRefs.current[index + 1]?.focus();
+  //   } else if (index === otp.length - 1 && value) {
+  //     handleVerify();
+  //   }
+  // };
+
+
+
+  // const handleVerify = async () => {
+  //   try {
+  //     setLoading(true);
+  //     otpSchema.parse(otp);
+  //     const otpCode = otp.join("");
+  //     const email = localStorage.getItem("email");
+
+  //     if (!email) {
+  //       toast.error("Email not found. Please try again.");
+  //       setLoading(false); // Ensure loading is set to false
+  //       return;
+  //     }
+
+  //     const response = await axiosInstance.post("/verify-otp", {
+  //       email,
+  //       otp: otpCode
+  //     });
+
+  //     setOnSuccess(true);
+  //     console.log(response);
+
+  //     setTimeout(() => {
+  //       router.push("/");
+  //     }, 3000);
+
+  //   } catch (error: unknown) {
+  //     console.error("Verification error:", error); // Log the error for debugging
+  //     if (axios.isAxiosError(error)) {
+  //       toast.error(error.response?.data?.message || "OTP verification failed");
+  //     }
+  //      else {
+  //       toast.error("An unexpected error occurred");
+  //     }
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   const handleResendCode = async () => {
     try {
@@ -111,7 +171,8 @@ const Verification = () => {
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         toast.error(error.response?.data?.message || "OTP resend failed");
-      } else {
+      }
+      else {
         toast.error("An unexpected error occurred");
       }
     } finally {
@@ -130,7 +191,7 @@ const Verification = () => {
                 Enter verification code
               </h1>
               <p className="text-[#718096] font-normal mt-2">
-                We have just sent a verification code to <br /> {myEmail}
+                We have just sent a verification code to <br /> {myEmail && maskEmail(myEmail)}
               </p>
             </div>
 
@@ -165,7 +226,8 @@ const Verification = () => {
                 </button>
               </div>
               <button
-                onClick={handleVerify}
+                // onClick={handleVerify}
+                onClick={() => handleVerify()}
                 disabled={loading}
                 className="button_v1"
               >
