@@ -7,7 +7,6 @@ import "react-phone-input-2/lib/style.css";
 import { useRouter } from "next-nprogress-bar";
 import { toast, ToastContainer } from "react-toastify";
 import { BiLoaderCircle } from "react-icons/bi";
-import axios from "axios";
 import AuthLeft from "@/components/auth/AuthLeft";
 import SocialSignup from "@/components/auth/SocialSignup";
 import axiosInstance from "@/lib/axiosInstance";
