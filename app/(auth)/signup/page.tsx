@@ -107,6 +107,7 @@ const Signup: React.FC = () => {
               <div className="mb-4">
                 <input
                   type="text"
+                  id="First name"
                   placeholder="First name"
                   className="authInput"
                   value={formData.firstName}
@@ -123,6 +124,7 @@ const Signup: React.FC = () => {
                 <input
                   type="text"
                   placeholder="Last name"
+                  id="Last name"
                   className="authInput"
                   value={formData.lastName}
                   onChange={(e) => handleChange("lastName", e.target.value)}
@@ -138,6 +140,7 @@ const Signup: React.FC = () => {
             <div className="mb-4">
               <input
                 type="email"
+                id="Email"
                 placeholder="Email"
                 className="authInput"
                 value={formData.email}
@@ -167,6 +170,7 @@ const Signup: React.FC = () => {
             <div className="mb-4 relative">
               <input
                 type={showPassword ? "text" : "password"}
+                id="Password"
                 placeholder="Password"
                 className="authInput"
                 value={formData.password}
@@ -195,6 +199,7 @@ const Signup: React.FC = () => {
             </div>
 
             <button
+              id="submit"
               type="submit"
               className={`button_v1 mb-4 w-full flex justify-center items-center ${
                 !isFormValid ? "opacity-50 cursor-not-allowed" : ""

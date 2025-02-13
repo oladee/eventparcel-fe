@@ -60,9 +60,11 @@ const Login: React.FC = () => {
                         {/* Email Input */}
                         <div className="mb-4">
                             <input
+                                id="login-email"
                                 type="email"
                                 placeholder="Email"
                                 className="authInput"
+                                aria-describedby="email-desc"
                                 name="email"
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
@@ -73,12 +75,16 @@ const Login: React.FC = () => {
                         <div className="mb-4 relative">
                             <input
                                 type={showPassword ? "text" : "password"}
+                                id="login-password"
+                                name="password"
                                 placeholder="Password"
                                 className="authInput"
+                                aria-describedby="password-desc"
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                             />
                             <button
+                                id="login-password-toggle"
                                 type="button"
                                 aria-label="Toggle password visibility"
                                 className="absolute right-3 top-[16px] text-gray-500 outline-none"
@@ -90,7 +96,7 @@ const Login: React.FC = () => {
 
                         {/* Remember Me & Forgot Password */}
                         <div className="flex justify-between items-center mb-6">
-                            <label className="flex items-center text-sm text-black-100">
+                            <label id="remember_me" className="flex items-center text-sm text-black-100">
                                 <input type="checkbox" className="mr-2 outline-none" id="checkbox" />
                                 Remember me
                             </label>
@@ -102,6 +108,7 @@ const Login: React.FC = () => {
                             className="button_v1 mb-4"
                             onClick={handleLogin}
                             disabled={loading}
+                            aria-disabled={loading}
                         >
                             {loading ? <BiLoaderCircle className="animate-spin mr-2" size={22} /> : "Sign in with email"}
                         </button>

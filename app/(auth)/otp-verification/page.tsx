@@ -176,6 +176,7 @@ const Verification = () => {
                   <span className="text-primary font-medium">{countdown}</span>
                 </p>
                 <button
+                
                   onClick={handleResendCode}
                   className="text-primary font-bold text-sm flex items-center hover:underline underline-offset-4 transition"
                 >
