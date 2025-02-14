@@ -1,3 +1,6 @@
+"use client"
+
+
 import { useEffect } from 'react';
 import { Facebook, Google, Apple } from '../icons/Icons';
 import axios from 'axios';
