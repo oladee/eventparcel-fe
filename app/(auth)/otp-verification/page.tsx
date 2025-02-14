@@ -30,7 +30,7 @@ const Verification = () => {
   const [onSuccess, setOnSuccess] = useState<boolean>(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [myEmail, setMyEmail] = useState<string | null>(null);
-  const [countdown, setCountdown] = useState<number>(120); // 2 minutes countdown
+  const [countdown, setCountdown] = useState<number>(60); // 2 minutes countdown
 
 
   useEffect(() => {
@@ -176,11 +176,13 @@ const Verification = () => {
                   <span className="text-primary font-medium">{countdown}</span>
                 </p>
                 <button
-                  onClick={handleResendCode}
-                  className="text-primary font-bold text-sm flex items-center hover:underline underline-offset-4 transition"
-                >
-                  Send the code again
-                </button>
+                      onClick={handleResendCode}
+                      disabled={countdown > 0}
+                      className={`${countdown > 0 ? "text-[#751423a0]": "text-primary"} font-bold text-sm flex items-center hover:underline underline-offset-4 transition`}
+                    >
+                      Send the code again
+                    </button>
+
               </div>
               <button
                 // onClick={handleVerify}
