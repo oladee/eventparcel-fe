@@ -33,8 +33,8 @@ const Header: React.FC = () => {
       <div className="container mx-auto grid grid-cols-2 md:grid-cols-2 items-center">
         {/* Logo Section */}
         <div className="flex items-center space-x-2 w-max">
-          <Logo width={40} height={40} />
-          <span className="text-base md:text-xl font-bold text-black-100 ">Event Parcel</span>
+          <Logo width={100} height={150} />
+          {/* <span className="text-base md:text-xl font-bold text-black-100 ">Event Parcel</span> */}
         </div>
 
         {/* Navigation Links (hidden on small screens) */}

@@ -8,7 +8,7 @@ body {
 }
 
 #checkbox {
-  accent-color : #751423;
+  accent-color: #751423;
 }
 
 @layer base {
@@ -39,7 +39,6 @@ body {
 .authButton {
   @apply flex items-center gap-2 px-4 py-2 border rounded-[12px] hover:bg-gray-100 text-black-100 outline-none font-bold;
 }
-
 
 /* Hide scrollbar for Chrome, Safari and Opera */
 .no-scrollbar::-webkit-scrollbar {
