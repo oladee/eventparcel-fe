@@ -6,11 +6,15 @@ import { Facebook, Google, Apple } from '../icons/Icons';
 import axios from 'axios';
 
 const SocialSignup: React.FC = () => {
-  const urlParams = new URLSearchParams(window.location.search);
-  const token = urlParams.get("token");
-  console.log(token);
-
   useEffect(() => {
+    if (typeof window === 'undefined') {
+      return;
+    }
+
+    const urlParams = new URLSearchParams(window.location.search);
+    const token = urlParams.get("token");
+    console.log(token);
+
     if (!token) {
       return;
     }
@@ -31,7 +35,7 @@ const SocialSignup: React.FC = () => {
     };
 
     handleAuthentication();
-  }, [token]);
+  }, []);
 
   return (
     <div className="grid lg:grid-cols-3 gap-4">
