@@ -29,7 +29,7 @@ const Header: React.FC = () => {
   };
 
   return (
-    <header className={`w-full py-4 px-6 md:px-8 lg:px-12 fixed right-0 top-0 z-10 ${isTransparentBg ? 'bg-transparent' : 'bg-white shadow-md'} ${isScrolled ? "bg-white shadow-lg" : "bg-transparent"}`}>
+    <header className={`w-full py-4 px-6 md:px-8 lg:px-12 fixed right-0 top-0 z-20 ${isTransparentBg ? 'bg-transparent' : 'bg-white shadow-md'} ${isScrolled ? "bg-white shadow-lg" : "bg-transparent"}`}>
       <div className="container mx-auto grid grid-cols-2 md:grid-cols-2 items-center">
         {/* Logo Section */}
         <div className="flex items-center space-x-2 w-max">
