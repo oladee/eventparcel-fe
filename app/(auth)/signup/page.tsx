@@ -28,7 +28,6 @@ const Signup: React.FC = () => {
     firstName: "",
     lastName: "",
     email: "",
-    // phoneNumber: "", //Phone number handling its own error
     password: ""
   });
 
@@ -49,21 +48,6 @@ const Signup: React.FC = () => {
         errorMessage = "Enter a valid email address";
       }
     }
-
-    //New validation created in PhoneNumberInput file
-    // if (name === "phoneNumber") {
-    //   if (!/^\d{10,15}$/.test(value)) {
-    //     errorMessage = "Enter a valid phone number";
-    //   }
-    // }
-
-    //New requirement format created in requirements array
-    // if (name === "password") {
-    //   if (!/(?=.*[a-z])(?=.*[A-Z])(?=.*\d)(?=.*[\W_]).{8,}/.test(value)) {
-    //     errorMessage =
-    //       "Password must contain uppercase, lowercase, number, and special character";
-    //   }
-    // }
 
     setErrors((prev) => ({ ...prev, [name]: errorMessage }));
   };
@@ -91,9 +75,7 @@ const Signup: React.FC = () => {
       const response = await axiosInstance.post('/signup', formData);
       toast.success(response.data.message || "Signup successful!");
   
-      // Set email to both localStorage and cookie after successful signup
-      // localStorage.setItem("email", formData.email);
-      Cookies.set("email", formData.email, { expires: 1, path: "/" });
+      Cookies.set("email", formData.email, { expires: 1, path: "/" }); //expire in one day
   
       // Redirect to OTP verification page
       router.push("/otp-verification");
@@ -104,12 +86,22 @@ const Signup: React.FC = () => {
     }
   };
 
+  const validatePassword = (password: string) => {
+    const errors = requirements.map((req) => ({
+      label: req.label,
+      isValid: req.regex.test(password),
+    }));
+  
+    return errors.every((error) => error.isValid);
+  };
+
   const isFormValid =
     formData.firstName &&
     formData.lastName &&
     formData.email &&
     formData.phoneNumber &&
     formData.password &&
+    validatePassword(formData.password) &&
     Object.values(errors).every((err) => err === "");
 
   return (
@@ -186,19 +178,7 @@ const Signup: React.FC = () => {
               )}
             </div>
 
-            {/* <div className="mb-4 relative overflow-hidden"> */}
             <div className="pb-3 overflow-hidden w-full">
-              {/* <PhoneInput
-                country={"ng"}
-                value={formData.phoneNumber}
-                onChange={(value) => handleChange("phoneNumber", value)}
-                inputClass="!w-full !py-6 !border-none !rounded-[12px] !bg-gray-100 !focus:outline-none !focus:ring-2 !focus:ring-gray-300"
-                buttonClass="!border-none !rounded-l-[12px]"
-              />
-              {errors.phoneNumber && (
-                <p className="text-red-500 text-sm">{errors.phoneNumber}</p>
-              )} */}
-              {/* <PhoneNumberInput /> */}
               <PhoneNumberInput
                 onPhoneChange={(value: string) =>
                   handleChange("phoneNumber", value)
