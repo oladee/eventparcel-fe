@@ -125,7 +125,7 @@ const Login: React.FC = () => {
       
                 {/* Signup Link */}
                 <div className="text-left text-sm text-gray-500 mt-6">
-                  Don’t have an account? 
+                  Don’t have an account?  {" "}
                   <a href="#" className="text-primary font-bold" onClick={() => router.push("/signup")}>
                     Get Started
                   </a>
