@@ -193,7 +193,7 @@ return (
               </div>
             </fieldset>
 
-            <div className="flex justify-between items-center mb-6">
+            <div className="flex justify-between items-center text-xs mb-6">
               <div>
                 {countdown > 0 && (
                   <p>
