@@ -136,23 +136,24 @@ const Verification = () => {
       setLoading(false);
     }
   };
+return (
+  <>
+    <ToastContainer role="alert" />
+    <div className="min-h-screen flex flex-col items-center justify-center bg-[#F9FAFB] px-4">
+      {!onSuccess && (
+        <div className="bg-white p-6 rounded-[24px]" role="form" aria-labelledby="verification-title">
+          <div className="text-left mb-8">
+            <h1 id="verification-title" className="text-xl md:text-2xl font-bold text-[#0D0E0D]">
+              Enter verification code
+            </h1>
+            <p className="text-[#718096] font-normal mt-2">
+              We have just sent a verification code to <br /> {myEmail && maskEmail(myEmail)}
+            </p>
+          </div>
 
-  return (
-    <>
-      <ToastContainer />
-      <div className="min-h-screen flex flex-col items-center justify-center bg-[#F9FAFB] px-4">
-        {
-          !onSuccess && <div className="bg-white p-6 rounded-[24px]">
-            <div className="text-left mb-8">
-              <h1 className="text-xl md:text-2xl font-bold text-[#0D0E0D]">
-                Enter verification code
-              </h1>
-              <p className="text-[#718096] font-normal mt-2">
-                We have just sent a verification code to <br /> {myEmail && maskEmail(myEmail)}
-              </p>
-            </div>
-
-            <div className="w-full max-w-md ">
+          <div className="w-full max-w-md">
+            <fieldset>
+              <legend className="sr-only">Enter 6-digit verification code</legend>
               <div className="grid grid-cols-6 gap-4 mb-4">
                 {otp.map((value, index) => (
                   <input
@@ -167,46 +168,51 @@ const Verification = () => {
                       inputRefs.current[index] = el;
                     }}
                     className="w-[43px] h-[43px] md:w-[53px] md:h-[63px] text-center text-xl border rounded-[10px] focus:ring-2 focus:ring-primary focus:outline-none"
+                    aria-label={`Digit ${index + 1} of verification code`}
+                    aria-required="true"
                   />
                 ))}
               </div>
-              <div className="flex justify-between items-center mb-6">
-                <p className="text-xs text-[#43564B]">
-                  Resend code in{" "}
-                  <span className="text-primary font-medium">{countdown}</span>
-                </p>
-                <button
-                      onClick={handleResendCode}
-                      disabled={countdown > 0}
-                      className={`${countdown > 0 ? "text-[#751423a0]": "text-primary"} font-bold text-sm flex items-center hover:underline underline-offset-4 transition`}
-                    >
-                      Send the code again
-                    </button>
+            </fieldset>
 
-              </div>
+            <div className="flex justify-between items-center mb-6">
+              <p className="text-xs text-[#43564B]" aria-live="polite">
+                Resend code in{" "}
+                <span className="text-primary font-medium">{countdown}</span>
+              </p>
               <button
-                // onClick={handleVerify}
-                onClick={() => handleVerify()}
-                disabled={loading}
-                className="button_v1"
+                onClick={handleResendCode}
+                disabled={countdown > 0}
+                className={`${
+                  countdown > 0 ? "text-[#751423a0]" : "text-primary"
+                } font-bold text-sm flex items-center hover:underline underline-offset-4 transition`}
+                aria-disabled={countdown > 0}
               >
-                {loading ? (
-                  <BiLoaderCircle className="mr-2 animate-spin" size={22} />
-                ) : (
-                  "Verify to Continue"
-                )}
+                Send the code again
               </button>
             </div>
+
+            <button
+              onClick={() => handleVerify()}
+              disabled={loading}
+              className="button_v1"
+              aria-disabled={loading}
+            >
+              {loading ? (
+                <BiLoaderCircle className="mr-2 animate-spin" size={22} aria-hidden="true" />
+              ) : (
+                "Verify to Continue"
+              )}
+            </button>
           </div>
-        }
+        </div>
+      )}
 
-        {
-          onSuccess && <Success />
-        }
+      {onSuccess && <Success />}
+    </div>
+  </>
+);
 
-      </div>
-    </>
-  );
 };
 
 export default Verification;

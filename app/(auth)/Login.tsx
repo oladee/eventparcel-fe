@@ -51,87 +51,96 @@ const Login: React.FC = () => {
 
     return (
         <>
-            <div className="grid lg:grid-cols-2 min-h-screen mt-8 md:mt-4 lg:mt-0">
-                {/* Left Side - Login Form */}
-                <div className="flex items-center justify-center px-6 py-10">
-                    <div className="max-w-md w-full">
-                        <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-6 text-black-100">Login to your account</h2>
-
-                        {/* Email Input */}
-                        <div className="mb-4">
-                            <input
-                                id="login-email"
-                                type="email"
-                                placeholder="Email"
-                                className="authInput"
-                                aria-describedby="email-desc"
-                                name="email"
-                                value={email}
-                                onChange={(e) => setEmail(e.target.value)}
-                            />
-                        </div>
-
-                        {/* Password Input */}
-                        <div className="mb-4 relative">
-                            <input
-                                type={showPassword ? "text" : "password"}
-                                id="login-password"
-                                name="password"
-                                placeholder="Password"
-                                className="authInput"
-                                aria-describedby="password-desc"
-                                value={password}
-                                onChange={(e) => setPassword(e.target.value)}
-                            />
-                            <button
-                                id="login-password-toggle"
-                                type="button"
-                                aria-label="Toggle password visibility"
-                                className="absolute right-3 top-[16px] text-gray-500 outline-none"
-                                onClick={() => setShowPassword(!showPassword)}
-                            >
-                                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
-                            </button>
-                        </div>
-
-                        {/* Remember Me & Forgot Password */}
-                        <div className="flex justify-between items-center mb-6">
-                            <label id="remember_me" className="flex items-center text-sm text-black-100">
-                                <input type="checkbox" className="mr-2 outline-none" id="checkbox" />
-                                Remember me
-                            </label>
-                            <a href="#" className="text-primary text-sm">Forgot Password?</a>
-                        </div>
-
-                        {/* Sign In Button */}
-                        <button
-                            className="button_v1 mb-4"
-                            onClick={handleLogin}
-                            disabled={loading}
-                            aria-disabled={loading}
-                        >
-                            {loading ? <BiLoaderCircle className="animate-spin mr-2" size={22} /> : "Sign in with email"}
-                        </button>
-
-                        {/* Or Login With */}
-                        <div className="text-center text-gray-500 text-sm mb-4">Or login with</div>
-
-                        {/* Social Login Buttons */}
-                        <SocialSignup />
-
-                        {/* Signup Link */}
-                        <div className="text-left text-sm text-gray-500 mt-6">
-                            Don’t have an account? <a href="#" className="text-primary font-bold" onClick={() => router.push("/signup")}>Get Started</a>
-                        </div>
-                    </div>
+          <main className="grid lg:grid-cols-2 min-h-screen mt-8 md:mt-4 lg:mt-0" role="main">
+            {/* Left Side - Login Form */}
+            <div className="flex items-center justify-center px-6 py-10">
+              <div className="max-w-md w-full">
+                <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-6 text-black-100">
+                  Login to your account
+                </h2>
+      
+                {/* Email Input */}
+                <div className="mb-4">
+                  <label htmlFor="login-email" className="sr-only">Email Address</label>
+                  <input
+                    id="login-email"
+                    type="email"
+                    placeholder="Email"
+                    className="authInput"
+                    aria-describedby="email-desc"
+                    name="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                  />
                 </div>
-
-                {/* Right Side - Image & Carousel */}
-                <AuthLeft />
+      
+                {/* Password Input */}
+                <div className="mb-4 relative">
+                  <label htmlFor="login-password" className="sr-only">Password</label>
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    id="login-password"
+                    name="password"
+                    placeholder="Password"
+                    className="authInput"
+                    aria-describedby="password-desc"
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                  />
+                  <button
+                    id="login-password-toggle"
+                    type="button"
+                    aria-label="Toggle password visibility"
+                    className="absolute right-3 top-[16px] text-gray-500 outline-none"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                  </button>
+                </div>
+      
+                {/* Remember Me & Forgot Password */}
+                <div className="flex justify-between items-center mb-6">
+                  <label id="remember_me" className="flex items-center text-sm text-black-100">
+                    <input type="checkbox" className="mr-2 outline-none" id="checkbox" />
+                    Remember me
+                  </label>
+                  <a href="#" className="text-primary text-sm">Forgot Password?</a>
+                </div>
+      
+                {/* Sign In Button */}
+                <button
+                  className="button_v1 mb-4"
+                  onClick={handleLogin}
+                  disabled={loading}
+                  aria-disabled={loading}
+                >
+                  {loading ? <BiLoaderCircle className="animate-spin mr-2" size={22} /> : "Sign in with email"}
+                </button>
+      
+                {/* Or Login With */}
+                <div className="text-center text-gray-500 text-sm mb-4">Or login with</div>
+      
+                {/* Social Login Buttons */}
+                <SocialSignup />
+      
+                {/* Signup Link */}
+                <div className="text-left text-sm text-gray-500 mt-6">
+                  Don’t have an account? 
+                  <a href="#" className="text-primary font-bold" onClick={() => router.push("/signup")}>
+                    Get Started
+                  </a>
+                </div>
+              </div>
             </div>
-            <ToastContainer />
-        </>
-    );
+      
+            {/* Right Side - Image & Carousel */}
+            <AuthLeft />
+        </main>
+      
+        {/* Toast Notifications */}
+        <ToastContainer aria-live="polite" />
+    </>
+    );      
 };
 
 export default Login;
