@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
-import { parsePhoneNumberFromString, getNumberType } from "libphonenumber-js";
+import { parsePhoneNumberFromString } from "libphonenumber-js";
 
 const PhoneNumberInput = ({ onPhoneChange }: {onPhoneChange: (value: string) => void}) => {
   const [phone, setPhone] = useState("");
