@@ -16,6 +16,7 @@ import Cookies from "js-cookie"
 const Signup: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
+  const [touched, setTouched] = useState(false);
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -195,6 +196,8 @@ const Signup: React.FC = () => {
                 value={formData.password}
                 onChange={(e) => handleChange("password", e.target.value)}
                 required
+                onFocus={() => setTouched(true)}
+                onBlur={() => setTouched(false)}
                 aria-required="true"
                 aria-describedby="password-desc"
               />
@@ -211,26 +214,28 @@ const Signup: React.FC = () => {
             </div>
 
             {/* Password Requirements */}
-            <ul className="mt-2 text-sm">
-              {requirements.map((req, index) => {
-                const isValid = req.regex.test(formData.password);
-                return (
-                  <li
-                    key={index}
-                    className={`flex text-xs items-center gap-2 ${
-                      isValid ? "text-green-600" : "text-gray-500"
-                    }`}
-                  >
-                    {isValid ? (
-                      <CheckCircle size={14} />
-                    ) : (
-                      <XCircle size={14} />
-                    )}{" "}
-                    {req.label}
-                  </li>
-                );
-              })}
-            </ul>
+            {(touched || formData.password) && (
+              <ul className="mt-2 text-sm">
+                {requirements.map((req, index) => {
+                  const isValid = req.regex.test(formData.password);
+                  return (
+                    <li
+                      key={index}
+                      className={`flex text-xs items-center gap-2 ${
+                        isValid ? "text-green-600" : "text-gray-500"
+                      }`}
+                    >
+                      {isValid ? (
+                        <CheckCircle size={14} />
+                      ) : (
+                        <XCircle size={14} />
+                      )}{" "}
+                      {req.label}
+                    </li>
+                  );
+                })}
+              </ul>
+            )}
 
             <div className="text-left text-black-100 my-2 text-sm md:text-base">
               By proceeding, you agree to the{" "}
