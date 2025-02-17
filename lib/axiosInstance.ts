@@ -10,7 +10,8 @@ axiosInstance.interceptors.request.use(
   function (config) {
     // Do something before the request is sent
     // For example, add an authentication token to the headers
-    const token = localStorage.getItem("authToken"); // Retrieve auth token from localStorage
+    const token = localStorage.getItem("authToken"); 
+    // Retrieve auth token from localStorage
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }

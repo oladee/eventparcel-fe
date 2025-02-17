@@ -74,8 +74,6 @@ const Verification = () => {
     }
   };
 
-
-
   const handleChange = (value: string, index: number) => {
     if (!/\d/.test(value) && value !== "") return;
     const updatedOtp = [...otp];
@@ -95,14 +93,13 @@ const Verification = () => {
       const currentOtp = otpArray || otp; // Use the passed array or state
       otpSchema.parse(currentOtp);
       const otpCode = currentOtp.join("");
-      // const email = localStorage.getItem("email");
       const email = Cookies.get("email");
 
-      useEffect(() => {
-        if(!email) {
-          router.push("/signup")
-        }
-      }, [email, router]);
+      if (!email) {
+        toast.error("Email is required. Redirecting to signup.");
+        router.push("/signup");
+        return;
+      }
 
       const response = await axiosInstance.post("/verify-otp", {
         email,
