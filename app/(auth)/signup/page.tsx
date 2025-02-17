@@ -13,7 +13,6 @@ import PhoneNumberInput from "@/components/PhoneNumberInput";
 import { CheckCircle, XCircle } from "lucide-react";
 import Cookies from "js-cookie"
 
-
 const Signup: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
@@ -22,7 +21,7 @@ const Signup: React.FC = () => {
     lastName: "",
     email: "",
     phoneNumber: "",
-    password: "",
+    password: ""
   });
 
   const [errors, setErrors] = useState({
@@ -30,7 +29,7 @@ const Signup: React.FC = () => {
     lastName: "",
     email: "",
     // phoneNumber: "", //Phone number handling its own error
-    password: "",
+    password: ""
   });
 
   const router = useRouter();
@@ -69,38 +68,38 @@ const Signup: React.FC = () => {
     setErrors((prev) => ({ ...prev, [name]: errorMessage }));
   };
 
-    // Password validation checks
-    const requirements = [
-      { label: "At least 8 characters", regex: /.{8,}/ },
-      { label: "At least one uppercase letter", regex: /[A-Z]/ },
-      { label: "At least one lowercase letter", regex: /[a-z]/ },
-      { label: "At least one number", regex: /[0-9]/ },
-      { label: "At least one special character (!@#$%^&*)", regex: /[!@#$%^&*]/ },
-    ];
-    const handleChange = (name: string, value: string) => {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-      validateInput(name, value); // Ensure you validate the input while changing
-    };
-    
-    const handleSubmit = async (e: React.FormEvent) => {
-      e.preventDefault();
-      setIsLoading(true);
-    
-      try {
-        const response = await axiosInstance.post('/signup', formData);
-        toast.success(response.data.message || "Signup successful!");
-    
-        // localStorage.setItem("email", formData.email);
-        Cookies.set("email", formData.email, { expires: 1, path: "/" });
-    
-        router.push("/otp-verification");
-      } catch (error: any) {
-        toast.error(error.response?.data?.message || "Signup failed. Please try again.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-    
+  // Password validation checks
+  const requirements = [
+    { label: "At least 8 characters", regex: /.{8,}/ },
+    { label: "At least one uppercase letter", regex: /[A-Z]/ },
+    { label: "At least one lowercase letter", regex: /[a-z]/ },
+    { label: "At least one number", regex: /[0-9]/ },
+    { label: "At least one special character (!@#$%^&*)", regex: /[!@#$%^&*]/ }
+  ];
+
+  // Handle input change
+  const handleChange = (name: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    validateInput(name, value);
+  };
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsLoading(true);
+
+    try {
+      const response = await axiosInstance.post("/signup", formData);
+      toast.success(response.data.message || "Signup successful!");
+      localStorage.setItem("email", formData.email);
+      router.push("/otp-verification");
+    } catch (error: any) {
+      toast.error(
+        error.response?.data?.message || "Signup failed. Please try again."
+      );
+    } finally {
+      setIsLoading(false);
+    }
+  };
 
   const isFormValid =
     formData.firstName &&
@@ -112,10 +111,16 @@ const Signup: React.FC = () => {
 
   return (
     <>
-      <main role="main" className="mt-12 md:mt-0 grid lg:grid-cols-2 min-h-screen">
+      <main
+        role="main"
+        className="mt-12 md:mt-0 grid lg:grid-cols-2 min-h-screen"
+      >
         <div className="flex items-center justify-center px-6 py-6 lg:mt-12">
           <form onSubmit={handleSubmit} className="max-w-md w-full">
-            <h2 role="heading" className="text-2xl lg:text-3xl font-bold mb-6 text-black-100">
+            <h2
+              role="heading"
+              className="text-2xl lg:text-3xl font-bold mb-6 text-black-100"
+            >
               Create an Account
             </h2>
 
@@ -133,7 +138,11 @@ const Signup: React.FC = () => {
                   aria-describedby="firstNameError"
                 />
                 {errors.firstName && (
-                  <p id="firstNameError" className="text-red-500 text-sm" role="alert">
+                  <p
+                    id="firstNameError"
+                    className="text-red-500 text-sm"
+                    role="alert"
+                  >
                     {errors.firstName}
                   </p>
                 )}
@@ -166,7 +175,7 @@ const Signup: React.FC = () => {
                 value={formData.email}
                 onChange={(e) => handleChange("email", e.target.value)}
                 required
-                 aria-required="true"
+                aria-required="true"
                 aria-describedby="email-desc"
               />
               {errors.email && (
@@ -176,7 +185,6 @@ const Signup: React.FC = () => {
 
             {/* <div className="mb-4 relative overflow-hidden"> */}
             <div className="pb-3 overflow-hidden w-full">
-
               {/* <PhoneInput
                 country={"ng"}
                 value={formData.phoneNumber}
@@ -188,10 +196,11 @@ const Signup: React.FC = () => {
                 <p className="text-red-500 text-sm">{errors.phoneNumber}</p>
               )} */}
               {/* <PhoneNumberInput /> */}
-              <PhoneNumberInput 
-                onPhoneChange={(value: string) => handleChange("phoneNumber", value)} 
+              <PhoneNumberInput
+                onPhoneChange={(value: string) =>
+                  handleChange("phoneNumber", value)
+                }
               />
-
             </div>
 
             <div className="mb-4 relative">
@@ -223,8 +232,18 @@ const Signup: React.FC = () => {
               {requirements.map((req, index) => {
                 const isValid = req.regex.test(formData.password);
                 return (
-                  <li key={index} className={`flex text-xs items-center gap-2 ${isValid ? "text-green-600" : "text-gray-500"}`}>
-                    {isValid ? <CheckCircle size={14}/> : <XCircle size={14} />} {req.label}
+                  <li
+                    key={index}
+                    className={`flex text-xs items-center gap-2 ${
+                      isValid ? "text-green-600" : "text-gray-500"
+                    }`}
+                  >
+                    {isValid ? (
+                      <CheckCircle size={14} />
+                    ) : (
+                      <XCircle size={14} />
+                    )}{" "}
+                    {req.label}
                   </li>
                 );
               })}
@@ -247,7 +266,10 @@ const Signup: React.FC = () => {
               aria-disabled={!isFormValid || isLoading}
             >
               {isLoading ? (
-                <BiLoaderCircle className="animate-spin h-6 w-6" aria-hidden="true" />
+                <BiLoaderCircle
+                  className="animate-spin h-6 w-6"
+                  aria-hidden="true"
+                />
               ) : (
                 "Sign up"
               )}
