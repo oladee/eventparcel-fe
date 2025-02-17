@@ -104,12 +104,22 @@ const Signup: React.FC = () => {
     }
   };
 
+  const validatePassword = (password: string) => {
+    const errors = requirements.map((req) => ({
+      label: req.label,
+      isValid: req.regex.test(password),
+    }));
+  
+    return errors.every((error) => error.isValid);
+  };
+
   const isFormValid =
     formData.firstName &&
     formData.lastName &&
     formData.email &&
     formData.phoneNumber &&
     formData.password &&
+    validatePassword(formData.password) &&
     Object.values(errors).every((err) => err === "");
 
   return (
