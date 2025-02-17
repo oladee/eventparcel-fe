@@ -25,6 +25,7 @@ const maskEmail = (email: string) => {
 
 
 const Verification = () => {
+  // Variables
   const router = useRouter();
   const [otp, setOtp] = useState<string[]>(["", "", "", "", "", ""]);
   const [loading, setLoading] = useState<boolean>(false);
