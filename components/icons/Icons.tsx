@@ -1,3 +1,4 @@
+// i will be storing all the icons in this file
 import Image from 'next/image';
 
 // Define the interface for the component props
