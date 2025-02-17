@@ -11,6 +11,7 @@ import SocialSignup from "@/components/auth/SocialSignup";
 import axiosInstance from "@/lib/axiosInstance";
 import PhoneNumberInput from "@/components/PhoneNumberInput";
 import { CheckCircle, XCircle } from "lucide-react";
+import Cookies from "js-cookie"
 
 
 const Signup: React.FC = () => {
@@ -76,28 +77,30 @@ const Signup: React.FC = () => {
       { label: "At least one number", regex: /[0-9]/ },
       { label: "At least one special character (!@#$%^&*)", regex: /[!@#$%^&*]/ },
     ];
-
-  // Handle input change
-  const handleChange = (name: string, value: string) => {
-    setFormData((prev) => ({ ...prev, [name]: value }));
-    validateInput(name, value);
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    setIsLoading(true);
-
-    try {
-      const response = await axiosInstance.post('/signup', formData);
-      toast.success(response.data.message || "Signup successful!");
-      localStorage.setItem("email", formData.email);
-      router.push("/otp-verification");
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Signup failed. Please try again.");
-    } finally {
-      setIsLoading(false);
-    }
-  };
+    const handleChange = (name: string, value: string) => {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+      validateInput(name, value); // Ensure you validate the input while changing
+    };
+    
+    const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      setIsLoading(true);
+    
+      try {
+        const response = await axiosInstance.post('/signup', formData);
+        toast.success(response.data.message || "Signup successful!");
+    
+        // localStorage.setItem("email", formData.email);
+        Cookies.set("email", formData.email, { expires: 1, path: "/" });
+    
+        router.push("/otp-verification");
+      } catch (error: any) {
+        toast.error(error.response?.data?.message || "Signup failed. Please try again.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    
 
   const isFormValid =
     formData.firstName &&

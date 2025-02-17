@@ -10,6 +10,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import axios from "axios";
 import { z } from "zod";
 import Success from "@/components/auth/Success";
+import Cookies from "js-cookie"
 
 
 const otpSchema = z
@@ -30,13 +31,21 @@ const Verification = () => {
   const [onSuccess, setOnSuccess] = useState<boolean>(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [myEmail, setMyEmail] = useState<string | null>(null);
-  const [countdown, setCountdown] = useState<number>(60); // 2 minutes countdown
+  const [countdown, setCountdown] = useState<number>(0); 
+  const [isLoading, setIsLoading] = useState(true);
 
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      const email = localStorage.getItem("email");
+    if(typeof window !== "undefined") {
+      const email = Cookies.get("email") || "";
+
+      if(!email) {
+        router.push("/signup");
+        return;
+      }
+
       setMyEmail(email);
+      setIsLoading(false);
     }
     inputRefs.current[0]?.focus();
 
@@ -45,7 +54,15 @@ const Verification = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-  }, []);
+    }, [router]);
+
+    if(isLoading) {
+      return (
+        <div className="flex justify-center items-center h-screen">
+          Checking Email Exist...
+        </div>
+      );
+    }
 
 
   const handleKeyDown = (
@@ -78,13 +95,14 @@ const Verification = () => {
       const currentOtp = otpArray || otp; // Use the passed array or state
       otpSchema.parse(currentOtp);
       const otpCode = currentOtp.join("");
-      const email = localStorage.getItem("email");
+      // const email = localStorage.getItem("email");
+      const email = Cookies.get("email");
 
-      if (!email) {
-        toast.error("Email not found. Please try again.");
-        setLoading(false);
-        return;
-      }
+      useEffect(() => {
+        if(!email) {
+          router.push("/signup")
+        }
+      }, [email, router]);
 
       const response = await axiosInstance.post("/verify-otp", {
         email,
@@ -111,12 +129,15 @@ const Verification = () => {
   const handleResendCode = async () => {
     try {
       setLoading(true);
-      const email = localStorage.getItem("email");
+      // const email = localStorage.getItem("email");
+      const email = Cookies.get("email");
 
       if (!email) {
-        toast.error("Email not found. Please try again.");
+        toast.error("Email is required. Redirecting to signup.");
+        router.push("/signup");
         return;
       }
+
 
       const response = await axiosInstance.post("/resend-otp", {
         email
@@ -176,10 +197,14 @@ return (
             </fieldset>
 
             <div className="flex justify-between items-center mb-6">
-              <p className="text-xs text-[#43564B]" aria-live="polite">
-                Resend code in{" "}
-                <span className="text-primary font-medium">{countdown}</span>
-              </p>
+              <div>
+                {countdown > 0 && (
+                  <p>
+                    Resend code in{" "}
+                    <span className="font-medium">{countdown}</span> seconds
+                  </p>
+                )}
+              </div>
               <button
                 onClick={handleResendCode}
                 disabled={countdown > 0}
