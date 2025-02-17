@@ -45,16 +45,16 @@ const Header: React.FC = () => {
           ${isTransparentBg ? "lg:text-white" : "text-black-100"} 
           ${isScrolled ? "!text-black-100" : "bg-transparent"}`}
         >
-          <a href="#" className="hover:text-gray-900 transition">
+         <a href="#" className="hover:text-[#3a8dff] transition">
             Products
           </a>
-          <a href="#" className="hover:text-gray-900 transition">
+          <a href="#" className="hover:text-[#3a8dff] transition">
             Features
           </a>
-          <a href="#" className="hover:text-gray-900 transition">
+          <a href="#" className="hover:text-[#3a8dff] transition">
             Pricing
           </a>
-          <a href="#" className="hover:text-gray-900 transition">
+          <a href="#" className="hover:text-[#3a8dff] transition">
             FAQ
           </a>
         </nav>
@@ -81,16 +81,16 @@ const Header: React.FC = () => {
           className="md:hidden bg-white shadow-md absolute top-15 right-0 w-full z-10"
         >
           <nav role="navigation" aria-label="Mobile Navigation" className="flex flex-col items-center space-y-4 py-4">
-            <a href="#" className="hover:text-gray-900 transition">
+            <a href="#" className="hover:text-[#3a8dff] transition">
               Products
             </a>
-            <a href="#" className="hover:text-gray-900 transition">
+            <a href="#" className="hover:text-[#3a8dff] transition">
               Features
             </a>
-            <a href="#" className="hover:text-gray-900 transition">
+            <a href="#" className="hover:text-[#3a8dff] transition">
               Pricing
             </a>
-            <a href="#" className="hover:text-gray-900 transition">
+            <a href="#" className="hover:text-[#3a8dff] transition">
               FAQ
             </a>
           </nav>

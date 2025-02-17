@@ -31,7 +31,7 @@ const Login: React.FC = () => {
             const response = await axiosInstance.post("/login", { email, password });
 
             toast.success("Login successful!");
-            localStorage.setItem("authToken", response.data.token); // Adjust based on API response
+            localStorage.setItem("authToken", response.data.token); 
 
             // router.push("/dashboard"); // Redirect after successful login
         } catch (error: any) {
