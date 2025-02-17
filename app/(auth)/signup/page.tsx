@@ -86,16 +86,19 @@ const Signup: React.FC = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsLoading(true);
-
+  
     try {
-      const response = await axiosInstance.post("/signup", formData);
+      const response = await axiosInstance.post('/signup', formData);
       toast.success(response.data.message || "Signup successful!");
-      localStorage.setItem("email", formData.email);
+  
+      // Set email to both localStorage and cookie after successful signup
+      // localStorage.setItem("email", formData.email);
+      Cookies.set("email", formData.email, { expires: 1, path: "/" });
+  
+      // Redirect to OTP verification page
       router.push("/otp-verification");
     } catch (error: any) {
-      toast.error(
-        error.response?.data?.message || "Signup failed. Please try again."
-      );
+      toast.error(error.response?.data?.message || "Signup failed. Please try again.");
     } finally {
       setIsLoading(false);
     }
