@@ -30,7 +30,7 @@ const Verification = () => {
   const [onSuccess, setOnSuccess] = useState<boolean>(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [myEmail, setMyEmail] = useState<string | null>(null);
-  const [countdown, setCountdown] = useState<number>(0);
+  const [countdown, setCountdown] = useState<number>(60);
   const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
