@@ -139,7 +139,7 @@ const Verification = () => {
         response?.data?.message || "New OTP has been sent to your email/SMS"
       );
       setOtp(["", "", "", "", "", ""]); // Clear the OTP inputs
-      setCountdown(60); // Reset the countdown timer
+      setCountdown(60); // Reseting the countdown timer
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         toast.error(error.response?.data?.message || "OTP resend failed");
