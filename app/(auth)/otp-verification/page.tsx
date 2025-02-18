@@ -10,8 +10,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import axios from "axios";
 import { z } from "zod";
 import Success from "@/components/auth/Success";
-import Cookies from "js-cookie"
-
+import Cookies from "js-cookie";
 
 const otpSchema = z
   .array(z.string().length(1, "Each digit must be 1 character"))
@@ -23,7 +22,6 @@ const maskEmail = (email: string) => {
   return `${maskedName}@${domain}`;
 };
 
-
 const Verification = () => {
   // Variables
   const router = useRouter();
@@ -32,15 +30,14 @@ const Verification = () => {
   const [onSuccess, setOnSuccess] = useState<boolean>(false);
   const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
   const [myEmail, setMyEmail] = useState<string | null>(null);
-  const [countdown, setCountdown] = useState<number>(0); 
+  const [countdown, setCountdown] = useState<number>(0);
   const [isLoading, setIsLoading] = useState(true);
 
-
   useEffect(() => {
-    if(typeof window !== "undefined") {
+    if (typeof window !== "undefined") {
       const email = Cookies.get("email") || "";
 
-      if(!email) {
+      if (!email) {
         router.push("/signup");
         return;
       }
@@ -55,16 +52,15 @@ const Verification = () => {
     }, 1000);
 
     return () => clearInterval(timer);
-    }, [router]);
+  }, [router]);
 
-    if(isLoading) {
-      return (
-        <div className="flex justify-center items-center h-screen">
-          Checking Email Exist...
-        </div>
-      );
-    }
-
+  if (isLoading) {
+    return (
+      <div className="flex justify-center items-center h-screen">
+        Checking Email Exist...
+      </div>
+    );
+  }
 
   const handleKeyDown = (
     e: React.KeyboardEvent<HTMLInputElement>,
@@ -104,7 +100,7 @@ const Verification = () => {
 
       const response = await axiosInstance.post("/verify-otp", {
         email,
-        otp: otpCode,
+        otp: otpCode
       });
 
       setOnSuccess(true);
@@ -123,7 +119,6 @@ const Verification = () => {
     }
   };
 
-
   const handleResendCode = async () => {
     try {
       setLoading(true);
@@ -136,108 +131,123 @@ const Verification = () => {
         return;
       }
 
-
       const response = await axiosInstance.post("/resend-otp", {
         email
       });
 
-      toast.success(response?.data?.message || "New OTP has been sent to your email/SMS");
+      toast.success(
+        response?.data?.message || "New OTP has been sent to your email/SMS"
+      );
       setOtp(["", "", "", "", "", ""]); // Clear the OTP inputs
       setCountdown(60); // Reset the countdown timer
     } catch (error: unknown) {
       if (axios.isAxiosError(error)) {
         toast.error(error.response?.data?.message || "OTP resend failed");
-      }
-      else {
+      } else {
         toast.error("An unexpected error occurred");
       }
     } finally {
       setLoading(false);
     }
   };
-return (
-  <>
-    <ToastContainer role="alert" />
-    <div className="min-h-screen flex flex-col items-center justify-center bg-[#F9FAFB] px-4">
-      {!onSuccess && (
-        <div className="bg-white p-6 rounded-[24px]" role="form" aria-labelledby="verification-title">
-          <div className="text-left mb-8">
-            <h1 id="verification-title" className="text-xl md:text-2xl font-bold text-[#0D0E0D]">
-              Enter verification code
-            </h1>
-            <p className="text-[#718096] font-normal mt-2">
-              We have just sent a verification code to <br /> {myEmail && maskEmail(myEmail)}
-            </p>
-          </div>
+  return (
+    <>
+      <ToastContainer role="alert" />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#F9FAFB] px-4">
+        {!onSuccess && (
+          <div
+            className="bg-white p-6 rounded-[24px]"
+            role="form"
+            aria-labelledby="verification-title"
+          >
+            <div className="text-left mb-8">
+              <h1
+                id="verification-title"
+                className="text-xl md:text-2xl font-bold text-[#0D0E0D]"
+              >
+                Enter verification code
+              </h1>
+              <p className="text-[#718096] font-normal mt-2">
+                We have just sent a verification code to <br />{" "}
+                {myEmail && maskEmail(myEmail)}
+              </p>
+            </div>
 
-          <div className="w-full max-w-md">
-            <fieldset>
-              <legend className="sr-only">Enter 6-digit verification code</legend>
-              <div className="grid grid-cols-6 gap-4 mb-4">
-                {otp.map((value, index) => (
-                  <input
-                    key={index}
-                    id={`otp-${index}`}
-                    type="text"
-                    maxLength={1}
-                    value={value}
-                    onChange={(e) => handleChange(e.target.value, index)}
-                    onKeyDown={(e) => handleKeyDown(e, index)}
-                    ref={(el) => {
-                      inputRefs.current[index] = el;
-                    }}
-                    className="w-[43px] h-[43px] md:w-[53px] md:h-[63px] text-center text-xl border rounded-[10px] focus:ring-2 focus:ring-primary focus:outline-none"
-                    aria-label={`Digit ${index + 1} of verification code`}
-                    aria-required="true"
-                  />
-                ))}
-              </div>
-            </fieldset>
+            <div className="w-full max-w-md">
+              <fieldset>
+                <legend className="sr-only">
+                  Enter 6-digit verification code
+                </legend>
+                <div className="grid grid-cols-6 gap-4 mb-4">
+                  {otp.map((value, index) => (
+                    <input
+                      key={index}
+                      id={`otp-${index}`}
+                      type="text"
+                      maxLength={1}
+                      value={value}
+                      onChange={(e) => handleChange(e.target.value, index)}
+                      onKeyDown={(e) => handleKeyDown(e, index)}
+                      ref={(el) => {
+                        inputRefs.current[index] = el;
+                      }}
+                      className="w-[43px] h-[43px] md:w-[53px] md:h-[63px] text-center text-xl border rounded-[10px] focus:ring-2 focus:ring-primary focus:outline-none"
+                      aria-label={`Digit ${index + 1} of verification code`}
+                      aria-required="true"
+                    />
+                  ))}
+                </div>
+              </fieldset>
 
-            <div className="flex justify-between items-center text-xs mb-6">
-              <div>
-                {countdown > 0 && (
+              <div className="flex justify-between items-center text-xs mb-6">
+                <div>
+                  {/* {countdown > 0 && (
                   <p>
                     Resend code in{" "}
                     <span className="font-medium">{countdown}</span> seconds
                   </p>
-                )}
+                )} */}
+                  <p>
+                    Resend code in{" "}
+                    <span className="font-medium">{countdown}</span> seconds
+                  </p>
+                </div>
+                <button
+                  onClick={handleResendCode}
+                  disabled={countdown > 0}
+                  className={`${
+                    countdown > 0 ? "text-[#751423a0]" : "text-primary"
+                  } font-bold text-sm flex items-center  hover:underline underline-offset-4 transition`}
+                  aria-disabled={countdown > 0}
+                >
+                  Send the code again
+                </button>
               </div>
+
               <button
-                onClick={handleResendCode}
-                disabled={countdown > 0}
-                className={`${
-                  countdown > 0 ? "text-[#751423a0]" : "text-primary"
-                } font-bold text-sm flex items-center hover:underline underline-offset-4 transition`}
-                aria-disabled={countdown > 0}
+                onClick={() => handleVerify()}
+                disabled={loading}
+                className="button_v1"
+                aria-disabled={loading}
               >
-                Send the code again
+                {loading ? (
+                  <BiLoaderCircle
+                    className="mr-2 animate-spin"
+                    size={22}
+                    aria-hidden="true"
+                  />
+                ) : (
+                  "Verify to Continue"
+                )}
               </button>
             </div>
-
-            <button
-              onClick={() => handleVerify()}
-              disabled={loading}
-              className="button_v1"
-              aria-disabled={loading}
-            >
-              {loading ? (
-                <BiLoaderCircle className="mr-2 animate-spin" size={22} aria-hidden="true" />
-              ) : (
-                "Verify to Continue"
-              )}
-            </button>
           </div>
-        </div>
-      )}
+        )}
 
-      {onSuccess && <Success />}
-    </div>
-  </>
-);
-
+        {onSuccess && <Success />}
+      </div>
+    </>
+  );
 };
 
 export default Verification;
-
-
