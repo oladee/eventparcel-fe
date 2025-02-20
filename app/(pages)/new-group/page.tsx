@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import CreatePackageModal from "@/components/CreatePackageModal";
+// import CreatePackageModal from "@/components/CreatePackageModal";
 
 const NewGroup = () => {
     const [availableGroup, setAvailableGroup] = useState(true);
@@ -41,9 +41,9 @@ const NewGroup = () => {
                     </p>
                 </div>
 
-                {openModal && (
+                {/* {openModal && (
                     <CreatePackageModal />
-                )}
+                )} */}
 
                 {availableGroup ? (
                     <div className="ml-44 flex">
