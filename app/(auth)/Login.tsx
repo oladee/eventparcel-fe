@@ -11,7 +11,6 @@ import SocialSignup from "@/components/auth/SocialSignup";
 import AuthLeft from "@/components/auth/AuthLeft";
 
 
-
 const Login: React.FC = () => {
     const [showPassword, setShowPassword] = useState(false);
     const [email, setEmail] = useState("");
@@ -29,6 +28,7 @@ const Login: React.FC = () => {
         try {
             setLoading(true);
             const response = await axiosInstance.post("/login", { email, password });
+            console.log(response.data)
 
             toast.success("Login successful!");
             localStorage.setItem("authToken", response.data.token); 

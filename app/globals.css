@@ -17,6 +17,39 @@ body {
   }
 }
 
+@font-face {
+  font-family: 'General Sans';
+  src: url('/fonts/GeneralSans-Regular.woff2') format('woff2'),
+       url('/fonts/GeneralSans-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'General Sans';
+  src: url('/fonts/GeneralSans-Bold.woff2') format('woff2'),
+       url('/fonts/GeneralSans-Bold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  src: url('/fonts/Manrope-Regular.woff2') format('woff2'),
+       url('/fonts/Manrope-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  src: url('/fonts/Manrope-Bold.woff2') format('woff2'),
+       url('/fonts/Manrope-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+}
+
+
 .slide_nav {
   @apply flex items-center cursor-pointer text-black-200 font-medium;
 }

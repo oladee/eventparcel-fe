@@ -26,7 +26,9 @@ export default {
         }
       },
       fontFamily: {
-        figtree: ["Figtree","poppins", "sans-serif"]
+        figtree: ["Figtree","poppins", "sans-serif"],
+        general: ['General Sans', 'sans-serif'],
+        manrope: ['Manrope', 'sans-serif'],
       },
       borderRadius: {
         lg: "var(--radius)",
