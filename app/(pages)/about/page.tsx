@@ -9,6 +9,9 @@ const About: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
+  // New state for modal visibility
+  const [showImagePickerModal, setShowImagePickerModal] = useState(false);
+
   const [formData, setFormData] = useState({
     eventName: "",
     eventDate: "",
@@ -18,7 +21,7 @@ const About: React.FC = () => {
     lastName: "",
     email: "",
     description: "",
-    eventImage: null as File | null
+    eventImage: null as File | null,
   });
 
   const [errors, setErrors] = useState({
@@ -30,7 +33,7 @@ const About: React.FC = () => {
     lastName: "",
     email: "",
     description: "",
-    eventImage: ""
+    eventImage: "",
   });
 
   const handleChange = (
@@ -44,10 +47,16 @@ const About: React.FC = () => {
     if (!value.trim()) {
       return "This field is required.";
     }
-    if (id === "email" && !/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(value)) {
+    if (
+      id === "email" &&
+      !/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(value)
+    ) {
       return "Enter a valid email address.";
     }
-    if ((id === "firstName" || id === "lastName") && /[^a-zA-Z\s]/.test(value)) {
+    if (
+      (id === "firstName" || id === "lastName") &&
+      /[^a-zA-Z\s]/.test(value)
+    ) {
       return "Name cannot include numbers or special characters.";
     }
     if (id === "description" && value.length < 20) {
@@ -83,9 +92,31 @@ const About: React.FC = () => {
     console.log("Form submitted:", formData);
   };
 
-  // Trigger file selection dialog on click
+  // Modified to show the modal on mobile
   const handleBrowseClick = () => {
-    fileInputRef.current?.click();
+    if (window.innerWidth < 768) {
+      setShowImagePickerModal(true);
+    } else {
+      fileInputRef.current?.click();
+    }
+  };
+
+  // Function to trigger gallery selection (no capture attribute)
+  const handleSelectGallery = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.removeAttribute("capture");
+      fileInputRef.current.click();
+    }
+    setShowImagePickerModal(false);
+  };
+
+  // Function to trigger camera capture (with capture attribute)
+  const handleTakePhoto = () => {
+    if (fileInputRef.current) {
+      fileInputRef.current.setAttribute("capture", "environment");
+      fileInputRef.current.click();
+    }
+    setShowImagePickerModal(false);
   };
 
   // Handle file selection via the file input
@@ -135,6 +166,35 @@ const About: React.FC = () => {
 
   return (
     <>
+      {/* Modal for image source selection on mobile */}
+      {showImagePickerModal && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+          <div className="bg-white p-6 rounded-lg text-center">
+            <h2 className="text-xl font-bold mb-4">Select Image Source</h2>
+            <div className="flex flex-col gap-4">
+              <button
+                onClick={handleSelectGallery}
+                className="px-4 py-2 bg-blue-500 text-white rounded"
+              >
+                Gallery
+              </button>
+              <button
+                onClick={handleTakePhoto}
+                className="px-4 py-2 bg-green-500 text-white rounded"
+              >
+                Take Photo
+              </button>
+              <button
+                onClick={() => setShowImagePickerModal(false)}
+                className="px-4 py-2 bg-gray-300 text-gray-700 rounded"
+              >
+                Cancel
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div>{showSuccess && <EventSuccess />}</div>
       <section className="bg-[#F9FAFB] mt-10">
         <div className="py-8 lg:py-16 px-4 mx-auto max-w-screen-md">
@@ -182,7 +242,7 @@ const About: React.FC = () => {
                 Event Cover Image
               </label>
               <div
-                className="border-2 border-dashed border-[#718096] h-[170px] rounded-xl flex flex-col justify-center items-center gap-4 cursor-pointer relative"
+                className="border-2 border-dashed border-[#718096] rounded-xl flex flex-col justify-center items-center gap-4 cursor-pointer relative"
                 onClick={handleBrowseClick}
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
@@ -330,7 +390,9 @@ const About: React.FC = () => {
                   required
                 />
                 {errors.location && (
-                  <p className="text-red-500 text-sm mt-1">{errors.location}</p>
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.location}
+                  </p>
                 )}
               </div>
             </div>
@@ -423,8 +485,9 @@ const About: React.FC = () => {
           </button>
           <button
             disabled={!isFormValid}
-            className={`bg-primary text-white py-3 px-3 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center font-extrabold font-manrope
-                        ${!isFormValid ? "opacity-50 cursor-not-allowed" : ""}`}
+            className={`bg-primary text-white py-3 px-3 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center font-extrabold font-manrope ${
+              !isFormValid ? "opacity-50 cursor-not-allowed" : ""
+            }`}
             onClick={() => isFormValid && setShowSuccess(!showSuccess)}
           >
             Continue
@@ -436,6 +499,15 @@ const About: React.FC = () => {
 };
 
 export default About;
+
+
+
+
+
+
+
+
+
 
 
 
