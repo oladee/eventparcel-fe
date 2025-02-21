@@ -127,7 +127,7 @@ const About: React.FC = () => {
       <section className="bg-[#F9FAFB] mt-10">
         <div className="py-8 lg:py-16 px-4 mx-auto max-w-screen-md">
           {/* Header */}
-          <div className="h-20 mb-12 text-center">
+          <div className="mb-12 text-center">
             <h3 className="text-[32px] font-general font-bold text-[#111827]">
               Tell us about your event
             </h3>
@@ -296,7 +296,7 @@ const About: React.FC = () => {
               </label>
               <div className="relative">
                 <MapPin
-                  className="absolute left-4 top-1/2 transform -translate-y-1/2 text-gray-500"
+                  className="absolute left-4 top-5 transform -translate-y-1/2 text-gray-500"
                   size={20}
                 />
                 <input
