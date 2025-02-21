@@ -1,7 +1,7 @@
 "use client";
 import { useState, useRef } from "react";
 import Image from "next/image";
-import { MapPin,} from "lucide-react";
+import { MapPin, XCircle } from "lucide-react";
 import EventSuccess from "@/components/EventSuccess";
 
 const About: React.FC = () => {
@@ -17,7 +17,8 @@ const About: React.FC = () => {
     firstName: "",
     lastName: "",
     email: "",
-    description: ""
+    description: "",
+    eventImage: null
   });
 
   const [errors, setErrors] = useState({
@@ -28,7 +29,8 @@ const About: React.FC = () => {
     firstName: "",
     lastName: "",
     email: "",
-    description: ""
+    description: "",
+    eventImage: ""
   });
 
   const handleChange = (
@@ -42,11 +44,14 @@ const About: React.FC = () => {
     if (!value.trim()) {
       return "This field is required.";
     }
-    if (
-      id === "email" &&
-      !/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(value)
-    ) {
+    if (id === "email" && !/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(value)) {
       return "Enter a valid email address.";
+    }
+    if ((id === "firstName" || id === "lastName") && /[^a-zA-Z\s]/.test(value)) {
+      return "Name cannot include numbers or special characters.";
+    }
+    if (id === "description" && value.length < 20) {
+      return "Description must be at least 20 characters.";
     }
     return "";
   };
@@ -90,7 +95,8 @@ const About: React.FC = () => {
       // Create a preview URL for the image
       const imageUrl = URL.createObjectURL(file);
       setSelectedImage(imageUrl);
-      // You can also add code here to upload the file to your server if needed.
+      setFormData({ ...formData, eventImage: file });
+      setErrors({ ...errors, eventImage: "" });
     }
   };
 
@@ -106,8 +112,14 @@ const About: React.FC = () => {
       const file = e.dataTransfer.files[0];
       const imageUrl = URL.createObjectURL(file);
       setSelectedImage(imageUrl);
-      // Process file as needed (e.g., upload)
+      setFormData({ ...formData, eventImage: file });
+      setErrors({ ...errors, eventImage: "" });
     }
+  };
+
+  const handleRemoveImage = () => {
+    setSelectedImage(null);
+    setFormData({ ...formData, eventImage: null });
   };
 
   const isFormValid =
@@ -118,8 +130,8 @@ const About: React.FC = () => {
     formData.location &&
     formData.eventName &&
     formData.eventTime &&
-    // Optionally, check for a selected image if required:
-    true;
+    formData.eventImage &&
+    Object.values(errors).every((err) => err === "");
 
   return (
     <>
@@ -170,21 +182,26 @@ const About: React.FC = () => {
                 Event Cover Image
               </label>
               <div
-                className="border-2 border-dashed border-[#718096] h-[170px] rounded-xl flex flex-col justify-center items-center gap-4 cursor-pointer"
+                className="border-2 border-dashed border-[#718096] rounded-xl flex flex-col justify-center items-center gap-4 cursor-pointer relative"
                 onClick={handleBrowseClick}
                 onDrop={handleDrop}
                 onDragOver={handleDragOver}
               >
                 {selectedImage ? (
-                  <Image
-                    src={selectedImage}
-                    alt="Preview"
-                    width={100}
-                    height={100}
-                    className="object-cover rounded"
-                  />
-                ) : (
                   <>
+                    <img
+                      src={selectedImage}
+                      alt="Preview"
+                      // className="rounded object-cover w-full h-full"
+                    />
+                    <XCircle
+                      className="absolute top-2 right-2 text-red-500 cursor-pointer"
+                      size={24}
+                      onClick={handleRemoveImage}
+                    />
+                  </>
+                ) : (
+                  <div className="py-24 flex flex-col justify-center items-center gap-4 cursor-pointer">
                     <Image
                       src="/images/photo.png"
                       alt="Upload"
@@ -195,9 +212,12 @@ const About: React.FC = () => {
                       Drop your image here, or{" "}
                       <span className="text-[#751423]">Click to browse</span>
                     </span>
-                  </>
+                  </div>
                 )}
               </div>
+              {errors.eventImage && (
+                <p className="text-red-500 text-sm mt-1">{errors.eventImage}</p>
+              )}
               {/* Hidden file input */}
               <input
                 type="file"
@@ -398,17 +418,13 @@ const About: React.FC = () => {
           </form>
         </div>
         <div className="bg-[#FFFF] h-32 flex gap-6 py-10 justify-end pr-56">
-          <button className="w-[150px] h-[56px] border border-[#111827] rounded-[10px] font-manrope font-extrabold text-base text-[#111827]">
+          <button className="p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827]">
             Save for later
           </button>
           <button
             disabled={!isFormValid}
-            className={`w-[150px] h-[56px] border border-[#111827] rounded-[10px] font-manrope font-extrabold text-base 
-                        ${
-                          isFormValid
-                            ? "bg-[#751423] text-[#FFFF] hover:bg-[#5c101c]"
-                            : "bg-[#e3abb4] text-gray-200 cursor-not-allowed"
-                        }`}
+            className={`bg-primary text-white py-3 px-3 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center font-extrabold font-manrope
+                        ${!isFormValid ? "opacity-50 cursor-not-allowed" : ""}`}
             onClick={() => isFormValid && setShowSuccess(!showSuccess)}
           >
             Continue
@@ -420,6 +436,36 @@ const About: React.FC = () => {
 };
 
 export default About;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
