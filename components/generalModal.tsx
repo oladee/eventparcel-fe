@@ -2,7 +2,7 @@
 
 import { Group } from "@/data/mockData"
 import Image from "next/image"
-import React, { useState } from "react"
+
 
 
 type GeneralGroupProps = {

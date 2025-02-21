@@ -61,7 +61,7 @@ const About: React.FC = () => {
   const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    let newErrors = { ...errors };
+    const newErrors = { ...errors };
     Object.keys(formData).forEach((key) => {
       newErrors[key as keyof typeof formData] = validateField(
         key,

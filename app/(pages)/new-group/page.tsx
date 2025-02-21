@@ -31,15 +31,15 @@ const NewGroup = () => {
         setIsAddGroupOpen(true);
     };
 
-    // Close AddGroup modal
-    const handleCloseAddGroup = () => {
-        setIsAddGroupOpen(false);
-    };
+    // // Close AddGroup modal
+    // const handleCloseAddGroup = () => {
+    //     setIsAddGroupOpen(false);
+    // };
 
     // Open CreatePackageModal when a group is clicked
-    const handleGroupClick = (groupId: string) => {
-        setSelectedGroup(groupId);
-    };
+    // const handleGroupClick = (groupId: string) => {
+    //     setSelectedGroup(groupId);
+    // };
     
 
     return (

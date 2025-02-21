@@ -2,7 +2,7 @@
 
 import { Group } from "@/data/mockData"
 import Image from "next/image"
-import { useState } from "react"
+
 
 
 type PrivateGroupProps = {
