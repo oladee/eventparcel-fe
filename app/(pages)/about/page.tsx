@@ -113,7 +113,7 @@ const About: React.FC  = () => {
                     >
                         {/* Event Name */}
                         <div>
-                            <label htmlFor="eventName" className="block mb-2 font-semibold text-[#111827]">
+                            <label htmlFor="eventName" className="font-general font-semibold text-base block mb-2 text-[#111827]">
                                 Event Name
                             </label>
                             <input
@@ -141,7 +141,7 @@ const About: React.FC  = () => {
 
                         {/* Description */}
                         <div>
-                            <label htmlFor="description" className="block mb-2 font-semibold text-[#111827]">
+                            <label htmlFor="description" className="font-general font-semibold text-base block mb-2 text-[#111827]">
                                 Description
                             </label>
                             <textarea
@@ -158,7 +158,7 @@ const About: React.FC  = () => {
                         {/* Date & Time */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label htmlFor="eventDate" className="block mb-2 font-semibold text-[#111827]">
+                                <label htmlFor="eventDate" className="font-general font-semibold text-base block mb-2 text-[#111827]">
                                     Date
                                 </label>
                                 <div className="relative">
@@ -176,7 +176,7 @@ const About: React.FC  = () => {
                                 </div>
                             </div>
                             <div>
-                                <label htmlFor="eventTime" className="block mb-2 font-semibold text-[#111827]">
+                                <label htmlFor="eventTime" className="font-general font-semibold text-base block mb-2 text-[#111827]">
                                     Time
                                 </label>
                                 <div className="relative">
@@ -197,7 +197,7 @@ const About: React.FC  = () => {
 
                         {/* Event Location (With Icon) */}
                         <div>
-                            <label htmlFor="location" className="block mb-2 font-semibold text-[#111827]">
+                            <label htmlFor="location" className="font-general font-semibold text-base block mb-2 text-[#111827]">
                                 Event Location
                             </label>
                             <div className="relative">
@@ -224,7 +224,7 @@ const About: React.FC  = () => {
                         {/* Name Fields */}
                         <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                             <div>
-                                <label htmlFor="firstName" className="block mb-2 font-semibold text-[#111827]">
+                                <label htmlFor="firstName" className="font-general font-semibold text-base block mb-2 text-[#111827]">
                                     First Name
                                 </label>
                                 <input
@@ -239,7 +239,7 @@ const About: React.FC  = () => {
                                 {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
                             </div>
                             <div>
-                                <label htmlFor="lastName" className="block mb-2 font-semibold text-[#111827]">
+                                <label htmlFor="lastName" className="font-general font-semibold text-base block mb-2 text-[#111827]">
                                     Last Name
                                 </label>
                                 <input
@@ -257,7 +257,7 @@ const About: React.FC  = () => {
 
                         {/* Email Address */}
                         <div>
-                            <label htmlFor="email" className="block mb-2 font-semibold text-[#111827]">
+                            <label htmlFor="email" className="font-general font-semibold text-base block mb-2 text-[#111827]">
                                 Email Address
                             </label>
                             <input
@@ -277,8 +277,8 @@ const About: React.FC  = () => {
                     <button className='w-[150px] h-[56px] border border-[#111827] rounded-[10px] font-manrope font-extrabold text-base text-[#111827]'>Save for later</button>
                     <button
                     disabled={!isFormValid}
-                    className={`w-[150px] h-[56px] border border-[#111827] rounded-[10px] font-manrope font-extrabold text-base 
-                        ${isFormValid ? "bg-[#751423] text-[#FFFF] hover:bg-[#5c101c]" : "bg-[#e3abb4] text-gray-200 cursor-not-allowed"}`}
+                    className={`w-[150px] h-[56px] rounded-[10px] font-manrope font-extrabold text-base 
+                        ${isFormValid ? "bg-[#751423] text-[#FFFF] hover:bg-[#5c101c]" : "bg-[#75142399] text-gray-200 cursor-not-allowed"}`}
                     onClick={() => isFormValid && setShowSuccess(!showSuccess)}
                 >
                     Continue
