@@ -190,7 +190,7 @@ const About: React.FC = () => {
       )}
 
       <div>{showSuccess && <EventSuccess />}</div>
-      <section className="bg-[#F9FAFB] mt-14 sm:mt-10">
+      <section className="bg-[#F9FAFB] mt-14 md:mt-10">
         <div className="py-8 lg:py-16 px-3 sm:px-4 mx-auto max-w-screen-md">
           {/* Header */}
           <div className="mb-12 text-center p-3 sm:p-0">
