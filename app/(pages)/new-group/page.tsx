@@ -15,10 +15,10 @@ import { groups } from "@/data/mockData";
 const NewGroup = () => {
     const [isRightBarOpen, setIsRightBarOpen] = useState(false);
     const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
-    const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
+    // const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
     const [openModal, setOpenModal] = useState(false);
 
-    console.log(selectedGroup);
+    // console.log(selectedGroup);
     
 
 
