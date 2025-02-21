@@ -64,6 +64,9 @@ body {
 .button_v1 {
   @apply w-full bg-primary text-white py-3 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center;
 }
+.button_v2 {
+  @apply w-full border border-primary text-black-100 py-3 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center;
+}
 
 .authInput {
   @apply w-full p-3 border rounded-[12px] bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300;

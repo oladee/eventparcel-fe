@@ -21,7 +21,7 @@ const About: React.FC = () => {
     lastName: "",
     email: "",
     description: "",
-    eventImage: null as File | null,
+    eventImage: null as File | null
   });
 
   const [errors, setErrors] = useState({
@@ -33,7 +33,7 @@ const About: React.FC = () => {
     lastName: "",
     email: "",
     description: "",
-    eventImage: "",
+    eventImage: ""
   });
 
   const handleChange = (
@@ -169,24 +169,18 @@ const About: React.FC = () => {
       {/* Modal for image source selection on mobile */}
       {showImagePickerModal && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
-          <div className="bg-white p-6 rounded-lg text-center">
+          <div className="bg-white w-[80%] p-6 rounded-[10px] text-center">
             <h2 className="text-xl font-bold mb-4">Select Image Source</h2>
             <div className="flex flex-col gap-4">
-              <button
-                onClick={handleSelectGallery}
-                className="px-4 py-2 bg-blue-500 text-white rounded"
-              >
+              <button onClick={handleSelectGallery} className="button_v2">
                 Gallery
               </button>
-              <button
-                onClick={handleTakePhoto}
-                className="px-4 py-2 bg-green-500 text-white rounded"
-              >
+              <button onClick={handleTakePhoto} className="button_v1">
                 Take Photo
               </button>
               <button
                 onClick={() => setShowImagePickerModal(false)}
-                className="px-4 py-2 bg-gray-300 text-gray-700 rounded"
+                className=""
               >
                 Cancel
               </button>
@@ -196,14 +190,14 @@ const About: React.FC = () => {
       )}
 
       <div>{showSuccess && <EventSuccess />}</div>
-      <section className="bg-[#F9FAFB] mt-10">
-        <div className="py-8 lg:py-16 px-4 mx-auto max-w-screen-md">
+      <section className="bg-[#F9FAFB] mt-14 sm:mt-10">
+        <div className="py-8 lg:py-16 px-3 sm:px-4 mx-auto max-w-screen-md">
           {/* Header */}
-          <div className="mb-12 text-center">
-            <h3 className="text-[32px] font-general font-bold text-[#111827]">
+          <div className="mb-12 text-center p-3 sm:p-0">
+            <h3 className="text-2xl sm:text-[32px] sm:font-general font-bold text-[#111827]">
               Tell us about your event
             </h3>
-            <p className="text-lg font-general font-medium text-[#718096] dark:text-gray-400 sm:text-xl">
+            <p className="text-lg sm:font-general font-medium text-[#718096] dark:text-gray-400 sm:text-xl">
               We&apos;ll help you get started based on your responses
             </p>
           </div>
@@ -261,14 +255,14 @@ const About: React.FC = () => {
                     />
                   </>
                 ) : (
-                  <div className="py-24 flex flex-col justify-center items-center gap-4 cursor-pointer">
+                  <div className="py-24 px-2 flex flex-col justify-center items-center gap-4 cursor-pointer">
                     <Image
                       src="/images/photo.png"
                       alt="Upload"
                       width={30}
                       height={30}
                     />
-                    <span className="text-sm text-[#718096]">
+                    <span className="text-sm text-[#718096] text-center">
                       Drop your image here, or{" "}
                       <span className="text-[#751423]">Click to browse</span>
                     </span>
@@ -390,9 +384,7 @@ const About: React.FC = () => {
                   required
                 />
                 {errors.location && (
-                  <p className="text-red-500 text-sm mt-1">
-                    {errors.location}
-                  </p>
+                  <p className="text-red-500 text-sm mt-1">{errors.location}</p>
                 )}
               </div>
             </div>
@@ -479,7 +471,8 @@ const About: React.FC = () => {
             </div>
           </form>
         </div>
-        <div className="bg-[#FFFF] h-32 flex gap-6 py-10 justify-end pr-56">
+        <div className="bg-[#FFFF] h-32 py-10 flex justify-center">
+          <div className="max-w-screen-md flex gap-4 items-center justify-center sm:justify-end w-full">
           <button className="p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827]">
             Save for later
           </button>
@@ -492,6 +485,7 @@ const About: React.FC = () => {
           >
             Continue
           </button>
+          </div>
         </div>
       </section>
     </>
@@ -499,24 +493,6 @@ const About: React.FC = () => {
 };
 
 export default About;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // "use client";
 // import { useState, useRef } from "react";
@@ -958,19 +934,6 @@ export default About;
 
 // export default About;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
 // "use client";
 // import { useState, useRef } from "react";
 // import Image from "next/image";
@@ -1110,16 +1073,16 @@ export default About;
 //     <>
 //       <div>{showSuccess && <EventSuccess />}</div>
 //       <section className="bg-[#F9FAFB] mt-14 sm:mt-10">
-//         <div className="py-8 lg:py-16 px-1 sm:px-4 mx-auto max-w-screen-md">
-//           {/* Header */}
-//           <div className="mb-12 text-center p-3 sm:p-0">
-//             <h3 className="text-2xl sm:text-[32px] sm:font-general font-bold text-[#111827]">
-//               Tell us about your event
-//             </h3>
-//             <p className="text-lg sm:font-general font-medium text-[#718096] dark:text-gray-400 sm:text-xl">
-//               We&apos;ll help you get started based on your responses
-//             </p>
-//           </div>
+// <div className="py-8 lg:py-16 px-1 sm:px-4 mx-auto max-w-screen-md">
+//   {/* Header */}
+//   <div className="mb-12 text-center p-3 sm:p-0">
+//     <h3 className="text-2xl sm:text-[32px] sm:font-general font-bold text-[#111827]">
+//       Tell us about your event
+//     </h3>
+//     <p className="text-lg sm:font-general font-medium text-[#718096] dark:text-gray-400 sm:text-xl">
+//       We&apos;ll help you get started based on your responses
+//     </p>
+//   </div>
 
 //           {/* Form */}
 //           <form
@@ -1404,7 +1367,7 @@ export default About;
 //             Continue
 //           </button>
 //           </div>
-          
+
 //         </div>
 //       </section>
 //     </>
