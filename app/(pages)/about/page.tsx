@@ -18,7 +18,7 @@ const About: React.FC = () => {
     lastName: "",
     email: "",
     description: "",
-    eventImage: null
+    eventImage: null as File | null
   });
 
   const [errors, setErrors] = useState({
@@ -70,7 +70,7 @@ const About: React.FC = () => {
     Object.keys(formData).forEach((key) => {
       newErrors[key as keyof typeof formData] = validateField(
         key,
-        formData[key as keyof typeof formData]
+        formData[key as keyof typeof formData] as string
       );
     });
 
@@ -188,20 +188,20 @@ const About: React.FC = () => {
                 onDragOver={handleDragOver}
               >
                 {selectedImage ? (
-                  <>
+                  <div>
                     <img
                       src={selectedImage}
                       alt="Preview"
-                      // className="rounded object-cover w-full h-full"
+                      className="rounded object-cover w-full h-full"
                     />
                     <XCircle
                       className="absolute top-2 right-2 text-red-500 cursor-pointer"
                       size={24}
                       onClick={handleRemoveImage}
                     />
-                  </>
+                  </div>
                 ) : (
-                  <div className="py-24 flex flex-col justify-center items-center gap-4 cursor-pointer">
+                  <div className="py-16 flex flex-col justify-center items-center gap-4 cursor-pointer">
                     <Image
                       src="/images/photo.png"
                       alt="Upload"
