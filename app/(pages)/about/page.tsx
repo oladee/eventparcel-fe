@@ -136,14 +136,14 @@ const About: React.FC = () => {
   return (
     <>
       <div>{showSuccess && <EventSuccess />}</div>
-      <section className="bg-[#F9FAFB] mt-10">
-        <div className="py-8 lg:py-16 px-4 mx-auto max-w-screen-md">
+      <section className="bg-[#F9FAFB] mt-14 sm:mt-10">
+        <div className="py-8 lg:py-16 px-1 sm:px-4 mx-auto max-w-screen-md">
           {/* Header */}
-          <div className="mb-12 text-center">
-            <h3 className="text-[32px] font-general font-bold text-[#111827]">
+          <div className="mb-12 text-center p-3 sm:p-0">
+            <h3 className="text-2xl sm:text-[32px] sm:font-general font-bold text-[#111827]">
               Tell us about your event
             </h3>
-            <p className="text-lg font-general font-medium text-[#718096] dark:text-gray-400 sm:text-xl">
+            <p className="text-lg sm:font-general font-medium text-[#718096] dark:text-gray-400 sm:text-xl">
               We&apos;ll help you get started based on your responses
             </p>
           </div>
@@ -417,18 +417,21 @@ const About: React.FC = () => {
             </div>
           </form>
         </div>
-        <div className="bg-[#FFFF] h-32 flex gap-6 py-10 justify-end pr-56">
-          <button className="p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827]">
+        <div className="bg-[#FFFF] h-32">
+          <div className="mx-auto max-w-screen-md flex gap-6 py-10 justify-center sm:justify-end">
+          <button className="p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-sm text-[#111827]">
             Save for later
           </button>
           <button
             disabled={!isFormValid}
-            className={`bg-primary text-white py-3 px-3 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center font-extrabold font-manrope
+            className={`bg-primary text-white py-3 px-3 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center font-extrabold font-manrope text-sm
                         ${!isFormValid ? "opacity-50 cursor-not-allowed" : ""}`}
             onClick={() => isFormValid && setShowSuccess(!showSuccess)}
           >
             Continue
           </button>
+          </div>
+          
         </div>
       </section>
     </>
