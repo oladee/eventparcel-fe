@@ -2,26 +2,42 @@
 
 import { useState } from "react";
 import Image from "next/image";
-// import CreatePackageModal from "@/components/CreatePackageModal";
+import RightBar from "@/components/Rightbar";
+import GeneralModal from "@/components/generalModal";
+import PrivateGroup from "@/components/PrivateModal";
+import CreatePackageModal from "@/components/CreatePackageModal";
+import AddGroup from "@/components/AddGroupCaller";
+import CreateGroupCaller from "@/components/AddNew";
+import { groups } from "@/data/mockData"; 
+
+
 
 const NewGroup = () => {
-    const [availableGroup, setAvailableGroup] = useState(true);
-    const [openModal, setOpenModal] = useState(false)
-    const [formData, setFormData] = useState({
-        email: "",
-        subject: "",
-        message: "",
-    });
+    const [isRightBarOpen, setIsRightBarOpen] = useState(false);
+    const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
+    const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
+    const [openModal, setOpenModal] = useState(false);
 
-    const handleChange = (e: { target: { id: any; value: any } }) => {
-        setFormData({ ...formData, [e.target.id]: e.target.value });
+
+    const hasGeneralGroup = groups.some((group) => group.type === "general");
+    const hasPrivateGroup = groups.some((group) => group.type === "private");
+    
+
+    // Open AddGroup modal
+    const handleAddGroupClick = () => {
+        setIsAddGroupOpen(true);
     };
 
-    const handleSubmit = (e: { preventDefault: () => void }) => {
-        e.preventDefault();
-        console.log("Form submitted:", formData);
-        // Submit the form data to FabForm or an API
+    // Close AddGroup modal
+    const handleCloseAddGroup = () => {
+        setIsAddGroupOpen(false);
     };
+
+    // Open CreatePackageModal when a group is clicked
+    const handleGroupClick = (groupId: string) => {
+        setSelectedGroup(groupId);
+    };
+    
 
     return (
         <section className="border border-gray-700 bg-[#EEEFF2] dark:bg-gray-900 mt-10">
@@ -33,132 +49,123 @@ const NewGroup = () => {
                     <p className="flex gap-1 justify-center items-center mb-8 lg:mb-16 font-general text-lg font-medium text-center text-[#718096] dark:text-gray-400 sm:text-xl">
                         Create groups and packages for different types of guests  
                         <Image
-                         src="/images/information.png" 
-                         width={20}
-                         height={20}
-                         alt="information"
+                            onClick={() => setIsRightBarOpen(true)} 
+                            src="/images/information.png" 
+                            width={20}
+                            height={20}
+                            alt="information"
+                            className="cursor-pointer"
                         />    
                     </p>
                 </div>
 
-                {/* {openModal && (
-                    <CreatePackageModal />
-                )} */}
+            <div className="flex flex-col">
+            {/* Show AddGroup only if no groups exist */}
+            {!hasGeneralGroup && !hasPrivateGroup ? (
+                <button onClick={handleAddGroupClick}>
+                    <AddGroup />
+                </button>
+            ) : (
+            <>
+                {/* If only general groups exist */}
+                {hasGeneralGroup && !hasPrivateGroup && (
+                    <div className="flex items-start gap-6">
+                        {/* General Groups - Displayed Vertically */}
+                        <div className="w-[750px] grid grid-cols-2 gap-11">
+                            {groups
+                                .filter((group) => group.type === "general")
+                                .map((group) => (
+                                    <GeneralModal key={group.id} group={group} setOpenModal={setOpenModal}/>
+                                ))}
+                        </div>
 
-                {availableGroup ? (
-                    <div className="ml-44 flex">
-                        <div className="w-[320px] h-[316px] space-y-8 bg-[#FFFFFF] pt-4 p-8 rounded-3xl">
-                            <div className="flex items-center justify-between">
-                                <span className="w-[76px] h-[22px] flex justify-center items-center px-10 py-2 rounded-[50px] font-general font-medium text-sm text-[#2B9EA0] border border-[#2B9EA0] bg-[#ebf3f3]">General</span>
-                                <div className="flex justify-center items-center gap-2">
-                                    <Image 
-                                        src="/images/edit.png"
-                                        alt="edit"
-                                        width={16}
-                                        height={16}
-                                    />
-                                    <span className="font-general font-medium text-sm text-[#718096]">Edit</span>
-                                </div>
-                            </div>
-                            <div className="flex flex-col">
-                                <span className="font-general font-semibold text-xl text-[#111827]">
-                                    General Aso Ebi
-                                </span>
-                                <span className="font-general font-medium text-sm text-[#718096]">
-                                    This is the general aso ebi for everyone who is not a family member
-                                </span>
-                            </div>
-                            <div className="flex flex-col gap-3">
-                                <p className="font-general font-semibold text-base text-[#111827]">Packages</p>
-                                <button onClick={() => setOpenModal(!openModal)} className="font-manrope font-extrabold text-xs py-2 flex justify-center items-center rounded-2xl border-[2px] border-[#751423] text-[#751423]">Create Package</button>
-                            </div>
-                            <div className="flex justify-between items-center">
-                                <div className="flex flex-row justify-between items-center gap-1">
-                                    <Image 
-                                        src="/images/trash.png"
-                                        alt="delete"
-                                        width={16}
-                                        height={16}
-                                     />
-                                    <span className="font-general pt-1 font-medium text-sm text-[#DE4222]">Delete</span>
-                                </div>
-                                <div className="flex flex-row justify-between items-center gap-1">
-                                <Image 
-                                    src="/images/copy.png"
-                                    alt="delete"
-                                    width={16}
-                                    height={16}
-                                />
-                                <span className="font-general pt-1 font-medium text-sm text-[#718096">Copy</span>
-                                </div>
-                            </div>
-                        </div>
-                        <div className="w-[320px] h-[316px] rounded-3xl flex flex-col border-[3px] border-dashed justify-center items-center bg-[#FFFFFF66] ml-10">
-                            <Image
-                                src="/images/plus.png"
-                                alt="plus" 
-                                width={52}
-                                height={52}   
-                            />
-                            <span className="font-general font-semibold text-base text-[#751423]">Add New</span>
+                        {/* Right Side */}
+                        <div className="flex flex-col space-y-4">
+                            {/* AddGroup (Only when called) */}
+                            {isAddGroupOpen && <AddGroup />}
+
+                            {/* CreateGroupCaller */}
+                            <CreateGroupCaller />
                         </div>
                     </div>
-                ) : (
-                    <form 
-                    className="w-[320px] h-[484px] ml-20 pl-4 space-y-8 bg-[#FFFFFF] px-5 py-6 rounded-3xl" 
-                    action="https://fabform.io/f/{form-id}" 
-                    method="post" 
-                    onSubmit={handleSubmit}
-                >
-                    <div className="">
-                        <span className="block mb-2 font-general text-xl text-[#111827] font-semibold dark:text-gray-300">
-                            New Group
-                        </span>
-                        <span className="font-general font-medium text-sm text-[#718096]">Create a group for specific guests</span>
-                    
-                    <div className="flex mt-5 flex-col gap-5">
-                        <input
-                            type="text"
-                            id="event"
-                            onChange={handleChange}
-                            className="h-14 shadow-sm bg-gray-50 border rounded-xl border-gray-300 text-gray-900  text-sm focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                            placeholder="Group name"
-                            required
-                            />
-                        <input 
-                            type="text" 
-                            className="h-[120px] shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white"
-                            placeholder="Group description"
-                            required  
-                            />
-                    </div>
-                    <div className="flex flex-col gap-3 mt-4">
-                        <span className="font-general text-base font-semibold text-[#111827]">Select group privacy</span>
-                        <div className="flex gap-14 mb-3">
-                            <div className="flex items-center gap-2">
-                                <Image
-                                    src="/images/check.png" 
-                                    alt="check"
-                                    width={20}
-                                    height={20}
-                                />
-                                <span className="font-general font-medium text-base text-[#111827]"> General </span>
-                            </div>
-                            <div className="flex items-center gap-2">
-                                <Image
-                                    src="/images/unchecked.png" 
-                                    alt="check"
-                                    width={20}
-                                    height={20}
-                                />
-                                <span  className="font-general font-medium text-base text-[#111827]">Private</span>
-                            </div>
+                )}
+
+                {/* If only private groups exist */}
+                {hasPrivateGroup && !hasGeneralGroup && (
+                    <div className="flex items-start gap-6">
+                        {/* Grid for Private Groups */}
+                        <div className="w-[750px] grid grid-cols-2 gap-11">
+                            {groups
+                                .filter((group) => group.type === "private")
+                                .map((group) => (
+                                    <PrivateGroup key={group.id} group={group} setOpenModal={setOpenModal}/>
+                                ))}
                         </div>
-                        <button className="w-[150px] h-12 rounded-xl p-2 text-sm text-[#FFFFFF] font-general bg-[#751423] flex justify-center items-center">Create Group</button>
+
+                        {/* Right Side */}
+                        <div className="flex flex-col space-y-4">
+                            {/* AddGroup (Only when called) */}
+                            {isAddGroupOpen && <AddGroup />}
+
+                            {/* CreateGroupCaller */}
+                            <CreateGroupCaller />
+                        </div>
                     </div>
+                )}
+
+
+                {/* If both general and private groups exist */}
+                {hasGeneralGroup && hasPrivateGroup && (
+                    <div className="flex">
+                        {/* General Groups - Displayed Vertically */}
+                        <div className="flex flex-col justify-start gap-6">
+                            {groups
+                                .filter((group) => group.type === "general")
+                                .map((group) => (
+                                    <GeneralModal key={group.id} group={group} setOpenModal={setOpenModal}/>
+                                ))}
+                        </div>
+
+                    {/* Private Groups - Displayed Vertically */}
+                    <div className="flex flex-col justify-start gap-6 ml-16">
+                        {groups
+                            .filter((group) => group.type === "private")
+                            .map((group) => (
+                                <PrivateGroup key={group.id} group={group} setOpenModal={setOpenModal}/>
+                            ))}
                     </div>
-                </form>
-                )}               
+
+                    {/* CreateGroupCaller */}
+                    <CreateGroupCaller />
+                    </div>
+                        )}
+                    </>
+                )}
+
+                {/* AddGroup Modal Popup */}
+                {isAddGroupOpen && (
+                    <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50">
+                        <AddGroup />
+                    </div>
+                    )}
+                </div>
+
+                {/* Add Group Modal */}
+                {/* {isAddGroupOpen && <AddGroup onClose={handleCloseAddGroup} />} */}
+
+                {/* Create Package Modal */}
+                {openModal && (
+                    <div className="absolute top-0 right-0 left-0 z-50">
+                        <CreatePackageModal
+                            // isOpen={!!selectedGroup}
+                            // groupId={selectedGroup}
+                            // onClose={() => setSelectedGroup(null)}
+                            setOpenModal={setOpenModal}
+                        />
+                    </div>
+                )}
+
+                <RightBar isOpen={isRightBarOpen} setIsOpen={setIsRightBarOpen} />
             </div>
         </section>
     );
