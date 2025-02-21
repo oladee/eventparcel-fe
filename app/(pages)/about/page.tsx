@@ -155,7 +155,7 @@ const About: React.FC = () => {
                 value={formData.eventName}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                className="input-field w-full p-2 rounded-[5px] bg-slate-50"
+                className="input-field outline-primary w-full p-2 rounded-[5px] bg-slate-50"
                 placeholder="Enter event name"
                 required
               />
@@ -222,7 +222,7 @@ const About: React.FC = () => {
                 onChange={handleChange}
                 onBlur={handleBlur}
                 placeholder="Write description"
-                className="input-field h-[140px] w-full resize-none p-4 rounded-[5px] bg-slate-50"
+                className="input-field outline-primary h-[140px] w-full resize-none p-4 rounded-[5px] bg-slate-50"
                 required
               />
               {errors.description && (
@@ -248,7 +248,7 @@ const About: React.FC = () => {
                     value={formData.eventDate}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    className="w-full p-2 input-field rounded-[5px] bg-slate-50"
+                    className="w-full p-2 input-field outline-primary rounded-[5px] bg-slate-50"
                     placeholder="Select date"
                     required
                   />
@@ -273,7 +273,7 @@ const About: React.FC = () => {
                     value={formData.eventTime}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    className="w-full p-2 input-field rounded-[5px] bg-slate-50"
+                    className="w-full p-2 input-field outline-primary rounded-[5px] bg-slate-50"
                     placeholder="Select time"
                     required
                   />
@@ -305,7 +305,7 @@ const About: React.FC = () => {
                   value={formData.location}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className="input-field pl-12 w-full p-2 rounded-[5px] bg-slate-50"
+                  className="input-field outline-primary pl-12 w-full p-2 rounded-[5px] bg-slate-50"
                   placeholder="Enter location of the event"
                   required
                 />
@@ -340,7 +340,7 @@ const About: React.FC = () => {
                   value={formData.firstName}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className="input-field w-full p-2 rounded-[5px] bg-slate-50"
+                  className="input-field outline-primary w-full p-2 rounded-[5px] bg-slate-50"
                   placeholder="First name"
                   required
                 />
@@ -363,7 +363,7 @@ const About: React.FC = () => {
                   value={formData.lastName}
                   onChange={handleChange}
                   onBlur={handleBlur}
-                  className="input-field w-full p-2 rounded-[5px] bg-slate-50"
+                  className="input-field outline-primary w-full p-2 rounded-[5px] bg-slate-50"
                   placeholder="Last name"
                   required
                 />
@@ -387,7 +387,7 @@ const About: React.FC = () => {
                 value={formData.email}
                 onChange={handleChange}
                 onBlur={handleBlur}
-                className="input-field w-full p-2 rounded-[5px] bg-slate-50"
+                className="input-field outline-primary w-full p-2 rounded-[5px] bg-slate-50"
                 placeholder="Enter your email"
                 required
               />
@@ -562,7 +562,7 @@ export default About;
 //                                 value={formData.eventName}
 //                                 onChange={handleChange}
 //                                 onBlur={handleBlur}
-//                                 className="input-field outline-primary w-full p-2 rounded-[5px] bg-slate-50"
+//                                 className="input-field outline-primary outline-primary w-full p-2 rounded-[5px] bg-slate-50"
 //                                 placeholder="Enter event name"
 //                                 required />
 //                             {errors.eventName && <p className="text-red-500 text-sm mt-1">{errors.eventName}</p>}
@@ -590,7 +590,7 @@ export default About;
 //                                 onChange={handleChange}
 //                                 onBlur={handleBlur}
 //                                 placeholder="Write description"
-//                                 className="input-field outline-primary h-[140px] w-full resize-none p-4 rounded-[5px] bg-slate-50"
+//                                 className="input-field outline-primary outline-primary h-[140px] w-full resize-none p-4 rounded-[5px] bg-slate-50"
 //                                 required />
 //                             {errors.description && <p className="text-red-500 text-sm mt-1">{errors.description}</p>}
 //                         </div>
@@ -609,7 +609,7 @@ export default About;
 //                                         value={formData.eventDate}
 //                                         onChange={handleChange}
 //                                         onBlur={handleBlur}
-//                                         className="w-full p-2 pl-12 input-field outline-primary rounded-[5px] bg-slate-50"
+//                                         className="w-full p-2 pl-12 input-field outline-primary outline-primary rounded-[5px] bg-slate-50"
 //                                         placeholder="Select date"
 //                                         required />
 //                                     {errors.eventDate && <p className="text-red-500 text-sm mt-1">{errors.eventDate}</p>}
@@ -627,7 +627,7 @@ export default About;
 //                                         value={formData.eventTime}
 //                                         onChange={handleChange}
 //                                         onBlur={handleBlur}
-//                                         className="w-full p-2 pl-12 input-field outline-primary rounded-[5px] bg-slate-50"
+//                                         className="w-full p-2 pl-12 input-field outline-primary outline-primary rounded-[5px] bg-slate-50"
 //                                         placeholder="Select time"
 //                                         required />
 //                                     {errors.eventTime && <p className="text-red-500 text-sm mt-1">{errors.eventTime}</p>}
@@ -648,7 +648,7 @@ export default About;
 //                                     value={formData.location}
 //                                     onChange={handleChange}
 //                                     onBlur={handleBlur}
-//                                     className="input-field outline-primary pl-12 w-full p-2 rounded-[5px] bg-slate-50"
+//                                     className="input-field outline-primary outline-primary pl-12 w-full p-2 rounded-[5px] bg-slate-50"
 //                                     placeholder="Enter location of the event"
 //                                     required />
 //                                 {errors.location && <p className="text-red-500 text-sm mt-1">{errors.location}</p>}
@@ -673,7 +673,7 @@ export default About;
 //                                     value={formData.firstName}
 //                                     onChange={handleChange}
 //                                     onBlur={handleBlur}
-//                                     className="input-field outline-primary w-full p-2 rounded-[5px] bg-slate-50"
+//                                     className="input-field outline-primary outline-primary w-full p-2 rounded-[5px] bg-slate-50"
 //                                     placeholder="First name"
 //                                     required />
 //                                 {errors.firstName && <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>}
@@ -688,7 +688,7 @@ export default About;
 //                                     value={formData.lastName}
 //                                     onChange={handleChange}
 //                                     onBlur={handleBlur}
-//                                     className="input-field outline-primary w-full p-2 rounded-[5px] bg-slate-50"
+//                                     className="input-field outline-primary outline-primary w-full p-2 rounded-[5px] bg-slate-50"
 //                                     placeholder="Last name"
 //                                     required />
 //                                 {errors.lastName && <p className="text-red-500 text-sm mt-1">{errors.lastName}</p>}
@@ -706,7 +706,7 @@ export default About;
 //                                 value={formData.email}
 //                                 onChange={handleChange}
 //                                 onBlur={handleBlur}
-//                                 className="input-field outline-primary w-full p-2 rounded-[5px] bg-slate-50"
+//                                 className="input-field outline-primary outline-primary w-full p-2 rounded-[5px] bg-slate-50"
 //                                 placeholder="Enter your email"
 //                                 required />
 //                             {errors.email && <p className="text-red-500 text-sm mt-1">{errors.email}</p>}
