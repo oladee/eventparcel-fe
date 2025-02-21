@@ -18,6 +18,9 @@ const NewGroup = () => {
     const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
     const [openModal, setOpenModal] = useState(false);
 
+    console.log(selectedGroup);
+    
+
 
     const hasGeneralGroup = groups.some((group) => group.type === "general");
     const hasPrivateGroup = groups.some((group) => group.type === "private");

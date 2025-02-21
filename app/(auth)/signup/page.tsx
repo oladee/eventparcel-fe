@@ -201,7 +201,7 @@ const Signup: React.FC = () => {
                 aria-required="true"
                 aria-describedby="password-desc"
               />
-              <button
+              <button 
                 type="button"
                 className="absolute right-3 top-[16px] text-gray-500 outline-none"
                 onClick={() => setShowPassword(!showPassword)}
