@@ -478,7 +478,7 @@ const About: React.FC = () => {
           </button>
           <button
             disabled={!isFormValid}
-            className={`bg-primary text-white py-3 px-3 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center font-extrabold font-manrope ${
+            className={`bg-primary text-white py-3 px-8 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center font-extrabold font-manrope ${
               !isFormValid ? "opacity-50 cursor-not-allowed" : ""
             }`}
             onClick={() => isFormValid && setShowSuccess(!showSuccess)}

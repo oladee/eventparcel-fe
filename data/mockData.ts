@@ -1,7 +1,10 @@
-interface Package {
+export interface Package {
     image: string;
     title: string;
+    description: string;
     amount: number;
+    packageId: number
+    quantity: number
   }
   
  export  interface Group {
@@ -22,12 +25,34 @@ interface Package {
         {
           image: "/images/cloth.png",
           title: "Gold Package",
+          description: "very good",
           amount: 5000,
+          packageId: 1,
+          quantity: 10
         },
         {
             image: "/images/cloth.png",
             title: "Platinum Package",
           amount: 10000,
+          packageId: 2,
+          quantity: 10,
+          description: "very good",
+        },
+        {
+          image: "/images/cloth.png",
+          title: "Gold Package silver",
+          amount: 5000,
+          packageId: 3,
+          quantity: 10,
+          description: "very good",
+        },
+        {
+            image: "/images/cloth.png",
+            title: "Platinum Package vip",
+          amount: 10000,
+          packageId: 4,
+          quantity: 10,
+          description: "very good",
         },
       ],
     },
@@ -39,18 +64,27 @@ interface Package {
       packages: [
         {
             image: "/images/cloth.png",
-            title: "Basic Savings",
+            title: "Basic cap",
           amount: 1000,
+          packageId: 1,
+          quantity: 10,
+          description: "very good",
         },
         {
             image: "/images/cloth.png",
-            title: "Premium Savings",
+            title: "Premium cap silver",
           amount: 5000,
+          packageId: 2,
+          quantity: 10,
+          description: "very good",
         },
         {
             image: "/images/cloth.png",
-            title: "Elite Savings",
+            title: "Elite Savings vip",
           amount: 10000,
+          packageId: 3,
+          quantity: 10,
+          description: "very good",
         },
       ],
     },
@@ -62,13 +96,19 @@ interface Package {
       packages: [
         {
             image: "/images/cloth.png",
-            title: "Seed Investor",
+            title: "Seed Investor prem",
           amount: 2000,
+          packageId: 1,
+          quantity: 10,
+          description: "very good",
         },
         {
             image: "/images/cloth.png",
-            title: "Angel Investor",
+            title: "Angel Investor vip",
           amount: 8000,
+          packageId: 2,
+          quantity: 10,
+          description: "very good",
         },
       ],
     },
@@ -80,13 +120,19 @@ interface Package {
         packages: [
           {
             image: "/images/cloth.png",
-            title: "Gold Package",
+            title: "Gold Package fila",
             amount: 5000,
+            packageId: 1,
+            quantity: 10,
+            description: "very good",
           },
           {
               image: "/images/cloth.png",
-              title: "Platinum Package",
+              title: "Platinum Package gucci",
             amount: 10000,
+            packageId: 2,
+            quantity: 10,
+            description: "very good",
           },
         ],
       },
@@ -98,18 +144,27 @@ interface Package {
         packages: [
           {
               image: "/images/cloth.png",
-              title: "Basic Savings",
+              title: "Basic Savings jersey",
             amount: 1000,
+            packageId: 1,
+            quantity: 10,
+            description: "very good",
           },
           {
               image: "/images/cloth.png",
-              title: "Premium Savings",
+              title: "Premium Savings fifa",
             amount: 5000,
+            packageId: 2,
+            quantity: 10,
+            description: "very good",
           },
           {
               image: "/images/cloth.png",
-              title: "Elite Savings",
+              title: "Elite Savings john",
             amount: 10000,
+            packageId: 3,
+            quantity: 10,
+            description: "very good",
           },
         ],
       },
@@ -121,13 +176,19 @@ interface Package {
         packages: [
           {
               image: "/images/cloth.png",
-              title: "Seed Investor",
+              title: "Seed Investor preci",
             amount: 2000,
+            packageId: 1,
+            quantity: 10,
+            description: "very good",
           },
           {
               image: "/images/cloth.png",
-              title: "Angel Investor",
+              title: "Angel Investor sick",
             amount: 8000,
+            packageId: 3,
+            quantity: 10,
+            description: "very good",
           },
         ],
       },
