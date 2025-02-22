@@ -10,7 +10,6 @@ type CreatePackageProps = {
 const PackageModal: React.FC<CreatePackageProps> = ({ setOpenModal }) => {
     return (
         <div className="w-[680px] bg-white rounded-2xl shadow-lg p-6 flex flex-col gap-6">
-            <Success />
             {/* Header */}
             <div className="flex justify-between gap-1">
                 <div>
