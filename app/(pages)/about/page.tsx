@@ -9,7 +9,6 @@ import PersonalDetails from "@/components/aboutEvent/PersonalDetails";
 import FormButtons from "@/components/aboutEvent/FormButtons";
 
 
-
 const About: React.FC = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
