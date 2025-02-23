@@ -16,7 +16,7 @@ const NewGroup: React.FC = () => {
     const [isRightBarOpen, setIsRightBarOpen] = useState(false);
     const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
     // const [selectedGroup, setSelectedGroup] = useState<string | null>(null);
-    const [openModalPackage, setOpenModalPackage] = useState(false);
+    // const [openModalPackage, setOpenModalPackage] = useState(false);
     const isFormValid = groups.length > 0 && groups.some(group => group.packages.length > 0);    
 
 
@@ -148,17 +148,19 @@ const NewGroup: React.FC = () => {
                 {/* {isAddGroupOpen && <AddGroup onClose={handleCloseAddGroup} />} */}
 
                 {/* Create Package Modal */}
+               {/* 
                 {openModalPackage && (
                     <div className="absolute top-0 right-0 left-0 z-50">
-                        {/* <CreatePackageModal
+                         <CreatePackageModal
                             // isOpen={!!selectedGroup}
                             // groupId={selectedGroup}
                             // onClose={() => setSelectedGroup(null)}
                             setOpenModalPackage={setOpenModalPackage}
                             mode="create"
-                        /> */}
+                        /> 
                     </div>
                 )}
+                */}
 
                 <RightBar isOpen={isRightBarOpen} setIsOpen={setIsRightBarOpen} />
             </div>

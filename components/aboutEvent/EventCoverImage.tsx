@@ -27,10 +27,12 @@ const EventCoverImage: React.FC<EventCoverImageProps> = ({
     >
       {selectedImage ? (
         <>
-          <img
+          <Image
             src={selectedImage}
             alt="Preview"
             className="rounded object-cover w-full h-full"
+            width={100}
+            height={100}
           />
           <XCircle
             className="absolute top-2 right-2 text-red-500 cursor-pointer"

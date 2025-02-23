@@ -1,7 +1,6 @@
 "use strict";
 
 import Image from "next/image";
-import Success from "./auth/Success";
 
 type CreatePackageProps = {
     setEditPackageModal: (open: boolean) => void;
