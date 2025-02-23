@@ -46,10 +46,10 @@ const NewGroup: React.FC = () => {
         <section className="border border-gray-700 bg-[#EEEFF2] mt-10">
             <div className="py-8 lg:py-16 mx-auto max-w-screen-lg">
                 <div className="h-20 mb-12">
-                    <h3 className="mb-1 text-[32px] tracking-tight font-general font-bold text-center text-[#111827] dark:text-white">
+                    <h3 className="mb-1 text-[32px] tracking-tight font-general font-bold text-center text-[#111827]">
                         Event Groups & Packages
                     </h3>
-                    <p className="flex gap-1 justify-center items-center mb-8 lg:mb-16 font-general text-lg font-medium text-center text-[#718096] dark:text-gray-400 sm:text-xl">
+                    <p className="flex gap-1 justify-center items-center mb-8 lg:mb-16 font-general text-lg font-medium text-center text-[#718096] sm:text-xl">
                         Create groups and packages for different types of guests  
                         <Image
                             onClick={() => setIsRightBarOpen(true)} 
