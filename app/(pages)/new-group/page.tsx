@@ -43,7 +43,7 @@ const NewGroup: React.FC = () => {
     
 
     return (
-        <section className="border border-gray-700 bg-[#EEEFF2] dark:bg-gray-900 mt-10">
+        <section className="border border-gray-700 bg-[#EEEFF2] mt-10">
             <div className="py-8 lg:py-16 mx-auto max-w-screen-lg">
                 <div className="h-20 mb-12">
                     <h3 className="mb-1 text-[32px] tracking-tight font-general font-bold text-center text-[#111827] dark:text-white">
