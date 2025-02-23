@@ -8,8 +8,6 @@ import EventFormFields from "@/components/aboutEvent/EventFormFields";
 import PersonalDetails from "@/components/aboutEvent/PersonalDetails";
 import FormButtons from "@/components/aboutEvent/FormButtons";
 
-
-
 const About: React.FC = () => {
   const [showSuccess, setShowSuccess] = useState(false);
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
@@ -27,7 +25,7 @@ const About: React.FC = () => {
     lastName: "",
     email: "",
     description: "",
-    eventImage: null as File | null,
+    eventImage: null as File | null
   });
 
   const [errors, setErrors] = useState({
@@ -39,7 +37,7 @@ const About: React.FC = () => {
     lastName: "",
     email: "",
     description: "",
-    eventImage: "",
+    eventImage: ""
   });
 
   // Handlers for input changes and validations
@@ -195,17 +193,6 @@ const About: React.FC = () => {
 };
 
 export default About;
-
-
-
-
-
-
-
-
-
-
-
 
 // "use client";
 // import { useState, useRef } from "react";
@@ -702,4 +689,3 @@ export default About;
 // };
 
 // export default About;
-

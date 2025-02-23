@@ -5,12 +5,10 @@ import Image from "next/image";
 import RightBar from "@/components/Rightbar";
 // import GeneralModal from "@/components/generalModal";
 import PrivateGroup from "@/components/PrivateModal";
-import CreatePackageModal from "@/components/CreatePackageModal";
 import AddGroup from "@/components/AddGroupCaller";
 import CreateGroupCaller from "@/components/AddNew";
 import { groups } from "@/data/mockData"; 
 import GeneralModal from "@/components/generalModal";
-import { group } from "console";
 
 
 
