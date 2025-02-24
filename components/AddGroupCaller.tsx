@@ -10,6 +10,7 @@ interface AddGroupProps {
 
 const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode }) => {
     const [showSuccess, setShowSuccess] = useState(false);
+    console.log(showSuccess)
     const [formData, setFormData] = useState({
         name: "",
         description: "",
