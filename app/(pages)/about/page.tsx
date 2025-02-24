@@ -86,10 +86,12 @@ const About: React.FC = () => {
 
   // Image file handling
   const handleBrowseClick = () => {
-    if (window.innerWidth < 768) {
-      setShowImagePickerModal(true);
-    } else {
-      fileInputRef.current?.click();
+    if (typeof window !== "undefined") {
+      if (window.innerWidth < 768) {
+        setShowImagePickerModal(true);
+      } else {
+        fileInputRef.current?.click();
+      }
     }
   };
 
