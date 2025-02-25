@@ -7,7 +7,15 @@ import EventHeader from "@/components/aboutEvent/EventHeader";
 import EventFormFields from "@/components/aboutEvent/EventFormFields";
 import PersonalDetails from "@/components/aboutEvent/PersonalDetails";
 import FormButtons from "@/components/aboutEvent/FormButtons";
-import LocationPickerModal from "@/components/aboutEvent/LocationPickerModal";
+// import LocationPickerModal from "@/components/aboutEvent/LocationPickerModal";
+import dynamic from "next/dynamic";
+
+
+// Dynamically import LocationPickerModal with SSR disabled.
+const LocationPickerModal = dynamic(
+  () => import("@/components/aboutEvent/LocationPickerModal"),
+  { ssr: false }
+);
 
 const About: React.FC = () => {
   const [showSuccess, setShowSuccess] = useState(false);
@@ -86,19 +94,19 @@ const About: React.FC = () => {
   };
 
   // Image file handling
-  const handleBrowseClick = () => {
-    setShowImagePickerModal(true);
-  };
-  
   // const handleBrowseClick = () => {
-  //   if (typeof window !== "undefined") {
-  //     if (window.innerWidth < 768) {
-  //       setShowImagePickerModal(true);
-  //     } else {
-  //       fileInputRef.current?.click();
-  //     }
-  //   }
+  //   setShowImagePickerModal(true);
   // };
+const handleBrowseClick = () => {
+    if (typeof window !== "undefined") {
+      if (window.innerWidth < 768) {
+        setShowImagePickerModal(true);
+      } else {
+        fileInputRef.current?.click();
+      }
+    }
+  };
+
 
   const handleSelectGallery = () => {
     fileInputRef.current?.removeAttribute("capture");
