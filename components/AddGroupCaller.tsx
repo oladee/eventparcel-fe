@@ -14,9 +14,10 @@ interface AddGroupProps {
 }
 
 const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode }) => {
+  const eventId = localStorage.getItem("eventId");
     const [showSuccess, setShowSuccess] = useState(false);
     const [formData, setFormData] = useState({
-        eventId: "67b776125f8354be23a58874", 
+        eventId: eventId, 
         groupName: "",
         groupDescription: "",
         groupPrivacy: "private",
