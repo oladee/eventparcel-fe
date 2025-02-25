@@ -1,9 +1,11 @@
 "use client"
 
-import { Group, Package } from "@/data/mockData"
+// import { Group, Package } from "@/data/mockData"
 import Image from "next/image"
 import { useState } from "react";
 import CreatePackageModal from "./CreatePackageModal";
+import { Group, Package } from "@/app/interface/Group";
+import axiosInstance from "@/lib/axiosInstance";
 
 
 
@@ -16,12 +18,29 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
     const [openModalPackage, setOpenModalPackage] = useState(false);
     const [modalMode, setModalMode] = useState<"create" | "update">("create");
     const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
+
+    const handleDelete = async () => {
+        if (!group?._id) return;
+    
+        const confirmDelete = window.confirm("Are you sure you want to delete this package?");
+        if (!confirmDelete) return;
+    
+        try {
+            await axiosInstance.delete(`/delete-group/${group._id}`);
+            alert("Package deleted successfully.");
+            setOpenModalPackage(false); 
+        } catch (error) {
+            console.error("Error deleting package:", error);
+            alert("Failed to delete package. Please try again.");
+        }
+    };
+    
         
     return (
         <div className="w-[320px]">
                 <div className="w-[320px] h-auto space-y-6 bg-[#FFFFFF] pt-4 p-8 rounded-3xl">
                     <div className="flex items-center justify-between">
-                        <span className="w-[76px] h-[22px] flex justify-center items-center px-10 py-2 rounded-[50px] font-general font-medium text-sm text-[#2B9EA0] border border-[#2B9EA0] bg-[#ebf3f3]">General</span>
+                        <span className="w-[76px] h-[22px] flex justify-center items-center px-10 py-2 rounded-[50px] font-general font-medium text-sm text-[#2B9EA0] border border-[#2B9EA0] bg-[#ebf3f3]">{group.groupPrivacy}</span>
                         <div className="flex justify-center items-center gap-2 cursor-pointer">
                             <Image 
                                 src="/images/edit.png"
@@ -34,10 +53,10 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
                     </div>
                     <div className="flex flex-col">
                         <span className="font-general font-semibold text-xl text-[#111827]">
-                            {group.title}
+                            {group.groupName}
                         </span>
                         <span className="font-general font-medium text-sm text-[#718096]">
-                            {group.description}
+                            {group.groupDescription}
                         </span>
                     </div>
                     <div className="flex flex-col gap-3">
@@ -77,7 +96,7 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
                             <div key={index} className="flex justify-between items-center border border-gray-300 p-2 rounded-[12px]">
                                 <div className="flex items-center gap-2">
                                     <Image 
-                                        src={item.image}
+                                        src={item.packageImgUrls && item.packageImgUrls.length > 0 ? item.packageImgUrls[0] : "/images/placeholder.png"} 
                                         alt="cloth"
                                         width={60}
                                         height={60}
@@ -85,9 +104,9 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
                                     />
                                     <div className="flex flex-col">
                                         <span className="text-sm font-general font-semibold leading-tight text-[#111827]">
-                                            {item.title}
+                                            {item.packageTitle}
                                         </span>
-                                        <p className="font-general font-medium text-xs text-[#718096]">₦{item.amount}</p>
+                                        <p className="font-general font-medium text-xs text-[#718096]">₦{item.packagePrice}</p>
                                     </div>
                                 </div>
                                 <Image 
@@ -107,7 +126,7 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
                     </div>
                 </div>
                 <div className="flex justify-between">
-                    <div className="flex items-center gap-1">
+                    <div className="flex items-center gap-1 cursor-pointer" onClick={handleDelete}>
                         <Image 
                             src="/images/trash.png"
                             alt="delete_package"
@@ -133,6 +152,7 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
                             setOpenModalPackage={setOpenModalPackage}
                             mode={modalMode}
                             packageData={selectedPackage}
+                            groudId={group._id}
                         />
                     </div>
                 )}
