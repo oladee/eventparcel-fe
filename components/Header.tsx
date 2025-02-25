@@ -26,7 +26,7 @@ const Header: React.FC = () => {
 
   return (
     <header
-      role="banner"
+      role="navigation"
       className={`w-full py-4 px-6 md:px-8 lg:px-12 fixed right-0 top-0 z-20 
       ${isTransparentBg ? "bg-transparent" : "bg-white shadow-md"} 
       ${isScrolled ? "bg-white shadow-lg" : "bg-transparent"}`}
