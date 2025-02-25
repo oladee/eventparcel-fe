@@ -1,3 +1,5 @@
+import Image from "next/image";
+
 interface GroupPrivacySelectorProps {
     groupPrivacy: "private" | "general"; 
     onPrivacyChange: (groupPrivacy: "private" | "general") => void;
@@ -15,7 +17,7 @@ interface GroupPrivacySelectorProps {
             className="flex items-center gap-2"
             onClick={() => onPrivacyChange("general")}
           >
-            <img
+            <Image
               src={groupPrivacy === "general" ? "/images/check.png" : "/images/unchecked.png"}
               alt="check"
               width={20}
@@ -28,7 +30,7 @@ interface GroupPrivacySelectorProps {
             className="flex items-center gap-2"
             onClick={() => onPrivacyChange("private")}
           >
-            <img
+            <Image
               src={groupPrivacy === "private" ? "/images/check.png" : "/images/unchecked.png"}
               alt="check"
               width={20}
