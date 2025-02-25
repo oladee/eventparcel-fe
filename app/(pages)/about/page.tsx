@@ -1,4 +1,5 @@
 "use client";
+
 import { useState, useRef } from "react";
 import EventSuccess from "@/components/EventSuccess";
 import ImagePickerModal from "@/components/aboutEvent/ImagePickerModal";
@@ -26,7 +27,7 @@ const About: React.FC = () => {
     lastName: "",
     email: "",
     description: "",
-    eventImage: null as File | null,
+    eventImage: null as File | null
   });
 
   const [errors, setErrors] = useState({
@@ -38,7 +39,7 @@ const About: React.FC = () => {
     lastName: "",
     email: "",
     description: "",
-    eventImage: "",
+    eventImage: ""
   });
 
   // Handlers for input changes and validations
@@ -86,14 +87,18 @@ const About: React.FC = () => {
 
   // Image file handling
   const handleBrowseClick = () => {
-    if (typeof window !== "undefined") {
-      if (window.innerWidth < 768) {
-        setShowImagePickerModal(true);
-      } else {
-        fileInputRef.current?.click();
-      }
-    }
+    setShowImagePickerModal(true);
   };
+  
+  // const handleBrowseClick = () => {
+  //   if (typeof window !== "undefined") {
+  //     if (window.innerWidth < 768) {
+  //       setShowImagePickerModal(true);
+  //     } else {
+  //       fileInputRef.current?.click();
+  //     }
+  //   }
+  // };
 
   const handleSelectGallery = () => {
     fileInputRef.current?.removeAttribute("capture");
@@ -211,16 +216,6 @@ const About: React.FC = () => {
 };
 
 export default About;
-
-
-
-
-
-
-
-
-
-
 
 // "use client";
 // import { useState, useRef } from "react";
@@ -436,50 +431,6 @@ export default About;
 
 // export default About;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // // pages/About.tsx or app/about/page.tsx
 // "use client";
 // import { useState, useRef } from "react";
@@ -693,20 +644,6 @@ export default About;
 
 // export default About;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // // pages/About.tsx or app/about/page.tsx
 // "use client";
 // import { useState, useRef } from "react";
@@ -902,48 +839,6 @@ export default About;
 // };
 
 // export default About;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // "use client";
 // import { useState, useRef } from "react";

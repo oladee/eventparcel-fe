@@ -1,3 +1,6 @@
+"use client"
+
+
 import React from "react";
 import { MapPin } from "lucide-react";
 import EventCoverImage from "./EventCoverImage";
