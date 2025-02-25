@@ -50,12 +50,12 @@ const Login: React.FC = () => {
             const response = await axiosInstance.post("/login", { email, password });
             console.log(response.data);
 
-            toast.success("Login successful!");
+            toast.success(response?.data?.message);
             localStorage.setItem("authToken", response.data.token);
 
             // router.push("/dashboard"); // Redirect after successful login
         } catch (error: any) {
-            if (error.response?.status === 403) {
+            if (error.response?.data?.message === "User not verified. Please verify OTP first") {
                 localStorage.setItem("email", email);
                 toast.error(error.response?.data?.message || "User not verified. Please verify OTP first");
                 setTimeout(() => {

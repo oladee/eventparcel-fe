@@ -160,8 +160,8 @@ const handleContinue = async () => {
     });
     console.log("Event created:", response.data);
     setShowSuccess(true);
-  } catch (error) {
-    console.error("Error creating event:", error);
+  } catch (error:any) {
+    toast.error(error.response?.data?.message);
   } finally {
     setLoading(false);
   }
