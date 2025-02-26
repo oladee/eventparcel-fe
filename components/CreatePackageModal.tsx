@@ -89,6 +89,18 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
     //     }
     // };
 
+    const validateField = (id: string, value: string) => {
+        if (id === "groupName") {
+          if (!value.trim()) return "Group name is required";
+          if (value.length < 5) return "Group name must be at least 5 characters";
+          if (value.length > 60) return "Group name must not exceed 60 characters";
+        }
+        if (id === "groupDescription") {
+          if (value.length > 150) return "Description must not exceed 150 characters";
+        }
+        return "";
+      };
+
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if (!files) return;
@@ -173,7 +185,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
     
     
     return (
-        <div className="w-[680px] max-h-[95vh] bg-white rounded-2xl shadow-lg p-5 flex flex-col gap-1.5 overflow-y-auto">
+        <div className="w-[680px] max-h-[98vh] bg-white rounded-2xl shadow-lg p-5 flex flex-col gap-1.5 overflow-y-auto">
             {/* Header */}
             <div className="flex justify-between items-center">
                 <p className="font-bold text-lg text-[#111827]">
@@ -241,14 +253,17 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                     placeholder="Add package description" 
                     className="w-full h-[120px] p-2 rounded-xl border" 
                 />
+                <div className="border border-gray-200 px-2 rounded-[10px] flex items-center">
+                <span className="text-[20px]">₦</span>
                 <input 
                     type="number" 
                     id="packagePrice" 
                     value={formData.packagePrice} 
                     onChange={handleChange} 
                     placeholder="Amount" 
-                    className="w-full h-14 p-2 rounded-xl border" 
-                />
+                    className="w-full h-14 p-2" 
+                    />
+                </div>
                 <input 
                     type="text" 
                     id="packageQuantity" 
