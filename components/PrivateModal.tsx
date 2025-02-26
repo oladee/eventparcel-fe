@@ -7,7 +7,7 @@ import { Group, Package } from "@/app/interface/Group";
 import axiosInstance from "@/lib/axiosInstance";
 import axios from "axios";
 import AddGroup from "./AddGroupCaller";
-import CreateGroupCaller from "./AddNew";
+// import CreateGroupCaller from "./AddNew";
 
 
 
@@ -18,7 +18,7 @@ type PrivateGroupProps = {
 
 const PrivateGroup: React.FC<PrivateGroupProps>  = ({ group }) => {
     const [openModalPackage, setOpenModalPackage] = useState(false);
-    const [openModalGroup, setOpenModalGroup] = useState(false);
+    // const [, setOpenModalGroup] = useState(false);
     const [modalMode, setModalMode] = useState<"create" | "update">("create");
     const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
     const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
