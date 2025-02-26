@@ -63,7 +63,7 @@ const Login: React.FC = () => {
                     router.push("/otp-verification");
                 }, 3000);
             } else {
-                toast.error(error.response?.data?.message || "Login failed. Try again.");
+                toast.error(error.response?.data?.message);
             }
         } finally {
             setLoading(false);
