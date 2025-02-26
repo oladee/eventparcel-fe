@@ -1,7 +1,8 @@
 "use client";
 
 import { useState } from "react";
-import { Eye, EyeOff } from "lucide-react";
+import { IoEyeOutline } from "react-icons/io5";
+import { FiEyeOff } from "react-icons/fi";
 import { useRouter } from "next-nprogress-bar";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -125,7 +126,7 @@ const Login: React.FC = () => {
                                 className="absolute right-3 top-[16px] text-gray-500 outline-none"
                                 onClick={() => setShowPassword(!showPassword)}
                             >
-                                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+                                {showPassword ? <FiEyeOff size={20} /> : <IoEyeOutline size={20} />}
                             </button>
                         </div>
 
