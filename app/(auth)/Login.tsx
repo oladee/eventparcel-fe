@@ -1,5 +1,7 @@
 "use client";
 
+
+
 import { useEffect, useState } from "react";
 import { IoEyeOutline } from "react-icons/io5";
 import { FiEyeOff } from "react-icons/fi";
@@ -18,11 +20,12 @@ const Login: React.FC = () => {
     const [loading, setLoading] = useState(false);
     const [errors, setErrors] = useState({ email: "", password: "" });
     const router = useRouter();
-    const [localEmail, setLocalEmail] = useState("");
+    // const [localEmail, setLocalEmail] = useState("");
 
     useEffect(() => {
         // Check localStorage for eventDetails
         const eventDetails = localStorage.getItem("eventDetails");
+        console.log(eventDetails)
     
         if (eventDetails) {
           const parsedDetails = JSON.parse(eventDetails);

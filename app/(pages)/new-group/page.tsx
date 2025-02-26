@@ -18,7 +18,7 @@ const AddGroup = dynamic(() => import('@/components/AddGroupCaller'), { ssr: fal
 const NewGroup: React.FC = () => {
   const [isRightBarOpen, setIsRightBarOpen] = useState(false);
   const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
+  // const [showSuccess, setShowSuccess] = useState(false);
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);

@@ -59,19 +59,16 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
-        
         setFormData((prev) => ({
             ...prev,
-            [id as keyof PackageFormData]: value, 
+            [id as keyof PackageFormData]: value,
         }));
-
-        if (value.trim() !== "") {
-            setErrors((prev) => ({
-                ...prev,
-                [id as keyof PackageFormData]: "",
-            }));
-        }
+        setErrors((prev) => ({
+            ...prev,
+            [id as keyof PackageFormData]: validateField(id as keyof PackageFormData, value),
+        }));
     };
+
 
     // const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     //     const { id, value } = e.target;
@@ -88,18 +85,19 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
     //         }));
     //     }
     // };
-
-    const validateField = (id: string, value: string) => {
-        if (id === "groupName") {
-          if (!value.trim()) return "Group name is required";
-          if (value.length < 5) return "Group name must be at least 5 characters";
-          if (value.length > 60) return "Group name must not exceed 60 characters";
+    const validateField = (id: keyof PackageFormData, value: string | number) => {
+        if (id === "packageTitle" && (!value || value.toString().trim().length < 3)) {
+            return "Package title must be at least 3 characters long";
         }
-        if (id === "groupDescription") {
-          if (value.length > 150) return "Description must not exceed 150 characters";
+        if (id === "packageDescription" && (!value || value.toString().trim().length < 10)) {
+            return "Package description must be at least 10 characters long";
+        }
+        if (id === "packagePrice" && (!value || Number(value) <= 0)) {
+            return "Price must be a positive number";
         }
         return "";
-      };
+    };
+
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
@@ -253,17 +251,19 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                     placeholder="Add package description" 
                     className="w-full h-[120px] p-2 rounded-xl border" 
                 />
-                <div className="border border-gray-200 px-2 rounded-[10px] flex items-center">
-                <span className="text-[20px]">₦</span>
-                <input 
-                    type="number" 
-                    id="packagePrice" 
-                    value={formData.packagePrice} 
-                    onChange={handleChange} 
-                    placeholder="Amount" 
-                    className="w-full h-14 p-2" 
-                    />
-                </div>
+           <div className="flex items-center border border-gray-300 rounded-[10px] px-4 py-2 bg-white focus-within:border-blue-500 transition">
+            <span className="text-lg text-gray-600 font-medium">₦</span>
+            <input
+                type="number"
+                id="packagePrice"
+                value={formData.packagePrice}
+                onChange={handleChange}
+                placeholder="Enter amount"
+                className="w-full h-12 p-2 outline-none bg-transparent text-gray-900 placeholder-gray-400"
+            />
+            </div>
+
+
                 <input 
                     type="text" 
                     id="packageQuantity" 
@@ -319,17 +319,25 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                 >
                     Cancel
                 </button>
-                {/* <button 
+                <button 
                     onClick={handleSubmit} 
-                    className="px-4 py-2 text-white rounded-xl bg-[#751423]"
+                    disabled={loading}  
+                    className={`px-4 py-2 text-white rounded-xl ${
+                        loading ? "bg-gray-400 cursor-not-allowed" : "bg-[#751423]"
+                    }`}
                 >
-                    {mode === "create" ? "Create Package" : "Update Package"}
-                </button> */}
-                <button
+                    {loading 
+                        ? "Creating Package..." 
+                        : mode === "create" 
+                            ? "Create Package" 
+                            : "Update Package"}
+                </button>
+
+                {/* <button
                 className="px-4 py-2 text-white rounded-xl bg-[#751423]"
                 onClick={handleSubmit}>
                         {loading ? "loading..." : "Create Package"}
-                </button>
+                </button> */}
             </div>
         </div>
     );

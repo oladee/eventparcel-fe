@@ -152,6 +152,7 @@ const handleContinue = async () => {
     });
     console.log("Event created:", response.data);
     localStorage.setItem("eventId", response.data.data._id); 
+    localStorage.setItem("eventDetails",JSON.stringify(response.data))
     setShowSuccess(true);
   } catch (error:any) {
     toast.error(error.response?.data?.message);
