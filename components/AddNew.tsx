@@ -30,7 +30,7 @@ const CreateGroupCaller: React.FC = () => {
 
             {/* Small Button for sm and md screens */}
             <button 
-                className="lg:hidden w-[80px] rounded-[5px] px-2 whitespace-nowrap py-2 bg-[#751423] text-white text-sm font-semibold hover:bg-[#5e101d] transition"
+                className="lg:hidden w-[80px] absolute rounded-[5px] px-2 whitespace-nowrap py-2 bg-[#751423] text-white text-sm font-semibold hover:bg-[#5e101d] transition"
                 onClick={() => setIsAddGroupOpen(true)}
             >
                 Add New

@@ -29,6 +29,7 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
             await axiosInstance.delete(`/delete-group/${group._id}`);
             alert("Package deleted successfully.");
             setOpenModalPackage(false); 
+            window.location.reload();
         } catch (error) {
             console.error("Error deleting package:", error);
             alert("Failed to delete package. Please try again.");
@@ -100,7 +101,7 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
                                         alt="cloth"
                                         width={60}
                                         height={60}
-                                        className="rounded-[5.29px]"
+                                        className="rounded-[5.29px] object-contain"
                                     />
                                     <div className="flex flex-col">
                                         <span className="text-sm font-general font-semibold leading-tight text-[#111827]">

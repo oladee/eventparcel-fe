@@ -65,6 +65,7 @@ const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode }) => {
             const response = await axiosInstance.post("/add-group", formData);
             console.log("Group created:", response.data);
             setShowSuccess(true);
+            window.location.reload()
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 console.error("Error creating group:", error.response?.data || error.message);

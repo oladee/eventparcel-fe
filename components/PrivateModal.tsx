@@ -28,6 +28,7 @@ const PrivateGroup: React.FC<PrivateGroupProps>  = ({ group }) => {
             await axiosInstance.delete(`/delete-group/${group._id}`);
             alert("Package deleted successfully.");
             setOpenModalPackage(false); 
+            window.location.reload();
         } catch (error) {
             console.error("Error deleting package:", error);
             alert("Failed to delete package. Please try again.");
@@ -126,7 +127,7 @@ const PrivateGroup: React.FC<PrivateGroupProps>  = ({ group }) => {
                 </div>
             </div>
             <div className="flex justify-between">
-                <div className="flex items-center gap-1" onClick={handleDelete}>
+                <div className="flex items-center gap-1 cursor-pointer" onClick={handleDelete}>
                     <Image 
                         src="/images/trash.png"
                         alt="delete_package"

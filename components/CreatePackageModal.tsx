@@ -144,15 +144,13 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
         try {
             let response;
             if (mode === "create") {
-                response = await axiosInstance.post("/add-package", formDataToSend, {
-                    headers: { "Content-Type": "multipart/form-data" },
-                });
+                response = await axiosInstance.post("/add-package", formDataToSend);
+                window.location.reload()
             } else if (mode === "update" && packageData?._id) {
                 // formDataToSend.append("packageId", packageData._id.toString());
                     console.log("here", packageData._id)
-                response = await axiosInstance.put(`/update-package/${packageData._id}`, formDataToSend, {
-                    headers: { "Content-Type": "multipart/form-data" },
-                });
+                response = await axiosInstance.put(`/update-package/${packageData._id}`, formDataToSend);
+                window.location.reload()
             }
     
             console.log("Response from backend:", response?.data);
@@ -165,7 +163,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
     
     
     return (
-        <div className="w-[680px] max-h-[90vh] bg-white rounded-2xl shadow-lg p-5 flex flex-col gap-3 overflow-y-auto">
+        <div className="w-[680px] max-h-[95vh] bg-white rounded-2xl shadow-lg p-5 flex flex-col gap-1.5 overflow-y-auto">
             {/* Header */}
             <div className="flex justify-between items-center">
                 <p className="font-bold text-lg text-[#111827]">

@@ -16,37 +16,42 @@ const AddGroup = dynamic(() => import('@/components/AddGroupCaller'), { ssr: fal
 
 
 const NewGroup: React.FC = () => {
-  const eventId = localStorage.getItem("eventId");
   const [isRightBarOpen, setIsRightBarOpen] = useState(false);
   const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  // const [eventId, setEventId] = useState<string | null>(null);
   console.log(loading, error)
-
+  
   useEffect(() => {
-
-    if(!eventId) {
+    if (typeof window !== "undefined") {
+      const storedEventId = localStorage.getItem("eventId");
+      // setEventId(storedEventId);
+  
+      if (!storedEventId) {
         router.push("/event-creation");
-    }
-
-    const fetchGroups = async () => {
-      setLoading(true); 
-  
-      try {
-        const response = await axiosInstance.get(`/view-groups/${eventId}`);
-        setGroups(response.data.data); 
-      } catch (err) {
-        console.error("Error fetching groups:", err);
-        setError("Failed to fetch groups");
-      } finally {
-        setLoading(false);
+        return; 
       }
-    };
   
-    fetchGroups();
-  }, []);
+      const fetchGroups = async () => {
+        setLoading(true);
+        try {
+          const response = await axiosInstance.get(`/view-groups/${storedEventId}`);
+          setGroups(response.data.data);
+        } catch (err) {
+          console.error("Error fetching groups:", err);
+          setError("Failed to fetch groups");
+        } finally {
+          setLoading(false);
+        }
+      };
+  
+      fetchGroups();
+    }
+  }, [router]); 
+  
   
   const isFormValid = groups.length > 0 && groups.some(group => group.packages.length > 0);
   const hasGeneralGroup = groups.some(group => group.groupPrivacy === "general");
@@ -57,8 +62,8 @@ const NewGroup: React.FC = () => {
   };
 
   return (
-    <section className="border border-gray-300 bg-[#EEEFF2] mt-14 ">
-      <div className="py-6 lg:py-12 mx-auto max-w-7xl">
+    <section className="border border-gray-300 bg-[#EEEFF2] mt-14 h-full">
+      <div className="py-6 lg:py-12">
         {/* Header Section */}
         <div className="mb-6 lg:mb-12 text-center">
           <h3 className="text-2xl sm:text-3xl font-bold text-gray-900">
@@ -78,17 +83,31 @@ const NewGroup: React.FC = () => {
         </div>
 
         {/* Content Section */}
-        <div className="flex flex-col items-center sm:items-start">
-          {!hasGeneralGroup && !hasPrivateGroup ? (
-            <button onClick={handleAddGroupClick} className="w-full sm:w-auto">
+        <div className="flex flex-col px-6 lg:pl-20 xl:pl-40">
+          {groups.length === 0 ? 
+            <div className="flex items-center justify-center h-screen w-full">
+            <div className="animate-spin h-10 w-10 border-4 border-gray-300 border-t-gray-600 rounded-full"></div>
+          </div>
+          : !hasGeneralGroup && !hasPrivateGroup ? (
+            <button onClick={handleAddGroupClick} className="w-full sm:w-auto lg:pl-24 xl:pl-48">
               <AddGroup mode="noGroup" setIsAddGroupOpen={setIsAddGroupOpen} />
             </button>
           ) : (
             <>
               {/* General Groups Only */}
               {hasGeneralGroup && !hasPrivateGroup && (
-                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full sm:w-auto">
+                <>
+                  <div className="sm:flex mb-11 md:flex lg:hidden w-full justify-center">
+                    <CreateGroupCaller />
+                  </div>
+                <div className=" flex sm:flex-row items-center sm:items-start mr-4 justify-start">
+                  <div 
+                    className={
+                      groups.filter(group => group.groupPrivacy === "general").length === 1
+                      ? "w-auto"
+                      : "grid grid-cols-2 gap-8 sm:grid-cols-2 w-auto"
+                    }
+                  >
                     {groups
                       .filter(group => group.groupPrivacy === "general")
                       .map(group => (
@@ -97,17 +116,28 @@ const NewGroup: React.FC = () => {
                   </div>
 
                   {/* Sidebar Actions */}
-                  <div className="flex flex-col space-y-4">
+                  <div className="hidden lg:flex flex-col space-y-2 ml-0">
                     {isAddGroupOpen && <AddGroup mode="availGroup" setIsAddGroupOpen={setIsAddGroupOpen} />}
                     <CreateGroupCaller />
                   </div>
                 </div>
+                    </>
               )}
-
+              
               {/* Private Groups Only */}
               {hasPrivateGroup && !hasGeneralGroup && (
-                <div className="flex flex-col sm:flex-row items-center sm:items-start gap-6">
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 w-full sm:w-auto">
+                <>
+                 <div className="sm:flex mb-11 md:flex lg:hidden w-full justify-center">
+                    <CreateGroupCaller />
+                  </div>
+                 <div className=" flex sm:flex-row items-center sm:items-start mr-4 justify-start">
+                 <div 
+                   className={
+                     groups.filter(group => group.groupPrivacy === "private").length === 1
+                     ? "w-auto lg:ml-10 xl:ml-28"
+                     : "grid grid-cols-2 gap-8 sm:grid-cols-2 w-auto"
+                    }
+                    >
                     {groups
                       .filter(group => group.groupPrivacy === "private")
                       .map(group => (
@@ -116,21 +146,23 @@ const NewGroup: React.FC = () => {
                   </div>
 
                   {/* Sidebar Actions */}
-                  <div className="flex flex-col space-y-4">
+                  <div className="hidden  lg:flex flex-col space-y-4 ">
                     {isAddGroupOpen && <AddGroup mode="availGroup" setIsAddGroupOpen={setIsAddGroupOpen} />}
                     <CreateGroupCaller />
                   </div>
                 </div>
+                  </>
               )}
 
               {/* Both General and Private Groups */}
               {hasGeneralGroup && hasPrivateGroup && (
-                <div className="grid mx-8 lg:ml-24 grid-cols-1 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3 md:gap-4 gap-3">
+                <div className="grid lg:ml-2 grid-cols-1 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3">
                   
                   {/* CreateGroupCaller - Show only for sm and md */}
-                  <div className="sm:flex md:flex lg:hidden w-full justify-center">
+                  <div className="sm:flex mb-11 md:flex lg:hidden w-full justify-center">
                     <CreateGroupCaller />
                   </div>
+                  <div className="flex flex-col lg:flex-row gap-16 xl:gap-20">
 
                   {/* General Groups */}
                   <div className="flex flex-col gap-2">
@@ -152,15 +184,16 @@ const NewGroup: React.FC = () => {
                     <CreateGroupCaller />
                   </div>
                 </div>
+              </div>
               )}
             </>
           )}
         </div>
 
-        {/* Right Bar */}
-        <RightBar isOpen={isRightBarOpen} setIsOpen={setIsRightBarOpen} />
+{/* Right Bar */}
+<RightBar isOpen={isRightBarOpen} setIsOpen={setIsRightBarOpen} />
       </div>
-
+      
       <FormButtons
           isFormValid={!!isFormValid}
           onContinue={() => isFormValid && setShowSuccess(!showSuccess)}
