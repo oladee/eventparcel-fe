@@ -18,17 +18,14 @@ const AddGroup = dynamic(() => import('@/components/AddGroupCaller'), { ssr: fal
 const NewGroup: React.FC = () => {
   const [isRightBarOpen, setIsRightBarOpen] = useState(false);
   const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
-  // const [showSuccess, setShowSuccess] = useState(false);
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
-  // const [eventId, setEventId] = useState<string | null>(null);
   console.log(loading, error)
   
   useEffect(() => {
     if (typeof window !== "undefined") {
       const storedEventId = localStorage.getItem("eventId");
-      // setEventId(storedEventId);
   
       if (!storedEventId) {
         router.push("/event-creation");

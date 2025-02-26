@@ -23,19 +23,19 @@ const Login: React.FC = () => {
     // const [localEmail, setLocalEmail] = useState("");
 
     useEffect(() => {
-        // Check localStorage for eventDetails
+        // Get eventDetails from localStorage
         const eventDetails = localStorage.getItem("eventDetails");
-        console.log(eventDetails)
     
         if (eventDetails) {
-          const parsedDetails = JSON.parse(eventDetails);
-          
-          // If email exists, set it to state
-          if (parsedDetails.hostEmail){
-            setEmail(parsedDetails.hostName);
-          }
+            const parsedDetails = JSON.parse(eventDetails);
+    
+        
+            if (parsedDetails.data?.hostEmail) {
+                setEmail(parsedDetails.data.hostEmail);
+            }
         }
-      }, []);
+    }, []);
+    
 
     const validateInput = (name: string, value: string) => {
         let errorMessage = "";
