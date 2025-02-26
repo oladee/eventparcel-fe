@@ -47,7 +47,7 @@ const NewGroup: React.FC = () => {
   
       fetchGroups();
     }
-  }, ); 
+  }, []); 
   
   
   const isFormValid = groups.length > 0 && groups.some(group => group.packages.length > 0);

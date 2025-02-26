@@ -82,7 +82,7 @@ const PrivateGroup: React.FC<PrivateGroupProps>  = ({ group }) => {
                             height={16}
                             onClick={() => {
                                 setSelectedGroup(group);
-                                setOpenModalGroup(true);
+                                // setOpenModalGroup(true);
                             }}
                         />
                         <span className="font-general font-medium text-sm text-[#718096]">Edit</span>
