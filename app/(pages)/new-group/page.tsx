@@ -16,8 +16,8 @@ const NewGroup: React.FC = () => {
   const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [groups, setGroups] = useState<Group[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [, setLoading] = useState(true);
+  const [, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const fetchGroups = async () => {
