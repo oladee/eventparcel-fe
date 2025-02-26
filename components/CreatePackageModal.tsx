@@ -38,6 +38,34 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
         packageImgUrls: [],  
     });
 
+    const validateField = (field: keyof PackageFormData, value: string) => {
+        if (field === "packageTitle") {
+            if (!value.trim()) return "Title is required.";
+            if (value.length < 5 || value.length > 60) return "Title must be between 5 and 60 characters.";
+        }
+    
+        if (field === "packageDescription") {
+            if (value && value.length > 150) return "Description cannot exceed 150 characters.";
+        }
+    
+        if (field === "packagePrice") {
+            if (!value.trim()) return "Price is required.";
+            if (isNaN(Number(value)) || Number(value) <= 0) return "Price must be a valid positive number.";
+        }
+    
+        // if (field === "packageQuantity") {
+        //     if (!value.trim()) return "Quantity is required.";
+        //     if (isNaN(Number(value)) || Number(value) <= 0 || !Number.isInteger(Number(value))) {
+        //         return "Quantity must be a valid positive integer.";
+        //     }
+        // }
+    
+        return ""; 
+    };
+    
+    
+    
+
     const [selectedOptions, setSelectedOptions] = useState<{ homeDelivery: boolean; pickUp: boolean }>({
         homeDelivery: false,
         pickUp: false,
@@ -59,15 +87,18 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
+        
         setFormData((prev) => ({
             ...prev,
             [id as keyof PackageFormData]: value,
         }));
+    
         setErrors((prev) => ({
             ...prev,
             [id as keyof PackageFormData]: validateField(id as keyof PackageFormData, value),
         }));
     };
+    
 
 
     // const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -85,18 +116,18 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
     //         }));
     //     }
     // };
-    const validateField = (id: keyof PackageFormData, value: string | number) => {
-        if (id === "packageTitle" && (!value || value.toString().trim().length < 3)) {
-            return "Package title must be at least 3 characters long";
-        }
-        if (id === "packageDescription" && (!value || value.toString().trim().length < 10)) {
-            return "Package description must be at least 10 characters long";
-        }
-        if (id === "packagePrice" && (!value || Number(value) <= 0)) {
-            return "Price must be a positive number";
-        }
-        return "";
-    };
+    // const validateField = (id: keyof PackageFormData, value: string | number) => {
+    //     if (id === "packageTitle" && (!value || value.toString().trim().length < 3)) {
+    //         return "Package title must be at least 3 characters long";
+    //     }
+    //     if (id === "packageDescription" && (!value || value.toString().trim().length < 10)) {
+    //         return "Package description must be at least 10 characters long";
+    //     }
+    //     if (id === "packagePrice" && (!value || Number(value) <= 0)) {
+    //         return "Price must be a positive number";
+    //     }
+    //     return "";
+    // };
 
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -183,7 +214,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
     
     
     return (
-        <div className="w-[680px] max-h-[98vh] bg-white rounded-2xl shadow-lg p-5 flex flex-col gap-1.5 overflow-y-auto">
+        <div className="w-[680px] max-h-[95vh] bg-white rounded-2xl gap-1.5 shadow-lg p-5 flex flex-col  overflow-y-auto">
             {/* Header */}
             <div className="flex justify-between items-center">
                 <p className="font-bold text-lg text-[#111827]">
@@ -242,15 +273,18 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                     value={formData.packageTitle} 
                     onChange={handleChange} 
                     placeholder="Add package title" 
-                    className="w-full h-14 p-2 rounded-xl border" 
+                    className="w-full h-10 p-2 rounded-xl border" 
                 />
+                {errors.packageTitle && <p className="text-red-500 text-sm mt-1">{errors.packageTitle}</p>}
+
                 <textarea 
                     id="packageDescription" 
                     value={formData.packageDescription} 
                     onChange={handleChange} 
                     placeholder="Add package description" 
-                    className="w-full h-[120px] p-2 rounded-xl border" 
+                    className="w-full h-[80px] p-2 rounded-xl border" 
                 />
+                {errors.packageDescription && <p className="text-red-500 text-sm mt-1">{errors.packageDescription}</p>}
            <div className="flex items-center border border-gray-300 rounded-[10px] px-4 py-2 bg-white focus-within:border-blue-500 transition">
             <span className="text-lg text-gray-600 font-medium">₦</span>
             <input
@@ -262,6 +296,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                 className="w-full h-12 p-2 outline-none bg-transparent text-gray-900 placeholder-gray-400"
             />
             </div>
+            {errors.packagePrice && <p className="text-red-500 text-sm mt-1">{errors.packagePrice}</p>}
 
 
                 <input 
