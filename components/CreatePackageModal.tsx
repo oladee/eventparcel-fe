@@ -26,6 +26,7 @@ interface CreatePackageModalProps {
 
 const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpenModalPackage, mode, packageData }) => {
     const [errors, setErrors] = useState<FormErrors>({});
+    const [loading, setLoading] = useState(false);
     // const [, setTouched] = useState<FormErrors>({});
     const [formData, setFormData] = useState<PackageFormData>({
         groupId: groudId,
@@ -121,6 +122,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
      Object.values(errors).every((err) => err === ""));
 
      const handleSubmit = async () => {
+
         if (!isFormValid) return;
     
         const formDataToSend = new FormData();
@@ -142,6 +144,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
         }
     
         try {
+            setLoading(true)
             let response;
             if (mode === "create") {
                 response = await axiosInstance.post("/add-package", formDataToSend, {
@@ -162,6 +165,8 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
         } catch (error) {
             console.error("Error submitting form:", error);
         }
+        finally {
+            setLoading(true)}
     };
     
     
@@ -299,11 +304,16 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                 >
                     Cancel
                 </button>
-                <button 
+                {/* <button 
                     onClick={handleSubmit} 
                     className="px-4 py-2 text-white rounded-xl bg-[#751423]"
                 >
                     {mode === "create" ? "Create Package" : "Update Package"}
+                </button> */}
+                <button
+                className="px-4 py-2 text-white rounded-xl bg-[#751423]"
+                onClick={handleSubmit}>
+                        {loading ? "loading..." : "Create Package"}
                 </button>
             </div>
         </div>
