@@ -76,10 +76,14 @@ const About: React.FC = () => {
       /[^a-zA-Z\s]/.test(value)
     )
       return "Name cannot include numbers or special characters.";
-    if (id === "description" && value.length < 20)
-      return "Description must be at least 20 characters.";
+    if (id === "description" && value.length < 5)
+      return "Description must be at least 5 characters.";
+    if (id === "description" && value.length > 300)
+      return "Description must have maximum of 300 character.";
     if (id === "eventName" && value.length < 5)
       return "Event name must be at least 5 characters.";
+    if (id === "eventName" && value.length > 60)
+      return "Event name must not be exceed 60 characters.";
     return "";
   };
 
