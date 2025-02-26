@@ -3,10 +3,11 @@ import React from "react";
 interface FormButtonsProps {
   isFormValid: boolean;
   onSubmit: () => void;
+  loading: boolean
 }
 
 
-const FormButton: React.FC<FormButtonsProps> = ({ isFormValid, onSubmit }) => {
+const FormButton: React.FC<FormButtonsProps> = ({ isFormValid, onSubmit, loading }) => {
   return (
     <button
       type="submit"
@@ -16,7 +17,7 @@ const FormButton: React.FC<FormButtonsProps> = ({ isFormValid, onSubmit }) => {
         !isFormValid ? "opacity-50 cursor-not-allowed" : ""
       }`}
     >
-      Continue Group
+      {loading ? "Creating Group..." : "Continue Group"}
     </button>
   );
 };

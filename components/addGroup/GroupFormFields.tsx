@@ -17,28 +17,37 @@ const GroupFormFields: React.FC<GroupFormFieldsProps> = ({
 }) => {
   return (
     <div className="flex flex-col gap-2">
+      {/* Group Name Input */}
       <input
         type="text"
         id="groupName"
         value={formData.groupName}
         onChange={handleChange}
         onBlur={handleBlur}
-        className="h-14 shadow-sm bg-gray-50 border rounded-xl border-gray-300 text-gray-900 text-sm focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
+        className={`h-14 shadow-sm bg-gray-50 border rounded-xl border-gray-300 text-gray-900 text-sm focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 ${
+          touched.groupName && errors.groupName ? "border-red-500" : ""
+        }`}
         placeholder="Group name"
         required
       />
-      {touched.groupName && errors.groupName && <p className="text-xs text-red-500">{errors.groupName}</p>}
+      {touched.groupName && errors.groupName && (
+        <p className="text-xs text-red-500">{errors.groupName}</p>
+      )}
 
+      {/* Group Description Input (Optional) */}
       <textarea
         id="groupDescription"
         value={formData.groupDescription}
         onChange={handleChange}
         onBlur={handleBlur}
-        placeholder="Group groupDescription"
-        className="h-[120px] shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5"
-        required
+        placeholder="Group description (optional)"
+        className={`h-[120px] shadow-sm bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-xl focus:ring-primary-500 focus:border-primary-500 block w-full p-2.5 ${
+          touched.groupDescription && errors.groupDescription ? "border-red-500" : ""
+        }`}
       />
-      {touched.groupDescription && errors.groupDescription && <p className="text-xs text-red-500">{errors.groupDescription}</p>}
+      {touched.groupDescription && errors.groupDescription && (
+        <p className="text-xs text-red-500">{errors.groupDescription}</p>
+      )}
     </div>
   );
 };

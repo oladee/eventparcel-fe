@@ -82,113 +82,72 @@ const NewGroup: React.FC = () => {
           </p>
         </div>
 
-        {/* Content Section */}
-        <div className="flex flex-col px-6 lg:pl-20 xl:pl-40">
-          {!hasGeneralGroup && !hasPrivateGroup ? (
-            <button onClick={handleAddGroupClick} className="w-full sm:w-auto lg:pl-24 xl:pl-48">
-              <AddGroup mode="noGroup" setIsAddGroupOpen={setIsAddGroupOpen} />
-            </button>
-          ) : (
-            <>
-              {/* General Groups Only */}
-              {hasGeneralGroup && !hasPrivateGroup && (
-                <>
-                  <div className="sm:flex mb-11 md:flex lg:hidden w-full justify-center">
-                    <CreateGroupCaller />
-                  </div>
-                <div className=" flex sm:flex-row items-center sm:items-start mr-4 justify-start">
-                  <div 
-                    className={
-                      groups.filter(group => group.groupPrivacy === "general").length === 1
-                      ? "w-auto"
-                      : "grid grid-cols-2 gap-8 sm:grid-cols-2 w-auto"
-                    }
-                  >
-                    {groups
-                      .filter(group => group.groupPrivacy === "general")
-                      .map(group => (
-                        <GeneralModal key={group._id} group={group} />
-                      ))}
-                  </div>
-
-                  {/* Sidebar Actions */}
-                  <div className=" lg:flex flex-col space-y-2 ml-0">
-                    {isAddGroupOpen && <AddGroup mode="availGroup" setIsAddGroupOpen={setIsAddGroupOpen} />}
-                    <CreateGroupCaller />
-                  </div>
+        {loading ? (
+          <div className="flex items-center justify-center">
+          <div className="w-10 h-10 border-4 border-gray-300 border-t-gray-700 rounded-full animate-spin"></div>
+        </div>
+        ) : groups.length === 0 ? (
+          <button onClick={handleAddGroupClick} className="w-full sm:w-auto lg:pl-24 xl:pl-48">
+            <AddGroup mode="noGroup" setIsAddGroupOpen={setIsAddGroupOpen} />
+          </button>
+        ) : (
+          <div className="flex flex-col px-6 lg:pl-20 xl:pl-40">
+            {/* Show General Groups */}
+            {hasGeneralGroup && !hasPrivateGroup && (
+              <div className="flex sm:flex-row items-center sm:items-start mr-4 justify-start">
+                <div className={groups.length === 1 ? "w-auto" : "grid grid-cols-2 gap-8 sm:grid-cols-2 w-auto"}>
+                  {groups.filter(group => group.groupPrivacy === "general").map(group => (
+                    <GeneralModal key={group._id} group={group} />
+                  ))}
                 </div>
-                    </>
-              )}
-              
-              {/* Private Groups Only */}
-              {hasPrivateGroup && !hasGeneralGroup && (
-                <>
-                 <div className="sm:flex mb-11 md:flex lg:hidden w-full justify-center">
-                    <CreateGroupCaller />
-                  </div>
-                 <div className=" flex sm:flex-row items-center sm:items-start mr-4 justify-start">
-                 <div 
-                   className={
-                     groups.filter(group => group.groupPrivacy === "private").length === 1
-                     ? "w-auto lg:ml-10 xl:ml-28"
-                     : "grid grid-cols-2 gap-8 sm:grid-cols-2 w-auto"
-                    }
-                    >
-                    {groups
-                      .filter(group => group.groupPrivacy === "private")
-                      .map(group => (
-                        <PrivateGroup key={group._id} group={group} />
-                      ))}
-                  </div>
-
-                  {/* Sidebar Actions */}
-                  <div className="hidden  lg:flex flex-col space-y-4 ">
-                    {isAddGroupOpen && <AddGroup mode="availGroup" setIsAddGroupOpen={setIsAddGroupOpen} />}
-                    <CreateGroupCaller />
-                  </div>
+                <div className="hidden lg:flex flex-col space-y-2 ml-0">
+                  {isAddGroupOpen && <AddGroup mode="availGroup" setIsAddGroupOpen={setIsAddGroupOpen} />}
+                  <CreateGroupCaller />
                 </div>
-                  </>
-              )}
+              </div>
+            )}
 
-              {/* Both General and Private Groups */}
-              {hasGeneralGroup && hasPrivateGroup && (
-                <div className="grid lg:ml-2 grid-cols-1 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3">
-                  
-                  {/* CreateGroupCaller - Show only for sm and md */}
-                  <div className="sm:flex mb-11 md:flex lg:hidden w-full justify-center">
-                    <CreateGroupCaller />
-                  </div>
-                  <div className="flex flex-col lg:flex-row gap-16 xl:gap-20">
+            {/* Show Private Groups */}
+            {hasPrivateGroup && !hasGeneralGroup && (
+              <div className="flex sm:flex-row items-center sm:items-start mr-4 justify-start">
+                <div className={groups.length === 1 ? "w-auto lg:ml-10 xl:ml-28" : "grid grid-cols-2 gap-8 sm:grid-cols-2 w-auto"}>
+                  {groups.filter(group => group.groupPrivacy === "private").map(group => (
+                    <PrivateGroup key={group._id} group={group} />
+                  ))}
+                </div>
+                <div className="hidden lg:flex flex-col space-y-4">
+                  {isAddGroupOpen && <AddGroup mode="availGroup" setIsAddGroupOpen={setIsAddGroupOpen} />}
+                  <CreateGroupCaller />
+                </div>
+              </div>
+            )}
 
-                  {/* General Groups */}
+            {/* Show Both Groups */}
+            {hasGeneralGroup && hasPrivateGroup && (
+              <div className="grid lg:ml-2 grid-cols-1 sm:grid-cols-3 md:grid-cols-3 lg:grid-cols-3">
+                <div className="flex flex-col lg:flex-row gap-16 xl:gap-20">
                   <div className="flex flex-col gap-2">
-                    {groups?.filter(group => group.groupPrivacy === "general")?.map(group => (
+                    {groups.filter(group => group.groupPrivacy === "general").map(group => (
                       <GeneralModal key={group._id} group={group} />
                     ))}
                   </div>
-
-                  {/* Private Groups */}
                   <div className="lg:ml-2 flex flex-col gap-2">
-                    {groups?.filter(group => group.groupPrivacy === "private")?.map(group => (
+                    {groups.filter(group => group.groupPrivacy === "private").map(group => (
                       <PrivateGroup key={group._id} group={group} />
                     ))}
                   </div>
-
-                  {/* Sidebar Actions - Show only on lg */}
                   <div className="hidden lg:flex flex-col gap-2">
                     {isAddGroupOpen && <AddGroup mode="availGroup" setIsAddGroupOpen={setIsAddGroupOpen} />}
                     <CreateGroupCaller />
                   </div>
                 </div>
               </div>
-              )}
-            </>
-          )}
-        </div>
-
-{/* Right Bar */}
-<RightBar isOpen={isRightBarOpen} setIsOpen={setIsRightBarOpen} />
-      </div>
+            )}
+          </div>
+        )}
+    {/* Right Bar */}
+    <RightBar isOpen={isRightBarOpen} setIsOpen={setIsRightBarOpen} />
+          </div>
       
       <FormButtons
           isFormValid={!!isFormValid}
