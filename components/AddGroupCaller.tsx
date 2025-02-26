@@ -18,6 +18,7 @@ const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode }) => {
   const eventId = localStorage.getItem("eventId");
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [error, setError] = useState(false);
   const [formData, setFormData] = useState({
     eventId: eventId,
     groupName: "",
@@ -99,7 +100,8 @@ const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode }) => {
       window.location.reload();
     } catch (error) {
       if (axios.isAxiosError(error)) {
-        console.error("Error creating group:", error.response?.data || error.message);
+        const errorMessage = error.response?.data?.message || error.message || "An unknown error occurred.";
+        setError(errorMessage);
       } else {
         console.error("Unexpected error:", error);
       }
@@ -135,7 +137,7 @@ const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode }) => {
         />
         <FormButton isFormValid={isFormValid} onSubmit={() => handleSubmit} loading={loading} />
       </form>
-      {}
+      {error && <p className="text-red-500 font-semibold">{error}</p>}
     </>
   );
 };

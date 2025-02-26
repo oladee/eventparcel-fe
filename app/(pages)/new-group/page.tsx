@@ -80,7 +80,7 @@ const NewGroup: React.FC = () => {
         </div>
 
         {loading ? (
-      <p className="text-xl font-semibold text-center">Loading groups...</p>
+      <p className="text-xl font-semibold h-screen text-center">Loading groups...</p>
     ) : groups.length === 0 ? (
       <button onClick={handleAddGroupClick} className="w-full sm:w-auto lg:pl-24 xl:pl-48">
         <AddGroup mode="noGroup" setIsAddGroupOpen={setIsAddGroupOpen} />

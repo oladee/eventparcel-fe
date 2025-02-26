@@ -2,8 +2,9 @@
 
 import { Package } from "@/app/interface/Group";
 import axiosInstance from "@/lib/axiosInstance";
+import axios from "axios";
 import Image from "next/image";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface PackageFormData {
     groupId?: string | number;
@@ -27,15 +28,15 @@ interface CreatePackageModalProps {
 const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpenModalPackage, mode, packageData }) => {
     const [errors, setErrors] = useState<FormErrors>({});
     const [loading, setLoading] = useState(false);
-    // const [, setTouched] = useState<FormErrors>({});
+    const [error, setError] = useState(false);
     const [formData, setFormData] = useState<PackageFormData>({
         groupId: groudId,
         packageTitle: packageData?.packageTitle || "",
         packageDescription: packageData?.packageDescription || "",
         packagePrice: packageData?.packagePrice || "",
         packageQuantity: packageData?.packageQuantity || "",
-        packageDelivery: [], 
-        packageImgUrls: [],  
+        packageDelivery: packageData?.packageDelivery || [],
+        packageImgUrls: packageData?.packageImgUrls ?? [],
     });
 
     const validateField = (field: keyof PackageFormData, value: string) => {
@@ -65,11 +66,20 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
     
     
     
-
     const [selectedOptions, setSelectedOptions] = useState<{ homeDelivery: boolean; pickUp: boolean }>({
-        homeDelivery: false,
-        pickUp: false,
+        homeDelivery: false, 
+        pickUp: false, 
     });
+    
+
+    useEffect(() => {
+        setSelectedOptions({
+            homeDelivery: formData.packageDelivery?.includes("homeDelivery") ?? false,
+            pickUp: formData.packageDelivery?.includes("pickUp") ?? false,
+        });
+    }, [formData.packageDelivery]);
+    
+
 
     const toggleDeliveryOption = (option: "homeDelivery" | "pickUp") => {
         setFormData((prev) => ({
@@ -129,14 +139,15 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
     //     return "";
     // };
 
-
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
         if (!files) return;
     
         const newFiles = Array.from(files);
-        const totalFiles = (formData.packageImgUrls?.length || 0) + newFiles.length; 
+        const existingImages = formData.packageImgUrls || [];
     
+        const totalFiles = existingImages.length + newFiles.length;
+        
         if (totalFiles > 4) {
             alert("You can only upload up to 4 images.");
             return;
@@ -144,9 +155,10 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
     
         setFormData((prev) => ({
             ...prev,
-            packageImgUrls: [...(prev.packageImgUrls || []), ...newFiles],
+            packageImgUrls: [...existingImages, ...newFiles],
         }));
     };
+    
     
     const removeImage = (index: number) => {
         setFormData((prev) => ({
@@ -195,7 +207,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
             } else if (mode === "update" && packageData?._id) {
                 // formDataToSend.append("packageId", packageData._id.toString());
                     console.log("here", packageData._id)
-                response = await axiosInstance.put(`/update-package/${packageData._id}`, formDataToSend, {
+                    response = await axiosInstance.put(`/update-package/${packageData._id}`, formDataToSend, {
                     headers: { "Content-Type": "multipart/form-data" },
                 });
                 window.location.reload()
@@ -204,7 +216,10 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
     
             console.log("Response from backend:", response?.data);
         } catch (error) {
-            console.error("Error submitting form:", error);
+            if (axios.isAxiosError(error)) {
+                const errorMessage = error.response?.data?.message || error.message || "An unknown error occurred.";
+                setError(errorMessage);
+            }
         }
         finally {
             setLoading(true)}
@@ -214,7 +229,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
     
     
     return (
-        <div className="w-[680px] max-h-[95vh] bg-white rounded-2xl gap-1.5 shadow-lg p-5 flex flex-col  overflow-y-auto">
+        <div className="w-[680px] max-h-[100vh] bg-white rounded-2xl gap-1.5 shadow-lg p-5 flex flex-col  overflow-y-auto">
             {/* Header */}
             <div className="flex justify-between items-center">
                 <p className="font-bold text-lg text-[#111827]">
@@ -234,8 +249,36 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
     
             {/* Image Upload Section */}
             <div className="flex flex-wrap gap-4">
-                {formData.packageImgUrls?.map((img, index) => (
-                    <div key={index} className="relative">
+            {(formData.packageImgUrls?.length ?? 0) > 0 && (
+                <div className="relative">
+                    <Image 
+                        src={
+                            formData.packageImgUrls?.[0]
+                                ? formData.packageImgUrls[0] instanceof File 
+                                    ? URL.createObjectURL(formData.packageImgUrls[0]) 
+                                    : formData.packageImgUrls[0]
+                                : "/placeholder.png" 
+                        }
+                        alt="Main package image"
+                        width={100}
+                        height={100}
+                        className="rounded-[10px] border w-[100px] h-[100px]"
+                    />
+                    <button 
+                        onClick={() => removeImage(0)} 
+                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
+                    >
+                        X
+                    </button>
+                </div>
+            )}
+
+
+
+            {/* Display the remaining images (excluding the first one) */}
+            <div className="flex gap-2 mt-2">
+                {formData.packageImgUrls?.slice(1)?.map((img, index) => (
+                    <div key={index + 1} className="relative">
                         <Image 
                             src={img instanceof File ? URL.createObjectURL(img) : img} 
                             alt="package"
@@ -244,14 +287,15 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                             className="rounded-[10px] border w-[100px] h-[100px]"
                         />
                         <button 
-                            onClick={() => removeImage(index)} 
+                            onClick={() => removeImage(index + 1)} 
                             className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
                         >
                             X
                         </button>
                     </div>
                 ))}
-    
+            </div>
+
                 {/* Image Upload Button */}
                 <label className="w-[100px] h-[100px] flex items-center justify-center border border-gray-300 rounded-[10px] cursor-pointer">
                     <input 
@@ -282,7 +326,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                     value={formData.packageDescription} 
                     onChange={handleChange} 
                     placeholder="Add package description" 
-                    className="w-full h-[80px] p-2 rounded-xl border" 
+                    className="w-full h-[100px] p-2 rounded-xl border" 
                 />
                 {errors.packageDescription && <p className="text-red-500 text-sm mt-1">{errors.packageDescription}</p>}
            <div className="flex items-center border border-gray-300 rounded-[10px] px-4 py-2 bg-white focus-within:border-blue-500 transition">
@@ -293,7 +337,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                 value={formData.packagePrice}
                 onChange={handleChange}
                 placeholder="Enter amount"
-                className="w-full h-12 p-2 outline-none bg-transparent text-gray-900 placeholder-gray-400"
+                className="w-full h-8 p-2 outline-none bg-transparent text-gray-900 placeholder-gray-400"
             />
             </div>
             {errors.packagePrice && <p className="text-red-500 text-sm mt-1">{errors.packagePrice}</p>}
@@ -305,7 +349,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                     value={formData.packageQuantity} 
                     onChange={handleChange} 
                     placeholder="Quantity (optional)" 
-                    className="w-full h-14 p-2 rounded-xl border" 
+                    className="w-full h-8 p-2 rounded-xl border" 
                 />
             </div>
     
@@ -368,12 +412,8 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                             : "Update Package"}
                 </button>
 
-                {/* <button
-                className="px-4 py-2 text-white rounded-xl bg-[#751423]"
-                onClick={handleSubmit}>
-                        {loading ? "loading..." : "Create Package"}
-                </button> */}
             </div>
+                {error && <p className="text-red-500 font-semibold">{error}</p>}
         </div>
     );
     

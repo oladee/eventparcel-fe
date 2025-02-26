@@ -6,7 +6,7 @@ import { useState } from "react";
 import CreatePackageModal from "./CreatePackageModal";
 import { Group, Package } from "@/app/interface/Group";
 import axiosInstance from "@/lib/axiosInstance";
-
+import axios from "axios";
 
 
 type GeneralGroupProps = {
@@ -18,6 +18,7 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
     const [openModalPackage, setOpenModalPackage] = useState(false);
     const [modalMode, setModalMode] = useState<"create" | "update">("create");
     const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
+    const [error, setError] = useState(false)
 
     const handleDelete = async () => {
         if (!group?._id) return;
@@ -31,10 +32,12 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
             setOpenModalPackage(false); 
             window.location.reload();
         } catch (error) {
-            console.error("Error deleting package:", error);
-            alert("Failed to delete package. Please try again.");
+            if (axios.isAxiosError(error)) {
+                const errorMessage = error.response?.data?.message || error.message || "An unknown error occurred.";
+                setError(errorMessage);
         }
     };
+}
     
         
     return (
@@ -157,6 +160,7 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
                         />
                     </div>
                 )}
+                {error && <p className="text-red-500 font-semibold">{error}</p>}
             </div>
         );
 };
