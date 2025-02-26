@@ -5,6 +5,9 @@ import { useState } from "react"
 import CreatePackageModal from "./CreatePackageModal"
 import { Group, Package } from "@/app/interface/Group";
 import axiosInstance from "@/lib/axiosInstance";
+import axios from "axios";
+import AddGroup from "./AddGroupCaller";
+import CreateGroupCaller from "./AddNew";
 
 
 
@@ -15,8 +18,13 @@ type PrivateGroupProps = {
 
 const PrivateGroup: React.FC<PrivateGroupProps>  = ({ group }) => {
     const [openModalPackage, setOpenModalPackage] = useState(false);
+    const [openModalGroup, setOpenModalGroup] = useState(false);
     const [modalMode, setModalMode] = useState<"create" | "update">("create");
     const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
+    const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
+    const [error, setError] = useState(false);
+    const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
+
 
     const handleDelete = async () => {
         if (!group?._id) return;
@@ -34,18 +42,48 @@ const PrivateGroup: React.FC<PrivateGroupProps>  = ({ group }) => {
             alert("Failed to delete package. Please try again.");
         }
     };
+
+    const handleDeletePackage = async () => {
+        const packageId = selectedPackage?._id
+        if (!packageId) return;
+    
+        const confirmDelete = window.confirm("Are you sure you want to delete this package?");
+        if (!confirmDelete) return;
+    
+        try {
+            await axiosInstance.delete(`/delete-package/${packageId}`);
+            setOpenModalPackage(false); 
+            window.location.reload();
+        } catch (error) {
+            if (axios.isAxiosError(error)) {
+                const errorMessage = error.response?.data?.message || error.message || "An unknown error occurred.";
+                setError(errorMessage);
+            }
+        };
+    };
+
+    const handleAddGroupClick = () => {
+        setIsAddGroupOpen(true);
+    };
     
     return (
         <div className="w-[320px]">
             <div className="w-[320px] h-auto space-y-6 bg-[#FFFFFF] pt-4 p-8 rounded-3xl">
                 <div className="flex items-center justify-between">
                     <span className="w-[76px] h-[22px] flex justify-center items-center px-10 py-2 rounded-[50px] font-general font-medium text-sm text-[#DE4222] border border-[#DE4222] bg-[#eadfdd]">{group.groupPrivacy}</span>
-                    <div className="flex justify-center items-center gap-2 cursor-pointer">
+                    <div className="flex justify-center items-center gap-2 cursor-pointer" onClick={() => {
+                        handleAddGroupClick();
+                        setSelectedGroup(group);
+                        }}>
                         <Image 
                             src="/images/edit.png"
                             alt="edit"
                             width={16}
                             height={16}
+                            onClick={() => {
+                                setSelectedGroup(group);
+                                setOpenModalGroup(true);
+                            }}
                         />
                         <span className="font-general font-medium text-sm text-[#718096]">Edit</span>
                     </div>
@@ -97,7 +135,7 @@ const PrivateGroup: React.FC<PrivateGroupProps>  = ({ group }) => {
                             <div className="flex items-center gap-2">
                                <Image 
                                     src={item.packageImgUrls && item.packageImgUrls.length > 0 ? item.packageImgUrls[0] : "/images/placeholder.png"} 
-                                    alt="cloth"
+                                    alt=""
                                     width={60}
                                     height={60}
                                     className="rounded-[5.29px]"
@@ -110,18 +148,32 @@ const PrivateGroup: React.FC<PrivateGroupProps>  = ({ group }) => {
                                 </div>
                             </div>
                             {/* button that update */}
-                            <Image 
-                                src="/images/edit.png"
-                                alt="edit"
-                                width={12}  
-                                height={12} 
-                                className="cursor-pointer"
-                                onClick={() => {
-                                    setModalMode("update");
-                                    setSelectedPackage(item); 
-                                    setOpenModalPackage(true);
-                                }}
+                        <div className="flex flex-col justify-center items-center gap-5">
+
+                        <Image 
+                            src="/images/trash.png"
+                            alt=""
+                            width={12}
+                            height={12}
+                            onClick={() => {
+                                handleDeletePackage();
+                                setSelectedPackage(item); 
+                            }}
+                            className="cursor-pointer"
                             />
+                        <Image 
+                            src="/images/edit.png"
+                            alt="edit"
+                            width={12}  
+                            height={12} 
+                            className="cursor-pointer"
+                            onClick={() => {
+                                setModalMode("update");
+                                setSelectedPackage(item); 
+                                setOpenModalPackage(true);
+                            }}
+                            />
+                            </div>
                         </div>
                     ))}
                 </div>
@@ -157,6 +209,13 @@ const PrivateGroup: React.FC<PrivateGroupProps>  = ({ group }) => {
                     />
                 </div>
             )}
+
+            {isAddGroupOpen && (
+            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                <AddGroup mode="availGroup" setIsAddGroupOpen={setIsAddGroupOpen} selectedGroup={selectedGroup} />
+            </div>
+            )}
+            {error && <p className="text-red-500 font-semibold">{error}</p>}
         </div>
     );
 };

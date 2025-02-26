@@ -8,22 +8,26 @@ import GroupPrivacySelector from "./addGroup/GroupPrivacySelector";
 import FormButton from "./addGroup/FormButton";
 import axiosInstance from "@/lib/axiosInstance";
 import axios from "axios";
+import { Group } from "@/app/interface/Group";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface AddGroupProps {
   setIsAddGroupOpen: React.Dispatch<React.SetStateAction<boolean>>;
   mode: "noGroup" | "availGroup";
+  selectedGroup?: Group | null;
 }
 
-const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode }) => {
+const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode, selectedGroup }) => {
   const eventId = localStorage.getItem("eventId");
   const [loading, setLoading] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [error, setError] = useState(false);
   const [formData, setFormData] = useState({
     eventId: eventId,
-    groupName: "",
-    groupDescription: "",
-    groupPrivacy: "private",
+    groupName: selectedGroup?.groupName || "",
+    groupDescription: selectedGroup?.groupDescription || "",
+    groupPrivacy: selectedGroup?.groupPrivacy || "private",
   });
 
   const [errors, setErrors] = useState({
@@ -93,10 +97,29 @@ const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode }) => {
 
     if (newErrors.groupName || newErrors.groupDescription) return;
 
+      const formDataToSend = new FormData();
+      
+      formDataToSend.append("groupName", formData.groupName);
+      formDataToSend.append("groupDescription", formData.groupDescription);
+      formDataToSend.append("groupPrivacy", formData.groupPrivacy);
+
     try {
-      const response = await axiosInstance.post("/add-group", formData);
-      console.log("Group created:", response.data);
-      setShowSuccess(true);
+       
+        if(selectedGroup) {
+          await axiosInstance.put(`/update-group/${selectedGroup._id}`, formDataToSend);
+        }else {
+          await axiosInstance.post("/add-group", formData);
+        }
+      
+        toast.success(`Group ${selectedGroup ? ("updated") : ("created")} successfully `, {
+          position: "top-right",
+          autoClose: 3000, 
+          hideProgressBar: false,
+          closeOnClick: true,
+          pauseOnHover: true,
+          draggable: true,
+          theme: "light",
+      });
       window.location.reload();
     } catch (error) {
       if (axios.isAxiosError(error)) {
@@ -120,9 +143,10 @@ const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode }) => {
   return (
     <>
       {/* Success message handling */}
-      {showSuccess && <p className="text-green-600 font-bold">Group created successfully!</p>}
-
-      <form className="w-[320px] space-y-8 bg-white px-5 py-6 rounded-3xl shadow-lg" onSubmit={handleSubmit}>
+      {/* {showSuccess && <p className="text-green-600 font-bold">Group created successfully!</p>} */}
+      <ToastContainer />
+      
+      <form className="w-[320px] space-y-4 bg-[#FFFFFF] px-5 py-6 rounded-3xl shadow-lg" onSubmit={handleSubmit}>
         <GroupHeader mode={mode} onClose={() => setIsAddGroupOpen(false)} />
         <GroupFormFields
           formData={formData}
@@ -136,8 +160,8 @@ const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode }) => {
           onPrivacyChange={handlePrivacyChange}
         />
         <FormButton isFormValid={isFormValid} onSubmit={() => handleSubmit} loading={loading} />
+      {error && <p className="text-red-500 font-semibold text-[10px] whitespace-nowrap">{error}</p>}
       </form>
-      {error && <p className="text-red-500 font-semibold">{error}</p>}
     </>
   );
 };

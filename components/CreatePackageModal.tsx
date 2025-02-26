@@ -35,8 +35,12 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
         packageDescription: packageData?.packageDescription || "",
         packagePrice: packageData?.packagePrice || "",
         packageQuantity: packageData?.packageQuantity || "",
-        packageDelivery: packageData?.packageDelivery || [],
-        packageImgUrls: packageData?.packageImgUrls ?? [],
+        packageDelivery: typeof packageData?.packageDelivery === "string"
+        ? (packageData.packageDelivery as string).split(",").map((item) => item.trim()) // Explicitly cast to string
+        : packageData?.packageDelivery ?? [],
+        packageImgUrls: Array.isArray(packageData?.packageImgUrls)
+        ? packageData.packageImgUrls
+        : packageData?.packageImgUrls ? [packageData.packageImgUrls] : []
     });
 
     const validateField = (field: keyof PackageFormData, value: string) => {
@@ -53,13 +57,6 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
             if (!value.trim()) return "Price is required.";
             if (isNaN(Number(value)) || Number(value) <= 0) return "Price must be a valid positive number.";
         }
-    
-        // if (field === "packageQuantity") {
-        //     if (!value.trim()) return "Quantity is required.";
-        //     if (isNaN(Number(value)) || Number(value) <= 0 || !Number.isInteger(Number(value))) {
-        //         return "Quantity must be a valid positive integer.";
-        //     }
-        // }
     
         return ""; 
     };
@@ -170,12 +167,12 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
     const isFormValid =
     mode === "update" ||
     (formData.packageTitle?.trim() &&
-     formData.packageDescription?.trim() &&
+    //  formData.packageDescription?.trim() &&
      formData.packagePrice?.toString().trim() &&
      Object.values(errors).every((err) => err === ""));
 
      const handleSubmit = async () => {
-
+        
         if (!isFormValid) return;
     
         const formDataToSend = new FormData();
@@ -192,10 +189,12 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
     
         if (formData.packageImgUrls && formData.packageImgUrls.length > 0) {
             formData.packageImgUrls.forEach((file) => {
-                formDataToSend.append("packageImgUrls", file);
+                formDataToSend.append("packageImgUrls[]", file);
             });
         }
-    
+        for (const pair of formDataToSend.entries()) {
+            console.log(`${pair[0]}: ${pair[1]}`);
+        }
         try {
             setLoading(true)
             let response;
@@ -222,14 +221,14 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
             }
         }
         finally {
-            setLoading(true)}
+            setLoading(false)}
     };
     
     
     
     
     return (
-        <div className="w-[680px] max-h-[100vh] bg-white rounded-2xl gap-1.5 shadow-lg p-5 flex flex-col  overflow-y-auto">
+        <div className="w-[680px] max-h-[100vh] bg-[#FFFFFF] rounded-2xl gap-1.5 shadow-lg p-5 flex flex-col  overflow-y-auto">
             {/* Header */}
             <div className="flex justify-between items-center">
                 <p className="font-bold text-lg text-[#111827]">
@@ -272,7 +271,6 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                     </button>
                 </div>
             )}
-
 
 
             {/* Display the remaining images (excluding the first one) */}
@@ -402,7 +400,11 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                     onClick={handleSubmit} 
                     disabled={loading}  
                     className={`px-4 py-2 text-white rounded-xl ${
-                        loading ? "bg-gray-400 cursor-not-allowed" : "bg-[#751423]"
+                        loading 
+                            ? "bg-gray-400 cursor-not-allowed" 
+                            : isFormValid 
+                                ? "bg-[#751423]" 
+                                : "bg-[#751423]"
                     }`}
                 >
                     {loading 
@@ -413,7 +415,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                 </button>
 
             </div>
-                {error && <p className="text-red-500 font-semibold">{error}</p>}
+                {error && <p className="flex justify-end text-red-500 font-semibold text-[12px]">{error}</p>}
         </div>
     );
     
