@@ -84,11 +84,7 @@ const NewGroup: React.FC = () => {
 
         {/* Content Section */}
         <div className="flex flex-col px-6 lg:pl-20 xl:pl-40">
-          {groups.length === 0 ? 
-            <div className="flex items-center justify-center h-screen w-full">
-            <div className="animate-spin h-10 w-10 border-4 border-gray-300 border-t-gray-600 rounded-full"></div>
-          </div>
-          : !hasGeneralGroup && !hasPrivateGroup ? (
+          {!hasGeneralGroup && !hasPrivateGroup ? (
             <button onClick={handleAddGroupClick} className="w-full sm:w-auto lg:pl-24 xl:pl-48">
               <AddGroup mode="noGroup" setIsAddGroupOpen={setIsAddGroupOpen} />
             </button>
@@ -116,7 +112,7 @@ const NewGroup: React.FC = () => {
                   </div>
 
                   {/* Sidebar Actions */}
-                  <div className="hidden lg:flex flex-col space-y-2 ml-0">
+                  <div className=" lg:flex flex-col space-y-2 ml-0">
                     {isAddGroupOpen && <AddGroup mode="availGroup" setIsAddGroupOpen={setIsAddGroupOpen} />}
                     <CreateGroupCaller />
                   </div>

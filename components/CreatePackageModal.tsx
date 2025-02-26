@@ -144,13 +144,18 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
         try {
             let response;
             if (mode === "create") {
-                response = await axiosInstance.post("/add-package", formDataToSend);
+                response = await axiosInstance.post("/add-package", formDataToSend, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                });
                 window.location.reload()
             } else if (mode === "update" && packageData?._id) {
                 // formDataToSend.append("packageId", packageData._id.toString());
                     console.log("here", packageData._id)
-                response = await axiosInstance.put(`/update-package/${packageData._id}`, formDataToSend);
+                response = await axiosInstance.put(`/update-package/${packageData._id}`, formDataToSend, {
+                    headers: { "Content-Type": "multipart/form-data" },
+                });
                 window.location.reload()
+
             }
     
             console.log("Response from backend:", response?.data);
