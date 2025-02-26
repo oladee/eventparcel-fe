@@ -78,6 +78,8 @@ const About: React.FC = () => {
       return "Name cannot include numbers or special characters.";
     if (id === "description" && value.length < 20)
       return "Description must be at least 20 characters.";
+    if (id === "eventName" && value.length < 5)
+      return "Event name must be at least 5 characters.";
     return "";
   };
 
@@ -87,16 +89,6 @@ const About: React.FC = () => {
     const { id, value } = e.target;
     setErrors((prev) => ({ ...prev, [id]: validateField(id, value) }));
   };
-
-
-// Helper function to convert 24-hour time (HH:mm) to 12-hour format (hh:mm AM/PM)
-// const convertTo12Hour = (time24: string): string => {
-//   const [hourStr, minute] = time24.split(":");
-//   let hours = parseInt(hourStr, 10);
-//   const ampm = hours >= 12 ? "PM" : "AM";
-//   hours = hours % 12 || 12; // Convert hour '0' to '12'
-//   return `${hours}:${minute} ${ampm}`;
-// };
 
 
 // Helper function to convert 24-hour time (HH:mm) to 12-hour format (hh:mm AM/PM) matching the regex
