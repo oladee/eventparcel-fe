@@ -8,13 +8,14 @@ import "leaflet/dist/leaflet.css";
 
 // Custom marker icon using images from the public folder
 const customMarkerIcon = new L.Icon({
-  iconUrl: "/marker-icon.png",
-  iconRetinaUrl: "/marker-icon-2x.png",
-  shadowUrl: "/marker-shadow.png",
-  iconSize: [25, 41],
-  iconAnchor: [12, 41],
-  popupAnchor: [1, -34],
-  shadowSize: [41, 41],
+  iconUrl: "/images/marker-icon.png",
+  // iconRetinaUrl: "/images/marker-icon.png",
+  shadowUrl: "/images/marker-icon-shadow.png",
+  iconSize:     [38, 95], // size of the icon
+  shadowSize:   [50, 64], // size of the shadow
+  iconAnchor:   [22, 94], // point of the icon which will correspond to marker's location
+  shadowAnchor: [4, 62],  // the same for the shadow
+  popupAnchor:  [-3, -76] // point from which the popup should open relative to the iconAnchor
 });
 
 // Helper to recenter the map when position changes
