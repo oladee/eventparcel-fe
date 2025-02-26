@@ -26,7 +26,7 @@ interface CreatePackageModalProps {
 
 const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpenModalPackage, mode, packageData }) => {
     const [errors, setErrors] = useState<FormErrors>({});
-    const [] = useState<FormErrors>({});
+    // const [, setTouched] = useState<FormErrors>({});
     const [formData, setFormData] = useState<PackageFormData>({
         groupId: groudId,
         packageTitle: packageData?.packageTitle || "",
