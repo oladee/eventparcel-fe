@@ -10,6 +10,7 @@ import axios from "axios";
 import AddGroup from "./AddGroupCaller";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import DeleteConfirmationDialog from "./modals/DeleteConfirmationDialog";
 
 
 type GeneralGroupProps = {
@@ -24,14 +25,12 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
     const [, setError] = useState(false);
     const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
     const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
+    const [isDialogOpen, setIsDialogOpen] = useState(false);
 
 
 
     const handleDelete = async () => {
         if (!group?._id) return;
-    
-        const confirmDelete = window.confirm("Are you sure you want to delete this group?");
-        if (!confirmDelete) return;
     
         try {
             await axiosInstance.delete(`/delete-group/${group._id}`);
@@ -46,7 +45,7 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
                 theme: "light",
             });
 
-            setOpenModalPackage(false); 
+            setIsDialogOpen(false); 
             window.location.reload();
         } catch (error) {
             if (axios.isAxiosError(error)) {
@@ -73,8 +72,8 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
         const packageId = selectedPackage?._id
         if (!packageId) return;
     
-        const confirmDelete = window.confirm("Are you sure you want to delete this package?");
-        if (!confirmDelete) return;
+        // const confirmDelete = window.confirm("Are you sure you want to delete this package?");
+        // if (!confirmDelete) return;
     
         try {
             await axiosInstance.delete(`/delete-package/${packageId}`);
@@ -112,6 +111,11 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
             };
         };
 
+        const handleDeleteModal = () => {
+            setIsDialogOpen(true)
+        }
+    
+
         const handleAddGroupClick = () => {
             setIsAddGroupOpen(true);
         };
@@ -120,6 +124,11 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
     return (
         <>
         <ToastContainer aria-live="polite" className="absolute "/>
+        <DeleteConfirmationDialog
+        isOpen={isDialogOpen}
+        onClose={() => setIsDialogOpen(false)}
+        onDelete={handleDelete}
+      />
         <div className="w-[320px]">
                 <div className="w-[320px] h-auto space-y-6 bg-[#FFFFFF] pt-4 p-8 rounded-3xl">
                     <div className="flex items-center justify-between">
@@ -226,13 +235,13 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
                     </div>
                 </div>
                 <div className="flex justify-between">
-                    <div className="flex items-center gap-1 cursor-pointer" onClick={handleDelete}>
+                    <div className="flex items-center gap-1 cursor-pointer" onClick={handleDeleteModal}>
                         <Image 
                             src="/images/trash.png"
                             alt="delete_package"
                             height={16}
                             width={16}
-                            />
+                        />
                         <span className="font-general font-medium text-sm text-[#DE4222]">Delete</span>
                     </div>
                     <div className="flex items-center gap-1">
