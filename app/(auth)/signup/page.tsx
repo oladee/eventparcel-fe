@@ -202,7 +202,7 @@ const Signup: React.FC = () => {
               )}
             </div>
 
-            <div className="pb-3 overflow-hidden w-full">
+            <div className="pb-3  w-full">
               <PhoneNumberInput
                 onPhoneChange={(value: string) =>
                   handleChange("phoneNumber", value)
