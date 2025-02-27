@@ -90,10 +90,7 @@ const NewGroup: React.FC = () => {
         {/* Show General Groups */}
         {hasGeneralGroup && !hasPrivateGroup && (
           <div className="flex sm:flex-row items-center sm:items-start mr-4 justify-start">
-             <div className="flex lg:hidden flex-col space-y-2 ml-0">
-              {isAddGroupOpen && <AddGroup mode="availGroup" setIsAddGroupOpen={setIsAddGroupOpen} />}
-              <CreateGroupCaller />
-            </div>
+            
             <div className={groups.length === 1 ? "w-auto" : "grid grid-cols-2 gap-8 sm:grid-cols-2 w-auto"}>
               {groups.filter(group => group.groupPrivacy === "general").map(group => (
                 <GeneralModal key={group._id} group={group} />

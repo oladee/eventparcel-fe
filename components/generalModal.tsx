@@ -195,7 +195,7 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
                                         alt="cloth"
                                         width={60}
                                         height={60}
-                                        className="rounded-[5.29px] object-contain"
+                                        className="rounded-[5.29px] object-fit h-[60px] w-[60px]"
                                     />
                                     <div className="flex flex-col">
                                         <span className="text-sm font-general font-semibold leading-tight text-[#111827]">
