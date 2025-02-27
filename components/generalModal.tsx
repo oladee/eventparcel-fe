@@ -72,8 +72,8 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
         const packageId = selectedPackage?._id
         if (!packageId) return;
     
-        // const confirmDelete = window.confirm("Are you sure you want to delete this package?");
-        // if (!confirmDelete) return;
+        const confirmDelete = window.confirm("Are you sure you want to delete this package?");
+        if (!confirmDelete) return;
     
         try {
             await axiosInstance.delete(`/delete-package/${packageId}`);
