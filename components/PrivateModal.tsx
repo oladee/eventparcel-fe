@@ -198,7 +198,7 @@ const PrivateGroup: React.FC<PrivateGroupProps>  = ({ group }) => {
                                     alt=""
                                     width={60}
                                     height={60}
-                                    className="rounded-[5.29px]"
+                                    className="rounded-[5.29px] h-[60px] w-[60px]"
                                     />
                                 <div className="flex flex-col">
                                     <span className="text-sm font-general font-semibold leading-tight text-[#111827]">
