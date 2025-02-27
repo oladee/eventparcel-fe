@@ -30,7 +30,7 @@ const EventCoverImage: React.FC<EventCoverImageProps> = ({
           <Image
             src={selectedImage}
             alt="Preview"
-            className="rounded object-cover w-full h-full"
+            className="rounded object-cover w-full max-w-fit h-full max-h-fit"
             width={100}
             height={100}
           />
