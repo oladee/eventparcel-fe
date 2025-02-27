@@ -46,8 +46,6 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
         : packageData?.packageImgUrls ? [packageData.packageImgUrls] : []
     });
 
-    
-
     const validateField = (field: keyof PackageFormData, value: string) => {
         if (field === "packageTitle") {
             if (!value.trim()) return "Title is required.";
@@ -62,11 +60,9 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
             if (!value.trim()) return "Price is required.";
             if (isNaN(Number(value)) || Number(value) <= 0) return "Price must be a valid positive number.";
         }
-    
+
         return ""; 
     };
-    
-    
     
     const [selectedOptions, setSelectedOptions] = useState<{ homeDelivery: boolean; pickUp: boolean }>({
         homeDelivery: false, 
@@ -182,12 +178,35 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                 response = await axiosInstance.post("/add-package", formDataToSend, {
                     headers: { "Content-Type": "multipart/form-data" },
                 });
+
+                
+            toast.success(`Package created successfully `, {
+                position: "top-right",
+                autoClose: 3000, 
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "light",
+            });
+
+
                 window.location.reload()
             } else if (mode === "update" && packageData?._id) {
                 // formDataToSend.append("packageId", packageData._id.toString());
                     console.log("here", packageData._id)
                     response = await axiosInstance.put(`/update-package/${packageData._id}`, formDataToSend, {
                     headers: { "Content-Type": "multipart/form-data" },
+                });
+
+                toast.success(`Package updated successfully `, {
+                    position: "top-right",
+                    autoClose: 3000, 
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    theme: "light",
                 });
                 window.location.reload()
             }
