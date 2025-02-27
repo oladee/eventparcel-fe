@@ -5,6 +5,8 @@ import axiosInstance from "@/lib/axiosInstance";
 import axios from "axios";
 import Image from "next/image";
 import { useEffect, useState } from "react";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface PackageFormData {
     groupId?: string | number;
@@ -26,9 +28,10 @@ interface CreatePackageModalProps {
 }
 
 const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpenModalPackage, mode, packageData }) => {
+    
     const [errors, setErrors] = useState<FormErrors>({});
     const [loading, setLoading] = useState(false);
-    const [error, setError] = useState(false);
+    const [, setError] = useState(false);
     const [formData, setFormData] = useState<PackageFormData>({
         groupId: groudId,
         packageTitle: packageData?.packageTitle || "",
@@ -36,12 +39,14 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
         packagePrice: packageData?.packagePrice || "",
         packageQuantity: packageData?.packageQuantity || "",
         packageDelivery: typeof packageData?.packageDelivery === "string"
-        ? (packageData.packageDelivery as string).split(",").map((item) => item.trim()) // Explicitly cast to string
+        ? (packageData.packageDelivery as string).split(",").map((item) => item.trim())
         : packageData?.packageDelivery ?? [],
         packageImgUrls: Array.isArray(packageData?.packageImgUrls)
         ? packageData.packageImgUrls
         : packageData?.packageImgUrls ? [packageData.packageImgUrls] : []
     });
+
+    
 
     const validateField = (field: keyof PackageFormData, value: string) => {
         if (field === "packageTitle") {
@@ -106,35 +111,6 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
         }));
     };
     
-
-
-    // const handleBlur = (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    //     const { id, value } = e.target;
-
-    //     setTouched((prev) => ({
-    //         ...prev,
-    //         [id as keyof PackageFormData]: true,
-    //     }));
-
-    //     if (mode === "create" && !value.trim()) {
-    //         setErrors((prev) => ({
-    //             ...prev,
-    //             [id as keyof PackageFormData]: `${id.charAt(0).toUpperCase() + id.slice(1)} is required`,
-    //         }));
-    //     }
-    // };
-    // const validateField = (id: keyof PackageFormData, value: string | number) => {
-    //     if (id === "packageTitle" && (!value || value.toString().trim().length < 3)) {
-    //         return "Package title must be at least 3 characters long";
-    //     }
-    //     if (id === "packageDescription" && (!value || value.toString().trim().length < 10)) {
-    //         return "Package description must be at least 10 characters long";
-    //     }
-    //     if (id === "packagePrice" && (!value || Number(value) <= 0)) {
-    //         return "Price must be a positive number";
-    //     }
-    //     return "";
-    // };
 
     const handleImageUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
         const files = e.target.files;
@@ -221,12 +197,19 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
             if (axios.isAxiosError(error)) {
                 const errorMessage = error.response?.data?.message || error.message || "An unknown error occurred.";
                 setError(errorMessage);
-                console.error("Error deleting package:", error);
-
-                console.error("Axios Error Response:", error.response?.data); // Log the full error response
-                console.error("Axios Error Message:", error.message); // Log the error message
+            
+                // Show toast notification
+                toast.error(errorMessage, {
+                    position: "top-right",
+                    autoClose: 5000, 
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    theme: "colored",
+                });
             } else {
-                console.error("Unexpected Error:", error); // Log unexpected errors
+                console.error("Unexpected Error:", error); 
             }
         }
         finally {
@@ -237,6 +220,8 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
     
     
     return (
+        <>
+        <ToastContainer aria-live="polite" />
         <div className="w-[680px] max-h-[100vh] bg-[#FFFFFF] rounded-2xl gap-1.5 shadow-lg p-5 flex flex-col  overflow-y-auto">
             {/* Header */}
             <div className="flex justify-between items-center">
@@ -311,7 +296,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                         multiple 
                         className="hidden" 
                         onChange={handleImageUpload} 
-                    />
+                        />
                     <span className="text-3xl text-gray-400">+</span>
                 </label>
             </div>
@@ -351,13 +336,13 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
 
 
                 <input 
-                    type="text" 
+                    type="number" 
                     id="packageQuantity" 
                     value={formData.packageQuantity} 
                     onChange={handleChange} 
                     placeholder="Quantity (optional)" 
                     className="w-full h-8 p-2 rounded-xl border" 
-                />
+                    />
             </div>
     
             {/* Delivery Options */}
@@ -383,7 +368,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                     <div 
                         className="flex items-center gap-1 cursor-pointer"
                         onClick={() => toggleDeliveryOption("pickUp")}
-                    >
+                        >
                         <Image
                             src={selectedOptions.pickUp ? "/images/check.png" : "/images/unchecked.png"}
                             alt="check"
@@ -415,17 +400,17 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                                 ? "bg-[#751423]" 
                                 : "bg-[#751423]"
                     }`}
-                >
+                    >
                     {loading 
                         ? "Creating Package..." 
                         : mode === "create" 
-                            ? "Create Package" 
-                            : "Update Package"}
+                        ? "Create Package" 
+                        : "Update Package"}
                 </button>
 
             </div>
-                {error && <p className="flex justify-end text-red-500 font-semibold text-[12px]">{error}</p>}
         </div>
+    </>
     );
     
 }

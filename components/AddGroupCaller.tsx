@@ -21,8 +21,7 @@ interface AddGroupProps {
 const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode, selectedGroup }) => {
   const eventId = localStorage.getItem("eventId");
   const [loading, setLoading] = useState(false);
-  // const [showSuccess, setShowSuccess] = useState(false);
-  const [error, setError] = useState(false);
+  const [, setError] = useState(false);
   const [formData, setFormData] = useState({
     eventId: eventId,
     groupName: selectedGroup?.groupName || "",
@@ -125,9 +124,18 @@ const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode, selectedGr
       if (axios.isAxiosError(error)) {
         const errorMessage = error.response?.data?.message || error.message || "An unknown error occurred.";
         setError(errorMessage);
-      } else {
-        console.error("Unexpected error:", error);
-      }
+    
+        // Show toast notification
+        toast.error(errorMessage, {
+            position: "top-right",
+            autoClose: 5000, 
+            hideProgressBar: false,
+            closeOnClick: true,
+            pauseOnHover: true,
+            draggable: true,
+            theme: "colored",
+        });
+    }
     } finally {
         setLoading(false)
     }
@@ -142,9 +150,7 @@ const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode, selectedGr
 
   return (
     <>
-      {/* Success message handling */}
-      {/* {showSuccess && <p className="text-green-600 font-bold">Group created successfully!</p>} */}
-      <ToastContainer />
+    <ToastContainer />
       
       <form className="w-[320px] space-y-4 bg-[#FFFFFF] px-5 py-6 rounded-3xl shadow-lg" onSubmit={handleSubmit}>
         <GroupHeader mode={mode} onClose={() => setIsAddGroupOpen(false)} />
@@ -160,7 +166,6 @@ const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode, selectedGr
           onPrivacyChange={handlePrivacyChange}
         />
         <FormButton isFormValid={isFormValid} onSubmit={() => handleSubmit} loading={loading} />
-      {error && <p className="text-red-500 font-semibold text-[10px] whitespace-nowrap">{error}</p>}
       </form>
     </>
   );

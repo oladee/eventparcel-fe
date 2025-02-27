@@ -8,6 +8,8 @@ import { Group, Package } from "@/app/interface/Group";
 import axiosInstance from "@/lib/axiosInstance";
 import axios from "axios";
 import AddGroup from "./AddGroupCaller";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 
 type GeneralGroupProps = {
@@ -19,7 +21,7 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
     const [openModalPackage, setOpenModalPackage] = useState(false);
     const [modalMode, setModalMode] = useState<"create" | "update">("create");
     const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
-    const [error, setError] = useState(false);
+    const [, setError] = useState(false);
     const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
     const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
 
@@ -33,14 +35,37 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
     
         try {
             await axiosInstance.delete(`/delete-group/${group._id}`);
-            alert("Package deleted successfully.");
+            
+            toast.success(`Group deleted successfully `, {
+                position: "top-right",
+                autoClose: 3000, 
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "light",
+            });
+
             setOpenModalPackage(false); 
             window.location.reload();
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 const errorMessage = error.response?.data?.message || error.message || "An unknown error occurred.";
                 setError(errorMessage);
-        }
+            
+                // Show toast notification
+                toast.error(errorMessage, {
+                    position: "top-right",
+                    autoClose: 5000, 
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    theme: "colored",
+                });
+            } else {
+                console.error("Unexpected Error:", error);
+            }
     };
 };
 
@@ -53,13 +78,37 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
     
         try {
             await axiosInstance.delete(`/delete-package/${packageId}`);
+
+            toast.success(`Package deleted successfully `, {
+                position: "top-right",
+                autoClose: 3000, 
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "light",
+            });
+
             setOpenModalPackage(false); 
             window.location.reload();
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 const errorMessage = error.response?.data?.message || error.message || "An unknown error occurred.";
                 setError(errorMessage);
-                }
+            
+                // Show toast notification
+                toast.error(errorMessage, {
+                    position: "top-right",
+                    autoClose: 5000, 
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    theme: "colored",
+                });
+            } else {
+                console.error("Unexpected Error:", error);
+            }
             };
         };
 
@@ -69,6 +118,8 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
             
         
     return (
+        <>
+        <ToastContainer aria-live="polite" />
         <div className="w-[320px]">
                 <div className="w-[320px] h-auto space-y-6 bg-[#FFFFFF] pt-4 p-8 rounded-3xl">
                     <div className="flex items-center justify-between">
@@ -119,7 +170,7 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
                                     setOpenModalPackage(true)
                                 }} 
                                 className="font-manrope font-extrabold text-xs py-3 px-20 flex justify-center items-center whitespace-nowrap rounded-[10px] border-[2px] border-[#751423] text-[#751423]"
-                            >
+                                >
                                 Create Package
                             </button>
                         </div>
@@ -181,7 +232,7 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
                             alt="delete_package"
                             height={16}
                             width={16}
-                        />
+                            />
                         <span className="font-general font-medium text-sm text-[#DE4222]">Delete</span>
                     </div>
                     <div className="flex items-center gap-1">
@@ -202,7 +253,7 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
                             mode={modalMode}
                             packageData={selectedPackage}
                             groudId={group._id}
-                        />
+                            />
                     </div>
                 )}
                     {isAddGroupOpen && (
@@ -210,8 +261,8 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
                             <AddGroup mode="availGroup" setIsAddGroupOpen={setIsAddGroupOpen} selectedGroup={selectedGroup} />
                         </div>
                     )}
-                {error && <p className="text-red-500 font-semibold">{error}</p>}
             </div>
+            </>
         );
 };
 

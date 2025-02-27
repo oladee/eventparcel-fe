@@ -7,7 +7,8 @@ import { Group, Package } from "@/app/interface/Group";
 import axiosInstance from "@/lib/axiosInstance";
 import axios from "axios";
 import AddGroup from "./AddGroupCaller";
-// import CreateGroupCaller from "./AddNew";
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 
 
@@ -22,24 +23,49 @@ const PrivateGroup: React.FC<PrivateGroupProps>  = ({ group }) => {
     const [modalMode, setModalMode] = useState<"create" | "update">("create");
     const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
     const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
-    const [error, setError] = useState(false);
+    const [, setError] = useState(false);
     const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
 
 
     const handleDelete = async () => {
         if (!group?._id) return;
     
-        const confirmDelete = window.confirm("Are you sure you want to delete this package?");
+        const confirmDelete = window.confirm("Are you sure you want to delete this group?");
         if (!confirmDelete) return;
     
         try {
             await axiosInstance.delete(`/delete-group/${group._id}`);
-            alert("Package deleted successfully.");
+
+            toast.success(`Group deleted successfully `, {
+                position: "top-right",
+                autoClose: 3000, 
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "light",
+            });
+
             setOpenModalPackage(false); 
             window.location.reload();
         } catch (error) {
-            console.error("Error deleting package:", error);
-            alert("Failed to delete package. Please try again.");
+            if (axios.isAxiosError(error)) {
+                const errorMessage = error.response?.data?.message || error.message || "An unknown error occurred.";
+                setError(errorMessage);
+            
+                // Show toast notification
+                toast.error(errorMessage, {
+                    position: "top-right",
+                    autoClose: 5000, 
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    theme: "colored",
+                });
+            } else {
+                console.error("Unexpected Error:", error);
+            }
         }
     };
 
@@ -52,12 +78,34 @@ const PrivateGroup: React.FC<PrivateGroupProps>  = ({ group }) => {
     
         try {
             await axiosInstance.delete(`/delete-package/${packageId}`);
+
+            toast.success(`Package deleted successfully `, {
+                position: "top-right",
+                autoClose: 3000, 
+                hideProgressBar: false,
+                closeOnClick: true,
+                pauseOnHover: true,
+                draggable: true,
+                theme: "light",
+            });
+
             setOpenModalPackage(false); 
             window.location.reload();
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 const errorMessage = error.response?.data?.message || error.message || "An unknown error occurred.";
                 setError(errorMessage);
+            
+                // Show toast notification
+                toast.error(errorMessage, {
+                    position: "top-right",
+                    autoClose: 5000, 
+                    hideProgressBar: false,
+                    closeOnClick: true,
+                    pauseOnHover: true,
+                    draggable: true,
+                    theme: "colored",
+                });
             }
         };
     };
@@ -67,6 +115,8 @@ const PrivateGroup: React.FC<PrivateGroupProps>  = ({ group }) => {
     };
     
     return (
+        <>
+        <ToastContainer aria-live="polite" />
         <div className="w-[320px]">
             <div className="w-[320px] h-auto space-y-6 bg-[#FFFFFF] pt-4 p-8 rounded-3xl">
                 <div className="flex items-center justify-between">
@@ -74,7 +124,7 @@ const PrivateGroup: React.FC<PrivateGroupProps>  = ({ group }) => {
                     <div className="flex justify-center items-center gap-2 cursor-pointer" onClick={() => {
                         handleAddGroupClick();
                         setSelectedGroup(group);
-                        }}>
+                    }}>
                         <Image 
                             src="/images/edit.png"
                             alt="edit"
@@ -84,7 +134,7 @@ const PrivateGroup: React.FC<PrivateGroupProps>  = ({ group }) => {
                                 setSelectedGroup(group);
                                 // setOpenModalGroup(true);
                             }}
-                        />
+                            />
                         <span className="font-general font-medium text-sm text-[#718096]">Edit</span>
                     </div>
                 </div>
@@ -139,7 +189,7 @@ const PrivateGroup: React.FC<PrivateGroupProps>  = ({ group }) => {
                                     width={60}
                                     height={60}
                                     className="rounded-[5.29px]"
-                                />
+                                    />
                                 <div className="flex flex-col">
                                     <span className="text-sm font-general font-semibold leading-tight text-[#111827]">
                                         {item.packageTitle}
@@ -194,7 +244,7 @@ const PrivateGroup: React.FC<PrivateGroupProps>  = ({ group }) => {
                             alt="delete_package"
                             height={16}
                             width={16}
-                    />
+                            />
                     <span className="font-general font-medium text-sm text-[#718096]">Copy</span>
                 </div>
             </div>
@@ -206,17 +256,17 @@ const PrivateGroup: React.FC<PrivateGroupProps>  = ({ group }) => {
                         mode={modalMode}
                         packageData={selectedPackage}
                         groudId={group._id}
-                    />
+                        />
                 </div>
             )}
 
             {isAddGroupOpen && (
-            <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
                 <AddGroup mode="availGroup" setIsAddGroupOpen={setIsAddGroupOpen} selectedGroup={selectedGroup} />
             </div>
             )}
-            {error && <p className="text-red-500 font-semibold">{error}</p>}
         </div>
+        </>
     );
 };
 
