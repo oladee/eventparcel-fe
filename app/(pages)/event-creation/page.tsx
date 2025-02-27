@@ -65,7 +65,8 @@ const About: React.FC = () => {
   };
 
   const validateField = (id: string, value: any): string => {
-    if (typeof value !== 'string' || !value.trim()) return "This field is required.";
+    // if (typeof value !== 'string' || !value.trim()) return "This field is required.";
+    if (id !== "description" && (typeof value !== 'string' || !value.trim())) return "This field is required.";
     if (
       id === "email" &&
       !/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(value)
@@ -76,8 +77,8 @@ const About: React.FC = () => {
       /[^a-zA-Z\s]/.test(value)
     )
       return "Name cannot include numbers or special characters.";
-    if (id === "description" && value.length < 5)
-      return "Description must be at least 5 characters.";
+      if (id === "description" && value.trim() && value.length < 5)
+        return "Description must be at least 5 characters.";
     if (id === "description" && value.length > 300)
       return "Description must have maximum of 300 character.";
     if (id === "eventName" && value.length < 5)

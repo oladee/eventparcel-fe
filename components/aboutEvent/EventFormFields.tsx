@@ -94,7 +94,6 @@ const EventFormFields: React.FC<EventFormFieldsProps> = ({
           onBlur={handleBlur}
           placeholder="Write description"
           className="input-field outline-primary h-[140px] w-full resize-none p-4 rounded-[5px] bg-slate-50"
-          // required
         />
         {errors.description && (
           <p className="text-red-500 text-sm mt-1">{errors.description}</p>
