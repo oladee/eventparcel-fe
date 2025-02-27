@@ -119,11 +119,11 @@ const NewGroup: React.FC = () => {
     
          {/* Groups Container */}
          <div className={
-           groups.filter(group => group.groupPrivacy === "general").length === 1 
+           groups.filter(group => group.groupPrivacy === "private").length === 1 
              ? "w-auto ml-48" 
              : "ml-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-2 gap-10"
          }>
-           {groups.filter(group => group.groupPrivacy === "general").map(group => (
+           {groups.filter(group => group.groupPrivacy === "private").map(group => (
              <div key={group._id}>
                <PrivateGroup group={group} />
              </div>
