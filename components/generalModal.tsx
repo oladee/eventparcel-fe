@@ -98,7 +98,7 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
             
                 // Show toast notification
                 toast.error(errorMessage, {
-                    position: "top-right",
+                    position: "bottom-right",
                     autoClose: 5000, 
                     hideProgressBar: false,
                     closeOnClick: true,
@@ -119,7 +119,7 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
         
     return (
         <>
-        <ToastContainer aria-live="polite" />
+        <ToastContainer aria-live="polite" className="absolute "/>
         <div className="w-[320px]">
                 <div className="w-[320px] h-auto space-y-6 bg-[#FFFFFF] pt-4 p-8 rounded-3xl">
                     <div className="flex items-center justify-between">
