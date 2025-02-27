@@ -12,8 +12,6 @@ import FormButtons2 from "@/components/aboutEvent/FormButtons2";
 import EventSaveSuccess from "@/components/aboutEvent/EventSaveSuccess";
 import { toast, ToastContainer } from "react-toastify";
 
-
-
 // Dynamically import LocationPickerModal with SSR disabled.
 const LocationPickerModal = dynamic(
   () => import("@/components/aboutEvent/LocationPickerModal"),
@@ -66,19 +64,17 @@ const About: React.FC = () => {
 
   const validateField = (id: string, value: any): string => {
     // if (typeof value !== 'string' || !value.trim()) return "This field is required.";
-    if (id !== "description" && (typeof value !== 'string' || !value.trim())) return "This field is required.";
+    if (id !== "description" && (typeof value !== "string" || !value.trim()))
+      return "This field is required.";
     if (
       id === "email" &&
       !/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(value)
     )
       return "Enter a valid email address.";
-    if (
-      (id === "firstName" || id === "lastName") &&
-      /[^a-zA-Z\s]/.test(value)
-    )
+    if ((id === "firstName" || id === "lastName") && /[^a-zA-Z\s]/.test(value))
       return "Name cannot include numbers or special characters.";
-      if (id === "description" && value.trim() && value.length < 5)
-        return "Description must be at least 5 characters.";
+    if (id === "description" && value.trim() && value.length < 5)
+      return "Description must be at least 5 characters.";
     if (id === "description" && value.length > 300)
       return "Description must have maximum of 300 character.";
     if (id === "eventName" && value.length < 5)
@@ -95,138 +91,142 @@ const About: React.FC = () => {
     setErrors((prev) => ({ ...prev, [id]: validateField(id, value) }));
   };
 
+  // Helper function to convert 24-hour time (HH:mm) to 12-hour format (hh:mm AM/PM) matching the regex
+  const convertTo12Hour = (time24: string): string => {
+    const [hourStr, minute] = time24.split(":");
+    let hours = parseInt(hourStr, 10);
+    const ampm = hours >= 12 ? "PM" : "AM";
+    // Convert hour '0' to '12'
+    hours = hours % 12 || 12;
+    // Pad hours with a leading zero if necessary
+    const paddedHours = hours < 10 ? `0${hours}` : `${hours}`;
+    return `${paddedHours}:${minute} ${ampm}`;
+  };
 
-// Helper function to convert 24-hour time (HH:mm) to 12-hour format (hh:mm AM/PM) matching the regex
-const convertTo12Hour = (time24: string): string => {
-  const [hourStr, minute] = time24.split(":");
-  let hours = parseInt(hourStr, 10);
-  const ampm = hours >= 12 ? "PM" : "AM";
-  // Convert hour '0' to '12'
-  hours = hours % 12 || 12;
-  // Pad hours with a leading zero if necessary
-  const paddedHours = hours < 10 ? `0${hours}` : `${hours}`;
-  return `${paddedHours}:${minute} ${ampm}`;
-};
-
-
-// API call triggered on clicking Continue
-const handleContinue = async () => {
-  // Validate all fields
-  const newErrors = { ...errors };
-  Object.keys(formData).forEach((key) => {
-    if (key === "eventImage") {
-      newErrors.eventImage = formData.eventImage ? "" : "Image is required.";
-    } else {
-      newErrors[key as keyof typeof formData] = validateField(
-        key,
-        formData[key as keyof typeof formData] as string
-      );
-    }
-  });
-  setErrors(newErrors);
-  if (Object.values(newErrors).some((error) => error !== "")) return;
-
-  setLoading(true);
-  try {
-    // Create FormData to match endpoint requirements
-    const submissionData = new FormData();
-    submissionData.append("eventName", formData.eventName);
-    submissionData.append("eventDescription", formData.description);
-    submissionData.append("date", formData.eventDate);
-
-    // Convert eventTime if needed
-    let formattedTime = formData.eventTime;
-    // If time matches the 24-hour format (e.g., "22:28"), convert it.
-    if (/^\d{2}:\d{2}$/.test(formData.eventTime)) {
-      formattedTime = convertTo12Hour(formData.eventTime);
-    }
-    submissionData.append("time", formattedTime);
-
-    submissionData.append("eventLocation", formData.location);
-    submissionData.append("hostFirstName", formData.firstName);
-    submissionData.append("hostLastName", formData.lastName);
-    submissionData.append("hostEmail", formData.email);
-    if (formData.eventImage) {
-      submissionData.append("eventImgUrl", formData.eventImage);
-    }
-
-    const response = await axiosInstance.post("/add-event", submissionData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+  // API call triggered on clicking Continue
+  const handleContinue = async () => {
+    // Validate all fields
+    // const newErrors = { ...errors };
+    // Object.keys(formData).forEach((key) => {
+    //   if (key === "eventImage") {
+    //     newErrors.eventImage = formData.eventImage ? "" : "Image is required.";
+    //   } else {
+    //     newErrors[key as keyof typeof formData] = validateField(
+    //       key,
+    //       formData[key as keyof typeof formData] as string
+    //     );
+    //   }
+    // });
+    const newErrors = { ...errors };
+    Object.keys(formData).forEach((key) => {
+      if (key !== "eventImage") {
+        // Remove eventImage validation
+        newErrors[key as keyof typeof formData] = validateField(
+          key,
+          formData[key as keyof typeof formData] as string
+        );
+      }
     });
-    console.log("Event created:", response.data);
-    localStorage.setItem("eventId", response.data.data._id); 
-    localStorage.setItem("eventDetails",JSON.stringify(response.data))
-    setShowSuccess(true);
-  } catch (error:any) {
-    toast.error(error.response?.data?.message);
-  } finally {
-    setLoading(false);
-  }
-};
+    setErrors(newErrors);
+    if (Object.values(newErrors).some((error) => error !== "")) return;
 
-// API call triggered on clicking Continue
-const handleSaveLater = async () => {
-  // Validate all fields
-  const newErrors = { ...errors };
-  Object.keys(formData).forEach((key) => {
-    if (key === "eventImage") {
-      newErrors.eventImage = formData.eventImage ? "" : "Image is required.";
-    } else {
-      newErrors[key as keyof typeof formData] = validateField(
-        key,
-        formData[key as keyof typeof formData] as string
-      );
+    setLoading(true);
+    try {
+      // Create FormData to match endpoint requirements
+      const submissionData = new FormData();
+      submissionData.append("eventName", formData.eventName);
+      submissionData.append("eventDescription", formData.description);
+      submissionData.append("date", formData.eventDate);
+
+      // Convert eventTime if needed
+      let formattedTime = formData.eventTime;
+      // If time matches the 24-hour format (e.g., "22:28"), convert it.
+      if (/^\d{2}:\d{2}$/.test(formData.eventTime)) {
+        formattedTime = convertTo12Hour(formData.eventTime);
+      }
+      submissionData.append("time", formattedTime);
+
+      submissionData.append("eventLocation", formData.location);
+      submissionData.append("hostFirstName", formData.firstName);
+      submissionData.append("hostLastName", formData.lastName);
+      submissionData.append("hostEmail", formData.email);
+      if (formData.eventImage) {
+        submissionData.append("eventImgUrl", formData.eventImage);
+      }
+
+      const response = await axiosInstance.post("/add-event", submissionData, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      });
+      console.log("Event created:", response.data);
+      localStorage.setItem("eventId", response.data.data._id);
+      localStorage.setItem("eventDetails", JSON.stringify(response.data));
+      setShowSuccess(true);
+    } catch (error: any) {
+      toast.error(error.response?.data?.message);
+    } finally {
+      setLoading(false);
     }
-  });
-  setErrors(newErrors);
-  if (Object.values(newErrors).some((error) => error !== "")) return;
+  };
 
-  setLoading2(true);
-  try {
-    // Create FormData to match endpoint requirements
-    const submissionData = new FormData();
-    submissionData.append("eventName", formData.eventName);
-    submissionData.append("eventDescription", formData.description);
-    submissionData.append("date", formData.eventDate);
-
-    // Convert eventTime if needed
-    let formattedTime = formData.eventTime;
-    // If time matches the 24-hour format (e.g., "22:28"), convert it.
-    if (/^\d{2}:\d{2}$/.test(formData.eventTime)) {
-      formattedTime = convertTo12Hour(formData.eventTime);
-    }
-    submissionData.append("time", formattedTime);
-
-    submissionData.append("eventLocation", formData.location);
-    submissionData.append("hostFirstName", formData.firstName);
-    submissionData.append("hostLastName", formData.lastName);
-    submissionData.append("hostEmail", formData.email);
-    if (formData.eventImage) {
-      submissionData.append("eventImgUrl", formData.eventImage);
-    }
-
-    const response = await axiosInstance.post("/add-event", submissionData, {
-      headers: {
-        "Content-Type": "multipart/form-data",
-      },
+  // API call triggered on clicking Continue
+  const handleSaveLater = async () => {
+    // Validate all fields
+    const newErrors = { ...errors };
+    Object.keys(formData).forEach((key) => {
+      if (key !== "eventImage") {
+        // Remove eventImage validation
+        newErrors[key as keyof typeof formData] = validateField(
+          key,
+          formData[key as keyof typeof formData] as string
+        );
+      }
     });
-    console.log("Event created:", response.data);
-    setShowSuccess2(true);
-  } catch (error:any) {
-    console.error("Error creating event:", error);
-    toast.error(error.response?.data?.message);
-  } finally {
-    setLoading2(false);
-  }
-};
+    setErrors(newErrors);
+    if (Object.values(newErrors).some((error) => error !== "")) return;
 
+    setLoading2(true);
+    try {
+      // Create FormData to match endpoint requirements
+      const submissionData = new FormData();
+      submissionData.append("eventName", formData.eventName);
+      submissionData.append("eventDescription", formData.description);
+      submissionData.append("date", formData.eventDate);
 
+      // Convert eventTime if needed
+      let formattedTime = formData.eventTime;
+      // If time matches the 24-hour format (e.g., "22:28"), convert it.
+      if (/^\d{2}:\d{2}$/.test(formData.eventTime)) {
+        formattedTime = convertTo12Hour(formData.eventTime);
+      }
+      submissionData.append("time", formattedTime);
 
+      submissionData.append("eventLocation", formData.location);
+      submissionData.append("hostFirstName", formData.firstName);
+      submissionData.append("hostLastName", formData.lastName);
+      submissionData.append("hostEmail", formData.email);
+      if (formData.eventImage) {
+        submissionData.append("eventImgUrl", formData.eventImage);
+      }
+
+      const response = await axiosInstance.post("/add-event", submissionData, {
+        headers: {
+          "Content-Type": "multipart/form-data"
+        }
+      });
+      console.log("Event created:", response.data);
+      setShowSuccess2(true);
+    } catch (error: any) {
+      console.error("Error creating event:", error);
+      toast.error(error.response?.data?.message);
+    } finally {
+      setLoading2(false);
+    }
+  };
 
   // Image file handling
-const handleBrowseClick = () => {
+  const handleBrowseClick = () => {
     if (typeof window !== "undefined") {
       if (window.innerWidth < 768) {
         setShowImagePickerModal(true);
@@ -235,7 +235,6 @@ const handleBrowseClick = () => {
       }
     }
   };
-
 
   const handleSelectGallery = () => {
     fileInputRef.current?.removeAttribute("capture");
@@ -292,7 +291,7 @@ const handleBrowseClick = () => {
     formData.location &&
     formData.eventName &&
     formData.eventTime &&
-    formData.eventImage &&
+    // formData.eventImage &&
     Object.values(errors).every((err) => err === "");
 
   return (
