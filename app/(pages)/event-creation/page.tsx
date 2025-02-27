@@ -287,7 +287,7 @@ const handleBrowseClick = () => {
     formData.firstName &&
     formData.lastName &&
     formData.email &&
-    formData.description &&
+    // formData.description &&
     formData.location &&
     formData.eventName &&
     formData.eventTime &&
