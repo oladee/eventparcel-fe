@@ -189,7 +189,11 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
     
         if (formData.packageImgUrls && formData.packageImgUrls.length > 0) {
             formData.packageImgUrls.forEach((file) => {
-                formDataToSend.append("packageImgUrls[]", file);
+                if (mode === "create") {
+                    formDataToSend.append("packageImgUrls", file);
+                } else {
+                    formDataToSend.append("packageImgUrls[]", file);
+                }
             });
         }
         for (const pair of formDataToSend.entries()) {
@@ -210,7 +214,6 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                     headers: { "Content-Type": "multipart/form-data" },
                 });
                 window.location.reload()
-
             }
     
             console.log("Response from backend:", response?.data);
@@ -218,6 +221,12 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
             if (axios.isAxiosError(error)) {
                 const errorMessage = error.response?.data?.message || error.message || "An unknown error occurred.";
                 setError(errorMessage);
+                console.error("Error deleting package:", error);
+
+                console.error("Axios Error Response:", error.response?.data); // Log the full error response
+                console.error("Axios Error Message:", error.message); // Log the error message
+            } else {
+                console.error("Unexpected Error:", error); // Log unexpected errors
             }
         }
         finally {
