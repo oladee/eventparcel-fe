@@ -27,15 +27,16 @@ const PrivateGroup: React.FC<PrivateGroupProps>  = ({ group }) => {
     const [, setError] = useState(false);
     const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
-
+    const [deleteId, setDeleteId] = useState<string | null>("");
+    const [deleteEndPoint, setDeletEndPoint] = useState<string | null>("");
 
     const handleDelete = async () => {
-        if (!group?._id) return;
-
+        if (!deleteId) return;
     
         try {
-            await axiosInstance.delete(`/delete-group/${group._id}`);
 
+            await axiosInstance.delete(`/${deleteEndPoint}/${deleteId}`);
+            
             toast.success(`Group deleted successfully `, {
                 position: "top-right",
                 autoClose: 3000, 
@@ -46,7 +47,7 @@ const PrivateGroup: React.FC<PrivateGroupProps>  = ({ group }) => {
                 theme: "light",
             });
 
-            setOpenModalPackage(false); 
+            setIsDialogOpen(false); 
             window.location.reload();
         } catch (error) {
             if (axios.isAxiosError(error)) {
@@ -66,51 +67,57 @@ const PrivateGroup: React.FC<PrivateGroupProps>  = ({ group }) => {
             } else {
                 console.error("Unexpected Error:", error);
             }
-        }
     };
+};
 
-    const handleDeletePackage = async () => {
-        const packageId = selectedPackage?._id
-        if (!packageId) return;
+    const handleDeletePackage = async (id: any) => {
+
+        setDeleteId(id);
+        setDeletEndPoint("delete-package")
+        setIsDialogOpen(true);
+        // const packageId = selectedPackage?._id
+        // if (!packageId) return;
     
-        const confirmDelete = window.confirm("Are you sure you want to delete this package?");
-        if (!confirmDelete) return;
+        // const confirmDelete = window.confirm("Are you sure you want to delete this package?");
+        // if (!confirmDelete) return;
     
-        try {
-            await axiosInstance.delete(`/delete-package/${packageId}`);
+        // try {
+        //     await axiosInstance.delete(`/delete-package/${packageId}`);
 
-            toast.success(`Package deleted successfully `, {
-                position: "top-right",
-                autoClose: 3000, 
-                hideProgressBar: false,
-                closeOnClick: true,
-                pauseOnHover: true,
-                draggable: true,
-                theme: "light",
-            });
+        //     toast.success(`Package deleted successfully `, {
+        //         position: "top-right",
+        //         autoClose: 3000, 
+        //         hideProgressBar: false,
+        //         closeOnClick: true,
+        //         pauseOnHover: true,
+        //         draggable: true,
+        //         theme: "light",
+        //     });
 
-            setOpenModalPackage(false); 
-            window.location.reload();
-        } catch (error) {
-            if (axios.isAxiosError(error)) {
-                const errorMessage = error.response?.data?.message || error.message || "An unknown error occurred.";
-                setError(errorMessage);
+        //     setOpenModalPackage(false); 
+        //     window.location.reload();
+        // } catch (error) {
+        //     if (axios.isAxiosError(error)) {
+        //         const errorMessage = error.response?.data?.message || error.message || "An unknown error occurred.";
+        //         setError(errorMessage);
             
-                // Show toast notification
-                toast.error(errorMessage, {
-                    position: "top-right",
-                    autoClose: 5000, 
-                    hideProgressBar: false,
-                    closeOnClick: true,
-                    pauseOnHover: true,
-                    draggable: true,
-                    theme: "colored",
-                });
-            }
-        };
+        //         // Show toast notification
+        //         toast.error(errorMessage, {
+        //             position: "top-right",
+        //             autoClose: 5000, 
+        //             hideProgressBar: false,
+        //             closeOnClick: true,
+        //             pauseOnHover: true,
+        //             draggable: true,
+        //             theme: "colored",
+        //         });
+        //     }
+        // };
     };
 
     const handleDeleteModal = () => {
+        setDeleteId(group._id);
+        setDeletEndPoint("delete-group")
         setIsDialogOpen(true)
     }
 
@@ -118,6 +125,7 @@ const PrivateGroup: React.FC<PrivateGroupProps>  = ({ group }) => {
     const handleAddGroupClick = () => {
         setIsAddGroupOpen(true);
     };
+        
     
     return (
         <>
@@ -216,7 +224,7 @@ const PrivateGroup: React.FC<PrivateGroupProps>  = ({ group }) => {
                             width={12}
                             height={12}
                             onClick={() => {
-                                handleDeletePackage();
+                                handleDeletePackage(item._id);
                                 setSelectedPackage(item); 
                             }}
                             className="cursor-pointer"

@@ -90,8 +90,12 @@ const NewGroup: React.FC = () => {
       {/* Groups Section */}
       {(hasGeneralGroup || hasPrivateGroup) && (
         <div className="flex flex-col sm:flex-row ">
-          <div className="flex item-center flex-wrap w-full max-w-3xl space-x-4 space-y-4">
-            {groups.map(group => ( 
+        <div
+            className={`${
+              groups.length === 1 ? "pl-40" : "flex item-center flex-wrap w-full max-w-3xl space-x-4 space-y-4"
+            }`}
+          >           
+           {groups.map(group => ( 
               group.groupPrivacy === "general" ? (
                 <GeneralModal key={group._id} group={group} />
               ) : (
@@ -101,7 +105,8 @@ const NewGroup: React.FC = () => {
           </div>
     
           {/* Sidebar Actions */}
-          <div className="hidden lg:flex flex-col space-y-4">
+          
+          <div className="hidden lg:flex flex-col space-y-4 z-55">
             {isAddGroupOpen && <AddGroup mode="availGroup" setIsAddGroupOpen={setIsAddGroupOpen} />}
             <CreateGroupCaller />
           </div>
