@@ -1,4 +1,5 @@
 "use client";
+
 import { useEffect, useState } from "react";
 import { IoEyeOutline } from "react-icons/io5";
 import { FiEyeOff } from "react-icons/fi";
@@ -18,7 +19,7 @@ const Login: React.FC = () => {
   const [errors, setErrors] = useState({ email: "", password: "" });
   const router = useRouter();
   // const [localEmail, setLocalEmail] = useState("");
-  
+
   useEffect(() => {
     // Get eventDetails from localStorage
     const eventDetails = localStorage.getItem("eventDetails");
