@@ -244,9 +244,12 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
         <div className="w-[680px] max-h-[100vh] bg-[#FFFFFF] rounded-2xl gap-1.5 shadow-lg p-5 flex flex-col  overflow-y-auto">
             {/* Header */}
             <div className="flex justify-between items-center">
-                <p className="font-bold text-lg text-[#111827]">
-                    {mode === "create" ? "Create Package" : "Update Package"}
-                </p>
+                <div className="flex flex-col items-start">
+                    <p className="font-bold text-lg text-[#111827]">
+                        {mode === "create" ? "Create Package" : "Update Package"}
+                    </p>
+                    <p className="font-general font-medium text-lg text-[#718096]">How do you want to sell to this group</p>
+                </div>
                 <Image 
                     src="/images/cancel.png" 
                     alt="cancel" 
@@ -416,8 +419,8 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                         loading 
                             ? "bg-gray-400 cursor-not-allowed" 
                             : isFormValid 
-                                ? "bg-[#751423]" 
-                                : "bg-[#751423]"
+                                ? "bg-[#751423]"
+                                : "bg-[#75142399]"
                     }`}
                     >
                     {loading 
