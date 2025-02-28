@@ -16,11 +16,11 @@ type generalGroupProps = {
     group: Group;
 }
 
-const generalModal: React.FC<generalGroupProps>  = ({ group }) => {
+const GeneralModal: React.FC<generalGroupProps>  = ({ group }) => {
     const [openModalPackage, setOpenModalPackage] = useState(false);
     const [modalMode, setModalMode] = useState<"create" | "update">("create");
     const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
-    const [, setError] = useState(false);
+    // const [, setError] = useState(false);
     const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
     const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
@@ -49,7 +49,7 @@ const generalModal: React.FC<generalGroupProps>  = ({ group }) => {
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 const errorMessage = error.response?.data?.message || error.message || "An unknown error occurred.";
-                setError(errorMessage);
+                // setError(errorMessage);
             
                 // Show toast notification
                 toast.error(errorMessage, {
@@ -239,4 +239,4 @@ const generalModal: React.FC<generalGroupProps>  = ({ group }) => {
         );
 };
 
-export default generalModal;
+export default GeneralModal;

@@ -17,12 +17,12 @@ type privateGroupProps = {
     group: Group
 }
 
-const privateGroup: React.FC<privateGroupProps>  = ({ group }) => {
+const PrivateGroup: React.FC<privateGroupProps>  = ({ group }) => {
     const [openModalPackage, setOpenModalPackage] = useState(false);
     const [modalMode, setModalMode] = useState<"create" | "update">("create");
     const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
     const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
-    const [, setError] = useState(false);
+    // const [, setError] = useState(false);
     const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [deleteId, setDeleteId] = useState<string | null>("");
@@ -50,7 +50,7 @@ const privateGroup: React.FC<privateGroupProps>  = ({ group }) => {
         } catch (error) {
             if (axios.isAxiosError(error)) {
                 const errorMessage = error.response?.data?.message || error.message || "An unknown error occurred.";
-                setError(errorMessage);
+                // setError(errorMessage);
             
                 // Show toast notification
                 toast.error(errorMessage, {
@@ -248,4 +248,4 @@ const privateGroup: React.FC<privateGroupProps>  = ({ group }) => {
     );
 };
 
-export default privateGroup;
+export default PrivateGroup;
