@@ -90,6 +90,7 @@ const NewGroup: React.FC = () => {
       {/* Groups Section */}
       {(hasGeneralGroup || hasPrivateGroup) && (
         <div className="flex flex-col sm:flex-row ">
+
         <div
             className={`${
               groups.length === 1 ? "pl-40" : "flex item-center flex-wrap w-full max-w-3xl space-x-4 space-y-4"

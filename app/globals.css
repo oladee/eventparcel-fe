@@ -18,17 +18,17 @@ body {
 }
 
 @font-face {
-  font-family: 'General Sans';
-  src: url('/fonts/GeneralSans-Regular.woff2') format('woff2'),
-       url('/fonts/GeneralSans-Regular.woff') format('woff');
+  font-family: 'general Sans';
+  src: url('/fonts/generalSans-Regular.woff2') format('woff2'),
+       url('/fonts/generalSans-Regular.woff') format('woff');
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'General Sans';
-  src: url('/fonts/GeneralSans-Bold.woff2') format('woff2'),
-       url('/fonts/GeneralSans-Bold.woff') format('woff');
+  font-family: 'general Sans';
+  src: url('/fonts/generalSans-Bold.woff2') format('woff2'),
+       url('/fonts/generalSans-Bold.woff') format('woff');
   font-weight: bold;
   font-style: normal;
 }

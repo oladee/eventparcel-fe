@@ -1,6 +1,5 @@
 "use client"
 
-// import { Group, Package } from "@/data/mockData"
 import Image from "next/image"
 import { useState } from "react";
 import CreatePackageModal from "./CreatePackageModal";
@@ -13,12 +12,11 @@ import "react-toastify/dist/ReactToastify.css";
 import DeleteConfirmationDialog from "./modals/DeleteConfirmationDialog";
 
 
-type GeneralGroupProps = {
+type generalGroupProps = {
     group: Group;
-    // setOpenModal: (open: boolean) => void;
 }
 
-const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
+const generalModal: React.FC<generalGroupProps>  = ({ group }) => {
     const [openModalPackage, setOpenModalPackage] = useState(false);
     const [modalMode, setModalMode] = useState<"create" | "update">("create");
     const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
@@ -74,49 +72,6 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
         setDeleteId(id);
         setDeletEndPoint("delete-package")
         setIsDialogOpen(true);
-
-        // const packageId = selectedPackage?._id
-        // if (!packageId) return;
-
-        
-    
-        // const confirmDelete = window.confirm("Are you sure you want to delete this package?");
-        // if (!confirmDelete) return;
-    
-        // try {
-        //     await axiosInstance.delete(`/delete-package/${packageId}`);
-
-        //     toast.success(`Package deleted successfully `, {
-        //         position: "top-right",
-        //         autoClose: 3000, 
-        //         hideProgressBar: false,
-        //         closeOnClick: true,
-        //         pauseOnHover: true,
-        //         draggable: true,
-        //         theme: "light",
-        //     });
-
-        //     setOpenModalPackage(false); 
-        //     window.location.reload();
-        // } catch (error) {
-        //     if (axios.isAxiosError(error)) {
-        //         const errorMessage = error.response?.data?.message || error.message || "An unknown error occurred.";
-        //         setError(errorMessage);
-            
-        //         // Show toast notification
-        //         toast.error(errorMessage, {
-        //             position: "bottom-right",
-        //             autoClose: 5000, 
-        //             hideProgressBar: false,
-        //             closeOnClick: true,
-        //             pauseOnHover: true,
-        //             draggable: true,
-        //             theme: "colored",
-        //         });
-        //     } else {
-        //         console.error("Unexpected Error:", error);
-        //     }
-        //     };
         };
 
         const handleDeleteModal = () => {
@@ -142,7 +97,7 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
         <div className="w-[320px]">
                 <div className="w-[320px] h-auto space-y-6 bg-[#FFFFFF] pt-4 p-8 rounded-3xl">
                     <div className="flex items-center justify-between">
-                        <span className="w-[76px] h-[22px] flex justify-center items-center px-10 py-2 rounded-[50px] font-general font-medium text-sm text-[#2B9EA0] border border-[#2B9EA0] bg-[#ebf3f3]">{group.groupPrivacy}</span>
+                        <span className="w-[76px] h-[22px] flex justify-center items-center px-10 py-2 rounded-[50px] font-general font-medium text-sm text-[#2B9EA0] border border-[#2B9EA0] bg-[#ebf3f3]">{group.groupPrivacy.charAt(0).toLocaleUpperCase() + group.groupPrivacy.slice(1)}</span>
                         <div className="flex justify-center items-center gap-2 cursor-pointer" onClick={() => {
                             handleAddGroupClick();
                             setSelectedGroup(group);
@@ -284,4 +239,4 @@ const GeneralModal: React.FC<GeneralGroupProps>  = ({ group }) => {
         );
 };
 
-export default GeneralModal;
+export default generalModal;

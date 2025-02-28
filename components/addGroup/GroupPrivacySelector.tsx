@@ -23,7 +23,7 @@ interface GroupPrivacySelectorProps {
               width={20}
               height={20}
             />
-            <span className="font-general font-medium text-base text-[#111827]"> General </span>
+            <span className="font-general font-medium text-base text-[#111827]"> general </span>
           </button>
           <button
             type="button"
@@ -36,7 +36,7 @@ interface GroupPrivacySelectorProps {
               width={20}
               height={20}
             />
-            <span className="font-general font-medium text-base text-[#111827]"> Private </span>
+            <span className="font-general font-medium text-base text-[#111827]"> private </span>
           </button>
         </div>
       </div>
