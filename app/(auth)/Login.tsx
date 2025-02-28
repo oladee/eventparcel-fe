@@ -18,8 +18,7 @@ const Login: React.FC = () => {
   const [errors, setErrors] = useState({ email: "", password: "" });
   const router = useRouter();
   // const [localEmail, setLocalEmail] = useState("");
-
-
+  
   useEffect(() => {
     // Get eventDetails from localStorage
     const eventDetails = localStorage.getItem("eventDetails");
@@ -228,7 +227,6 @@ const Login: React.FC = () => {
 
       {/* Toast Notifications */}
       <ToastContainer aria-live="polite" />
-
     </>
   );
 };
