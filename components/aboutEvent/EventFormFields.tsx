@@ -35,6 +35,10 @@ const EventFormFields: React.FC<EventFormFieldsProps> = ({
   handleFileChange,
   handleMapLocationSelect,
 }) => {
+
+   // Get today's date in YYYY-MM-DD format
+   const today = new Date().toISOString().split("T")[0];
+
   return (
     <>
       {/* Event Name */}
@@ -114,6 +118,7 @@ const EventFormFields: React.FC<EventFormFieldsProps> = ({
             onBlur={handleBlur}
             className="w-full p-2 input-field outline-primary rounded-[5px] bg-slate-50"
             required
+            min={today}
           />
           {errors.eventDate && (
             <p className="text-red-500 text-sm mt-1">{errors.eventDate}</p>
