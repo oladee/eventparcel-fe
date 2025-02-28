@@ -9,10 +9,29 @@ const CreateGroupCaller: React.FC = () => {
 
     return (
         <>
-            {/* Large CreateGroupCaller for lg and above */}
+            {/* Mobile Version */}
             <div 
                 className="
-                    hidden lg:flex w-[320px] h-[316px] rounded-3xl flex-col border-[3px] border-dashed 
+                    flex sm:hidden w-[310px] h-[100px] mt-10 rounded-2xl flex-col border-[2px] border-dashed 
+                    justify-center items-center ml-[130px] bg-[#FFFFFF66] cursor-pointer
+                "
+                onClick={() => setIsAddGroupOpen(true)}
+            >
+                <Image
+                    src="/images/plus.png"
+                    alt="plus" 
+                    width={32}  
+                    height={32}   
+                />
+                <span className="font-general font-semibold text-sm text-[#751423]">
+                    Add New
+                </span>
+            </div>
+
+            {/* Large CreateGroupCaller for sm and above */}
+            <div 
+                className="
+                    hidden sm:flex w-[320px] h-[316px] rounded-3xl flex-col border-[3px] border-dashed 
                     justify-center items-center bg-[#FFFFFF66] ml-10 cursor-pointer
                 "
                 onClick={() => setIsAddGroupOpen(true)}
@@ -28,17 +47,9 @@ const CreateGroupCaller: React.FC = () => {
                 </span>
             </div>
 
-            {/* Small Button for sm and md screens */}
-            <button 
-                className="lg:hidden w-[80px] absolute rounded-[5px] px-2 whitespace-nowrap py-2 bg-[#751423] text-white text-sm font-semibold hover:bg-[#5e101d] transition"
-                onClick={() => setIsAddGroupOpen(true)}
-            >
-                Add New
-            </button>
-
             {/* Modal - Common for both buttons */}
             {isAddGroupOpen && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 px-4">
+                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-10 px-4">
                     <div className="w-full max-w-lg rounded-3xl p-6 md:p-10 lg:p-14">
                         <AddGroup mode="availGroup" setIsAddGroupOpen={setIsAddGroupOpen} />
                     </div>

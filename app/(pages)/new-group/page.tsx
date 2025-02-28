@@ -62,7 +62,7 @@ const NewGroup: React.FC = () => {
     <section className="w-auto border border-gray-300 bg-[#EEEFF2] mt-14 h-full">
       <div className="py-6 lg:py-12">
         {/* Header Section */}
-        <div className="mb-6 lg:mb-12 text-center">
+        <div className="mb-6 lg:mb-12 text-start pl-8 lg:text-center">
           <h3 className="text-2xl sm:text-3xl font-bold text-gray-900">
             Event Groups & Packages
           </h3>
@@ -82,18 +82,19 @@ const NewGroup: React.FC = () => {
         {loading ? (
       <p className="text-xl font-semibold h-screen text-center">Loading groups...</p>
     ) : groups.length === 0 ? (
-      <button onClick={handleAddGroupClick} className="w-full sm:w-auto lg:pl-24 xl:pl-48">
+      <button onClick={handleAddGroupClick} className="w-full flex justify-center xl:justify-start xl:pl-[280px]">
         <AddGroup mode="noGroup" setIsAddGroupOpen={setIsAddGroupOpen} />
       </button>
     ) : (
-      <div className="flex flex-col lg:pl-20 xl:pl-20">
+      // <div className="flex flex-col lg:pl-20 xl:pl-20">
+         <div className="flex justify-center pr-[180px]">
       {/* Groups Section */}
       {(hasGeneralGroup || hasPrivateGroup) && (
-        <div className="flex flex-col sm:flex-row ">
+        <div className="flex flex-col sm:flex-row ml-12">
 
         <div
             className={`${
-              groups.length === 1 ? "pl-40" : "flex item-center flex-wrap w-full max-w-3xl space-x-4 space-y-4"
+              groups.length === 1 ? "pl-40" : "flex item-center flex-wrap w-full max-w-3xl space-x-4 space-y-4 pl-28 md:pl-2 xl:pl-16 -mr-8"
             }`}
           >           
            {groups.map(group => ( 
@@ -106,8 +107,7 @@ const NewGroup: React.FC = () => {
           </div>
     
           {/* Sidebar Actions */}
-          
-          <div className="hidden lg:flex flex-col space-y-4 z-55">
+          <div className="flex flex-col space-y-4 z-55 ">
             {isAddGroupOpen && <AddGroup mode="availGroup" setIsAddGroupOpen={setIsAddGroupOpen} />}
             <CreateGroupCaller />
           </div>
@@ -119,11 +119,8 @@ const NewGroup: React.FC = () => {
 {/* Right Bar */}
 <RightBar isOpen={isRightBarOpen} setIsOpen={setIsRightBarOpen} />
       </div>
-      
       <FormButtons
-       
           isFormValid={!!isFormValid}
-      
         />
     </section>
   );
