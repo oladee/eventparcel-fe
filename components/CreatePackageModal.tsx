@@ -245,9 +245,9 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
             {/* Header */}
             <div className="flex justify-between items-center">
                 <div className="flex flex-col items-start">
-                    <p className="font-bold text-lg text-[#111827]">
+                    <div className="font-bold text-lg text-[#111827]">
                         {mode === "create" ? "Create Package" : "Update Package"}
-                    </p>
+                    </div>
                     <p className="font-general font-medium text-lg text-[#718096]">How do you want to sell to this group</p>
                 </div>
                 <Image 

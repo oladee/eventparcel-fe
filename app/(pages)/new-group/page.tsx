@@ -66,7 +66,7 @@ const NewGroup: React.FC = () => {
           <h3 className="text-2xl sm:text-3xl font-bold text-gray-900">
             Event Groups & Packages
           </h3>
-          <p className="flex items-center justify-center gap-2 text-sm sm:text-base text-gray-600">
+          <div className="flex items-center justify-center gap-2 text-sm sm:text-base text-gray-600">
             Create groups and packages for different types of guests
             <Image
               onClick={() => setIsRightBarOpen(true)}
@@ -76,7 +76,7 @@ const NewGroup: React.FC = () => {
               alt="information"
               className="cursor-pointer"
             />
-          </p>
+          </div>
         </div>
 
         {loading ? (
@@ -94,7 +94,7 @@ const NewGroup: React.FC = () => {
 
         <div
             className={`${
-              groups.length === 1 ? "pl-40" : "flex item-center flex-wrap w-full max-w-3xl space-x-4 space-y-4 pl-28 md:pl-2 xl:pl-16 -mr-8"
+              groups.length === 1 ? "pl-40" : "flex item-center flex-wrap w-full max-w-3xl space-x-4 space-y-4 pl-28 bg-black-100 md:pl-2 xl:pl-2 -mr-8"
             }`}
           >           
            {groups.map(group => ( 
