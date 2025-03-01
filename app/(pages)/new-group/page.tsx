@@ -94,7 +94,7 @@ const NewGroup: React.FC = () => {
 
         <div
             className={`${
-              groups.length === 1 ? "pl-40" : "flex item-center flex-wrap w-full max-w-3xl space-x-4 space-y-4 pl-28 bg-black-100 md:pl-2 xl:pl-2 -mr-8"
+              groups.length === 1 ? "pl-40" : "flex item-center flex-wrap w-full max-w-3xl space-x-4 space-y-4 pl-28 md:pl-2 xl:pl-2 -mr-8"
             }`}
           >           
            {groups.map(group => ( 
