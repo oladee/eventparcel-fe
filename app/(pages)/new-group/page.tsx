@@ -94,7 +94,7 @@ const NewGroup: React.FC = () => {
 
         <div
             className={`${
-              groups.length === 1 ? "pl-40" : "flex item-center flex-wrap w-full max-w-3xl space-x-4 space-y-4 pl-28 md:pl-2 xl:pl-2 -mr-8"
+              groups.length === 1 ? "ml-32 xl:pl:40" : "flex item-center flex-wrap w-full max-w-3xl space-x-4 space-y-4 pl-28 md:pl-2 xl:pl-2 -mr-6"
             }`}
           >           
            {groups.map(group => ( 
@@ -107,7 +107,9 @@ const NewGroup: React.FC = () => {
           </div>
     
           {/* Sidebar Actions */}
-          <div className="flex flex-col space-y-4 z-55 ">
+          <div  className={`${
+              groups.length === 1 ? "flex flex-col space-y-1 z-55" : "flex flex-col space-y-3 z-55"
+            }`}>
             {isAddGroupOpen && <AddGroup mode="availGroup" setIsAddGroupOpen={setIsAddGroupOpen} />}
             <CreateGroupCaller />
           </div>
