@@ -96,7 +96,7 @@ const PrivateGroup: React.FC<privateGroupProps>  = ({ group }) => {
         onDelete={handleDelete}
       />
         <div className="w-[320px]">
-            <div className="w-[320px] h-auto space-y-6 bg-[#FFFFFF] pt-4 p-8 rounded-3xl">
+            <div className="w-[320px] h-auto space-y-6 bg-[#702222] pt-4 p-8 rounded-3xl">
                 <div className="flex items-center justify-between">
                     <span className="w-[76px] h-[22px] flex justify-center items-center px-10 py-2 rounded-[50px] font-general font-medium text-sm text-[#DE4222] border border-[#DE4222] bg-[#eadfdd]">{group.groupPrivacy.charAt(0).toLocaleUpperCase() + group.groupPrivacy.slice(1)}</span>
                     <div className="flex justify-center items-center gap-2 cursor-pointer" onClick={() => {
