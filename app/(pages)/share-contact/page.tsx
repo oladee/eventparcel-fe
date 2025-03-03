@@ -1,7 +1,5 @@
 import { CSV, Doc, Done } from "@/components/icons/Icons";
 import React from "react";
-import { FiUpload } from "react-icons/fi";
-import { HiOutlineDocumentText } from "react-icons/hi";
 
 const Page: React.FC = () => {
   return (
