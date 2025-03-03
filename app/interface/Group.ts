@@ -12,6 +12,6 @@ export interface Package {
     _id: string;
     groupName: string;
     groupDescription: string;
-    groupPrivacy: "general" | "private";
+    groupPrivacy: "General" | "Private";
     packages: Package[];
   }

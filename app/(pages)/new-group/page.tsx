@@ -51,8 +51,9 @@ const NewGroup: React.FC = () => {
   
   
   const isFormValid = groups.length > 0 && groups.some(group => group.packages.length > 0);
-  const hasGeneralGroup = groups.some(group => group.groupPrivacy === "general");
-  const hasPrivateGroup = groups.some(group => group.groupPrivacy === "private");
+  const hasGeneralGroup = groups.some(group => group.groupPrivacy === "General");
+  const hasPrivateGroup = groups.some(group => group.groupPrivacy === "Private");
+
 
   const handleAddGroupClick = () => {
     setIsAddGroupOpen(true);
@@ -98,7 +99,7 @@ const NewGroup: React.FC = () => {
             }`}
           >           
            {groups.map(group => ( 
-              group.groupPrivacy === "general" ? (
+              group.groupPrivacy === "General" ? (
                 <GeneralModal key={group._id} group={group} />
               ) : (
                 <PrivateGroup key={group._id} group={group} />
