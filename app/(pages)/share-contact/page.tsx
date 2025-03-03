@@ -1,5 +1,4 @@
 import { CSV, Doc, Done } from "@/components/icons/Icons";
-import React from "react";
 
 const Page: React.FC = () => {
   return (
