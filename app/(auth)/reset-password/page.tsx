@@ -5,6 +5,5 @@ const ResetPass = () => {
     </div>
   )
 }
-
 export default ResetPass
 
