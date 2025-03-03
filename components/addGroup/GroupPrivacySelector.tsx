@@ -1,8 +1,8 @@
 import Image from "next/image";
 
 interface GroupPrivacySelectorProps {
-    groupPrivacy: "private" | "general"; 
-    onPrivacyChange: (groupPrivacy: "private" | "general") => void;
+    groupPrivacy: "Private" | "General"; 
+    onPrivacyChange: (groupPrivacy: "Private" | "General") => void;
   }
   
   const GroupPrivacySelector: React.FC<GroupPrivacySelectorProps> = ({ groupPrivacy, onPrivacyChange }) => {
@@ -15,10 +15,10 @@ interface GroupPrivacySelectorProps {
           <button
             type="button"
             className="flex items-center gap-2"
-            onClick={() => onPrivacyChange("general")}
+            onClick={() => onPrivacyChange("General")}
           >
             <Image
-              src={groupPrivacy === "general" ? "/images/check.png" : "/images/unchecked.png"}
+              src={groupPrivacy === "General" ? "/images/check.png" : "/images/unchecked.png"}
               alt="check"
               width={20}
               height={20}
@@ -28,10 +28,10 @@ interface GroupPrivacySelectorProps {
           <button
             type="button"
             className="flex items-center gap-2"
-            onClick={() => onPrivacyChange("private")}
+            onClick={() => onPrivacyChange("Private")}
           >
             <Image
-              src={groupPrivacy === "private" ? "/images/check.png" : "/images/unchecked.png"}
+              src={groupPrivacy === "Private" ? "/images/check.png" : "/images/unchecked.png"}
               alt="check"
               width={20}
               height={20}

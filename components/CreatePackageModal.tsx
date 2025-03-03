@@ -32,6 +32,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
     const [errors, setErrors] = useState<FormErrors>({});
     const [loading, setLoading] = useState(false);
     const [, setError] = useState(false);
+    const [openHomeDeliveryOption, setOpenHomeDeliveryOption] = useState(false);
     const [formData, setFormData] = useState<PackageFormData>({
         groupId: groudId,
         packageTitle: packageData?.packageTitle || "",
@@ -68,30 +69,65 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
         homeDelivery: false, 
         pickUp: false, 
     });
+    const [homeDeliverySelectedOptions, setHomeDeliverySelectedOptions] = useState<{
+        platformDelivery: boolean;
+        selfManaged: boolean;
+    }>({
+        platformDelivery: false,
+        selfManaged: false,
+    });
     
 
     useEffect(() => {
+        const packageOptions = formData.packageDelivery || []; // No need to split
+    
+        setHomeDeliverySelectedOptions({
+            platformDelivery: packageOptions.includes("homeDelivery:platformDelivery"),
+            selfManaged: packageOptions.includes("homeDelivery:selfManaged"),
+        });
+    
         setSelectedOptions({
-            homeDelivery: formData.packageDelivery?.includes("homeDelivery") ?? false,
-            pickUp: formData.packageDelivery?.includes("pickUp") ?? false,
+            homeDelivery: packageOptions.includes("homeDelivery:platformDelivery") || packageOptions.includes("homeDelivery:selfManaged"),
+            pickUp: packageOptions.includes("pickUp"),
         });
     }, [formData.packageDelivery]);
-    
 
-
-    const toggleDeliveryOption = (option: "homeDelivery" | "pickUp") => {
-        setFormData((prev) => ({
-            ...prev,
-            packageDelivery: prev.packageDelivery?.includes(option)
-                ? prev.packageDelivery.filter((item) => item !== option)
-                : [...(prev.packageDelivery || []), option],
-        }));
+    const toggleDeliveryOption = (option: "pickUp" | "homeDelivery:platformDelivery" | "homeDelivery:selfManaged") => {
+        setFormData((prev) => {
+            const currentSelections = new Set(prev.packageDelivery || []); // Ensure it's an array
     
-        setSelectedOptions((prev) => ({
-            ...prev,
-            [option]: !prev[option],
-        }));
+            if (currentSelections.has(option)) {
+                currentSelections.delete(option); // Remove if already selected
+            } else {
+                currentSelections.add(option); // Add if not selected
+            }
+    
+            return {
+                ...prev,
+                packageDelivery: Array.from(currentSelections), // Keep it as an array
+            };
+        });
+    
+        if (option === "pickUp") {
+            setSelectedOptions((prev) => ({ ...prev, pickUp: !prev.pickUp }));
+        } else {
+            setHomeDeliverySelectedOptions((prev) => ({
+                ...prev,
+                platformDelivery: option === "homeDelivery:platformDelivery" ? !prev.platformDelivery : prev.platformDelivery,
+                selfManaged: option === "homeDelivery:selfManaged" ? !prev.selfManaged : prev.selfManaged,
+            }));
+    
+            setSelectedOptions((prev) => ({
+                ...prev,
+                homeDelivery: option === "homeDelivery:platformDelivery"
+                    ? !homeDeliverySelectedOptions.platformDelivery || homeDeliverySelectedOptions.selfManaged
+                    : option === "homeDelivery:selfManaged"
+                    ? !homeDeliverySelectedOptions.selfManaged || homeDeliverySelectedOptions.platformDelivery
+                    : prev.homeDelivery,
+            }));
+        }
     };
+    
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         const { id, value } = e.target;
@@ -240,202 +276,258 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
     
     return (
         <>
-        <ToastContainer aria-live="polite" />
-        <div className="w-[680px] max-h-[100vh] bg-[#FFFFFF] rounded-2xl gap-1.5 shadow-lg p-5 flex flex-col  overflow-y-auto">
-            {/* Header */}
-            <div className="flex justify-between items-center">
-                <div className="flex flex-col items-start">
-                    <div className="font-bold text-lg text-[#111827]">
-                        {mode === "create" ? "Create Package" : "Update Package"}
+            <ToastContainer aria-live="polite" />
+            <div className="w-[680px] max-h-[80vh] lg:max-h-[98vh] bg-[#FFFFFF] rounded-2xl shadow-lg p-5 flex flex-col  overflow-y-auto">
+                {/* Header */}
+                <div className="flex justify-between items-center">
+                    <div className="flex flex-col items-start">
+                        <div className="font-bold text-lg text-[#111827]">
+                            {mode === "create" ? "Create Package" : "Update Package"}
+                        </div>
+                        <p className="font-general font-medium text-lg text-[#718096]">How do you want to sell to this group</p>
                     </div>
-                    <p className="font-general font-medium text-lg text-[#718096]">How do you want to sell to this group</p>
-                </div>
-                <Image 
-                    src="/images/cancel.png" 
-                    alt="cancel" 
-                    width={14} 
-                    height={14} 
-                    className="cursor-pointer" 
-                    onClick={() => setOpenModalPackage(false)} 
-                />
-            </div>
-            
-            <div className="border border-gray-100"></div>
-    
-            {/* Image Upload Section */}
-            <div className="flex flex-wrap gap-4">
-            {(formData.packageImgUrls?.length ?? 0) > 0 && (
-                <div className="relative">
                     <Image 
-                        src={
-                            formData.packageImgUrls?.[0]
-                                ? formData.packageImgUrls[0] instanceof File 
-                                    ? URL.createObjectURL(formData.packageImgUrls[0]) 
-                                    : formData.packageImgUrls[0]
-                                : "/placeholder.png" 
-                        }
-                        alt="Main package image"
-                        width={100}
-                        height={100}
-                        className="rounded-[10px] border w-[100px] h-[100px]"
+                        src="/images/cancel.png" 
+                        alt="cancel" 
+                        width={14} 
+                        height={14} 
+                        className="cursor-pointer" 
+                        onClick={() => setOpenModalPackage(false)} 
                     />
-                    <button 
-                        onClick={() => removeImage(0)} 
-                        className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
-                    >
-                        X
-                    </button>
                 </div>
-            )}
+                
+                <div className="border border-gray-100"></div>
+        
+                {/* Image Upload Section */}
+                <div className="flex flex-wrap gap-2 py-2">
+                    {(formData.packageImgUrls?.length ?? 0) > 0 && (
+                        <div className="relative">
+                            <Image 
+                                src={
+                                    formData.packageImgUrls?.[0]
+                                        ? formData.packageImgUrls[0] instanceof File 
+                                            ? URL.createObjectURL(formData.packageImgUrls[0]) 
+                                            : formData.packageImgUrls[0]
+                                        : "/placeholder.png" 
+                                }
+                                alt="Main package image"
+                                width={100}
+                                height={100}
+                                className="rounded-[10px] border w-[90px] h-[90px]"
+                            />
+                            <button 
+                                onClick={() => removeImage(0)} 
+                                className="absolute top-0 right-0 bg-red-500 text-white h-5 w-5 flex justify-center items-center text-xs rounded-full p-1"
+                            >
+                                X
+                            </button>
+                        </div>
+                    )}
 
-
-            {/* Display the remaining images (excluding the first one) */}
-            <div className="flex gap-2 mt-2">
-                {formData.packageImgUrls?.slice(1)?.map((img, index) => (
-                    <div key={index + 1} className="relative">
-                        <Image 
-                            src={img instanceof File ? URL.createObjectURL(img) : img} 
-                            alt="package"
-                            width={100}
-                            height={100}
-                            className="rounded-[10px] border w-[100px] h-[100px]"
-                        />
-                        <button 
-                            onClick={() => removeImage(index + 1)} 
-                            className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
-                        >
-                            X
-                        </button>
+                    {/* Display the remaining images (excluding the first one) */}
+                    <div className="flex gap-2 ">
+                        {formData.packageImgUrls?.slice(1)?.map((img, index) => (
+                            <div key={index + 1} className="relative">
+                                <Image 
+                                    src={img instanceof File ? URL.createObjectURL(img) : img} 
+                                    alt="package"
+                                    width={100}
+                                    height={100}
+                                    className="rounded-[10px] border w-[90px] h-[90px]"
+                                />
+                                <button 
+                                    onClick={() => removeImage(index + 1)} 
+                                    className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
+                                >
+                                    X
+                                </button>
+                            </div>
+                        ))}
                     </div>
-                ))}
-            </div>
 
-                {/* Image Upload Button */}
-                <label className="w-[100px] h-[100px] flex items-center justify-center border border-gray-300 rounded-[10px] cursor-pointer">
+                    {/* Image Upload Button */}
+                    <label className="w-[90px] h-[90px] flex items-center justify-center border border-dashed rounded-[10px] cursor-pointer">
+                        <input 
+                            type="file" 
+                            accept="image/*" 
+                            multiple 
+                            className="hidden" 
+                            onChange={handleImageUpload} 
+                            />
+                            <div className="flex flex-col justify-center items-center">
+                                <Image
+                                    src={"/images/Group.png"}
+                                    alt=""
+                                    height={22}
+                                    width={22}
+                                />
+                                <span className="font-general font-medium text-sm text-[#718096]">Add Image</span>
+                            </div>
+                    </label>
+                </div>
+        
+                {/* Form Inputs */}
+                <div className="flex flex-col gap-3">
                     <input 
-                        type="file" 
-                        accept="image/*" 
-                        multiple 
-                        className="hidden" 
-                        onChange={handleImageUpload} 
-                        />
-                    <span className="text-3xl text-gray-400">+</span>
-                </label>
-            </div>
-    
-            {/* Form Inputs */}
-            <div className="flex flex-col gap-3">
-                <input 
-                    type="text" 
-                    id="packageTitle" 
-                    value={formData.packageTitle} 
-                    onChange={handleChange} 
-                    placeholder="Add package title" 
-                    className="w-full h-10 p-2 rounded-xl border" 
-                />
-                {errors.packageTitle && <p className="text-red-500 text-sm mt-1">{errors.packageTitle}</p>}
-
-                <textarea 
-                    id="packageDescription" 
-                    value={formData.packageDescription} 
-                    onChange={handleChange} 
-                    placeholder="Add package description" 
-                    className="w-full h-[100px] p-2 rounded-xl border" 
-                />
-                {errors.packageDescription && <p className="text-red-500 text-sm mt-1">{errors.packageDescription}</p>}
-           <div className="flex items-center border border-gray-300 rounded-[10px] px-4 py-2 bg-white focus-within:border-blue-500 transition">
-            <span className="text-lg text-gray-600 font-medium">₦</span>
-            <input
-                type="number"
-                id="packagePrice"
-                value={formData.packagePrice}
-                onChange={handleChange}
-                placeholder="Enter amount"
-                className="w-full h-8 p-2 outline-none bg-transparent text-gray-900 placeholder-gray-400"
-            />
-            </div>
-            {errors.packagePrice && <p className="text-red-500 text-sm mt-1">{errors.packagePrice}</p>}
-
-
-                <input 
-                    type="number" 
-                    id="packageQuantity" 
-                    value={formData.packageQuantity} 
-                    onChange={handleChange} 
-                    placeholder="Quantity (optional)" 
-                    className="w-full h-8 p-2 rounded-xl border" 
+                        type="text" 
+                        id="packageTitle" 
+                        value={formData.packageTitle} 
+                        onChange={handleChange} 
+                        placeholder="Add package title" 
+                        className="w-full h-10 p-2 rounded-xl border bg-[#FAFAFA]" 
                     />
-            </div>
-    
-            {/* Delivery Options */}
-            <div className="flex flex-col gap-3">
-                <p className="font-semibold text-base text-[#111827]">How would you like to handle delivery?</p>
-                <p className="text-sm text-[#718096]">
-                    With Event Parcel platform, you can manage and track delivery easily.
-                </p>
-                <p className="text-sm font-semibold text-[#111827]">Delivery Options</p>
-                <div className="flex gap-6">
-                    <div 
-                        className="flex items-center gap-1 cursor-pointer"
-                        onClick={() => toggleDeliveryOption("homeDelivery")}
-                    >
-                        <Image
-                            src={selectedOptions.homeDelivery ? "/images/check.png" : "/images/unchecked.png"}
-                            alt="check"
-                            width={16}
-                            height={16}
+                    {errors.packageTitle && <p className="text-red-500 text-sm mt-1">{errors.packageTitle}</p>}
+
+                    <textarea 
+                        id="packageDescription" 
+                        value={formData.packageDescription} 
+                        onChange={handleChange} 
+                        placeholder="Add package description" 
+                        className="w-full h-[100px] p-2 rounded-xl border bg-[#FAFAFA]" 
+                    />
+                    {errors.packageDescription && <p className="text-red-500 text-sm mt-1">{errors.packageDescription}</p>}
+                    <div className="flex items-center gap-3">
+                    {/* Price Input */}
+                    <div className="flex items-center border border-gray-300 rounded-[10px] px-4 py-2 bg-[#FAFAFA] focus-within:border-blue-500 transition flex-1">
+                        <span className="text-lg text-gray-600 font-medium">₦</span>
+                        <input
+                            type="number"
+                            id="packagePrice"
+                            value={formData.packagePrice}
+                            onChange={handleChange}
+                            placeholder="Enter amount"
+                            className="w-full h-6 p-2 outline-none bg-transparent text-gray-900 placeholder-gray-400"
                         />
-                        <span className="text-sm">Home Delivery</span>
                     </div>
-                    <div 
-                        className="flex items-center gap-1 cursor-pointer"
-                        onClick={() => toggleDeliveryOption("pickUp")}
-                        >
-                        <Image
-                            src={selectedOptions.pickUp ? "/images/check.png" : "/images/unchecked.png"}
-                            alt="check"
-                            width={16}
-                            height={16}
+
+                    {/* Quantity Input */}
+                    <div className="flex-1">
+                        <input 
+                            type="number" 
+                            id="packageQuantity" 
+                            value={formData.packageQuantity} 
+                            onChange={handleChange} 
+                            placeholder="Quantity (optional)" 
+                            className="w-full h-11 p-2 rounded-xl border border-gray-300 bg-[#FAFAFA]" 
                         />
-                        <span className="text-sm">Pickup</span>
                     </div>
                 </div>
-            </div>
-    
-            <div className="border border-gray-100"></div>
-    
-            {/* Buttons */}
-            <div className="flex justify-end gap-2">
-                <button 
-                    onClick={() => setOpenModalPackage(false)} 
-                    className="px-4 py-2 rounded-xl border"
-                >
-                    Cancel
-                </button>
-                <button 
-                    onClick={handleSubmit} 
-                    disabled={loading}  
-                    className={`px-4 py-2 text-white rounded-xl ${
-                        loading 
-                            ? "bg-gray-400 cursor-not-allowed" 
-                            : isFormValid 
+
+                </div>
+        
+                {/* Delivery Options */}
+                <div className="flex flex-col gap-3 mt-2">
+                    <p className="font-semibold text-base text-[#111827]">How would you like to handle delivery?</p>
+                    <p className="text-sm text-[#718096]">
+                        With Event Parcel platform, you can manage and track delivery easily.
+                    </p>
+                    <p className="text-sm font-semibold text-[#111827]">Delivery Options</p>
+                    {/* Delivery Options Section */}
+                    <div className="flex flex-col gap-3">
+                        <p className="font-semibold text-base text-[#111827]">How would you like to handle delivery?</p>
+                        <p className="text-sm text-[#718096]">
+                            With Event Parcel platform, you can manage and track delivery easily.
+                        </p>
+
+                        {/* Main Delivery Options */}
+                        <div className="flex flex-col gap-1">
+                            {/* Home Delivery - Expandable */}
+                            <div 
+                                className="flex flex-col border border-gray-100 items-start gap-1 cursor-pointer p-2"
+                                onClick={() => setOpenHomeDeliveryOption(!openHomeDeliveryOption)}
+                            >
+                                <div className="flex items-center gap-2">
+                                    <Image
+                                        src={(homeDeliverySelectedOptions.platformDelivery || homeDeliverySelectedOptions.selfManaged) 
+                                            ? "/images/check.png" 
+                                            : "/images/unchecked.png"}
+                                            alt="check"
+                                        width={16}
+                                        height={16}
+                                    />
+                                    <span className="text-sm">Home Delivery</span>
+                                </div>
+
+                                {/* Sub-options */}
+                                {openHomeDeliveryOption && (
+                                    <div className="flex flex-col gap-0.5 border border-gray-100 ">
+                                        <div
+                                            className="flex items-center gap-1 cursor-pointer p-2"
+                                            onClick={() => toggleDeliveryOption("homeDelivery:platformDelivery")}
+                                            >
+                                            <Image
+                                                src={homeDeliverySelectedOptions.platformDelivery ? "/images/check.png" : "/images/unchecked.png"}
+                                                alt="check"
+                                                width={16}
+                                                height={16}
+                                            />
+                                            <span className="text-sm">Platform Delivery - We handle delivery for you</span>
+                                        </div>
+
+                                        <div
+                                            className="flex items-center gap-1 cursor-pointer p-2"
+                                            onClick={() => toggleDeliveryOption("homeDelivery:selfManaged")}
+                                        >
+                                            <Image
+                                                src={homeDeliverySelectedOptions.selfManaged ? "/images/check.png" : "/images/unchecked.png"}
+                                                alt="check"
+                                                width={16}
+                                                height={16}
+                                                />
+                                            <span className="text-sm">Self-Managed - You handle delivery yourself</span>
+                                        </div>
+                                    </div>
+                                )}
+                            </div>
+                        </div>
+                        <div>
+                            <div
+                                className="flex border border-gray-100 items-center gap-1 cursor-pointer p-2"
+                                onClick={() => toggleDeliveryOption("pickUp")}
+                                >
+                                <Image
+                                    src={selectedOptions.pickUp ? "/images/check.png" : "/images/unchecked.png"}
+                                    alt="check"
+                                    width={16}
+                                    height={16}
+                                    />
+                                <span className="text-sm">Pickup</span>
+                            </div>
+                        </div>
+                            
+                        </div>
+                    <div className="border border-gray-100"></div>
+                    {/* Buttons */}
+                    <div className="flex justify-end gap-2">
+                        <button 
+                            onClick={() => setOpenModalPackage(false)} 
+                            className="px-4 py-2 rounded-xl border"
+                            >
+                            Cancel
+                        </button>
+                        <button 
+                            onClick={handleSubmit} 
+                            disabled={loading}  
+                            className={`px-4 py-2 text-white rounded-xl ${
+                                loading 
+                                ? "bg-gray-400 cursor-not-allowed" 
+                                : isFormValid 
                                 ? "bg-[#751423]"
                                 : "bg-[#75142399]"
-                    }`}
-                    >
-                    {loading 
-                        ? "Creating Package..." 
-                        : mode === "create" 
-                        ? "Create Package" 
-                        : "Update Package"}
-                </button>
-
+                            }`}
+                            >
+                            {loading 
+                                ? "Creating Package..." 
+                                : mode === "create" 
+                                ? "Create Package" 
+                                : "Update Package"}
+                        </button>
+                    </div>
+                </div>
             </div>
-        </div>
-    </>
+        </>
     );
-    
-}
+};
 
 export default CreatePackageModal;
 
@@ -445,6 +537,77 @@ export default CreatePackageModal;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+{/* <div 
+    className="flex border border-gray-100 items-center gap-1 cursor-pointer p-2"
+    onClick={() => toggleDeliveryOption("pickUp")}
+    >
+    <Image
+    src={selectedOptions.pickUp ? "/images/check.png" : "/images/unchecked.png"}
+    alt="check"
+    width={16}
+    height={16}
+    />
+    <span className="text-sm">Pickup</span>
+    </div> */}
+
+{/* <div className="flex flex-col gap-6">
+    <div 
+    className="flex flex-col border border-gray-100 items-start gap-1 cursor-pointer p-2"
+    // onClick={() => toggleDeliveryOption("homeDelivery")}
+    >
+    <div className="flex items-center gap-2"
+            onClick={() => setOpenHomeDeliveryOption(!openHomeDeliveryOption)}
+            >
+            <Image
+            src={selectedOptions.homeDelivery ? "/images/check.png" : "/images/unchecked.png"}
+            alt="check"
+            width={16}
+            height={16}
+            />
+        <span className="text-sm">Home Delivery</span>
+        </div>
+        {openHomeDeliveryOption && (
+            <div className="flex flex-col gap-2 pl-5">
+                <div
+                    className="flex border border-gray-100 items-center gap-1 cursor-pointer p-2"    
+                >
+                     <Image
+                    src={selectedOptions.homeDelivery ? "/images/check.png" : "/images/unchecked.png"}
+                    alt="check"
+                    width={16}
+                    height={16}
+                    />
+                    <span className="text-sm">Platform Delivery</span>
+                    <span className="text-sm">We handle delivery for you</span>
+                </div>
+                <div
+                    className="flex border border-gray-100 items-center gap-1 cursor-pointer p-2"    
+                >
+                     <Image
+                        src={selectedOptions.homeDelivery ? "/images/check.png" : "/images/unchecked.png"}
+                        alt="check"
+                        width={16}
+                        height={16}
+                    />
+                    <span className="text-sm">Self-Managed</span>
+                    <span className="text-sm">You handle delivery yourself.</span>
+                </div>
+            </div>
+        )}
+    </div> */}
+    // <div 
 
 
 

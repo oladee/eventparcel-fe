@@ -26,7 +26,7 @@ const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode, selectedGr
     eventId: eventId,
     groupName: selectedGroup?.groupName || "",
     groupDescription: selectedGroup?.groupDescription || "",
-    groupPrivacy: selectedGroup?.groupPrivacy || "private",
+    groupPrivacy: selectedGroup?.groupPrivacy || "Private",
   });
 
   const [errors, setErrors] = useState({
@@ -77,7 +77,7 @@ const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode, selectedGr
     }));
   };
 
-  const handlePrivacyChange = (privacyType: "general" | "private") => {
+  const handlePrivacyChange = (privacyType: "General" | "Private") => {
     setFormData((prev) => ({ ...prev, groupPrivacy: privacyType }));
   };
 
@@ -162,7 +162,7 @@ const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode, selectedGr
           touched={touched}
         />
         <GroupPrivacySelector
-          groupPrivacy={formData.groupPrivacy as "private" | "general"}
+          groupPrivacy={formData.groupPrivacy as "Private" | "General"}
           onPrivacyChange={handlePrivacyChange}
         />
         <FormButton isFormValid={isFormValid} onSubmit={() => handleSubmit} loading={loading} />
