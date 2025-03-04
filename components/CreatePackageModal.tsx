@@ -94,17 +94,17 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
 
     const toggleDeliveryOption = (option: "pickUp" | "homeDelivery:platformDelivery" | "homeDelivery:selfManaged") => {
         setFormData((prev) => {
-            const currentSelections = new Set(prev.packageDelivery || []); // Ensure it's an array
+            const currentSelections = new Set(prev.packageDelivery || []); 
     
             if (currentSelections.has(option)) {
-                currentSelections.delete(option); // Remove if already selected
+                currentSelections.delete(option); 
             } else {
-                currentSelections.add(option); // Add if not selected
+                currentSelections.add(option); 
             }
     
             return {
                 ...prev,
-                packageDelivery: Array.from(currentSelections), // Keep it as an array
+                packageDelivery: Array.from(currentSelections), 
             };
         });
     
