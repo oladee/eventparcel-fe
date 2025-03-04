@@ -1,6 +1,8 @@
 'use client'
 
+
 import { CSV, Doc, Done } from "@/components/icons/Icons";
+import ContactModal from "@/components/shareContact/ContactModal";
 import CsvModal from "@/components/shareContact/CsvModal";
 import { useState, useEffect } from "react";
 import { FiX, FiSearch } from 'react-icons/fi'; // Example icons; install react-icons if needed
@@ -284,6 +286,7 @@ const Page: React.FC = () => {
           </div>
         </div>
       )}
+      <ContactModal />
     </>
   );
 };
