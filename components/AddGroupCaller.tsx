@@ -26,8 +26,10 @@ const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode, selectedGr
     eventId: eventId,
     groupName: selectedGroup?.groupName || "",
     groupDescription: selectedGroup?.groupDescription || "",
-    groupPrivacy: selectedGroup?.groupPrivacy || "private",
+    groupPrivacy: selectedGroup?.groupPrivacy.toLocaleLowerCase() || "private",
   });
+
+  console.log(selectedGroup)
 
   const [errors, setErrors] = useState({
     groupName: "",
@@ -100,7 +102,7 @@ const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode, selectedGr
       
       formDataToSend.append("groupName", formData.groupName);
       formDataToSend.append("groupDescription", formData.groupDescription);
-      formDataToSend.append("groupPrivacy", formData.groupPrivacy);
+      formDataToSend.append("groupPrivacy", formData.groupPrivacy.toLowerCase());
 
     try {
        
@@ -151,17 +153,7 @@ const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode, selectedGr
 
   return (
     <>
-    <ToastContainer
-  position="top-right"
-  autoClose={5000}
-  hideProgressBar={false}
-  closeOnClick
-  pauseOnHover
-  draggable
-  theme="light"
-  style={{ zIndex: 9999 }} // Ensure it appears above other elements
-/>
-
+    <ToastContainer />
       
       <form className="w-[320px] space-y-4 bg-[#FFFFFF] px-5 py-6 rounded-3xl" onSubmit={handleSubmit}>
         <GroupHeader mode={mode} onClose={() => setIsAddGroupOpen(false)} />
@@ -173,7 +165,7 @@ const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode, selectedGr
           touched={touched}
         />
         <GroupPrivacySelector
-          groupPrivacy={formData.groupPrivacy as "private" | "general"}
+          groupPrivacy={formData.groupPrivacy as "Private" | "General"}
           onPrivacyChange={handlePrivacyChange}
         />
         <FormButton isFormValid={isFormValid} onSubmit={() => handleSubmit} loading={loading} />

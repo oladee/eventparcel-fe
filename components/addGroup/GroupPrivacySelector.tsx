@@ -1,7 +1,7 @@
 import Image from "next/image";
 
 interface GroupPrivacySelectorProps {
-    groupPrivacy: "private" | "general"; 
+    groupPrivacy: string; 
     onPrivacyChange: (groupPrivacy: "private" | "general") => void;
   }
   
