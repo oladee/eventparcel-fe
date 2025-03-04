@@ -9,7 +9,7 @@ type Contact = {
   name: string[];
   email?: string[];
   tel?: string[];
-  // group?: "Work" | "Family" | "Friends" | "Other"; // optional, if you want tab-based grouping
+  group?: "Work" | "Family" | "Friends" | "Other"; // optional, if you want tab-based grouping
 };
 
 type ContactProperty = 'name' | 'email' | 'tel';
@@ -85,16 +85,16 @@ const Page: React.FC = () => {
     return nameMatch || emailMatch || telMatch;
   });
 
-  /*
-    OPTIONAL: If you want to add "All", "Work", "Family" tabs, you could do something like:
+  
+    // OPTIONAL: If you want to add "All", "Work", "Family" tabs, you could do something like:
     
     const [selectedTab, setSelectedTab] = useState<"All" | "Work" | "Family">("All");
     const tabFilteredContacts = selectedTab === "All"
       ? filteredContacts
       : filteredContacts.filter(contact => contact.group === selectedTab);
 
-    Then in the render, map over `tabFilteredContacts` instead of `filteredContacts`.
-  */
+    // Then in the render, map over `tabFilteredContacts` instead of `filteredContacts`.
+  
 
   return (
     <>
@@ -196,7 +196,7 @@ const Page: React.FC = () => {
                   />
                 </div>
 
-                {/* (Optional) Tabs for All / Work / Family 
+                (Optional) Tabs for All / Work / Family 
                 <div className="flex gap-4 mb-4">
                   {["All", "Work", "Family"].map(tab => (
                     <button
@@ -212,7 +212,7 @@ const Page: React.FC = () => {
                     </button>
                   ))}
                 </div>
-                */}
+               
 
                 {contacts.length > 0 && (
                   <div className="max-h-96 overflow-y-auto border rounded-lg">
