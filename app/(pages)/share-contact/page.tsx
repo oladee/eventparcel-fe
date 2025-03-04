@@ -76,6 +76,7 @@ const Page: React.FC = () => {
     setIsContactModalOpen(false);
     setSelectedContacts([]);
   };
+  
 
   // Filter contacts by search term
   const filteredContacts = contacts.filter((contact) => {
