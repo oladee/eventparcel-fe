@@ -118,6 +118,7 @@ const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode, selectedGr
           pauseOnHover: true,
           draggable: true,
           theme: "light",
+          
       });
       window.location.reload();
     } catch (error) {
@@ -150,7 +151,17 @@ const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode, selectedGr
 
   return (
     <>
-    <ToastContainer />
+    <ToastContainer
+  position="top-right"
+  autoClose={5000}
+  hideProgressBar={false}
+  closeOnClick
+  pauseOnHover
+  draggable
+  theme="light"
+  style={{ zIndex: 9999 }} // Ensure it appears above other elements
+/>
+
       
       <form className="w-[320px] space-y-4 bg-[#FFFFFF] px-5 py-6 rounded-3xl" onSubmit={handleSubmit}>
         <GroupHeader mode={mode} onClose={() => setIsAddGroupOpen(false)} />

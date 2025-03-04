@@ -49,7 +49,7 @@ const CreateGroupCaller: React.FC = () => {
 
             {/* Modal - Common for both buttons */}
             {isAddGroupOpen && (
-                <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-10 px-4">
+                <div className=" inset-0 flex items-center justify-center bg-black bg-opacity-10 px-4 absolute">
                     <div className="w-full max-w-lg rounded-3xl p-6 md:p-10 lg:p-14">
                         <AddGroup mode="availGroup" setIsAddGroupOpen={setIsAddGroupOpen} />
                     </div>

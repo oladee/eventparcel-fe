@@ -83,7 +83,7 @@ const NewGroup: React.FC = () => {
         {loading ? (
       <p className="text-xl font-semibold h-screen text-center">Loading groups...</p>
     ) : groups.length === 0 ? (
-      <button onClick={handleAddGroupClick} className="w-full flex justify-center xl:justify-start xl:pl-[280px]">
+      <button onClick={handleAddGroupClick} className="w-full flex justify-center xl:justify-start xl:pl-[380px]">
         <AddGroup mode="noGroup" setIsAddGroupOpen={setIsAddGroupOpen} />
       </button>
     ) : (
@@ -109,7 +109,7 @@ const NewGroup: React.FC = () => {
     
           {/* Sidebar Actions */}
           <div  className={`${
-              groups.length === 1 ? "flex flex-col space-y-1 z-55" : "flex flex-col space-y-3 z-55"
+              groups.length === 1 ? "flex flex-col space-y-1" : "flex flex-col space-y-3 "
             }`}>
             {isAddGroupOpen && <AddGroup mode="availGroup" setIsAddGroupOpen={setIsAddGroupOpen} />}
             <CreateGroupCaller />
