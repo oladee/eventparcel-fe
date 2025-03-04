@@ -107,3 +107,15 @@ export const CSV: React.FC<LogoProps> = ({ width, height }) => {
     />
   );
 };
+
+export const FileUpload: React.FC<LogoProps> = ({ width, height }) => {
+  return (
+    <Image
+      src="/images/file-upload.png" // Path relative to the public folder
+      alt="FileUpload"
+      width={width}
+      height={height}
+      priority // Use this prop if the image is critical (e.g., logo)
+    />
+  );
+};
