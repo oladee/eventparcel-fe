@@ -5,8 +5,9 @@ import { MapPin } from "lucide-react";
 import dynamic from "next/dynamic";
 import React, { useState, useEffect } from "react";
 import { banks } from "@/data/banks";
-import axiosInstance from "@/lib/axiosInstance";
+// import axiosInstance from "@/lib/axiosInstance";
 import Image from "next/image";
+import ReusuableSuccess from "@/components/modals/ReusuableSuccess";
 
 const LocationPickerModal = dynamic(
   () => import("@/components/aboutEvent/LocationPickerModal"),
@@ -19,12 +20,19 @@ interface Bank {
   url: string;
 }
 
+const validTimeZones = [
+  "UTC", "GMT", "WAT", "CAT", "EAT", "PST", "CST", "EST", "MST",
+  "AKST", "HST", "IST", "CET", "EET", "BST", "AST", "NST", "JST",
+  "KST", "AEST", "ACST", "AWST"
+];
+
 const Page = () => {
   const [isRightBarOpen, setIsRightBarOpen] = useState(false);
   const [showMapPickerModal, setShowMapPickerModal] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
   const [searchInput, setSearchInput] = useState("");
+  const [showModal, setShowModal] = useState<boolean>(false)
 
   const filteredBanks = banks.filter((bank: Bank) =>
     bank.name.toLowerCase().includes(searchInput.toLowerCase())
@@ -32,17 +40,21 @@ const Page = () => {
 
   const [formData, setFormData] = useState({
     accountNumber: "",
+    accountName: "",
     bankName: "",
     paymentDate: "",
     paymentTime: "",
+    paymentTimeZone: "WAT",
     contactName: "",
     pickupLocation: "",
     deliveryDate: "",
-    deliveryTime: ""
+    deliveryTime: "",
+    deliveryTimeZone: "WAT"
   });
 
   const [errors, setErrors] = useState({
     accountNumber: "",
+    accountName: "",
     bankName: "",
     paymentDate: "",
     paymentTime: "",
@@ -55,8 +67,12 @@ const Page = () => {
   const [isFormValid, setIsFormValid] = useState(false);
 
   useEffect(() => {
-    const isAllFieldsFilled = Object.values(formData).every((value) => value.trim() !== "");
-    const isAllFieldsValid = Object.values(errors).every((error) => error === "");
+    const isAllFieldsFilled = Object.values(formData).every(
+      (value) => value.trim() !== ""
+    );
+    const isAllFieldsValid = Object.values(errors).every(
+      (error) => error === ""
+    );
     setIsFormValid(isAllFieldsFilled && isAllFieldsValid);
   }, [formData, errors]);
 
@@ -64,7 +80,14 @@ const Page = () => {
     switch (id) {
       case "accountNumber":
         if (!/^\d+$/.test(value)) return "Account number must be a number";
-        if (value.length < 5 || value.length > 15) return "Account number must be between 5 and 15 digits";
+        if (value.length != 10)
+          return "Account number must be 10 digits";
+        return "";
+      case "accountName":
+        if (!/^[A-Za-z\s]+$/.test(value))
+          return "Account name must only contain letters and spaces";
+        if (value.length < 3 || value.length > 50)
+          return "Account name must be between 3 and 50 characters";
         return "";
       case "paymentDate":
       case "deliveryDate":
@@ -73,7 +96,10 @@ const Page = () => {
         if (selectedDate < currentDate) return "Date cannot be in the past";
         return "";
       case "contactName":
-        if (!/^[A-Za-z\s]+$/.test(value)) return "Contact name must only contain letters and spaces";
+        if (!/^[A-Za-z\s]+$/.test(value))
+          return "Contact name must only contain letters and spaces";
+        if (value.length < 3 || value.length > 50)
+          return "Contact name must be between 3 and 50 characters";
         return "";
       default:
         return "";
@@ -81,7 +107,7 @@ const Page = () => {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
   ) => {
     const { id, value } = e.target;
     setFormData({ ...formData, [id]: value });
@@ -103,14 +129,16 @@ const Page = () => {
     e.preventDefault();
     if (!isFormValid) return;
 
-    try {
-      const response = await axiosInstance.post("/payment-delivery", formData);
-      console.log("Response:", response.data);
-      // Handle successful submission
-    } catch (error) {
-      console.error("Error:", error);
-      // Handle error
-    }
+    setShowModal(true)
+
+    // try {
+    //   const response = await axiosInstance.post("/payment-delivery", formData);
+    //   console.log("Response:", response.data);
+    //   // Handle successful submission
+    // } catch (error) {
+    //   console.error("Error:", error);
+    //   // Handle error
+    // }
   };
 
   return (
@@ -143,7 +171,10 @@ const Page = () => {
             </p>
           </div>
 
-          <form onSubmit={handleSubmit} className="space-y-8 bg-white p-8 rounded-3xl shadow-md">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-8 bg-white p-8 rounded-3xl shadow-md"
+          >
             <div>
               <div className="mb-5">
                 <h2 className="text-xl font-semibold text-[#111827] mb-2">
@@ -155,7 +186,10 @@ const Page = () => {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex flex-col">
-                  <label htmlFor="accountNumber" className="block mb-2 font-semibold text-[#111827]">
+                  <label
+                    htmlFor="accountNumber"
+                    className="block mb-2 font-semibold text-[#111827]"
+                  >
                     Account Number
                   </label>
                   <input
@@ -163,17 +197,22 @@ const Page = () => {
                     id="accountNumber"
                     placeholder="Enter account number"
                     value={formData.accountNumber}
+                    maxLength={10}
                     onChange={handleChange}
                     onBlur={handleBlur}
                     className="px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50"
                   />
                   {errors.accountNumber && (
-                    <p className="text-red-500 text-sm mt-1">{errors.accountNumber}</p>
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.accountNumber}
+                    </p>
                   )}
                 </div>
 
                 <div>
-                  <label className="block mb-2 font-semibold text-[#111827]">Bank Name</label>
+                  <label className="block mb-2 font-semibold text-[#111827]">
+                    Bank Name
+                  </label>
                   <div className="relative mb-6">
                     <div
                       className="px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50 cursor-pointer"
@@ -212,7 +251,10 @@ const Page = () => {
                               onClick={() => {
                                 setSelectedBank(bank);
                                 setIsDropdownOpen(false);
-                                setFormData({ ...formData, bankName: bank.name });
+                                setFormData({
+                                  ...formData,
+                                  bankName: bank.name
+                                });
                               }}
                             >
                               <Image
@@ -234,6 +276,28 @@ const Page = () => {
                   </div>
                 </div>
               </div>
+              <div className="flex flex-col">
+                <label
+                  htmlFor="accountName"
+                  className="block mb-2 font-semibold text-[#111827]"
+                >
+                  Account Name
+                </label>
+                <input
+                  type="text"
+                  id="accountName"
+                  placeholder="Account name"
+                  value={formData.accountName}
+                  onChange={handleChange}
+                  onBlur={handleBlur}
+                  className="px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50"
+                />
+                {errors.accountName && (
+                  <p className="text-red-500 text-sm mt-1">
+                    {errors.accountName}
+                  </p>
+                )}
+              </div>
             </div>
 
             <div className="mt-8">
@@ -247,7 +311,10 @@ const Page = () => {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <div className="flex flex-col">
-                  <label htmlFor="paymentDate" className="block mb-2 font-semibold text-[#111827]">
+                  <label
+                    htmlFor="paymentDate"
+                    className="block mb-2 font-semibold text-[#111827]"
+                  >
                     Date
                   </label>
                   <input
@@ -259,12 +326,17 @@ const Page = () => {
                     className="px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50"
                   />
                   {errors.paymentDate && (
-                    <p className="text-red-500 text-sm mt-1">{errors.paymentDate}</p>
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.paymentDate}
+                    </p>
                   )}
                 </div>
 
                 <div className="flex flex-col">
-                  <label htmlFor="paymentTime" className="block mb-2 font-semibold text-[#111827]">
+                  <label
+                    htmlFor="paymentTime"
+                    className="block mb-2 font-semibold text-[#111827]"
+                  >
                     Time
                   </label>
                   <div className="flex space-x-3">
@@ -276,11 +348,17 @@ const Page = () => {
                       onBlur={handleBlur}
                       className="input-field outline-primary w-full p-2 rounded-[5px] bg-slate-50"
                     />
-                    <select className="px-3 py-2 input-field outline-primary rounded-[5px] bg-slate-50">
-                      <option value="WAT">WAT</option>
-                      <option value="GMT">GMT</option>
-                      <option value="UTC">UTC</option>
-                      <option value="EST">EST</option>
+                    <select
+                      id="paymentTimeZone"
+                      value={formData.paymentTimeZone}
+                      onChange={handleChange}
+                      className="px-3 py-2 input-field outline-primary rounded-[5px] bg-slate-50"
+                    >
+                      {validTimeZones.map((zone) => (
+                        <option key={zone} value={zone}>
+                          {zone}
+                        </option>
+                      ))}
                     </select>
                   </div>
                 </div>
@@ -293,12 +371,16 @@ const Page = () => {
                   Delivery Details
                 </h2>
                 <span className="text-sm text-[#718096] font-medium">
-                  Add pickup contact details and when you want to start the delivery
+                  Add pickup contact details and when you want to start the
+                  delivery
                 </span>
               </div>
               <div className="grid grid-cols-1 gap-6">
                 <div className="flex flex-col">
-                  <label htmlFor="contactName" className="block mb-2 font-semibold text-[#111827]">
+                  <label
+                    htmlFor="contactName"
+                    className="block mb-2 font-semibold text-[#111827]"
+                  >
                     Contact Name
                   </label>
                   <input
@@ -311,12 +393,17 @@ const Page = () => {
                     className="px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50"
                   />
                   {errors.contactName && (
-                    <p className="text-red-500 text-sm mt-1">{errors.contactName}</p>
+                    <p className="text-red-500 text-sm mt-1">
+                      {errors.contactName}
+                    </p>
                   )}
                 </div>
 
                 <div className="flex flex-col">
-                  <label htmlFor="pickupLocation" className="block mb-2 font-semibold text-[#111827]">
+                  <label
+                    htmlFor="pickupLocation"
+                    className="block mb-2 font-semibold text-[#111827]"
+                  >
                     Pickup Location
                   </label>
                   <div className="relative">
@@ -336,14 +423,19 @@ const Page = () => {
                       required
                     />
                     {errors.pickupLocation && (
-                      <p className="text-red-500 text-sm mt-1">{errors.pickupLocation}</p>
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.pickupLocation}
+                      </p>
                     )}
                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                   <div className="flex flex-col">
-                    <label htmlFor="deliveryDate" className="block mb-2 font-semibold text-[#111827]">
+                    <label
+                      htmlFor="deliveryDate"
+                      className="block mb-2 font-semibold text-[#111827]"
+                    >
                       Date
                     </label>
                     <input
@@ -355,12 +447,17 @@ const Page = () => {
                       className="px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50"
                     />
                     {errors.deliveryDate && (
-                      <p className="text-red-500 text-sm mt-1">{errors.deliveryDate}</p>
+                      <p className="text-red-500 text-sm mt-1">
+                        {errors.deliveryDate}
+                      </p>
                     )}
                   </div>
 
                   <div className="flex flex-col">
-                    <label htmlFor="deliveryTime" className="block mb-2 font-semibold text-[#111827]">
+                    <label
+                      htmlFor="deliveryTime"
+                      className="block mb-2 font-semibold text-[#111827]"
+                    >
                       Time
                     </label>
                     <div className="flex space-x-3">
@@ -372,11 +469,17 @@ const Page = () => {
                         onBlur={handleBlur}
                         className="px-3 py-2 input-field outline-primar w-full rounded-[5px] bg-slate-50"
                       />
-                      <select className="px-3 py-2 input-field outline-primar rounded-[5px] bg-slate-50">
-                        <option value="WAT">WAT</option>
-                        <option value="GMT">GMT</option>
-                        <option value="UTC">UTC</option>
-                        <option value="EST">EST</option>
+                      <select
+                        id="deliveryTimeZone"
+                        value={formData.deliveryTimeZone}
+                        onChange={handleChange}
+                        className="px-3 py-2 input-field outline-primar rounded-[5px] bg-slate-50"
+                      >
+                        {validTimeZones.map((zone) => (
+                          <option key={zone} value={zone}>
+                            {zone}
+                          </option>
+                        ))}
                       </select>
                     </div>
                   </div>
@@ -405,12 +508,14 @@ const Page = () => {
           <RightBar isOpen={isRightBarOpen} setIsOpen={setIsRightBarOpen} />
         </div>
       </section>
+      {
+        showModal && <ReusuableSuccess title="You&apos;ve successfully uploaded your details" subtitle="Congratulations you have successfully created your Payment details" route="/" buttonText="continue" />
+      }
     </>
   );
 };
 
 export default Page;
-
 // "use client";
 
 // import RightBar from "@/components/Rightbar";

@@ -8,7 +8,7 @@ const EventSuccess: React.FC = () => {
       <div className="bg-white p-6 rounded-[24px] w-full  max-w-md grid place-items-center text-center gap-4">
         <Checked width={100} height={100} />
         <p className="font-bold text-2xl md:text-3xl">
-          You’ve successfully created an event
+          You&apos;ve successfully created an event
         </p>
         <p className="font-medium text-[#718096]">
           You can now create groups for different type of guest and packages to
