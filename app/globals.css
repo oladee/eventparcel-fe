@@ -121,3 +121,15 @@ body {
 .Toastify__toast-container {
   z-index: 9999 !important;
 }
+
+
+  /* Hide the spinner for number inputs */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield; /* Firefox */
+  }

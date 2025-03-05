@@ -105,18 +105,6 @@ const About: React.FC = () => {
 
   // API call triggered on clicking Continue
   const handleContinue = async () => {
-    // Validate all fields
-    // const newErrors = { ...errors };
-    // Object.keys(formData).forEach((key) => {
-    //   if (key === "eventImage") {
-    //     newErrors.eventImage = formData.eventImage ? "" : "Image is required.";
-    //   } else {
-    //     newErrors[key as keyof typeof formData] = validateField(
-    //       key,
-    //       formData[key as keyof typeof formData] as string
-    //     );
-    //   }
-    // });
     const newErrors = { ...errors };
     Object.keys(formData).forEach((key) => {
       if (key !== "eventImage") {
