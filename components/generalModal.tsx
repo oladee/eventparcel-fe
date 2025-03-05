@@ -97,8 +97,14 @@ const GeneralModal: React.FC<generalGroupProps>  = ({ group }) => {
         <div className="w-[320px]">
                 <div className="w-[320px] h-auto space-y-6 bg-[#FFFFFF] pt-4 p-8 rounded-3xl">
                     <div className="flex items-center justify-between">
-                        <span className="w-[76px] h-[22px] flex justify-center items-center px-10 py-2 rounded-[50px] font-general font-medium text-sm text-[#2B9EA0] border border-[#2B9EA0] bg-[#ebf3f3]">{group.groupPrivacy.charAt(0).toLocaleUpperCase() + group.groupPrivacy.slice(1)}</span>
-                        <div className="flex justify-center items-center gap-2 cursor-pointer" onClick={() => {
+                    <div
+                        id="privacy"
+                        className={`w-[76px] h-[22px] flex justify-center items-center px-10 py-2 rounded-[50px] font-general font-medium text-sm 
+                        ${group.groupPrivacy === "Private" ? "text-[#DE4222] border border-[#DE4222] bg-[#f6ebe9]"  : "text-[#2B9EA0] border border-[#2B9EA0] bg-[#ebf3f3]"}`}
+                        >
+                        {group.groupPrivacy}
+                    </div>
+                        <div id="edit" className="flex justify-center items-center gap-2 cursor-pointer" onClick={() => {
                             handleAddGroupClick();
                             setSelectedGroup(group);
                             }}>
@@ -112,10 +118,10 @@ const GeneralModal: React.FC<generalGroupProps>  = ({ group }) => {
                         </div>
                     </div>
                     <div className="flex flex-col">
-                        <span className="font-general font-semibold text-xl text-[#111827]">
+                        <span id="groupTitle" className="font-general font-semibold text-xl text-[#111827]">
                             {group.groupName}
                         </span>
-                        <span className="font-general font-medium text-sm text-[#718096]">
+                        <span id="groupDesc" className="font-general font-medium text-sm text-[#718096]">
                             {group.groupDescription}
                         </span>
                     </div>
@@ -144,6 +150,7 @@ const GeneralModal: React.FC<generalGroupProps>  = ({ group }) => {
                                     setOpenModalPackage(true)
                                 }} 
                                 className="font-manrope font-extrabold text-xs py-3 px-20 flex justify-center items-center whitespace-nowrap rounded-[10px] border-[2px] border-[#751423] text-[#751423]"
+                                id="createPackage"
                                 >
                                 Create Package
                             </button>
@@ -206,7 +213,7 @@ const GeneralModal: React.FC<generalGroupProps>  = ({ group }) => {
                             height={16}
                             width={16}
                         />
-                        <span className="font-general font-medium text-sm text-[#DE4222]">Delete</span>
+                        <span id="delete" className="font-general font-medium text-sm text-[#DE4222]">Delete</span>
                     </div>
                     <div className="flex items-center gap-1">
                         <Image 
@@ -215,7 +222,7 @@ const GeneralModal: React.FC<generalGroupProps>  = ({ group }) => {
                               height={16}
                               width={16}
                         />
-                        <span className="font-general font-medium text-sm text-[#718096]">Copy</span>
+                        <span id="copy" className="font-general font-medium text-sm text-[#718096]">Copy</span>
                     </div>
                 </div>
                 </div>
@@ -226,7 +233,7 @@ const GeneralModal: React.FC<generalGroupProps>  = ({ group }) => {
                             mode={modalMode}
                             packageData={selectedPackage}
                             groudId={group._id}
-                            />
+                        />
                     </div>
                 )}
                     {isAddGroupOpen && (

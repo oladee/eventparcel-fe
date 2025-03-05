@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import RightBar from "@/components/Rightbar";
-import PrivateGroup from "@/components/PrivateModal";
+// import PrivateGroup from "@/components/PrivateModal";
 import CreateGroupCaller from "@/components/AddNew";
 import GeneralModal from "@/components/generalModal";
 import FormButtons from "@/components/aboutEvent/FormButtons";
@@ -64,11 +64,11 @@ const NewGroup: React.FC = () => {
       <div className="py-6 lg:py-12">
         {/* Header Section */}
         <div className="mb-6 lg:mb-12 text-start pl-8 lg:text-center">
-          <h3 className="text-2xl sm:text-3xl font-bold text-gray-900">
+          <h3 id="header" className="text-2xl sm:text-3xl font-bold text-gray-900">
             Event Groups & Packages
           </h3>
           <div className="flex items-center justify-center gap-2 text-sm sm:text-base text-gray-600">
-            Create groups and packages for different types of guests
+            <span id="desc">Create groups and packages for different types of guests</span>
             <Image
               onClick={() => setIsRightBarOpen(true)}
               src="/images/information.png"
@@ -76,6 +76,7 @@ const NewGroup: React.FC = () => {
               height={20}
               alt="information"
               className="cursor-pointer"
+              id="infoButton"
             />
           </div>
         </div>
@@ -99,16 +100,17 @@ const NewGroup: React.FC = () => {
             }`}
           >           
            {groups.map(group => ( 
-              group.groupPrivacy === "General" ? (
-                <GeneralModal key={group._id} group={group} />
-              ) : (
-                <PrivateGroup key={group._id} group={group} />
-              )
+              // group.groupPrivacy === "General" ? (
+              //   <GeneralModal key={group._id} group={group} />
+              // ) : (
+              //   <PrivateGroup key={group._id} group={group} />
+              // )
+              <GeneralModal key={group._id} group={group}/>
             ))}
           </div>
     
           {/* Sidebar Actions */}
-          <div  className={`${
+          <div id="addNew"  className={`${
               groups.length === 1 ? "flex flex-col space-y-1" : "flex flex-col space-y-3 "
             }`}>
             {isAddGroupOpen && <AddGroup mode="availGroup" setIsAddGroupOpen={setIsAddGroupOpen} />}
