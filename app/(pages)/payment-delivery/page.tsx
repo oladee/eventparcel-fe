@@ -125,7 +125,7 @@ const Page = () => {
         />
       )}
       <section className="bg-[#F9FAFB] !overflow-hidden relative">
-        <div className="py-11 lg:py-24 px-3 sm:px-4 mx-auto max-w-screen-md h-screen overflow-y-auto no-scrollbar">
+        <div className="py-20 lg:py-24 px-3 sm:px-4 mx-auto max-w-screen-md h-screen overflow-y-auto no-scrollbar">
           <div className="mb-4 md:mb-12 text-center p-3 sm:p-0 space-y-3">
             <h1 className="text-2xl sm:text-3xl font-bold text-[#111827]">
               Payment & Delivery
