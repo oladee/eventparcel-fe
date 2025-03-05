@@ -1,6 +1,8 @@
+"use client";
+
 import React from "react";
 import { Checked } from "../icons/Icons";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 interface SuccessModalProps {
   title: string;
