@@ -277,14 +277,14 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
     return (
         <>
             <ToastContainer aria-live="polite" />
-            <div className="w-[680px] max-h-[80vh] lg:max-h-[98vh] bg-[#FFFFFF] rounded-2xl shadow-lg p-5 flex flex-col  overflow-y-auto">
+            <div className="w-[680px] max-h-[80vh] lg:max-h-[100vh] bg-[#FFFFFF] rounded-2xl shadow-lg p-10 flex flex-col  overflow-y-auto">
                 {/* Header */}
                 <div className="flex justify-between items-center">
                     <div className="flex flex-col items-start">
-                        <div className="font-bold text-lg text-[#111827]">
+                        <div id="header" className="font-bold text-lg text-[#111827]">
                             {mode === "create" ? "Create Package" : "Update Package"}
                         </div>
-                        <p className="font-general font-medium text-lg text-[#718096]">How do you want to sell to this group</p>
+                        <p id="desc" className="font-general font-medium text-lg text-[#718096]">How do you want to sell to this group</p>
                     </div>
                     <Image 
                         src="/images/cancel.png" 
@@ -313,7 +313,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                                 alt="Main package image"
                                 width={100}
                                 height={100}
-                                className="rounded-[10px] border w-[90px] h-[90px]"
+                                className="rounded-[10px] border w-[100px] h-[100px]"
                             />
                             <button 
                                 onClick={() => removeImage(0)} 
@@ -333,7 +333,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                                     alt="package"
                                     width={100}
                                     height={100}
-                                    className="rounded-[10px] border w-[90px] h-[90px]"
+                                    className="rounded-[10px] border w-[100px] h-[100px]"
                                 />
                                 <button 
                                     onClick={() => removeImage(index + 1)} 
@@ -396,7 +396,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                             value={formData.packagePrice}
                             onChange={handleChange}
                             placeholder="Enter amount"
-                            className="w-full h-6 p-2 outline-none bg-transparent text-gray-900 placeholder-gray-400"
+                            className="w-full h-5 p-2 outline-none bg-transparent text-gray-900 placeholder-gray-400"
                         />
                     </div>
 
@@ -417,15 +417,10 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
         
                 {/* Delivery Options */}
                 <div className="flex flex-col gap-3 mt-2">
-                    <p className="font-semibold text-base text-[#111827]">How would you like to handle delivery?</p>
-                    <p className="text-sm text-[#718096]">
-                        With Event Parcel platform, you can manage and track delivery easily.
-                    </p>
-                    <p className="text-sm font-semibold text-[#111827]">Delivery Options</p>
                     {/* Delivery Options Section */}
                     <div className="flex flex-col gap-3">
-                        <p className="font-semibold text-base text-[#111827]">How would you like to handle delivery?</p>
-                        <p className="text-sm text-[#718096]">
+                        <p id="deliveryHeader" className="font-semibold text-base text-[#111827]">How would you like to handle delivery?</p>
+                        <p id="deliveryDesc" className="text-sm text-[#718096]">
                             With Event Parcel platform, you can manage and track delivery easily.
                         </p>
 
@@ -444,37 +439,46 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                                             alt="check"
                                         width={16}
                                         height={16}
+                                        id="HomeDelivery"
                                     />
-                                    <span className="text-sm">Home Delivery</span>
+                                    <span className="font-general font-semibold text-base text-[#111827]">Home Delivery</span>
                                 </div>
 
                                 {/* Sub-options */}
                                 {openHomeDeliveryOption && (
-                                    <div className="flex flex-col gap-0.5 border border-gray-100 ">
+                                    <div className="flex w-full flex-col border border-gray-100 ">
                                         <div
-                                            className="flex items-center gap-1 cursor-pointer p-2"
+                                            className="flex flex-col items-start gap-1 cursor-pointer p-2"
                                             onClick={() => toggleDeliveryOption("homeDelivery:platformDelivery")}
                                             >
-                                            <Image
-                                                src={homeDeliverySelectedOptions.platformDelivery ? "/images/check.png" : "/images/unchecked.png"}
-                                                alt="check"
-                                                width={16}
-                                                height={16}
-                                            />
-                                            <span className="text-sm">Platform Delivery - We handle delivery for you</span>
+                                            <div className="flex items-center gap-2">
+                                                <Image
+                                                    src={homeDeliverySelectedOptions.platformDelivery ? "/images/check.png" : "/images/unchecked.png"}
+                                                    alt="check"
+                                                    width={16}
+                                                    height={16}
+                                                    id="platformDelivery"
+                                                    />
+                                                <span className="font-general font-medium text-base text-[#111827]">Platform Delivery</span>
+                                            </div>
+                                            <span id="platformDeliveryDesc" className="pl-6 font-general font-medium text-sm text-[#718096]">We handle delivery for you</span>
                                         </div>
 
                                         <div
-                                            className="flex items-center gap-1 cursor-pointer p-2"
+                                            className="flex flex-col items-start gap-1 cursor-pointer p-2"
                                             onClick={() => toggleDeliveryOption("homeDelivery:selfManaged")}
                                         >
-                                            <Image
-                                                src={homeDeliverySelectedOptions.selfManaged ? "/images/check.png" : "/images/unchecked.png"}
-                                                alt="check"
-                                                width={16}
-                                                height={16}
-                                                />
-                                            <span className="text-sm">Self-Managed - You handle delivery yourself</span>
+                                            <div className="flex items-center gap-2">
+                                                <Image
+                                                    src={homeDeliverySelectedOptions.selfManaged ? "/images/check.png" : "/images/unchecked.png"}
+                                                    alt="check"
+                                                    width={16}
+                                                    height={16}
+                                                    id="selfManaged"
+                                                    />
+                                                <span className="font-general font-medium text-base text-[#111827]">Self-Managed</span>
+                                            </div>
+                                            <span id="selfManagedDesc" className="pl-6 font-general font-medium text-sm text-[#718096]">You handle delivery yourself</span>
                                         </div>
                                     </div>
                                 )}
@@ -490,8 +494,9 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                                     alt="check"
                                     width={16}
                                     height={16}
+                                    id="pickUp"
                                     />
-                                <span className="text-sm">Pickup</span>
+                                <span className="font-general font-medium text-base text-[#111827]">Pickup</span>
                             </div>
                         </div>
                             
@@ -500,12 +505,14 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                     {/* Buttons */}
                     <div className="flex justify-end gap-2">
                         <button 
+                            id="cancel"
                             onClick={() => setOpenModalPackage(false)} 
                             className="px-4 py-2 rounded-xl border"
                             >
                             Cancel
                         </button>
                         <button 
+                            id="createPackage"
                             onClick={handleSubmit} 
                             disabled={loading}  
                             className={`px-4 py-2 text-white rounded-xl ${

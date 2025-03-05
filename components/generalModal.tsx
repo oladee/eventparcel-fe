@@ -127,9 +127,10 @@ const GeneralModal: React.FC<generalGroupProps>  = ({ group }) => {
                     </div>
                     <div className="flex flex-col gap-3">
                     {group.packages.length > 0 ? (
-                        <div className="flex justify-between">
+                        <div id="package" className="flex justify-between">
                             <p className="font-general font-semibold text-base text-[#111827]">Packages</p>
                             <div className="flex justify-center items-center gap-2 cursor-pointer"
+                                 id="addNewPackage"
                                   onClick={() => {
                                     setModalMode("create");
                                     setSelectedPackage(null);
@@ -170,16 +171,17 @@ const GeneralModal: React.FC<generalGroupProps>  = ({ group }) => {
                                         className="rounded-[5.29px] object-contain h-[60px] w-[60px]"
                                     />
                                     <div className="flex flex-col">
-                                        <span className="text-sm font-general font-semibold leading-tight text-[#111827]">
+                                        <span id="packageHeader" className="text-sm font-general font-semibold leading-tight text-[#111827]">
                                             {item.packageTitle}
                                         </span>
-                                        <p className="font-general font-medium text-xs text-[#718096]">₦{item.packagePrice}</p>
+                                        <p id="packagePrice" className="font-general font-medium text-xs text-[#718096]">₦{item.packagePrice}</p>
                                     </div>
                                 </div>
                                 <div className="flex flex-col justify-center items-center gap-5">
                                 <Image 
                                     src="/images/trash.png"
-                                    alt=""
+                                    alt="delete"
+                                    id="deletePackage"
                                     width={12}
                                     height={12}
                                     onClick={() => {
@@ -191,6 +193,7 @@ const GeneralModal: React.FC<generalGroupProps>  = ({ group }) => {
                                 <Image 
                                     src="/images/edit.png"
                                     alt="edit"
+                                    id="editPackage"
                                     width={12}  
                                     height={12} 
                                     className="cursor-pointer"
@@ -206,14 +209,14 @@ const GeneralModal: React.FC<generalGroupProps>  = ({ group }) => {
                     </div>
                 </div>
                 <div className="flex justify-between">
-                    <div className="flex items-center gap-1 cursor-pointer" onClick={handleDeleteModal}>
+                    <div id="delete" className="flex items-center gap-1 cursor-pointer" onClick={handleDeleteModal}>
                         <Image 
                             src="/images/trash.png"
                             alt="delete_package"
                             height={16}
                             width={16}
                         />
-                        <span id="delete" className="font-general font-medium text-sm text-[#DE4222]">Delete</span>
+                        <span  className="font-general font-medium text-sm text-[#DE4222]">Delete</span>
                     </div>
                     <div className="flex items-center gap-1">
                         <Image 
