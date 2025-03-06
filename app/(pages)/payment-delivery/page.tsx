@@ -487,7 +487,7 @@ const Page = () => {
               </div>
             </div>
 
-            <div className="bg-[#FFFF] py-4 flex justify-center absolute z-10 right-0 bottom-0 w-full">
+            <div className="bg-[#FFFF] py-4 flex justify-center md:absolute z-10 right-0 bottom-0 w-full">
               <div className="max-w-3xl flex gap-4 items-center justify-center sm:justify-end w-full">
                 <button className="p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827]">
                   Save for later
@@ -516,6 +516,33 @@ const Page = () => {
 };
 
 export default Page;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // "use client";
 
 // import RightBar from "@/components/Rightbar";
