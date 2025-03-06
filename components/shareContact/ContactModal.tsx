@@ -21,6 +21,7 @@ const ContactModal: React.FC<ContactModalProps> = ({ onClose, contacts }) => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedContacts, setSelectedContacts] = useState<number[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
+  const [selectAll, setSelectAll] = useState(false);
 
   const getInitials = (firstName: string, lastName: string): string => {
     const getValidChar = (name: string) => {
@@ -69,6 +70,15 @@ const ContactModal: React.FC<ContactModalProps> = ({ onClose, contacts }) => {
         ? prev.filter((contactId) => contactId !== id)
         : [...prev, id]
     );
+  };
+
+  const handleSelectAll = () => {
+    if (selectAll) {
+      setSelectedContacts([]);
+    } else {
+      setSelectedContacts(filteredContacts.map((contact) => contact.id));
+    }
+    setSelectAll(!selectAll);
   };
 
   return (
@@ -142,6 +152,17 @@ const ContactModal: React.FC<ContactModalProps> = ({ onClose, contacts }) => {
               {contacts.filter((c) => c.category === "Family").length}
             </span>
           </span>
+          {selectedContacts.length > 0 && (
+            <span className="ml-auto">
+              <input
+                type="checkbox"
+                id="selectAll"
+                checked={selectAll}
+                onChange={handleSelectAll}
+              />{" "}
+              <label htmlFor="selectAll">Select All</label>
+            </span>
+          )}
         </div>
 
         {/* Contact List */}
@@ -188,7 +209,10 @@ const ContactModal: React.FC<ContactModalProps> = ({ onClose, contacts }) => {
             <div className="flex flex-col items-center justify-center p-6 text-center text-gray-500">
               <FiSearch size={48} className="mb-4" />
               <p className="text-lg font-semibold">No contacts found</p>
-              <p className="text-sm">Try adjusting your search or filter to find what you&apos;re looking for.</p>
+              <p className="text-sm">
+                Try adjusting your search or filter to find what you're looking
+                for.
+              </p>
             </div>
           )}
         </div>
@@ -202,7 +226,10 @@ const ContactModal: React.FC<ContactModalProps> = ({ onClose, contacts }) => {
             Cancel
           </button>
           <button
-            className="bg-primary text-white py-3 px-8 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center font-extrabold font-manrope"
+            className={`bg-primary text-white py-3 px-8 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center font-extrabold font-manrope ${
+              selectedContacts.length === 0 ? "opacity-50 cursor-not-allowed" : ""
+            }`}
+            disabled={selectedContacts.length === 0}
           >
             Import
           </button>
@@ -213,6 +240,11 @@ const ContactModal: React.FC<ContactModalProps> = ({ onClose, contacts }) => {
 };
 
 export default ContactModal;
+
+
+
+
+
 
 
 
@@ -250,7 +282,7 @@ export default ContactModal;
 
 //   const getInitials = (firstName: string, lastName: string): string => {
 //     const getValidChar = (name: string) => {
-//       for (let char of name) {
+//       for (const char of name) {
 //         if (/[a-zA-Z]/.test(char)) {
 //           return char.toUpperCase();
 //         }
@@ -368,47 +400,57 @@ export default ContactModal;
 //               {contacts.filter((c) => c.category === "Family").length}
 //             </span>
 //           </span>
+
+//           <span className=""><input type="checkbox" /> <label htmlFor="selectAll">select All</label></span>
 //         </div>
 
 //         {/* Contact List */}
 //         <div className="mt-4 space-y-3 max-h-64 overflow-y-auto no-scrollbar">
-//           {filteredContacts.map((contact) => (
-//             <div
-//               key={contact.id}
-//               className={`flex items-center justify-between p-3 rounded-lg ${
-//                 selectedContacts.includes(contact.id) ? "bg-gray-100" : ""
-//               }`}
-//             >
-//               <div className="flex items-center space-x-3">
-//                 <input
-//                   type="checkbox"
-//                   id="checkbox"
-//                   checked={selectedContacts.includes(contact.id)}
-//                   onChange={() => toggleSelect(contact.id)}
-//                   className="outline-none"
-//                 />
-//                 <div
-//                   className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold"
-//                   style={{
-//                     backgroundColor: selectedContacts.includes(contact.id)
-//                       ? "#751423"
-//                       : "#C4C4C4"
-//                   }}
-//                 >
-//                   {contact.initials}
+//           {filteredContacts.length > 0 ? (
+//             filteredContacts.map((contact) => (
+//               <div
+//                 key={contact.id}
+//                 className={`flex items-center justify-between p-3 rounded-lg ${
+//                   selectedContacts.includes(contact.id) ? "bg-gray-100" : ""
+//                 }`}
+//               >
+//                 <div className="flex items-center space-x-3">
+//                   <input
+//                     type="checkbox"
+//                     id="checkbox"
+//                     checked={selectedContacts.includes(contact.id)}
+//                     onChange={() => toggleSelect(contact.id)}
+//                     className="outline-none"
+//                   />
+//                   <div
+//                     className="w-8 h-8 rounded-full flex items-center justify-center text-white text-sm font-semibold"
+//                     style={{
+//                       backgroundColor: selectedContacts.includes(contact.id)
+//                         ? "#751423"
+//                         : "#C4C4C4"
+//                     }}
+//                   >
+//                     {contact.initials}
+//                   </div>
+//                   <div>
+//                     <p className="text-sm font-medium">{contact.name}</p>
+//                     <p className="text-xs text-gray-500">{contact.phone}</p>
+//                   </div>
 //                 </div>
-//                 <div>
-//                   <p className="text-sm font-medium">{contact.name}</p>
-//                   <p className="text-xs text-gray-500">{contact.phone}</p>
-//                 </div>
+//                 {contact.category !== "All" && (
+//                   <span className="text-xs text-gray-500">
+//                     {contact.category}
+//                   </span>
+//                 )}
 //               </div>
-//               {contact.category !== "All" && (
-//                 <span className="text-xs text-gray-500">
-//                   {contact.category}
-//                 </span>
-//               )}
+//             ))
+//           ) : (
+//             <div className="flex flex-col items-center justify-center p-6 text-center text-gray-500">
+//               <FiSearch size={48} className="mb-4" />
+//               <p className="text-lg font-semibold">No contacts found</p>
+//               <p className="text-sm">Try adjusting your search or filter to find what you&apos;re looking for.</p>
 //             </div>
-//           ))}
+//           )}
 //         </div>
 
 //         {/* Footer Buttons */}
@@ -431,6 +473,15 @@ export default ContactModal;
 // };
 
 // export default ContactModal;
+
+
+
+
+
+
+
+
+
 
 
 
