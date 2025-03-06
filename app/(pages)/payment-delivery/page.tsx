@@ -4,10 +4,11 @@ import RightBar from "@/components/Rightbar";
 import { MapPin } from "lucide-react";
 import dynamic from "next/dynamic";
 import React, { useState, useEffect } from "react";
-import { banks } from "@/data/banks";
-// import axiosInstance from "@/lib/axiosInstance";
-import Image from "next/image";
+import axiosInstance from "@/lib/axiosInstance";
 import ReusuableSuccess from "@/components/modals/ReusuableSuccess";
+import { toast, ToastContainer } from "react-toastify";
+import { BiLoaderCircle } from "react-icons/bi";
+import BankDropdown from "@/components/BankDropdown";
 
 const LocationPickerModal = dynamic(
   () => import("@/components/aboutEvent/LocationPickerModal"),
@@ -21,22 +22,36 @@ interface Bank {
 }
 
 const validTimeZones = [
-  "UTC", "GMT", "WAT", "CAT", "EAT", "PST", "CST", "EST", "MST",
-  "AKST", "HST", "IST", "CET", "EET", "BST", "AST", "NST", "JST",
-  "KST", "AEST", "ACST", "AWST"
+  "UTC",
+  "GMT",
+  "WAT",
+  "CAT",
+  "EAT",
+  "PST",
+  "CST",
+  "EST",
+  "MST",
+  "AKST",
+  "HST",
+  "IST",
+  "CET",
+  "EET",
+  "BST",
+  "AST",
+  "NST",
+  "JST",
+  "KST",
+  "AEST",
+  "ACST",
+  "AWST"
 ];
 
 const Page = () => {
   const [isRightBarOpen, setIsRightBarOpen] = useState(false);
   const [showMapPickerModal, setShowMapPickerModal] = useState(false);
-  const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
-  const [searchInput, setSearchInput] = useState("");
-  const [showModal, setShowModal] = useState<boolean>(false)
-
-  const filteredBanks = banks.filter((bank: Bank) =>
-    bank.name.toLowerCase().includes(searchInput.toLowerCase())
-  );
+  const [showModal, setShowModal] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const [formData, setFormData] = useState({
     accountNumber: "",
@@ -80,8 +95,7 @@ const Page = () => {
     switch (id) {
       case "accountNumber":
         if (!/^\d+$/.test(value)) return "Account number must be a number";
-        if (value.length != 10)
-          return "Account number must be 10 digits";
+        if (value.length != 10) return "Account number must be 10 digits";
         return "";
       case "accountName":
         if (!/^[A-Za-z\s]+$/.test(value))
@@ -107,7 +121,9 @@ const Page = () => {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { id, value } = e.target;
     setFormData({ ...formData, [id]: value });
@@ -125,24 +141,72 @@ const Page = () => {
     setShowMapPickerModal(true);
   };
 
+  // Helper function to convert 24-hour time (HH:mm) to 12-hour format (hh:mm AM/PM) matching the regex
+  const convertTo12Hour = (time24: string): string => {
+    const [hourStr, minute] = time24.split(":");
+    let hours = parseInt(hourStr, 10);
+    const ampm = hours >= 12 ? "PM" : "AM";
+    // Convert hour '0' to '12'
+    hours = hours % 12 || 12;
+    // Pad hours with a leading zero if necessary
+    const paddedHours = hours < 10 ? `0${hours}` : `${hours}`;
+    return `${paddedHours}:${minute} ${ampm}`;
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!isFormValid) return;
 
-    setShowModal(true)
+    try {
+      setLoading(true);
 
-    // try {
-    //   const response = await axiosInstance.post("/payment-delivery", formData);
-    //   console.log("Response:", response.data);
-    //   // Handle successful submission
-    // } catch (error) {
-    //   console.error("Error:", error);
-    //   // Handle error
-    // }
+      // Convert paymentTime and deliveryTime to 12-hour format if needed
+      let formattedPaymentTime = formData.paymentTime;
+      if (/^\d{2}:\d{2}$/.test(formData.paymentTime)) {
+        formattedPaymentTime = convertTo12Hour(formData.paymentTime);
+      }
+
+      let formattedDeliveryTime = formData.deliveryTime;
+      if (/^\d{2}:\d{2}$/.test(formData.deliveryTime)) {
+        formattedDeliveryTime = convertTo12Hour(formData.deliveryTime);
+      }
+
+      const submissionData = {
+        ...formData,
+        paymentTime: formattedPaymentTime,
+        deliveryTime: formattedDeliveryTime
+      };
+
+      const response = await axiosInstance.post("/create", submissionData);
+      console.log("Response:", response.data);
+      setShowModal(true);
+    } catch (error: any) {
+      console.error("Error:", error);
+
+      // Handle network errors
+      if (error.isAxiosError && !error.response) {
+        toast.error("Network error. Please check your internet connection.");
+      } else if (error.response?.data?.errors) {
+        // Handle server-side validation errors
+        const serverErrors = error.response.data.errors;
+        Object.keys(serverErrors).forEach((key) => {
+          setErrors((prev) => ({ ...prev, [key]: serverErrors[key] }));
+        });
+        toast.error("Please fix the errors in the form.");
+      } else {
+        // Handle generic errors
+        toast.error(
+          error.response?.data?.message || "An unexpected error occurred."
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <>
+      <ToastContainer />
       {showMapPickerModal && (
         <LocationPickerModal
           onLocationSelect={(pickupLocation) => {
@@ -189,6 +253,7 @@ const Page = () => {
                   <label
                     htmlFor="accountNumber"
                     className="block mb-2 font-semibold text-[#111827]"
+                    aria-required="true"
                   >
                     Account Number
                   </label>
@@ -201,9 +266,16 @@ const Page = () => {
                     onChange={handleChange}
                     onBlur={handleBlur}
                     className="px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50"
+                    aria-describedby="accountNumberError"
+                    aria-invalid={!!errors.accountNumber}
+                    required
                   />
                   {errors.accountNumber && (
-                    <p className="text-red-500 text-sm mt-1">
+                    <p
+                      id="accountNumberError"
+                      className="text-red-500 text-sm mt-1"
+                      role="alert"
+                    >
                       {errors.accountNumber}
                     </p>
                   )}
@@ -213,67 +285,11 @@ const Page = () => {
                   <label className="block mb-2 font-semibold text-[#111827]">
                     Bank Name
                   </label>
-                  <div className="relative mb-6">
-                    <div
-                      className="px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50 cursor-pointer"
-                      onClick={() => setIsDropdownOpen(!isDropdownOpen)}
-                    >
-                      {selectedBank ? (
-                        <div className="flex items-center">
-                          <Image
-                            src={selectedBank.url}
-                            alt={selectedBank.name}
-                            className="w-6 h-6 mr-2"
-                            width={24}
-                            height={24}
-                          />
-                          <span>{selectedBank.name}</span>
-                          <span className="ml-auto">({selectedBank.code})</span>
-                        </div>
-                      ) : (
-                        <span>Select Bank</span>
-                      )}
-                    </div>
-                    {isDropdownOpen && (
-                      <div className="absolute z-10 w-full bg-white border rounded mt-2 max-h-60 overflow-y-auto">
-                        <input
-                          type="text"
-                          placeholder="Search for a bank..."
-                          className="w-full p-2 border-b"
-                          value={searchInput}
-                          onChange={(e) => setSearchInput(e.target.value)}
-                        />
-                        {filteredBanks.length > 0 ? (
-                          filteredBanks.map((bank: Bank) => (
-                            <div
-                              key={bank.code}
-                              className="flex items-center p-2 cursor-pointer hover:bg-gray-100"
-                              onClick={() => {
-                                setSelectedBank(bank);
-                                setIsDropdownOpen(false);
-                                setFormData({
-                                  ...formData,
-                                  bankName: bank.name
-                                });
-                              }}
-                            >
-                              <Image
-                                src={bank.url}
-                                alt={bank.name}
-                                className="w-6 h-6 mr-2"
-                                width={24}
-                                height={24}
-                              />
-                              <span>{bank.name}</span>
-                              <span className="ml-auto">({bank.code})</span>
-                            </div>
-                          ))
-                        ) : (
-                          <div className="p-2 text-center">Not found</div>
-                        )}
-                      </div>
-                    )}
-                  </div>
+                  <BankDropdown
+                    selectedBank={selectedBank}
+                    setSelectedBank={setSelectedBank}
+                    setFormData={setFormData}
+                  />
                 </div>
               </div>
               <div className="flex flex-col">
@@ -499,7 +515,11 @@ const Page = () => {
                     !isFormValid ? "opacity-50 cursor-not-allowed" : ""
                   }`}
                 >
-                  Continue
+                  {loading ? (
+                    <BiLoaderCircle className="animate-spin mr-2" size={22} />
+                  ) : (
+                    "Continue"
+                  )}
                 </button>
               </div>
             </div>
@@ -508,9 +528,14 @@ const Page = () => {
           <RightBar isOpen={isRightBarOpen} setIsOpen={setIsRightBarOpen} />
         </div>
       </section>
-      {
-        showModal && <ReusuableSuccess title="You&apos;ve successfully uploaded your details" subtitle="Congratulations you have successfully created your Payment details" route="/" buttonText="continue" />
-      }
+      {showModal && (
+        <ReusuableSuccess
+          title="You've successfully uploaded your details"
+          subtitle="Congratulations you have successfully created your Payment details"
+          route="/"
+          buttonText="continue"
+        />
+      )}
     </>
   );
 };
@@ -543,34 +568,100 @@ export default Page;
 
 
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // "use client";
 
 // import RightBar from "@/components/Rightbar";
 // import { MapPin } from "lucide-react";
 // import dynamic from "next/dynamic";
-// import React, { useState } from "react";
-// import { FiInfo } from "react-icons/fi";
+// import React, { useState, useEffect } from "react";
+// import { banks } from "@/data/banks";
+// import axiosInstance from "@/lib/axiosInstance";
+// import ReusuableSuccess from "@/components/modals/ReusuableSuccess";
+// import { toast, ToastContainer } from "react-toastify";
+// import { BiLoaderCircle } from "react-icons/bi";
+// import BankDropdown from "@/components/BankDropdown";
 
 // const LocationPickerModal = dynamic(
 //   () => import("@/components/aboutEvent/LocationPickerModal"),
 //   { ssr: false }
 // );
+
+// interface Bank {
+//   name: string;
+//   code: string;
+//   url: string;
+// }
+
+// const validTimeZones = [
+//   "UTC",
+//   "GMT",
+//   "WAT",
+//   "CAT",
+//   "EAT",
+//   "PST",
+//   "CST",
+//   "EST",
+//   "MST",
+//   "AKST",
+//   "HST",
+//   "IST",
+//   "CET",
+//   "EET",
+//   "BST",
+//   "AST",
+//   "NST",
+//   "JST",
+//   "KST",
+//   "AEST",
+//   "ACST",
+//   "AWST"
+// ];
+
 // const Page = () => {
 //   const [isRightBarOpen, setIsRightBarOpen] = useState(false);
 //   const [showMapPickerModal, setShowMapPickerModal] = useState(false);
+//   const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
+//   // const [searchInput, setSearchInput] = useState("");
+//   const [searchInput] = useState("");
+//   const [showModal, setShowModal] = useState<boolean>(false);
+//   const [loading, setLoading] = useState<boolean>(false);
+
+//   // const filteredBanks = banks.filter((bank: Bank) =>
+//   //   bank.name.toLowerCase().includes(searchInput.toLowerCase())
+//   // );
+
 //   const [formData, setFormData] = useState({
 //     accountNumber: "",
+//     accountName: "",
 //     bankName: "",
 //     paymentDate: "",
 //     paymentTime: "",
+//     paymentTimeZone: "WAT",
 //     contactName: "",
 //     pickupLocation: "",
 //     deliveryDate: "",
-//     deliveryTime: ""
+//     deliveryTime: "",
+//     deliveryTimeZone: "WAT"
 //   });
 
 //   const [errors, setErrors] = useState({
 //     accountNumber: "",
+//     accountName: "",
 //     bankName: "",
 //     paymentDate: "",
 //     paymentTime: "",
@@ -579,16 +670,56 @@ export default Page;
 //     deliveryDate: "",
 //     deliveryTime: ""
 //   });
-//   // Handlers for input changes and validations
-//   const handleChange = (
-//     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
-//   ) => {
-//     setFormData({ ...formData, [e.target.id]: e.target.value });
-//     setErrors({ ...errors, [e.target.id]: "" });
-//   };
+
+//   const [isFormValid, setIsFormValid] = useState(false);
+
+//   useEffect(() => {
+//     const isAllFieldsFilled = Object.values(formData).every(
+//       (value) => value.trim() !== ""
+//     );
+//     const isAllFieldsValid = Object.values(errors).every(
+//       (error) => error === ""
+//     );
+//     setIsFormValid(isAllFieldsFilled && isAllFieldsValid);
+//   }, [formData, errors]);
 
 //   const validateField = (id: string, value: any) => {
-//     console.log("Validation Logic");
+//     switch (id) {
+//       case "accountNumber":
+//         if (!/^\d+$/.test(value)) return "Account number must be a number";
+//         if (value.length != 10) return "Account number must be 10 digits";
+//         return "";
+//       case "accountName":
+//         if (!/^[A-Za-z\s]+$/.test(value))
+//           return "Account name must only contain letters and spaces";
+//         if (value.length < 3 || value.length > 50)
+//           return "Account name must be between 3 and 50 characters";
+//         return "";
+//       case "paymentDate":
+//       case "deliveryDate":
+//         const selectedDate = new Date(value);
+//         const currentDate = new Date();
+//         if (selectedDate < currentDate) return "Date cannot be in the past";
+//         return "";
+//       case "contactName":
+//         if (!/^[A-Za-z\s]+$/.test(value))
+//           return "Contact name must only contain letters and spaces";
+//         if (value.length < 3 || value.length > 50)
+//           return "Contact name must be between 3 and 50 characters";
+//         return "";
+//       default:
+//         return "";
+//     }
+//   };
+
+//   const handleChange = (
+//     e: React.ChangeEvent<
+//       HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+//     >
+//   ) => {
+//     const { id, value } = e.target;
+//     setFormData({ ...formData, [id]: value });
+//     setErrors({ ...errors, [id]: validateField(id, value) });
 //   };
 
 //   const handleBlur = (
@@ -598,13 +729,92 @@ export default Page;
 //     setErrors((prev) => ({ ...prev, [id]: validateField(id, value) }));
 //   };
 
-//   // Map location handler
 //   const handleMapLocationSelect = () => {
 //     setShowMapPickerModal(true);
 //   };
 
+//   // Helper function to convert 24-hour time (HH:mm) to 12-hour format (hh:mm AM/PM) matching the regex
+//   const convertTo12Hour = (time24: string): string => {
+//     const [hourStr, minute] = time24.split(":");
+//     let hours = parseInt(hourStr, 10);
+//     const ampm = hours >= 12 ? "PM" : "AM";
+//     // Convert hour '0' to '12'
+//     hours = hours % 12 || 12;
+//     // Pad hours with a leading zero if necessary
+//     const paddedHours = hours < 10 ? `0${hours}` : `${hours}`;
+//     return `${paddedHours}:${minute} ${ampm}`;
+//   };
+
+//   const handleSubmit = async (e: React.FormEvent) => {
+//     e.preventDefault();
+//     if (!isFormValid) return;
+
+//     try {
+//       setLoading(true);
+
+//       // Convert paymentTime and deliveryTime to 12-hour format if needed
+//       let formattedPaymentTime = formData.paymentTime;
+//       if (/^\d{2}:\d{2}$/.test(formData.paymentTime)) {
+//         formattedPaymentTime = convertTo12Hour(formData.paymentTime);
+//       }
+
+//       let formattedDeliveryTime = formData.deliveryTime;
+//       if (/^\d{2}:\d{2}$/.test(formData.deliveryTime)) {
+//         formattedDeliveryTime = convertTo12Hour(formData.deliveryTime);
+//       }
+
+//       const submissionData = {
+//         ...formData,
+//         paymentTime: formattedPaymentTime,
+//         deliveryTime: formattedDeliveryTime
+//       };
+
+//       const response = await axiosInstance.post("/create", submissionData);
+//       console.log("Response:", response.data);
+//       setShowModal(true);
+//     } catch (error: any) {
+//       console.error("Error:", error);
+
+//       // Handle network errors
+//       if (error.isAxiosError && !error.response) {
+//         toast.error("Network error. Please check your internet connection.");
+//       } else if (error.response?.data?.errors) {
+//         // Handle server-side validation errors
+//         const serverErrors = error.response.data.errors;
+//         Object.keys(serverErrors).forEach((key) => {
+//           setErrors((prev) => ({ ...prev, [key]: serverErrors[key] }));
+//         });
+//         toast.error("Please fix the errors in the form.");
+//       } else {
+//         // Handle generic errors
+//         toast.error(
+//           error.response?.data?.message || "An unexpected error occurred."
+//         );
+//       }
+//     } finally {
+//       setLoading(false);
+//     }
+//   };
+
+//   // const handleSubmit = async (e: React.FormEvent) => {
+//   //   e.preventDefault();
+//   //   if (!isFormValid) return;
+
+//   //   try {
+//   //     const response = await axiosInstance.post("/create", formData);
+//   //     console.log("Response:", response.data);
+//   //     // setShowModal(true);
+
+//   //     // Handle successful submission
+//   //   } catch (error) {
+//   //     console.error("Error:", error);
+//   //     // Handle error
+//   //   }
+//   // };
+
 //   return (
 //     <>
+//       <ToastContainer />
 //       {showMapPickerModal && (
 //         <LocationPickerModal
 //           onLocationSelect={(pickupLocation) => {
@@ -615,8 +825,7 @@ export default Page;
 //         />
 //       )}
 //       <section className="bg-[#F9FAFB] !overflow-hidden relative">
-//         <div className="py-11 lg:py-24 px-3 sm:px-4 mx-auto max-w-screen-md h-screen overflow-y-auto no-scrollbar">
-//           {/* Page Header */}
+//         <div className="py-20 lg:py-24 px-3 sm:px-4 mx-auto max-w-screen-md h-screen overflow-y-auto no-scrollbar">
 //           <div className="mb-4 md:mb-12 text-center p-3 sm:p-0 space-y-3">
 //             <h1 className="text-2xl sm:text-3xl font-bold text-[#111827]">
 //               Payment & Delivery
@@ -635,10 +844,9 @@ export default Page;
 //           </div>
 
 //           <form
-//             action=""
+//             onSubmit={handleSubmit}
 //             className="space-y-8 bg-white p-8 rounded-3xl shadow-md"
 //           >
-//             {/* Payment Details */}
 //             <div>
 //               <div className="mb-5">
 //                 <h2 className="text-xl font-semibold text-[#111827] mb-2">
@@ -649,44 +857,223 @@ export default Page;
 //                 </span>
 //               </div>
 //               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-//                 {/* Account Number */}
 //                 <div className="flex flex-col">
 //                   <label
 //                     htmlFor="accountNumber"
 //                     className="block mb-2 font-semibold text-[#111827]"
+//                     aria-required="true"
 //                   >
 //                     Account Number
 //                   </label>
 //                   <input
-//                     type="text"
+//                     type="number"
 //                     id="accountNumber"
 //                     placeholder="Enter account number"
+//                     value={formData.accountNumber}
+//                     maxLength={10}
+//                     onChange={handleChange}
+//                     onBlur={handleBlur}
 //                     className="px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50"
+//                     aria-describedby="accountNumberError"
+//                     aria-invalid={!!errors.accountNumber}
+//                     required
 //                   />
+//                   {errors.accountNumber && (
+//                     <p
+//                       id="accountNumberError"
+//                       className="text-red-500 text-sm mt-1"
+//                       role="alert"
+//                     >
+//                       {errors.accountNumber}
+//                     </p>
+//                   )}
 //                 </div>
 
-//                 {/* Bank Name */}
-//                 <div className="flex flex-col">
-//                   <label
-//                     htmlFor="bankName"
-//                     className="block mb-2 font-semibold text-[#111827]"
-//                   >
+//                 <div>
+//                   <label className="block mb-2 font-semibold text-[#111827]">
 //                     Bank Name
 //                   </label>
-//                   <select
-//                     id="bankName"
-//                     className="px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50"
-//                   >
-//                     <option value="">Select bank</option>
-//                     <option value="bankA">Bank A</option>
-//                     <option value="bankB">Bank B</option>
-//                     <option value="bankC">Bank C</option>
-//                   </select>
+//                   <BankDropdown
+//                     selectedBank={selectedBank}
+//                     setSelectedBank={setSelectedBank}
+//                     setFormData={setFormData}
+//                   />
+//                   {/* <div className="relative mb-6">
+//                     <div
+//                       role="combobox"
+//                       aria-expanded={isDropdownOpen}
+//                       aria-controls="bank-list"
+//                       aria-haspopup="listbox"
+//                       className="px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50 cursor-pointer"
+//                       onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+//                       onKeyDown={(e) => {
+//                         if (e.key === "Enter" || e.key === " ") {
+//                           setIsDropdownOpen(!isDropdownOpen);
+//                         }
+//                       }}
+//                       tabIndex={0}
+//                     >
+//                       {selectedBank ? (
+//                         <div className="flex items-center">
+//                           <Image
+//                             src={selectedBank.url}
+//                             alt={selectedBank.name}
+//                             className="w-6 h-6 mr-2"
+//                             width={24}
+//                             height={24}
+//                           />
+//                           <span>{selectedBank.name}</span>
+//                           <span className="ml-auto">({selectedBank.code})</span>
+//                         </div>
+//                       ) : (
+//                         <span>Select Bank</span>
+//                       )}
+//                     </div>
+//                     {isDropdownOpen && (
+//                       <div
+//                         id="bank-list"
+//                         role="listbox"
+//                         className="absolute z-10 w-full bg-white border rounded mt-2 max-h-60 overflow-y-auto"
+//                       >
+//                         <input
+//                           type="text"
+//                           placeholder="Search for a bank..."
+//                           className="w-full p-2 border-b"
+//                           value={searchInput}
+//                           onChange={(e) => setSearchInput(e.target.value)}
+//                           aria-label="Search for a bank"
+//                         />
+//                         {filteredBanks.length > 0 ? (
+//                           filteredBanks.map((bank: Bank) => (
+//                             <div
+//                               key={bank.code}
+//                               role="option"
+//                               aria-selected={selectedBank?.code === bank.code}
+//                               className="flex items-center p-2 cursor-pointer hover:bg-gray-100"
+//                               onClick={() => {
+//                                 setSelectedBank(bank);
+//                                 setIsDropdownOpen(false);
+//                                 setFormData({
+//                                   ...formData,
+//                                   bankName: bank.name
+//                                 });
+//                               }}
+//                               onKeyDown={(e) => {
+//                                 if (e.key === "Enter" || e.key === " ") {
+//                                   setSelectedBank(bank);
+//                                   setIsDropdownOpen(false);
+//                                   setFormData({
+//                                     ...formData,
+//                                     bankName: bank.name
+//                                   });
+//                                 }
+//                               }}
+//                               tabIndex={0}
+//                             >
+//                               <Image
+//                                 src={bank.url}
+//                                 alt={bank.name}
+//                                 className="w-6 h-6 mr-2"
+//                                 width={24}
+//                                 height={24}
+//                               />
+//                               <span>{bank.name}</span>
+//                               <span className="ml-auto">({bank.code})</span>
+//                             </div>
+//                           ))
+//                         ) : (
+//                           <div className="p-2 text-center">Not found</div>
+//                         )}
+//                       </div>
+//                     )}
+//                   </div> */}
+//                   {/* <div className="relative mb-6">
+//                     <div
+//                       className="px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50 cursor-pointer"
+//                       onClick={() => setIsDropdownOpen(!isDropdownOpen)}
+//                     >
+//                       {selectedBank ? (
+//                         <div className="flex items-center">
+//                           <Image
+//                             src={selectedBank.url}
+//                             alt={selectedBank.name}
+//                             className="w-6 h-6 mr-2"
+//                             width={24}
+//                             height={24}
+//                           />
+//                           <span>{selectedBank.name}</span>
+//                           <span className="ml-auto">({selectedBank.code})</span>
+//                         </div>
+//                       ) : (
+//                         <span>Select Bank</span>
+//                       )}
+//                     </div>
+//                     {isDropdownOpen && (
+//                       <div className="absolute z-10 w-full bg-white border rounded mt-2 max-h-60 overflow-y-auto">
+//                         <input
+//                           type="text"
+//                           placeholder="Search for a bank..."
+//                           className="w-full p-2 border-b"
+//                           value={searchInput}
+//                           onChange={(e) => setSearchInput(e.target.value)}
+//                         />
+//                         {filteredBanks.length > 0 ? (
+//                           filteredBanks.map((bank: Bank) => (
+//                             <div
+//                               key={bank.code}
+//                               className="flex items-center p-2 cursor-pointer hover:bg-gray-100"
+//                               onClick={() => {
+//                                 setSelectedBank(bank);
+//                                 setIsDropdownOpen(false);
+//                                 setFormData({
+//                                   ...formData,
+//                                   bankName: bank.name
+//                                 });
+//                               }}
+//                             >
+//                               <Image
+//                                 src={bank.url}
+//                                 alt={bank.name}
+//                                 className="w-6 h-6 mr-2"
+//                                 width={24}
+//                                 height={24}
+//                               />
+//                               <span>{bank.name}</span>
+//                               <span className="ml-auto">({bank.code})</span>
+//                             </div>
+//                           ))
+//                         ) : (
+//                           <div className="p-2 text-center">Not found</div>
+//                         )}
+//                       </div>
+//                     )}
+//                   </div> */}
 //                 </div>
+//               </div>
+//               <div className="flex flex-col">
+//                 <label
+//                   htmlFor="accountName"
+//                   className="block mb-2 font-semibold text-[#111827]"
+//                 >
+//                   Account Name
+//                 </label>
+//                 <input
+//                   type="text"
+//                   id="accountName"
+//                   placeholder="Account name"
+//                   value={formData.accountName}
+//                   onChange={handleChange}
+//                   onBlur={handleBlur}
+//                   className="px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50"
+//                 />
+//                 {errors.accountName && (
+//                   <p className="text-red-500 text-sm mt-1">
+//                     {errors.accountName}
+//                   </p>
+//                 )}
 //               </div>
 //             </div>
 
-//             {/* Payment Deadline */}
 //             <div className="mt-8">
 //               <div className="mb-5">
 //                 <h2 className="text-xl font-semibold text-[#111827] mb-2">
@@ -697,7 +1084,6 @@ export default Page;
 //                 </span>
 //               </div>
 //               <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-//                 {/* Date */}
 //                 <div className="flex flex-col">
 //                   <label
 //                     htmlFor="paymentDate"
@@ -708,11 +1094,18 @@ export default Page;
 //                   <input
 //                     type="date"
 //                     id="paymentDate"
+//                     value={formData.paymentDate}
+//                     onChange={handleChange}
+//                     onBlur={handleBlur}
 //                     className="px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50"
 //                   />
+//                   {errors.paymentDate && (
+//                     <p className="text-red-500 text-sm mt-1">
+//                       {errors.paymentDate}
+//                     </p>
+//                   )}
 //                 </div>
 
-//                 {/* Time + Time Zone Dropdown */}
 //                 <div className="flex flex-col">
 //                   <label
 //                     htmlFor="paymentTime"
@@ -724,20 +1117,28 @@ export default Page;
 //                     <input
 //                       type="time"
 //                       id="paymentTime"
+//                       value={formData.paymentTime}
+//                       onChange={handleChange}
+//                       onBlur={handleBlur}
 //                       className="input-field outline-primary w-full p-2 rounded-[5px] bg-slate-50"
 //                     />
-//                     <select className="px-3 py-2 input-field outline-primary rounded-[5px] bg-slate-50">
-//                       <option value="WAT">WAT</option>
-//                       <option value="GMT">GMT</option>
-//                       <option value="UTC">UTC</option>
-//                       <option value="EST">EST</option>
+//                     <select
+//                       id="paymentTimeZone"
+//                       value={formData.paymentTimeZone}
+//                       onChange={handleChange}
+//                       className="px-3 py-2 input-field outline-primary rounded-[5px] bg-slate-50"
+//                     >
+//                       {validTimeZones.map((zone) => (
+//                         <option key={zone} value={zone}>
+//                           {zone}
+//                         </option>
+//                       ))}
 //                     </select>
 //                   </div>
 //                 </div>
 //               </div>
 //             </div>
 
-//             {/* Delivery Details */}
 //             <div className="mt-8">
 //               <div className="mb-5">
 //                 <h2 className="text-xl font-semibold text-[#111827] mb-2">
@@ -749,7 +1150,6 @@ export default Page;
 //                 </span>
 //               </div>
 //               <div className="grid grid-cols-1 gap-6">
-//                 {/* Contact Name */}
 //                 <div className="flex flex-col">
 //                   <label
 //                     htmlFor="contactName"
@@ -761,11 +1161,18 @@ export default Page;
 //                     type="text"
 //                     id="contactName"
 //                     placeholder="Enter the name of the contact person"
+//                     value={formData.contactName}
+//                     onChange={handleChange}
+//                     onBlur={handleBlur}
 //                     className="px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50"
 //                   />
+//                   {errors.contactName && (
+//                     <p className="text-red-500 text-sm mt-1">
+//                       {errors.contactName}
+//                     </p>
+//                   )}
 //                 </div>
 
-//                 {/* Pickup Location */}
 //                 <div className="flex flex-col">
 //                   <label
 //                     htmlFor="pickupLocation"
@@ -773,12 +1180,6 @@ export default Page;
 //                   >
 //                     Pickup Location
 //                   </label>
-//                   {/* <input
-//                     type="text"
-//                     id="pickupLocation"
-//                     placeholder="Enter location"
-//                     className="px-3 py-2 input-field outline-primar w-full rounded-[5px] bg-slate-50"
-//                   /> */}
 //                   <div className="relative">
 //                     <MapPin
 //                       onClick={handleMapLocationSelect}
@@ -804,7 +1205,6 @@ export default Page;
 //                 </div>
 
 //                 <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-//                   {/* Delivery Date */}
 //                   <div className="flex flex-col">
 //                     <label
 //                       htmlFor="deliveryDate"
@@ -815,11 +1215,18 @@ export default Page;
 //                     <input
 //                       type="date"
 //                       id="deliveryDate"
+//                       value={formData.deliveryDate}
+//                       onChange={handleChange}
+//                       onBlur={handleBlur}
 //                       className="px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50"
 //                     />
+//                     {errors.deliveryDate && (
+//                       <p className="text-red-500 text-sm mt-1">
+//                         {errors.deliveryDate}
+//                       </p>
+//                     )}
 //                   </div>
 
-//                   {/* Delivery Time + Time Zone Dropdown */}
 //                   <div className="flex flex-col">
 //                     <label
 //                       htmlFor="deliveryTime"
@@ -831,13 +1238,22 @@ export default Page;
 //                       <input
 //                         type="time"
 //                         id="deliveryTime"
+//                         value={formData.deliveryTime}
+//                         onChange={handleChange}
+//                         onBlur={handleBlur}
 //                         className="px-3 py-2 input-field outline-primar w-full rounded-[5px] bg-slate-50"
 //                       />
-//                       <select className="px-3 py-2 input-field outline-primar rounded-[5px] bg-slate-50">
-//                         <option value="WAT">WAT</option>
-//                         <option value="GMT">GMT</option>
-//                         <option value="UTC">UTC</option>
-//                         <option value="EST">EST</option>
+//                       <select
+//                         id="deliveryTimeZone"
+//                         value={formData.deliveryTimeZone}
+//                         onChange={handleChange}
+//                         className="px-3 py-2 input-field outline-primar rounded-[5px] bg-slate-50"
+//                       >
+//                         {validTimeZones.map((zone) => (
+//                           <option key={zone} value={zone}>
+//                             {zone}
+//                           </option>
+//                         ))}
 //                       </select>
 //                     </div>
 //                   </div>
@@ -845,20 +1261,23 @@ export default Page;
 //               </div>
 //             </div>
 
-//             {/* Submit Button */}
-//             <div className="bg-[#FFFF] py-4 flex justify-center absolute z-10 right-0 bottom-0 w-full">
+//             <div className="bg-[#FFFF] py-4 flex justify-center md:absolute z-10 right-0 bottom-0 w-full">
 //               <div className="max-w-3xl flex gap-4 items-center justify-center sm:justify-end w-full">
 //                 <button className="p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827]">
 //                   Save for later
 //                 </button>
 //                 <button
-//                   disabled={true}
+//                   type="submit"
+//                   disabled={!isFormValid}
 //                   className={`bg-primary text-white py-3 px-8 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center font-extrabold font-manrope ${
-//                     true ? "opacity-50 cursor-not-allowed" : ""
+//                     !isFormValid ? "opacity-50 cursor-not-allowed" : ""
 //                   }`}
-//                   onClick={() => {}}
 //                 >
-//                   Continue
+//                   {loading ? (
+//                     <BiLoaderCircle className="animate-spin mr-2" size={22} />
+//                   ) : (
+//                     "Continue"
+//                   )}
 //                 </button>
 //               </div>
 //             </div>
@@ -867,6 +1286,14 @@ export default Page;
 //           <RightBar isOpen={isRightBarOpen} setIsOpen={setIsRightBarOpen} />
 //         </div>
 //       </section>
+//       {showModal && (
+//         <ReusuableSuccess
+//           title="You've successfully uploaded your details"
+//           subtitle="Congratulations you have successfully created your Payment details"
+//           route="/"
+//           buttonText="continue"
+//         />
+//       )}
 //     </>
 //   );
 // };

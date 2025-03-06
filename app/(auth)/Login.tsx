@@ -62,13 +62,19 @@ const Login: React.FC = () => {
 
     try {
       setLoading(true);
-      const response = await axiosInstance.post("/login", { email, password });
+      const response = await axiosInstance.post("/login", { email, password },
+        {
+          withCredentials: true // Ensure cookies are sent with the request
+        }
+      );
       console.log(response.data);
 
-      toast.success(response?.data?.message);
-      localStorage.setItem("authToken", response.data.token);
+       // Store the accessToken in localStorage
+    localStorage.setItem("authToken", response.data.accessToken);
 
-      // router.push("/dashboard"); // Redirect after successful login
+    toast.success(response?.data?.message);
+
+      router.push("/event-creation"); 
     } catch (error: any) {
       if (
         error.response?.data?.message ===
