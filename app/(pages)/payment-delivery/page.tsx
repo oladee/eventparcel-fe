@@ -107,6 +107,8 @@ const Page = () => {
       case "deliveryDate":
         const selectedDate = new Date(value);
         const currentDate = new Date();
+        selectedDate.setHours(0, 0, 0, 0);
+        currentDate.setHours(0, 0, 0, 0);
         if (selectedDate < currentDate) return "Date cannot be in the past";
         return "";
       case "contactName":
@@ -541,47 +543,6 @@ const Page = () => {
 };
 
 export default Page;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // "use client";
 
