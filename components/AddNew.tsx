@@ -1,19 +1,18 @@
 "use client";
 
 import Image from "next/image";
-import AddGroup from "./AddGroupCaller";
 import { useState } from "react";
 
-const CreateGroupCaller: React.FC = () => {
-    const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
+const CreateGroupCaller: React.FC= () => {
+    const [, setIsAddGroupOpen] = useState(false);
 
     return (
         <>
             {/* Mobile Version */}
             <div 
                 className="
-                    flex sm:hidden w-[310px] h-[100px] mt-10 rounded-2xl flex-col border-[2px] border-dashed 
-                    justify-center items-center ml-[130px] bg-[#FFFFFF66] cursor-pointer
+                    flex sm:hidden w-[310px] h-[100px] mt-5 rounded-2xl flex-col border-[2px] border-dashed 
+                    justify-center items-center ml-[5px] bg-[#FFFFFF66] cursor-pointer
                 "
                 onClick={() => setIsAddGroupOpen(true)}
             >
@@ -48,13 +47,13 @@ const CreateGroupCaller: React.FC = () => {
             </div>
 
             {/* Modal - Common for both buttons */}
-            {isAddGroupOpen && (
-                <div className=" inset-0 flex items-center justify-center bg-black bg-opacity-10 px-4 absolute">
+            {/* {isAddGroupOpen && (
+                <div className=" inset-0 flex items-center justify-center px-4 absolute">
                     <div className="w-full max-w-lg rounded-3xl p-6 md:p-10 lg:p-14">
                         <AddGroup mode="availGroup" setIsAddGroupOpen={setIsAddGroupOpen} />
                     </div>
                 </div>
-            )}
+            )} */}
         </>
     );
 };

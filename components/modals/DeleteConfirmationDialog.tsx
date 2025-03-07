@@ -14,7 +14,7 @@ const DeleteConfirmationDialog: React.FC<DeleteConfirmationDialogProps> = ({
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-[999] flex items-start p-3 justify-center bg-black bg-opacity-50">
+    <div className="fixed inset-0 z-[999] flex items-start p-3 justify-center">
       <div className="bg-white rounded-[20px] shadow-lg w-full max-w-md mx-4 p-6">
         <h2 className="text-xl font-semibold text-gray-800 mb-4">
           Confirm Delete

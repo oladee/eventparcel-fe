@@ -20,12 +20,13 @@ const GeneralModal: React.FC<generalGroupProps>  = ({ group }) => {
     const [openModalPackage, setOpenModalPackage] = useState(false);
     const [modalMode, setModalMode] = useState<"create" | "update">("create");
     const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
-    // const [, setError] = useState(false);
     const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
     const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
     const [deleteId, setDeleteId] = useState<string | null>("");
     const [deleteEndPoint, setDeletEndPoint] = useState<string | null>("");
+    const [packages, setPackages] = useState(group.packages);
+
 
     const handleDelete = async () => {
         if (!deleteId) return;
@@ -33,6 +34,10 @@ const GeneralModal: React.FC<generalGroupProps>  = ({ group }) => {
         try {
 
             await axiosInstance.delete(`/${deleteEndPoint}/${deleteId}`);
+            if (deleteEndPoint === "delete-package") {
+                setPackages((prev) => prev.filter((pkg) => pkg._id !== deleteId));
+            }
+    
             
             toast.success(`Group deleted successfully `, {
                 position: "top-right",
@@ -160,7 +165,7 @@ const GeneralModal: React.FC<generalGroupProps>  = ({ group }) => {
     
                     {/* Scrollable Packages List */}
                     <div className="max-h-[165px] overflow-y-auto space-y-2 scrollbar-hide">
-                        {group.packages.map((item, index) => (
+                        {packages.map((item, index) => (
                             <div key={index} className="flex justify-between items-center border border-gray-300 p-2 rounded-[12px]">
                                 <div className="flex items-center gap-2">
                                     <Image 
@@ -240,7 +245,7 @@ const GeneralModal: React.FC<generalGroupProps>  = ({ group }) => {
                     </div>
                 )}
                     {isAddGroupOpen && (
-                        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
+                        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-5 z-50">
                             <AddGroup mode="availGroup" setIsAddGroupOpen={setIsAddGroupOpen} selectedGroup={selectedGroup} />
                         </div>
                     )}
