@@ -77,6 +77,18 @@ export const Checked: React.FC<LogoProps> = ({ width, height }) => {
   );
 };
 
+export const Warning: React.FC<LogoProps> = ({ width, height }) => {
+  return (
+    <Image
+      src="/images/warning.png" // Path relative to the public folder
+      alt="warning Icon"
+      width={width}
+      height={height}
+      priority // Use this prop if the image is critical (e.g., logo)
+    />
+  );
+};
+
 export const Done: React.FC<LogoProps> = ({ width, height }) => {
   return (
     <Image

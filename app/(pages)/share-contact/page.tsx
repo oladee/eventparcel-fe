@@ -1,15 +1,17 @@
 "use client";
 
 import { CSV, Doc, Done } from "@/components/icons/Icons";
+import AccessError from "@/components/modals/AccessError";
+// import ContactModal from "@/components/shareContact/ContactModal";
 import CsvModal from "@/components/shareContact/CsvModal";
 import { useState, useEffect } from "react";
-import { FiX, FiSearch } from "react-icons/fi";
+import { FiX, FiSearch } from "react-icons/fi"; // Example icons; install react-icons if needed
 
 type Contact = {
   name: string[];
   email?: string[];
   tel?: string[];
-  group?: "Work" | "Family" | "Friends" | "Other";
+  group?: "Work" | "Family" | "Friends" | "Other"; // optional, if you want tab-based grouping
 };
 
 type ContactProperty = "name" | "email" | "tel";
@@ -23,9 +25,11 @@ const Page: React.FC = () => {
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [selectedContacts, setSelectedContacts] = useState<Contact[]>([]);
   const [isContactsSupported, setIsContactsSupported] = useState(false);
+
+  // NEW: For searching
   const [searchTerm, setSearchTerm] = useState("");
 
-  // Check if Contacts API is supported
+  // Check if Contact Picker API is supported
   useEffect(() => {
     if ("contacts" in navigator && "ContactsManager" in window) {
       setIsContactsSupported(true);
@@ -33,6 +37,8 @@ const Page: React.FC = () => {
   }, []);
 
   const handleContainerClick = (option: "contact" | "csv") => {
+    console.log("Hello world");
+
     setSelectedOption(option);
   };
 
@@ -44,14 +50,14 @@ const Page: React.FC = () => {
     }
   };
 
-  // Access contacts programmatically using the Contacts API
-  const handleGetContactsProgrammatically = async () => {
+  // Access real device contacts
+  const handleGetContacts = async () => {
     try {
       const props: ContactProperty[] = ["name", "email", "tel"];
       const opts = { multiple: true };
 
-      // @ts-expect-error - Experimental API
-      const fetchedContacts = await navigator.contacts.get(props, opts);
+      // @ts-expect-error - TypeScript doesn't recognize ContactsManager yet
+      const fetchedContacts = await navigator.contacts.select(props, opts);
 
       // Set the contacts and automatically select them all
       setContacts(fetchedContacts);
@@ -93,6 +99,7 @@ const Page: React.FC = () => {
     return nameMatch || emailMatch || telMatch;
   });
 
+  // OPTIONAL: If you want to add "All", "Work", "Family" tabs, you could do something like:
   const [selectedTab, setSelectedTab] = useState<"All" | "Work" | "Family">(
     "All"
   );
@@ -122,18 +129,19 @@ const Page: React.FC = () => {
                 <Doc width={60} height={60} />
               </div>
               <div className="sm:hidden">
-                <Doc width={30} height={30} />
+                <Doc width={40} height={40} />
               </div>
               <div>
                 <h3 className="text-[#111827] font-semibold">
                   Import from contact list
                 </h3>
                 <p className="text-xs md:text-sm text-gray-500">
-                  You can import directly from your device linked contacts
+                  You can import directly from your <br /> device linked
+                  contacts
                 </p>
               </div>
               {selectedOption === "contact" && (
-                <div className="absolute right-2">
+                <div className="max-[500px]:-top-2 -right-2 absolute md:right-2">
                   <Done width={30} height={30} />
                 </div>
               )}
@@ -143,21 +151,23 @@ const Page: React.FC = () => {
               onClick={() => handleContainerClick("csv")}
               className="relative flex items-center p-4 bg-white rounded-[10px] gap-4 border border-[#1118271F] cursor-pointer transition"
             >
-              <div className="hidden sm:block">
-                <CSV width={60} height={60} />
-              </div>
-              <div className="sm:hidden">
-                <CSV width={30} height={30} />
+              <div className="">
+                <div className="hidden sm:block">
+                  <CSV width={60} height={60} />
+                </div>
+                <div className="sm:hidden">
+                  <CSV width={40} height={40} />
+                </div>
               </div>
               <div>
-                <h3 className="text-[#111827] font-semibold">Upload CSV</h3>
+                <h3 className=" text-[#111827] font-semibold">Upload CSV</h3>
                 <p className="text-xs md:text-sm text-gray-500 whitespace-nowrap">
                   You can upload a csv file exported <br /> from your contact
                   list
                 </p>
               </div>
               {selectedOption === "csv" && (
-                <div className="absolute right-2">
+                <div className="max-[500px]:-top-2 -right-2 absolute md:right-2">
                   <Done width={30} height={30} />
                 </div>
               )}
@@ -189,6 +199,7 @@ const Page: React.FC = () => {
       {isContactModalOpen && (
         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
           <div className="bg-white rounded-lg w-full max-w-md p-6 relative">
+            {/* Close Icon */}
             <button
               onClick={() => setIsContactModalOpen(false)}
               className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
@@ -201,12 +212,13 @@ const Page: React.FC = () => {
             {isContactsSupported ? (
               <>
                 <button
-                  onClick={handleGetContactsProgrammatically}
+                  onClick={handleGetContacts}
                   className="w-full p-3 bg-primary text-white rounded-lg mb-4"
                 >
-                  Fetch Contacts
+                  Choose Contacts
                 </button>
 
+                {/* Search Bar */}
                 <div className="relative mb-4">
                   <FiSearch className="absolute top-3 left-3 text-gray-400" />
                   <input
@@ -218,6 +230,7 @@ const Page: React.FC = () => {
                   />
                 </div>
 
+                {/* Tabs for All / Work / Family */}
                 <div className="flex gap-4 mb-4">
                   {["All", "Work", "Family"].map((tab) => (
                     <button
@@ -249,7 +262,9 @@ const Page: React.FC = () => {
                           className="flex items-center justify-between p-3 border-b cursor-pointer hover:bg-gray-50"
                           onClick={() => handleContactSelect(contact)}
                         >
+                          {/* Avatar and info */}
                           <div className="flex items-center gap-3">
+                            {/* First-letter avatar */}
                             <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-700">
                               {firstLetter}
                             </div>
@@ -267,6 +282,7 @@ const Page: React.FC = () => {
                               )}
                             </div>
                           </div>
+                          {/* Checkbox */}
                           <input
                             type="checkbox"
                             checked={isChecked}
@@ -279,6 +295,7 @@ const Page: React.FC = () => {
                   </div>
                 )}
 
+                {/* Footer buttons */}
                 {selectedContacts.length > 0 && (
                   <div className="flex justify-end gap-4 mt-6">
                     <button
@@ -297,16 +314,22 @@ const Page: React.FC = () => {
                 )}
               </>
             ) : (
-              <div className="text-red-500 p-4">
-                Contact access is not supported in your browser. Please use:
-                <ul className="list-disc pl-6 mt-2">
-                  <li>Chrome/Edge for Android</li>
-                  <li>
-                    Enable the flag:
-                    chrome://flags/#enable-experimental-web-platform-features
-                  </li>
-                </ul>
-              </div>
+              // <div className="text-red-500 p-4">
+              //   Contact access is not supported in your browser. Please use:
+              //   <ul className="list-disc pl-6 mt-2">
+              //     <li>Chrome/Edge for Android</li>
+              //     <li>
+              //       Enable the flag:
+              //       chrome://flags/#enable-experimental-web-platform-features
+              //     </li>
+              //   </ul>
+              // </div>
+              <AccessError
+                title="We couldn't access your contact"
+                subtitle="You need to grant us access to your google contact to import from contact"
+                route="https://contacts.google.com/"
+                buttonText="Grant Access Contact"
+              />
             )}
           </div>
         </div>
@@ -317,19 +340,26 @@ const Page: React.FC = () => {
 
 export default Page;
 
+
+
+
+
+
+
+//  This is for the contact API
+
 // "use client";
 
 // import { CSV, Doc, Done } from "@/components/icons/Icons";
-// // import ContactModal from "@/components/shareContact/ContactModal";
 // import CsvModal from "@/components/shareContact/CsvModal";
 // import { useState, useEffect } from "react";
-// import { FiX, FiSearch } from "react-icons/fi"; // Example icons; install react-icons if needed
+// import { FiX, FiSearch } from "react-icons/fi";
 
 // type Contact = {
 //   name: string[];
 //   email?: string[];
 //   tel?: string[];
-//   group?: "Work" | "Family" | "Friends" | "Other"; // optional, if you want tab-based grouping
+//   group?: "Work" | "Family" | "Friends" | "Other";
 // };
 
 // type ContactProperty = "name" | "email" | "tel";
@@ -343,11 +373,9 @@ export default Page;
 //   const [contacts, setContacts] = useState<Contact[]>([]);
 //   const [selectedContacts, setSelectedContacts] = useState<Contact[]>([]);
 //   const [isContactsSupported, setIsContactsSupported] = useState(false);
-
-//   // NEW: For searching
 //   const [searchTerm, setSearchTerm] = useState("");
 
-//   // Check if Contact Picker API is supported
+//   // Check if Contacts API is supported
 //   useEffect(() => {
 //     if ("contacts" in navigator && "ContactsManager" in window) {
 //       setIsContactsSupported(true);
@@ -366,14 +394,14 @@ export default Page;
 //     }
 //   };
 
-//   // Access real device contacts
-//   const handleGetContacts = async () => {
+//   // Access contacts programmatically using the Contacts API
+//   const handleGetContactsProgrammatically = async () => {
 //     try {
 //       const props: ContactProperty[] = ["name", "email", "tel"];
 //       const opts = { multiple: true };
 
-//       // @ts-expect-error - TypeScript doesn't recognize ContactsManager yet
-//       const fetchedContacts = await navigator.contacts.select(props, opts);
+//       // @ts-expect-error - Experimental API
+//       const fetchedContacts = await navigator.contacts.get(props, opts);
 
 //       // Set the contacts and automatically select them all
 //       setContacts(fetchedContacts);
@@ -415,7 +443,6 @@ export default Page;
 //     return nameMatch || emailMatch || telMatch;
 //   });
 
-//   // OPTIONAL: If you want to add "All", "Work", "Family" tabs, you could do something like:
 //   const [selectedTab, setSelectedTab] = useState<"All" | "Work" | "Family">(
 //     "All"
 //   );
@@ -439,38 +466,51 @@ export default Page;
 //           <div className="mt-8 w-full max-w-md grid gap-4">
 //             <div
 //               onClick={() => handleContainerClick("contact")}
-//               className="relative flex items-center p-4 bg-white  rounded-[10px] gap-4 border border-[#1118271F] cursor-pointer transition"
+//               className="relative flex items-center p-4 bg-white rounded-[10px] gap-4 border border-[#1118271F] cursor-pointer transition"
 //             >
-//               <Doc width={60} height={60} />
+//               <div className="hidden sm:block">
+//                 <Doc width={60} height={60} />
+//               </div>
+//               <div className="sm:hidden">
+//                 <Doc width={30} height={30} />
+//               </div>
 //               <div>
 //                 <h3 className="text-[#111827] font-semibold">
 //                   Import from contact list
 //                 </h3>
 //                 <p className="text-xs md:text-sm text-gray-500">
-//                   You can import directly from your  device linked
-//                   contacts
+//                   You can import directly from your device linked contacts
 //                 </p>
 //               </div>
-//               {selectedOption === "contact" && <div className="absolute right-2"><Done width={30} height={30} /></div>}
+//               {selectedOption === "contact" && (
+//                 <div className="absolute right-2">
+//                   <Done width={30} height={30} />
+//                 </div>
+//               )}
 //             </div>
 
 //             <div
 //               onClick={() => handleContainerClick("csv")}
 //               className="relative flex items-center p-4 bg-white rounded-[10px] gap-4 border border-[#1118271F] cursor-pointer transition"
 //             >
-//              <div className="">
-//              <CSV width={60} height={60} />
-//              </div>
+//               <div className="hidden sm:block">
+//                 <CSV width={60} height={60} />
+//               </div>
+//               <div className="sm:hidden">
+//                 <CSV width={30} height={30} />
+//               </div>
 //               <div>
-//                 <h3 className=" text-[#111827] font-semibold">
-//                   Upload CSV
-//                 </h3>
+//                 <h3 className="text-[#111827] font-semibold">Upload CSV</h3>
 //                 <p className="text-xs md:text-sm text-gray-500 whitespace-nowrap">
 //                   You can upload a csv file exported <br /> from your contact
 //                   list
 //                 </p>
 //               </div>
-//               {selectedOption === "csv" && <div className="absolute right-2"><Done width={30} height={30} /></div>}
+//               {selectedOption === "csv" && (
+//                 <div className="absolute right-2">
+//                   <Done width={30} height={30} />
+//                 </div>
+//               )}
 //             </div>
 //           </div>
 //         </div>
@@ -499,7 +539,6 @@ export default Page;
 //       {isContactModalOpen && (
 //         <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
 //           <div className="bg-white rounded-lg w-full max-w-md p-6 relative">
-//             {/* Close Icon */}
 //             <button
 //               onClick={() => setIsContactModalOpen(false)}
 //               className="absolute top-4 right-4 text-gray-500 hover:text-gray-800"
@@ -512,13 +551,12 @@ export default Page;
 //             {isContactsSupported ? (
 //               <>
 //                 <button
-//                   onClick={handleGetContacts}
+//                   onClick={handleGetContactsProgrammatically}
 //                   className="w-full p-3 bg-primary text-white rounded-lg mb-4"
 //                 >
-//                   Choose Contacts
+//                   Fetch Contacts
 //                 </button>
 
-//                 {/* Search Bar */}
 //                 <div className="relative mb-4">
 //                   <FiSearch className="absolute top-3 left-3 text-gray-400" />
 //                   <input
@@ -530,7 +568,6 @@ export default Page;
 //                   />
 //                 </div>
 
-//                 {/* Tabs for All / Work / Family */}
 //                 <div className="flex gap-4 mb-4">
 //                   {["All", "Work", "Family"].map((tab) => (
 //                     <button
@@ -562,9 +599,7 @@ export default Page;
 //                           className="flex items-center justify-between p-3 border-b cursor-pointer hover:bg-gray-50"
 //                           onClick={() => handleContactSelect(contact)}
 //                         >
-//                           {/* Avatar and info */}
 //                           <div className="flex items-center gap-3">
-//                             {/* First-letter avatar */}
 //                             <div className="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-sm font-bold text-gray-700">
 //                               {firstLetter}
 //                             </div>
@@ -582,7 +617,6 @@ export default Page;
 //                               )}
 //                             </div>
 //                           </div>
-//                           {/* Checkbox */}
 //                           <input
 //                             type="checkbox"
 //                             checked={isChecked}
@@ -595,7 +629,6 @@ export default Page;
 //                   </div>
 //                 )}
 
-//                 {/* Footer buttons */}
 //                 {selectedContacts.length > 0 && (
 //                   <div className="flex justify-end gap-4 mt-6">
 //                     <button
@@ -633,6 +666,14 @@ export default Page;
 // };
 
 // export default Page;
+
+
+
+
+
+
+
+
 
 // 'use client'
 
