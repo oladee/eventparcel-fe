@@ -13,6 +13,8 @@ import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FormEvent } from "react";
 import TimeZoneDropdown from "@/components/TimeZoneDropdown";
+import { PiCalendarMinus } from "react-icons/pi";
+import { AiOutlineClockCircle } from "react-icons/ai";
 
 const LocationPickerModal = dynamic(
   () => import("@/components/aboutEvent/LocationPickerModal"),
@@ -353,14 +355,25 @@ const Page = () => {
                   >
                     Date
                   </label>
-                  <DatePicker
+                  {/* <DatePicker
                     selected={formData.paymentDate}
                     id="paymentDate"
                     onChange={(date) => handleDateChange(date, "paymentDate")}
                     dateFormat="yyyy-MM-dd"
                     className="px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50"
                     popperClassName="custom-datepicker"
-                  />
+                  /> */}
+                  <div className="relative">
+                    <PiCalendarMinus className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10 text-[#111827]" />
+                    <DatePicker
+                      selected={formData.paymentDate}
+                      id="paymentDate"
+                      onChange={(date) => handleDateChange(date, "paymentDate")}
+                      dateFormat="yyyy-MM-dd"
+                      className="pl-10 px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50"
+                      popperClassName="custom-datepicker"
+                    />
+                  </div>
                   {errors.paymentDate && (
                     <p className="text-red-500 text-sm mt-1">
                       {errors.paymentDate}
@@ -376,31 +389,25 @@ const Page = () => {
                     Time
                   </label>
                   <div className="flex space-x-3">
-                    <DatePicker
-                      selected={formData.paymentTime}
-                      id="paymentTime"
-                      onChange={(date) => handleDateChange(date, "paymentTime")}
-                      showTimeSelect
-                      showTimeSelectOnly
-                      timeIntervals={15}
-                      timeCaption="Time"
-                      dateFormat="hh:mm aa"
-                      placeholderText="Select Payment Time"
-                      className="px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50"
-                      popperClassName="custom-datepicker"
-                    />
-                    {/* <select
-                      id="paymentTimeZone"
-                      value={formData.paymentTimeZone}
-                      onChange={handleChange}
-                      className="px-3 py-2 input-field outline-primary rounded-[5px] bg-slate-50"
-                    >
-                      {validTimeZones.map((zone) => (
-                        <option key={zone} value={zone}>
-                          {zone}
-                        </option>
-                      ))}
-                    </select> */}
+                    <div className="relative">
+                      <AiOutlineClockCircle className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#111827] z-10" />
+                      <DatePicker
+                        selected={formData.paymentTime}
+                        id="paymentTime"
+                        onChange={(date) =>
+                          handleDateChange(date, "paymentTime")
+                        }
+                        showTimeSelect
+                        showTimeSelectOnly
+                        timeIntervals={15}
+                        timeCaption="Time"
+                        dateFormat="hh:mm aa"
+                        placeholderText="Select Payment Time"
+                        className="pl-10 px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50"
+                        popperClassName="custom-datepicker"
+                      />
+                    </div>
+
                     <TimeZoneDropdown
                       value={formData.paymentTimeZone}
                       onChange={(value) =>
@@ -486,16 +493,19 @@ const Page = () => {
                     >
                       Date
                     </label>
-                    <DatePicker
-                      selected={formData.deliveryDate}
-                      id="deliveryDate"
-                      onChange={(date) =>
-                        handleDateChange(date, "deliveryDate")
-                      }
-                      dateFormat="yyyy-MM-dd"
-                      className="px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50"
-                      popperClassName="custom-datepicker"
-                    />
+                    <div className="relative">
+                      <PiCalendarMinus className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10 text-[#111827]" />
+                      <DatePicker
+                        selected={formData.deliveryDate}
+                        id="deliveryDate"
+                        onChange={(date) =>
+                          handleDateChange(date, "deliveryDate")
+                        }
+                        dateFormat="yyyy-MM-dd"
+                        className="pl-10 px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50"
+                        popperClassName="custom-datepicker"
+                      />
+                    </div>
                     {errors.deliveryDate && (
                       <p className="text-red-500 text-sm mt-1">
                         {errors.deliveryDate}
@@ -511,19 +521,23 @@ const Page = () => {
                       Time
                     </label>
                     <div className="flex space-x-3">
-                      <DatePicker
-                        selected={formData.deliveryTime}
-                        id="deliveryTime"
-                        onChange={(date) =>
-                          handleDateChange(date, "deliveryTime")
-                        }
-                        showTimeSelect
-                        showTimeSelectOnly
-                        timeIntervals={15}
-                        timeCaption="Time"
-                        dateFormat="hh:mm aa"
-                        className="px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50 "
-                      />
+                      <div className="relative">
+                        <AiOutlineClockCircle className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#111827] z-10" />
+                        <DatePicker
+                          selected={formData.deliveryTime}
+                          id="deliveryTime"
+                          onChange={(date) =>
+                            handleDateChange(date, "deliveryTime")
+                          }
+                          showTimeSelect
+                          showTimeSelectOnly
+                          timeIntervals={15}
+                          timeCaption="Time"
+                          dateFormat="hh:mm aa"
+                           popperClassName="custom-datepicker"
+                          className="pl-10 px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50"
+                        />
+                      </div>
                       <select
                         id="deliveryTimeZone"
                         value={formData.deliveryTimeZone}

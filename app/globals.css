@@ -239,7 +239,7 @@ input[type="number"] {
 /* ----- Scrollbar Styling ----- */
 .react-datepicker__time-list {
   scrollbar-width: thin; /* Firefox */
-  scrollbar-color: #751423 #ffdddd; 
+  scrollbar-color: #751423 #fff; 
 }
 
 /* WebKit Browsers (Chrome, Edge, Safari) */
