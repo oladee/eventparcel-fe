@@ -6,6 +6,11 @@ interface LogoProps {
   width: number;
   height: number;
 }
+// interface LogoProps2 {
+//   width: number;
+//   height: number;
+//   cla
+// }
 
 // Logo component to display the company logo
 export const Logo: React.FC<LogoProps> = ({ width, height }) => {

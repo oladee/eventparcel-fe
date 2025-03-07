@@ -17,7 +17,9 @@ type ContactProperty = "name" | "email" | "tel";
 const Page: React.FC = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState<"contact" | "csv" | null>(null);
+  const [selectedOption, setSelectedOption] = useState<
+    "contact" | "csv" | null
+  >(null);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [selectedContacts, setSelectedContacts] = useState<Contact[]>([]);
   const [isContactsSupported, setIsContactsSupported] = useState(false);
@@ -56,7 +58,9 @@ const Page: React.FC = () => {
       setSelectedContacts(fetchedContacts);
     } catch (err) {
       console.error("Error accessing contacts:", err);
-      alert("Failed to access contacts. Please check browser support and permissions.");
+      alert(
+        "Failed to access contacts. Please check browser support and permissions."
+      );
     }
   };
 
@@ -89,7 +93,9 @@ const Page: React.FC = () => {
     return nameMatch || emailMatch || telMatch;
   });
 
-  const [selectedTab, setSelectedTab] = useState<"All" | "Work" | "Family">("All");
+  const [selectedTab, setSelectedTab] = useState<"All" | "Work" | "Family">(
+    "All"
+  );
   const tabFilteredContacts =
     selectedTab === "All"
       ? filteredContacts
@@ -112,7 +118,12 @@ const Page: React.FC = () => {
               onClick={() => handleContainerClick("contact")}
               className="relative flex items-center p-4 bg-white rounded-[10px] gap-4 border border-[#1118271F] cursor-pointer transition"
             >
-              <Doc width={60} height={60} />
+              <div className="hidden sm:block">
+                <Doc width={60} height={60} />
+              </div>
+              <div className="sm:hidden">
+                <Doc width={30} height={30} />
+              </div>
               <div>
                 <h3 className="text-[#111827] font-semibold">
                   Import from contact list
@@ -132,13 +143,17 @@ const Page: React.FC = () => {
               onClick={() => handleContainerClick("csv")}
               className="relative flex items-center p-4 bg-white rounded-[10px] gap-4 border border-[#1118271F] cursor-pointer transition"
             >
-              <div className="">
+              <div className="hidden sm:block">
                 <CSV width={60} height={60} />
+              </div>
+              <div className="sm:hidden">
+                <CSV width={30} height={30} />
               </div>
               <div>
                 <h3 className="text-[#111827] font-semibold">Upload CSV</h3>
                 <p className="text-xs md:text-sm text-gray-500 whitespace-nowrap">
-                  You can upload a csv file exported <br /> from your contact list
+                  You can upload a csv file exported <br /> from your contact
+                  list
                 </p>
               </div>
               {selectedOption === "csv" && (
@@ -301,19 +316,6 @@ const Page: React.FC = () => {
 };
 
 export default Page;
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // "use client";
 
@@ -631,25 +633,6 @@ export default Page;
 // };
 
 // export default Page;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // 'use client'
 
