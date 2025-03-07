@@ -75,10 +75,10 @@ body {
   @apply flex items-center gap-2 px-4 py-2 border rounded-[12px] hover:bg-gray-100 text-black-100 outline-none font-bold;
 }
 
-input[type="date"]::-webkit-datetime-edit,
+/* input[type="date"]::-webkit-datetime-edit,
 input[type="time"]::-webkit-datetime-edit {
   @apply text-primary;
-}
+} */
 
 /* Hide scrollbar for Chrome, Safari and Opera */
 .no-scrollbar::-webkit-scrollbar {
@@ -137,10 +137,7 @@ input[type="number"] {
   -moz-appearance: textfield; /* Firefox */
 }
 
-input[type="date"]::-webkit-datetime-edit,
-input[type="time"]::-webkit-datetime-edit {
-  color: #751423; /* Replace with your primary color */
-}
+
 
 .custom-timepicker {
   background-color: #751423 !important;
@@ -153,41 +150,123 @@ input[type="time"]::-webkit-datetime-edit {
 
 
 
-/* custom-datepicker.css */
+.custom-datepicker .react-datepicker__day--selected {
+  background-color: #751423 !important;
+  color: #ffff !important;
+}
 
-/* Change the text color of the datepicker modal */
+
+
+
+
+
+
+
+/* .custom-datepicker {
+  background-color: #751423 !important;
+  border: none;
+  color: white;
+}
+
+.custom-datepicker .react-datepicker__header {
+  background-color: #751423 !important;
+  color: white !important;
+}
+
+.custom-datepicker .react-datepicker__day--selected {
+  background-color: white !important;
+  color: #751423 !important;
+}
+
+.custom-datepicker .react-datepicker__day:hover {
+  background-color: #ffcccc !important;
+} */
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+/* Custom DatePicker Modal Styles */
 .react-datepicker {
-  color: #751423; /* Change this to your desired text color */
+  border: 2px solid #751423 !important;
+  /* background-color: #ffdddd !important;  */
+  color: white !important;
+
 }
 
-/* Change the text color of the header */
 .react-datepicker__header {
-  background-color: #f0f0f0; /* Optional: Change the background color of the header */
-  color: #751423; /* Change this to your desired text color */
+  background-color: #751423 !important;
+  color: white !important;
 }
 
-/* Change the text color of the day names */
-.react-datepicker__day-name {
-  color: #751423; /* Change this to your desired text color */
+.react-datepicker__time-container {
+  /* background-color: #ffdddd !important; */
+  color: white !important;
+
 }
 
-/* Change the text color of the days */
-.react-datepicker__day {
-  color: #751423; /* Change this to your desired text color */
-}
+/* .react-datepicker__time-box {
+  background-color: #ffaaaa !important; 
+} */
 
-/* Change the text color of the selected day */
-.react-datepicker__day--selected {
-  color: #fff; /* Change this to your desired text color */
-  background-color: #751423; /* Optional: Change the background color of the selected day */
-}
-
-/* Change the text color of the time picker */
+.react-datepicker__current-month,
 .react-datepicker-time__header {
-  color: #751423; /* Change this to your desired text color */
+  color: white !important;
+  font-weight: bold;
 }
 
-/* Change the text color of the time list */
+.react-datepicker__day,
 .react-datepicker__time-list-item {
-  color: #751423; /* Change this to your desired text color */
+  color: black !important;
 }
+
+.react-datepicker__day:hover,
+.react-datepicker__time-list-item:hover {
+  background-color: #751423 !important;
+  color: white !important;
+}
+
+/* ----- Scrollbar Styling ----- */
+.react-datepicker__time-list {
+  scrollbar-width: thin; /* Firefox */
+  scrollbar-color: #751423 #ffdddd; 
+}
+
+/* WebKit Browsers (Chrome, Edge, Safari) */
+.react-datepicker__time-list::-webkit-scrollbar {
+  width: 5px;
+}
+
+.react-datepicker__time-list::-webkit-scrollbar-track {
+  /* background: #ffdddd;  */
+  border-radius: 10px;
+  color: #751423 !important;
+}
+
+.react-datepicker__time-list::-webkit-scrollbar-thumb {
+  background: #751423; /* #751423 scrollbar */
+  border-radius: 10px;
+}
+
+.react-datepicker__time-list::-webkit-scrollbar-thumb:hover {
+  background: #751423; /* Darker red on hover */
+}
+
+
+
+
+
+
+
+
+
