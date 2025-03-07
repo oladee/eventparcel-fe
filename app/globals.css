@@ -18,37 +18,36 @@ body {
 }
 
 @font-face {
-  font-family: 'general Sans';
-  src: url('/fonts/generalSans-Regular.woff2') format('woff2'),
-       url('/fonts/generalSans-Regular.woff') format('woff');
+  font-family: "general Sans";
+  src: url("/fonts/generalSans-Regular.woff2") format("woff2"),
+    url("/fonts/generalSans-Regular.woff") format("woff");
   font-weight: normal;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'general Sans';
-  src: url('/fonts/generalSans-Bold.woff2') format('woff2'),
-       url('/fonts/generalSans-Bold.woff') format('woff');
+  font-family: "general Sans";
+  src: url("/fonts/generalSans-Bold.woff2") format("woff2"),
+    url("/fonts/generalSans-Bold.woff") format("woff");
   font-weight: bold;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Manrope';
-  src: url('/fonts/Manrope-Regular.woff2') format('woff2'),
-       url('/fonts/Manrope-Regular.woff') format('woff');
+  font-family: "Manrope";
+  src: url("/fonts/Manrope-Regular.woff2") format("woff2"),
+    url("/fonts/Manrope-Regular.woff") format("woff");
   font-weight: 400;
   font-style: normal;
 }
 
 @font-face {
-  font-family: 'Manrope';
-  src: url('/fonts/Manrope-Bold.woff2') format('woff2'),
-       url('/fonts/Manrope-Bold.woff') format('woff');
+  font-family: "Manrope";
+  src: url("/fonts/Manrope-Bold.woff2") format("woff2"),
+    url("/fonts/Manrope-Bold.woff") format("woff");
   font-weight: 700;
   font-style: normal;
 }
-
 
 .slide_nav {
   @apply flex items-center cursor-pointer text-black-200 font-medium;
@@ -74,6 +73,11 @@ body {
 
 .authButton {
   @apply flex items-center gap-2 px-4 py-2 border rounded-[12px] hover:bg-gray-100 text-black-100 outline-none font-bold;
+}
+
+input[type="date"]::-webkit-datetime-edit,
+input[type="time"]::-webkit-datetime-edit {
+  @apply text-primary;
 }
 
 /* Hide scrollbar for Chrome, Safari and Opera */
@@ -114,22 +118,76 @@ body {
   display: none;
 }
 .scrollbar-hide {
-  -ms-overflow-style: none;  /* IE and Edge */
-  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
 }
 
 .Toastify__toast-container {
   z-index: 9999 !important;
 }
 
+/* Hide the spinner for number inputs */
+input[type="number"]::-webkit-inner-spin-button,
+input[type="number"]::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
 
-  /* Hide the spinner for number inputs */
-  input[type="number"]::-webkit-inner-spin-button,
-  input[type="number"]::-webkit-outer-spin-button {
-    -webkit-appearance: none;
-    margin: 0;
-  }
+input[type="number"] {
+  -moz-appearance: textfield; /* Firefox */
+}
 
-  input[type="number"] {
-    -moz-appearance: textfield; /* Firefox */
-  }
+input[type="date"]::-webkit-datetime-edit,
+input[type="time"]::-webkit-datetime-edit {
+  color: #751423; /* Replace with your primary color */
+}
+
+.custom-timepicker {
+  background-color: #751423 !important;
+  color: white !important;
+  border-radius: 8px;
+}
+.react-time-picker__clock {
+  background-color: #751423 !important;
+}
+
+
+
+/* custom-datepicker.css */
+
+/* Change the text color of the datepicker modal */
+.react-datepicker {
+  color: #751423; /* Change this to your desired text color */
+}
+
+/* Change the text color of the header */
+.react-datepicker__header {
+  background-color: #f0f0f0; /* Optional: Change the background color of the header */
+  color: #751423; /* Change this to your desired text color */
+}
+
+/* Change the text color of the day names */
+.react-datepicker__day-name {
+  color: #751423; /* Change this to your desired text color */
+}
+
+/* Change the text color of the days */
+.react-datepicker__day {
+  color: #751423; /* Change this to your desired text color */
+}
+
+/* Change the text color of the selected day */
+.react-datepicker__day--selected {
+  color: #fff; /* Change this to your desired text color */
+  background-color: #751423; /* Optional: Change the background color of the selected day */
+}
+
+/* Change the text color of the time picker */
+.react-datepicker-time__header {
+  color: #751423; /* Change this to your desired text color */
+}
+
+/* Change the text color of the time list */
+.react-datepicker__time-list-item {
+  color: #751423; /* Change this to your desired text color */
+}

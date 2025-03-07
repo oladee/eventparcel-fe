@@ -314,16 +314,6 @@ const Page: React.FC = () => {
                 )}
               </>
             ) : (
-              // <div className="text-red-500 p-4">
-              //   Contact access is not supported in your browser. Please use:
-              //   <ul className="list-disc pl-6 mt-2">
-              //     <li>Chrome/Edge for Android</li>
-              //     <li>
-              //       Enable the flag:
-              //       chrome://flags/#enable-experimental-web-platform-features
-              //     </li>
-              //   </ul>
-              // </div>
               <AccessError
                 title="We couldn't access your contact"
                 subtitle="You need to grant us access to your google contact to import from contact"
