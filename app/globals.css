@@ -1,0 +1,135 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+body {
+  width: 100%;
+  height: 100%;
+}
+
+#checkbox {
+  accent-color: #751423;
+}
+
+@layer base {
+  html {
+    font-family: var(--font-open-sans), sans-serif;
+  }
+}
+
+@font-face {
+  font-family: 'general Sans';
+  src: url('/fonts/generalSans-Regular.woff2') format('woff2'),
+       url('/fonts/generalSans-Regular.woff') format('woff');
+  font-weight: normal;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'general Sans';
+  src: url('/fonts/generalSans-Bold.woff2') format('woff2'),
+       url('/fonts/generalSans-Bold.woff') format('woff');
+  font-weight: bold;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  src: url('/fonts/Manrope-Regular.woff2') format('woff2'),
+       url('/fonts/Manrope-Regular.woff') format('woff');
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: 'Manrope';
+  src: url('/fonts/Manrope-Bold.woff2') format('woff2'),
+       url('/fonts/Manrope-Bold.woff') format('woff');
+  font-weight: 700;
+  font-style: normal;
+}
+
+
+.slide_nav {
+  @apply flex items-center cursor-pointer text-black-200 font-medium;
+}
+
+.small_p {
+  @apply text-xs font-bold text-left;
+}
+.medium_p {
+  @apply text-sm font-bold text-left;
+}
+
+.button_v1 {
+  @apply w-full bg-primary text-white py-3 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center;
+}
+.button_v2 {
+  @apply w-full border border-primary text-black-100 py-3 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center;
+}
+
+.authInput {
+  @apply w-full p-3 border rounded-[12px] bg-gray-100 focus:outline-none focus:ring-2 focus:ring-gray-300;
+}
+
+.authButton {
+  @apply flex items-center gap-2 px-4 py-2 border rounded-[12px] hover:bg-gray-100 text-black-100 outline-none font-bold;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;
+  /* IE and Edge */
+  scrollbar-width: none;
+  /* Firefox */
+}
+
+/* Custom Scrollbar for the dropdown */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #f4f4f4;
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #c1c1c1;
+  border-radius: 10px;
+  border: 2px solid #f4f4f4;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: #a8a8a8;
+}
+
+/* Hide scrollbar but allow scrolling */
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+.scrollbar-hide {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+.Toastify__toast-container {
+  z-index: 9999 !important;
+}
+
+
+  /* Hide the spinner for number inputs */
+  input[type="number"]::-webkit-inner-spin-button,
+  input[type="number"]::-webkit-outer-spin-button {
+    -webkit-appearance: none;
+    margin: 0;
+  }
+
+  input[type="number"] {
+    -moz-appearance: textfield; /* Firefox */
+  }
