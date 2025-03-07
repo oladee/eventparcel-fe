@@ -84,9 +84,9 @@ const NewGroup: React.FC = () => {
         {loading ? (
           <p className="text-xl font-semibold h-screen text-center">Loading groups...</p>
           ) : groups.length === 0 ? (
-            <button onClick={handleAddGroupClick} className="w-full flex justify-center xl:justify-start xl:pl-[380px]">
+            <div onClick={handleAddGroupClick} className="w-full flex justify-center xl:justify-start xl:pl-[380px]">
               <AddGroup mode="noGroup" setIsAddGroupOpen={setIsAddGroupOpen} />
-            </button>
+            </div>
           ) : groups.length === 1 ? (
             <div className="flex flex-col md:flex-row gap-7 justify-center px-8">
             {groups.map((group) => (
