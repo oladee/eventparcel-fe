@@ -17,7 +17,8 @@ const AddGroup = dynamic(() => import('@/components/AddGroupCaller'), { ssr: fal
 
 const NewGroup: React.FC = () => {
   const [isRightBarOpen, setIsRightBarOpen] = useState(false);
-  const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
+  const [, setIsAddGroupOpen] = useState(false);
+  const [isAddSingleGroupOpen, setIsAddSingleGroupOpen] = useState(false);
   const [groups, setGroups] = useState<Group[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,7 +29,7 @@ const NewGroup: React.FC = () => {
       const storedEventId = localStorage.getItem("eventId");
   
       if (!storedEventId) {
-        router.push("/event-creation");
+        router.replace("/event-creation");
         return; 
       }
   
@@ -51,8 +52,7 @@ const NewGroup: React.FC = () => {
   
   
   const isFormValid = groups.length > 0 && groups.some(group => group.packages.length > 0);
-  const hasGeneralGroup = groups.some(group => group.groupPrivacy === "General");
-  const hasPrivateGroup = groups.some(group => group.groupPrivacy === "Private");
+
 
 
   const handleAddGroupClick = () => {
@@ -82,56 +82,59 @@ const NewGroup: React.FC = () => {
         </div>
 
         {loading ? (
-      <p className="text-xl font-semibold h-screen text-center">Loading groups...</p>
-    ) : groups.length === 0 ? (
-      <button onClick={handleAddGroupClick} className="w-full flex justify-center xl:justify-start xl:pl-[380px]">
-        <AddGroup mode="noGroup" setIsAddGroupOpen={setIsAddGroupOpen} />
-      </button>
-    ) : (
-      // <div className="flex flex-col lg:pl-20 xl:pl-20">
-         <div className="flex justify-center pr-[180px]">
-      {/* Groups Section */}
-      {(hasGeneralGroup || hasPrivateGroup) && (
-        <div className="flex flex-col sm:flex-row ml-12">
-
-        <div
-            className={`${
-              groups.length === 1 ? "ml-32 xl:pl:40" : "flex item-center flex-wrap w-full max-w-3xl space-x-4 space-y-4 pl-28 md:pl-2 xl:pl-2 -mr-6"
-            }`}
-          >           
-           {groups.map(group => ( 
-              // group.groupPrivacy === "General" ? (
-              //   <GeneralModal key={group._id} group={group} />
-              // ) : (
-              //   <PrivateGroup key={group._id} group={group} />
-              // )
-              <GeneralModal key={group._id} group={group}/>
+          <p className="text-xl font-semibold h-screen text-center">Loading groups...</p>
+          ) : groups.length === 0 ? (
+            <button onClick={handleAddGroupClick} className="w-full flex justify-center xl:justify-start xl:pl-[380px]">
+              <AddGroup mode="noGroup" setIsAddGroupOpen={setIsAddGroupOpen} />
+            </button>
+          ) : groups.length === 1 ? (
+            <div className="flex flex-col md:flex-row gap-7 justify-center px-8">
+            {groups.map((group) => (
+              <GeneralModal key={group._id} group={group} />
             ))}
+        
+            {isAddSingleGroupOpen && (
+              <AddGroup setIsAddGroupOpen={setIsAddGroupOpen} mode="noGroup"/>
+            )}
+            {/* Clicking this will open AddGroup */}
+            <div className="" onClick={() => setIsAddSingleGroupOpen(!isAddSingleGroupOpen)}>
+              <CreateGroupCaller />
+            </div>
           </div>
-    
-          {/* Sidebar Actions */}
-          <div id="addNew"  className={`${
-              groups.length === 1 ? "flex flex-col space-y-1" : "flex flex-col space-y-3 "
-            }`}>
-            {isAddGroupOpen && <AddGroup mode="availGroup" setIsAddGroupOpen={setIsAddGroupOpen} />}
-            <CreateGroupCaller />
+        ) : (
+        // Render content for when there are multiple groups
+          <div className="flex flex-col sm:flex-row lg:justify-center">
+            <div className=" flex flex-wrap w-full max-w-3xl space-x-2 space-y-4 pl-6 md:pl-2 xl:pl-24 -mr-6">
+              {groups.map((group) => (
+                <GeneralModal key={group._id} group={group} />
+              ))}
+            
+                {isAddSingleGroupOpen && (
+                  <AddGroup setIsAddGroupOpen={setIsAddGroupOpen} mode="noGroup"/>
+                )}
+            </div>
+
+              <div className="px-8 md:px-0 py-4">
+                {/* Clicking this will open AddGroup */}
+                <div className="" onClick={() => setIsAddSingleGroupOpen(!isAddSingleGroupOpen)}>
+                  <CreateGroupCaller />
+                </div>
+              </div>
           </div>
-        </div>
-      )}
-    </div>
+        )
+      }
 
-    )}
-{/* Right Bar */}
-<RightBar isOpen={isRightBarOpen} setIsOpen={setIsRightBarOpen} />
-      </div>
-      <FormButtons
-          isFormValid={!!isFormValid}
-        />
-    </section>
-  );
-};
+      {/* Right Bar */}
+      <RightBar isOpen={isRightBarOpen} setIsOpen={setIsRightBarOpen} />
+            </div>
+            <FormButtons
+                isFormValid={!!isFormValid}
+              />
+          </section>
+        );
+      };
 
-export default NewGroup;
+      export default NewGroup;
 
 
 

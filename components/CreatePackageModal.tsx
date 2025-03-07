@@ -50,7 +50,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
     const validateField = (field: keyof PackageFormData, value: string) => {
         if (field === "packageTitle") {
             if (!value.trim()) return "Title is required.";
-            if (value.length < 5 || value.length > 60) return "Title must be between 5 and 60 characters.";
+            if (value.length < 2 || value.length > 60) return "Title must be between 2 and 60 characters.";
         }
     
         if (field === "packageDescription") {
@@ -79,7 +79,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
     
 
     useEffect(() => {
-        const packageOptions = formData.packageDelivery || []; // No need to split
+        const packageOptions = formData.packageDelivery || [];
     
         setHomeDeliverySelectedOptions({
             platformDelivery: packageOptions.includes("homeDelivery:platformDelivery"),
@@ -94,39 +94,52 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
 
     const toggleDeliveryOption = (option: "pickUp" | "homeDelivery:platformDelivery" | "homeDelivery:selfManaged") => {
         setFormData((prev) => {
-            const currentSelections = new Set(prev.packageDelivery || []); 
+            const updatedSelections = new Set(prev.packageDelivery || []);
     
-            if (currentSelections.has(option)) {
-                currentSelections.delete(option); 
-            } else {
-                currentSelections.add(option); 
+            if (option === "pickUp") {
+                // Toggle pickUp independently
+                if (updatedSelections.has(option)) {
+                  updatedSelections.delete(option);
+                } else {
+                  updatedSelections.add(option);
+                }
+              
+                return { ...prev, packageDelivery: Array.from(updatedSelections) };
+              }
+              
+    
+            if (option.startsWith("homeDelivery")) {
+                // If clicked option is already selected, deselect it
+                if (updatedSelections.has(option)) {
+                    updatedSelections.delete(option);
+                } else {
+                    // Remove other homeDelivery options before selecting a new one
+                    updatedSelections.delete("homeDelivery:platformDelivery");
+                    updatedSelections.delete("homeDelivery:selfManaged");
+                    updatedSelections.add(option);
+                }
             }
     
-            return {
-                ...prev,
-                packageDelivery: Array.from(currentSelections), 
-            };
+            return { ...prev, packageDelivery: Array.from(updatedSelections) };
         });
     
         if (option === "pickUp") {
             setSelectedOptions((prev) => ({ ...prev, pickUp: !prev.pickUp }));
         } else {
             setHomeDeliverySelectedOptions((prev) => ({
-                ...prev,
-                platformDelivery: option === "homeDelivery:platformDelivery" ? !prev.platformDelivery : prev.platformDelivery,
-                selfManaged: option === "homeDelivery:selfManaged" ? !prev.selfManaged : prev.selfManaged,
+                platformDelivery: option === "homeDelivery:platformDelivery" ? !prev.platformDelivery : false,
+                selfManaged: option === "homeDelivery:selfManaged" ? !prev.selfManaged : false,
             }));
     
             setSelectedOptions((prev) => ({
                 ...prev,
                 homeDelivery: option === "homeDelivery:platformDelivery"
-                    ? !homeDeliverySelectedOptions.platformDelivery || homeDeliverySelectedOptions.selfManaged
-                    : option === "homeDelivery:selfManaged"
-                    ? !homeDeliverySelectedOptions.selfManaged || homeDeliverySelectedOptions.platformDelivery
-                    : prev.homeDelivery,
+                    ? !homeDeliverySelectedOptions.platformDelivery
+                    : !homeDeliverySelectedOptions.selfManaged,
             }));
         }
     };
+    
     
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
@@ -277,9 +290,9 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
     return (
         <>
             <ToastContainer aria-live="polite" />
-            <div className="w-[680px] max-h-[80vh] lg:max-h-[100vh] bg-[#FFFFFF] rounded-2xl shadow-lg p-10 flex flex-col  overflow-y-auto">
+            <div className="w-[95vw] lg:w-[680px] max-h-[80vh] lg:max-h-[97vh] bg-[#FFFFFF] rounded-2xl shadow-lg px-5 pb-3 md:p-5 flex flex-col  overflow-y-auto">
                 {/* Header */}
-                <div className="flex justify-between items-center">
+                <div className="sticky top-0 z-10 flex justify-between items-center py-4 bg-[#FFFFFF]">
                     <div className="flex flex-col items-start">
                         <div id="header" className="font-bold text-lg text-[#111827]">
                             {mode === "create" ? "Create Package" : "Update Package"}
@@ -291,29 +304,33 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                         alt="cancel" 
                         width={14} 
                         height={14} 
-                        className="cursor-pointer" 
+                        className="cursor-pointer absolute top-4 right-0" 
                         onClick={() => setOpenModalPackage(false)} 
                     />
                 </div>
-                
                 <div className="border border-gray-100"></div>
+                
         
                 {/* Image Upload Section */}
+                <div className="flex-grow">
+
                 <div className="flex flex-wrap gap-2 py-2">
+                    <div className="flex gap-1">
+
                     {(formData.packageImgUrls?.length ?? 0) > 0 && (
                         <div className="relative">
                             <Image 
                                 src={
                                     formData.packageImgUrls?.[0]
-                                        ? formData.packageImgUrls[0] instanceof File 
+                                    ? formData.packageImgUrls[0] instanceof File 
                                             ? URL.createObjectURL(formData.packageImgUrls[0]) 
                                             : formData.packageImgUrls[0]
                                         : "/placeholder.png" 
-                                }
+                                    }
                                 alt="Main package image"
                                 width={100}
                                 height={100}
-                                className="rounded-[10px] border w-[100px] h-[100px]"
+                                className="rounded-[10px] border w-[80px] h-[80px] md:w-[100px] md:h-[100px]"
                             />
                             <button 
                                 onClick={() => removeImage(0)} 
@@ -333,12 +350,12 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                                     alt="package"
                                     width={100}
                                     height={100}
-                                    className="rounded-[10px] border w-[100px] h-[100px]"
+                                    className="rounded-[10px] border w-[80px] h-[80px] md:w-[100px] md:h-[100px]"
                                 />
                                 <button 
                                     onClick={() => removeImage(index + 1)} 
-                                    className="absolute top-0 right-0 bg-red-500 text-white rounded-full p-1"
-                                >
+                                    className="absolute top-0 right-0 bg-red-500 text-white h-5 w-5 flex justify-center items-center text-xs rounded-full p-1"
+                                    >
                                     X
                                 </button>
                             </div>
@@ -346,14 +363,15 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                     </div>
 
                     {/* Image Upload Button */}
-                    <label className="w-[90px] h-[90px] flex items-center justify-center border border-dashed rounded-[10px] cursor-pointer">
-                        <input 
-                            type="file" 
-                            accept="image/*" 
-                            multiple 
-                            className="hidden" 
-                            onChange={handleImageUpload} 
-                            />
+                    {(formData?.packageImgUrls?.length ?? 0) < 4 && (
+                        <label className="w-[80px] h-[80px] md:w-[100px] md:h-[100px] flex items-center justify-center border border-dashed rounded-[10px] cursor-pointer">
+                            <input 
+                                type="file" 
+                                accept="image/*" 
+                                multiple 
+                                className="hidden" 
+                                onChange={handleImageUpload} 
+                                />
                             <div className="flex flex-col justify-center items-center">
                                 <Image
                                     src={"/images/Group.png"}
@@ -363,7 +381,10 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                                 />
                                 <span className="font-general font-medium text-sm text-[#718096]">Add Image</span>
                             </div>
-                    </label>
+                        </label>
+                    )}
+                    </div>
+
                 </div>
         
                 {/* Form Inputs */}
@@ -374,8 +395,8 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                         value={formData.packageTitle} 
                         onChange={handleChange} 
                         placeholder="Add package title" 
-                        className="w-full h-10 p-2 rounded-xl border bg-[#FAFAFA]" 
-                    />
+                        className="w-full h-10 p-2 outline-primary rounded-xl bg-[#FAFAFA]" 
+                        />
                     {errors.packageTitle && <p className="text-red-500 text-sm mt-1">{errors.packageTitle}</p>}
 
                     <textarea 
@@ -383,12 +404,13 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                         value={formData.packageDescription} 
                         onChange={handleChange} 
                         placeholder="Add package description" 
-                        className="w-full h-[100px] p-2 rounded-xl border bg-[#FAFAFA]" 
-                    />
+                        className="w-full h-[100px] p-2 rounded-xl outline-primary bg-[#FAFAFA]" 
+                        />
                     {errors.packageDescription && <p className="text-red-500 text-sm mt-1">{errors.packageDescription}</p>}
-                    <div className="flex items-center gap-3">
+                    <div className="flex flex-col md:flex-row items-start md:items-center gap-3">
                     {/* Price Input */}
-                    <div className="flex items-center border border-gray-300 rounded-[10px] px-4 py-2 bg-[#FAFAFA] focus-within:border-blue-500 transition flex-1">
+                    <div className="w-full flex items-center rounded-[10px] px-4 py-2 bg-[#FAFAFA] flex-1 
+                        focus-within:outline focus-within:outline-primary focus-within:outline-2">
                         <span className="text-lg text-gray-600 font-medium">₦</span>
                         <input
                             type="number"
@@ -401,15 +423,15 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                     </div>
 
                     {/* Quantity Input */}
-                    <div className="flex-1">
+                    <div className="flex-1 w-full">
                         <input 
                             type="number" 
                             id="packageQuantity" 
                             value={formData.packageQuantity} 
                             onChange={handleChange} 
                             placeholder="Quantity (optional)" 
-                            className="w-full h-11 p-2 rounded-xl border border-gray-300 bg-[#FAFAFA]" 
-                        />
+                            className="w-full h-12 p-2 rounded-xl outline-primary border-gray-300 bg-[#FAFAFA]" 
+                            />
                     </div>
                 </div>
 
@@ -428,7 +450,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                         <div className="flex flex-col gap-1">
                             {/* Home Delivery - Expandable */}
                             <div 
-                                className="flex flex-col border border-gray-100 items-start gap-1 cursor-pointer p-2"
+                                className="flex flex-col border border-gray-100 rounded-[5px] items-start gap-1 cursor-pointer p-2"
                                 onClick={() => setOpenHomeDeliveryOption(!openHomeDeliveryOption)}
                             >
                                 <div className="flex items-center gap-2">
@@ -437,8 +459,8 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                                             ? "/images/check.png" 
                                             : "/images/unchecked.png"}
                                             alt="check"
-                                        width={16}
-                                        height={16}
+                                        width={20}
+                                        height={20}
                                         id="HomeDelivery"
                                     />
                                     <span className="font-general font-semibold text-base text-[#111827]">Home Delivery</span>
@@ -446,7 +468,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
 
                                 {/* Sub-options */}
                                 {openHomeDeliveryOption && (
-                                    <div className="flex w-full flex-col border border-gray-100 ">
+                                    <div className="flex w-[90%] md:w-[95%] ml-6 flex-col rounded-[5px] border border-gray-100 ">
                                         <div
                                             className="flex flex-col items-start gap-1 cursor-pointer p-2"
                                             onClick={() => toggleDeliveryOption("homeDelivery:platformDelivery")}
@@ -455,8 +477,8 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                                                 <Image
                                                     src={homeDeliverySelectedOptions.platformDelivery ? "/images/check.png" : "/images/unchecked.png"}
                                                     alt="check"
-                                                    width={16}
-                                                    height={16}
+                                                    width={20}
+                                                    height={20}
                                                     id="platformDelivery"
                                                     />
                                                 <span className="font-general font-medium text-base text-[#111827]">Platform Delivery</span>
@@ -467,13 +489,13 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                                         <div
                                             className="flex flex-col items-start gap-1 cursor-pointer p-2"
                                             onClick={() => toggleDeliveryOption("homeDelivery:selfManaged")}
-                                        >
+                                            >
                                             <div className="flex items-center gap-2">
                                                 <Image
                                                     src={homeDeliverySelectedOptions.selfManaged ? "/images/check.png" : "/images/unchecked.png"}
                                                     alt="check"
-                                                    width={16}
-                                                    height={16}
+                                                    width={20}
+                                                    height={20}
                                                     id="selfManaged"
                                                     />
                                                 <span className="font-general font-medium text-base text-[#111827]">Self-Managed</span>
@@ -486,14 +508,14 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                         </div>
                         <div>
                             <div
-                                className="flex border border-gray-100 items-center gap-1 cursor-pointer p-2"
+                                className="flex border border-gray-100 items-center rounded-[5px] gap-1 cursor-pointer p-2"
                                 onClick={() => toggleDeliveryOption("pickUp")}
                                 >
                                 <Image
                                     src={selectedOptions.pickUp ? "/images/check.png" : "/images/unchecked.png"}
                                     alt="check"
-                                    width={16}
-                                    height={16}
+                                    width={20}
+                                    height={20}
                                     id="pickUp"
                                     />
                                 <span className="font-general font-medium text-base text-[#111827]">Pickup</span>
@@ -503,11 +525,11 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                         </div>
                     <div className="border border-gray-100"></div>
                     {/* Buttons */}
-                    <div className="flex justify-end gap-2">
+                    <div className="flex justify-center md:justify-end gap-2">
                         <button 
                             id="cancel"
                             onClick={() => setOpenModalPackage(false)} 
-                            className="px-4 py-2 rounded-xl border"
+                            className="w-[147px] h[48px] px-4 py-2 rounded-xl border"
                             >
                             Cancel
                         </button>
@@ -515,7 +537,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                             id="createPackage"
                             onClick={handleSubmit} 
                             disabled={loading}  
-                            className={`px-4 py-2 text-white rounded-xl ${
+                            className={`w-[147px] h[48px] px-4 py-2 text-white whitespace-nowrap rounded-xl ${
                                 loading 
                                 ? "bg-gray-400 cursor-not-allowed" 
                                 : isFormValid 
@@ -523,14 +545,14 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                                 : "bg-[#75142399]"
                             }`}
                             >
-                            {loading 
-                                ? "Creating Package..." 
-                                : mode === "create" 
-                                ? "Create Package" 
-                                : "Update Package"}
+                         {loading 
+                            ? (mode === "create" ? "Creating..." : "Updating...") 
+                            : (mode === "create" ? "Create Package" : "Update Package")
+                        }
                         </button>
                     </div>
                 </div>
+            </div>
             </div>
         </>
     );
