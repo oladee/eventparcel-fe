@@ -12,7 +12,7 @@ import BankDropdown from "@/components/BankDropdown";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { FormEvent } from "react";
-import TimeZoneDropdown from "@/components/TimeZoneDropdown";
+// import TimeZoneDropdown from "@/components/TimeZoneDropdown";
 import { PiCalendarMinus } from "react-icons/pi";
 import { AiOutlineClockCircle } from "react-icons/ai";
 
@@ -168,6 +168,7 @@ const Page = () => {
     const { id, value } = e.target;
     setErrors((prev) => ({ ...prev, [id]: validateField(id, value) }));
   };
+
 
   const handleMapLocationSelect = () => {
     setShowMapPickerModal(true);
@@ -408,13 +409,26 @@ const Page = () => {
                       />
                     </div>
 
-                    <TimeZoneDropdown
+                    {/* <TimeZoneDropdown
                       value={formData.paymentTimeZone}
                       onChange={(value) =>
                         setFormData({ ...formData, paymentTimeZone: value })
                       }
                       options={validTimeZones}
-                    />
+                    /> */}
+
+                    <select
+                      id="paymentTimeZone"
+                      value={formData.paymentTimeZone}
+                      onChange={handleChange}
+                      className="px-3 py-2 input-field outline-primary rounded-[5px] bg-slate-50"
+                    >
+                      {validTimeZones.map((zone) => (
+                        <option key={zone} value={zone}>
+                          {zone}
+                        </option>
+                      ))}
+                    </select>
                   </div>
                 </div>
               </div>
@@ -534,7 +548,7 @@ const Page = () => {
                           timeIntervals={15}
                           timeCaption="Time"
                           dateFormat="hh:mm aa"
-                           popperClassName="custom-datepicker"
+                          popperClassName="custom-datepicker"
                           className="pl-10 px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50"
                         />
                       </div>
@@ -594,6 +608,35 @@ const Page = () => {
 };
 
 export default Page;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // "use client";
 
