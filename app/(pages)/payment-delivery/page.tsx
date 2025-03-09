@@ -371,7 +371,7 @@ const Page = () => {
                       id="paymentDate"
                       onChange={(date) => handleDateChange(date, "paymentDate")}
                       dateFormat="yyyy-MM-dd"
-                      className="pl-10 px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50"
+                      className="pl-10 px-3 py-2 z-20 input-field outline-primary w-full rounded-[5px] bg-slate-50"
                       popperClassName="custom-datepicker"
                     />
                   </div>
