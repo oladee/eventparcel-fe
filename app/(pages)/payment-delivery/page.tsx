@@ -599,7 +599,7 @@ const Page = () => {
         <ReusuableSuccess
           title="You've successfully uploaded your details"
           subtitle="Congratulations you have successfully created your Payment details"
-          route="/"
+          route="/event-creation"
           buttonText="continue"
         />
       )}

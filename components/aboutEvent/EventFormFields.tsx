@@ -143,6 +143,7 @@ const EventFormFields: React.FC<EventFormFieldsProps> = ({
               minDate={today}
               onChange={(date) => handleDateChange(date, "eventDate")}
               dateFormat="yyyy-MM-dd"
+              popperClassName="custom-datepicker"
               className="pl-10 px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50"
             />
           </div>
@@ -168,6 +169,7 @@ const EventFormFields: React.FC<EventFormFieldsProps> = ({
               timeIntervals={15}
               timeCaption="Time"
               dateFormat="hh:mm aa"
+              popperClassName="custom-datepicker"
               className="pl-10 px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50"
             />
           </div>

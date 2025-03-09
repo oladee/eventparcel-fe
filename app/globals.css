@@ -155,6 +155,10 @@ input[type="number"] {
   color: #ffff !important;
 }
 
+.custom-datepicker .react-datepicker__time-list-item--selected {
+  background-color: #751423 !important;
+  color: #ffff !important;
+}
 
 
 
@@ -228,6 +232,10 @@ input[type="number"] {
 .react-datepicker__day,
 .react-datepicker__time-list-item {
   color: black !important;
+}
+
+.react-datepicker__day-name {
+  color: white !important;
 }
 
 .react-datepicker__day:hover,
