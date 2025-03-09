@@ -318,6 +318,19 @@ const ContactModal: React.FC<ContactModalProps> = ({ onClose, contacts }) => {
 
 export default ContactModal;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
 // import React, { useState, useEffect } from "react";
 // import { FiSearch, FiX } from "react-icons/fi";
 // import axiosInstance from "@/lib/axiosInstance";
