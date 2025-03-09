@@ -142,7 +142,7 @@ const Page: React.FC = () => {
     await axiosInstance.post("/save-contacts", {
         contacts: selectedContacts.map((contact) => ({
           guestName: contact.name.join(" "),
-          guestPhoneNumber: contact.tel?.[0] || ""
+          guestPhoneNumber: contact.tel?.join("").replace(/\D/g, "")
         }))
       });
       // console.log("Contacts saved:", response.data);
