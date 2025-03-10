@@ -141,9 +141,9 @@ const CsvModal: React.FC<CsvModalProps> = ({ onClose }) => {
 
         <p id="downloadTemplate" className="mt-4 text-sm text-gray-900 font-medium">
           Got a manually created CSV?{" "}
-          <span className="text-primary cursor-pointer font-medium">
+          <a href="/Event_Parcel_CSV_TemplateNew.csv"  download="Event_Parcel_CSV_TemplateNew.csv" className="text-primary cursor-pointer font-medium">
             Download Template
-          </span>
+          </a>
         </p>
 
         <div className="flex justify-end space-x-4 mt-6">
