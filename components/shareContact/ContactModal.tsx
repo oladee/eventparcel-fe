@@ -145,17 +145,23 @@ const ContactModal: React.FC<ContactModalProps> = ({ onClose, contacts }) => {
         <div className="fixed overflow-y-auto no-scrollbar inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4">
           <div className="bg-white rounded-2xl shadow-lg w-full max-w-lg p-6 mt-44">
             {/* Header */}
-            <div className="flex justify-between items-center border-b pb-3">
-              <h2 className="text-lg font-semibold">Select Contacts</h2>
+            <div className="relative border-b pb-3">
+              <h2 
+              id="uploadCsvHeade"
+              className="text-lg lg:text-xl font-bold text-[#111827]">
+                Upload CSV File
+              </h2>
               <FiX
-                className="cursor-pointer text-gray-600"
+                className="absolute top-4 right-4 cursor-pointer text-gray-600"
                 size={20}
                 onClick={onClose}
               />
+              <p 
+              id="uploadCsvDesc"
+              className="text-sm text-[#718096] mt-2">
+                You can upload a csv file exported from your contact list
+              </p>
             </div>
-            <p className="text-sm text-gray-500 mt-2">
-              Select contacts to import
-            </p>
 
             {/* Search Bar */}
             <div className="relative mt-4">
@@ -164,6 +170,7 @@ const ContactModal: React.FC<ContactModalProps> = ({ onClose, contacts }) => {
                 size={16}
               />
               <input
+              id="seearchBarCSV"
                 type="text"
                 placeholder="Search contacts"
                 value={searchTerm}
@@ -317,19 +324,6 @@ const ContactModal: React.FC<ContactModalProps> = ({ onClose, contacts }) => {
 };
 
 export default ContactModal;
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // import React, { useState, useEffect } from "react";
 // import { FiSearch, FiX } from "react-icons/fi";

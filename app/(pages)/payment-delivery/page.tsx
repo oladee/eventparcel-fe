@@ -169,7 +169,6 @@ const Page = () => {
     setErrors((prev) => ({ ...prev, [id]: validateField(id, value) }));
   };
 
-
   const handleMapLocationSelect = () => {
     setShowMapPickerModal(true);
   };
@@ -242,10 +241,13 @@ const Page = () => {
       <section className="bg-[#F9FAFB] !overflow-hidden relative">
         <div className="py-20 lg:py-24 px-3 sm:px-4 mx-auto max-w-screen-md h-screen overflow-y-auto no-scrollbar">
           <div className="mb-4 md:mb-12 text-center p-3 sm:p-0 space-y-3">
-            <h1 className="text-2xl sm:text-3xl font-bold text-[#111827]">
+            <h1
+              id="payment_deliveryHeader"
+              className="text-2xl sm:text-3xl font-bold text-[#111827]"
+            >
               Payment & Delivery
             </h1>
-            <p className="gap-3">
+            <p id="payment_deliveryDesc" className="gap-3">
               <span className="mr-2">
                 Let&apos;s setup your payment process and delivery plans
               </span>
@@ -264,10 +266,16 @@ const Page = () => {
           >
             <div>
               <div className="mb-5">
-                <h2 className="text-xl font-semibold text-[#111827] mb-2">
+                <h2
+                  id="paymentDetailsHeader"
+                  className="text-xl font-semibold text-[#111827] mb-2"
+                >
                   Payment Details
                 </h2>
-                <span className="text-sm text-[#718096] font-medium">
+                <span
+                  id="paymentDetailsDesc"
+                  className="text-sm text-[#718096] font-medium"
+                >
                   Add your bank account details and payment deadline
                 </span>
               </div>
@@ -341,10 +349,16 @@ const Page = () => {
 
             <div className="mt-8">
               <div className="mb-5">
-                <h2 className="text-xl font-semibold text-[#111827] mb-2">
+                <h2
+                  id="payment_deadlineHeader"
+                  className="text-xl font-semibold text-[#111827] mb-2"
+                >
                   Payment Deadline
                 </h2>
-                <span className="text-sm text-[#718096] font-medium">
+                <span
+                  id="payment_deadlineDesc"
+                  className="text-sm text-[#718096] font-medium"
+                >
                   Select the payment deadline date and time
                 </span>
               </div>
@@ -436,10 +450,16 @@ const Page = () => {
 
             <div className="mt-8">
               <div className="mb-5">
-                <h2 className="text-xl font-semibold text-[#111827] mb-2">
+                <h2
+                  id="deliveryDetailsHeader"
+                  className="text-xl font-semibold text-[#111827] mb-2"
+                >
                   Delivery Details
                 </h2>
-                <span className="text-sm text-[#718096] font-medium">
+                <span
+                  id="deliveryDetailsDesc"
+                  className="text-sm text-[#718096] font-medium"
+                >
                   Add pickup contact details and when you want to start the
                   delivery
                 </span>
@@ -608,35 +628,6 @@ const Page = () => {
 };
 
 export default Page;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // "use client";
 

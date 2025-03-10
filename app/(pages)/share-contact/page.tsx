@@ -139,7 +139,7 @@ const Page: React.FC = () => {
   const handleImportContacts = useCallback(async () => {
     setIsImportingContacts(true);
     try {
-    await axiosInstance.post("/save-contacts", {
+      await axiosInstance.post("/save-contacts", {
         contacts: selectedContacts.map((contact) => ({
           guestName: contact.name.join(" "),
           guestPhoneNumber: contact.tel?.join("").replace(/\D/g, "")
@@ -183,7 +183,7 @@ const Page: React.FC = () => {
 
   return (
     <>
-     {showModal && (
+      {showModal && (
         <ReusuableSuccess
           title="Nicely done,you're almost there"
           subtitle="Let's setup your payment process and delivery plans"
@@ -264,7 +264,20 @@ const Page: React.FC = () => {
               <FiX size={20} />
             </button>
 
-            <h2 className="text-xl font-bold mb-4">Select Contacts</h2>
+            {/* <h2 className="text-xl font-bold mb-4">Select Contacts</h2> */}
+            <div className="border-b pb-3">
+              <h2
+              id="importContactHeader"
+               className="text-lg lg:text-xl font-bold text-[#111827]">
+                Import From Contact List
+              </h2>
+
+              <p
+              id="importContactDesc"
+               className="text-sm text-[#718096] mt-2">
+                Select the contacts you’d like to invite for the event
+              </p>
+            </div>
 
             {isContactsSupported ? (
               <ContactSelection

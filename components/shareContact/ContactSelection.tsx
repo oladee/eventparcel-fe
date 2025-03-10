@@ -37,7 +37,7 @@ const ContactSelection: React.FC<ContactSelectionProps> = ({
   handleContactSelect,
   setIsContactModalOpen,
   handleImportContacts,
-  isImportingContacts,
+  isImportingContacts
 }) => {
   return (
     <>
@@ -56,6 +56,7 @@ const ContactSelection: React.FC<ContactSelectionProps> = ({
       <div className="relative mb-4">
         <FiSearch className="absolute top-3 left-3 text-gray-400" />
         <input
+          id="seearchBarContact"
           type="text"
           placeholder="Search contacts..."
           value={searchTerm}
@@ -86,7 +87,9 @@ const ContactSelection: React.FC<ContactSelectionProps> = ({
           {tabFilteredContacts.map((contact) => {
             const displayName = contact.name?.join(", ") || "No Name";
             const firstLetter = displayName.charAt(0).toUpperCase();
-            const contactKey = `${contact.name.join("-")}-${contact.email?.join("-") || ""}-${contact.tel?.join("-") || ""}`;
+            const contactKey = `${contact.name.join("-")}-${
+              contact.email?.join("-") || ""
+            }-${contact.tel?.join("-") || ""}`;
             const isChecked = selectedContacts.includes(contact);
 
             return (
@@ -116,6 +119,7 @@ const ContactSelection: React.FC<ContactSelectionProps> = ({
                 </div>
                 {/* Checkbox */}
                 <input
+                  id="checkbox"
                   type="checkbox"
                   checked={isChecked}
                   readOnly
@@ -132,17 +136,21 @@ const ContactSelection: React.FC<ContactSelectionProps> = ({
       {/* Footer buttons */}
       <div className="flex justify-end gap-4 mt-6">
         <button
+          id="cancel"
           onClick={() => setIsContactModalOpen(false)}
           className="p-2 px-4 border border-gray-300 rounded-lg"
         >
           Cancel
         </button>
         <button
+          id="import"
           onClick={handleImportContacts}
           disabled={selectedContacts.length === 0 || isImportingContacts}
           className="p-2 px-4 bg-primary text-white rounded-lg disabled:opacity-50"
         >
-          {isImportingContacts ? "Importing..." : `Import ${selectedContacts.length} Contacts`}
+          {isImportingContacts
+            ? "Importing..."
+            : `Import ${selectedContacts.length} Contacts`}
         </button>
       </div>
     </>
@@ -150,15 +158,6 @@ const ContactSelection: React.FC<ContactSelectionProps> = ({
 };
 
 export default ContactSelection;
-
-
-
-
-
-
-
-
-
 
 // import React from "react";
 // import { FiSearch } from "react-icons/fi";

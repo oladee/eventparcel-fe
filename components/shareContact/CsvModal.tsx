@@ -92,7 +92,7 @@ const CsvModal: React.FC<CsvModalProps> = ({ onClose }) => {
     <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4">
       <div className="bg-white rounded-2xl shadow-lg max-w-lg w-full p-6">
         <div className="flex justify-between items-center">
-          <h2 className="text-xl font-bold text-gray-900">Upload CSV File</h2>
+          <h2 id="uploadCSVHeader" className="text-xl font-bold text-gray-900">Upload CSV File</h2>
           <button
             onClick={onClose}
             className="text-gray-500 hover:text-gray-800"
@@ -100,7 +100,7 @@ const CsvModal: React.FC<CsvModalProps> = ({ onClose }) => {
             <IoClose size={24} />
           </button>
         </div>
-        <p className="text-gray-500 mt-1">
+        <p id="uploadCSVDesc" className="text-gray-500 mt-1">
           You can upload a csv file exported from your contact list
         </p>
 
@@ -139,7 +139,7 @@ const CsvModal: React.FC<CsvModalProps> = ({ onClose }) => {
           )}
         </div>
 
-        <p className="mt-4 text-sm text-gray-900 font-medium">
+        <p id="downloadTemplate" className="mt-4 text-sm text-gray-900 font-medium">
           Got a manually created CSV?{" "}
           <span className="text-primary cursor-pointer font-medium">
             Download Template
@@ -148,12 +148,14 @@ const CsvModal: React.FC<CsvModalProps> = ({ onClose }) => {
 
         <div className="flex justify-end space-x-4 mt-6">
           <button
+          id="cancel"
             onClick={onClose}
             className="p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827]"
           >
             Cancel
           </button>
           <button
+          id="import"
             onClick={handleImport}
             disabled={!selectedFile}
             className={`bg-primary text-white py-3 px-8 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center font-extrabold font-manrope ${
