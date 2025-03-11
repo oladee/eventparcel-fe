@@ -46,6 +46,7 @@ const PhoneNumberInput = ({ onPhoneChange }: {onPhoneChange: (value: string) => 
         onFocus={() => setTouched(true)}
         inputClass="!w-full !py-6 !border-none !rounded-[12px] !bg-gray-100 !focus:outline-none !focus:ring-2 !focus:ring-gray-300"
         buttonClass="!border-none !rounded-l-[12px]"
+        containerClass="custom-phone-input"
       />
       {touched && error && <p style={{ color: "red", fontSize: "12px"}}>{error}</p>}
     </div>
