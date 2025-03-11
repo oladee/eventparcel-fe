@@ -177,7 +177,11 @@ const GeneralModal: React.FC<generalGroupProps>  = ({ group }) => {
                                     />
                                     <div className="flex flex-col">
                                         <span id="packageHeader" className="text-sm font-general font-semibold leading-tight text-[#111827]">
-                                            {item.packageTitle}
+                                        {item.packageTitle
+                                        .split(" ")
+                                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                                        .join(" ")
+                                        }
                                         </span>
                                         <p id="packagePrice" className="font-general font-medium text-xs text-[#718096]">₦{item.packagePrice}</p>
                                     </div>

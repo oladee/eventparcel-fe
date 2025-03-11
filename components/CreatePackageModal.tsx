@@ -12,6 +12,7 @@ interface PackageFormData {
     groupId?: string | number;
     packageTitle?: string;
     packageDescription?: string;
+    packagePriceCurrency?: string;
     packagePrice?: string | number;
     packageQuantity?: string | number;
     packageDelivery?: string[];
@@ -37,6 +38,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
         groupId: groudId,
         packageTitle: packageData?.packageTitle || "",
         packageDescription: packageData?.packageDescription || "",
+        packagePriceCurrency: packageData?.packagePriceCurrency || "NGN",
         packagePrice: packageData?.packagePrice || "",
         packageQuantity: packageData?.packageQuantity || "",
         packageDelivery: typeof packageData?.packageDelivery === "string"
@@ -202,6 +204,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
         }
         formDataToSend.append("packageTitle", formData.packageTitle || "");
         formDataToSend.append("packageDescription", formData.packageDescription || "");
+        formDataToSend.append("packagePriceCurrency", formData.packagePriceCurrency || "");
         formDataToSend.append("packagePrice", formData.packagePrice?.toString() || "");
         formDataToSend.append("packageQuantity", formData.packageQuantity?.toString() || "");
     
@@ -411,7 +414,16 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                     {/* Price Input */}
                     <div className="w-full flex items-center rounded-[10px] px-4 py-2 bg-[#FAFAFA] flex-1 
                         focus-within:outline focus-within:outline-primary focus-within:outline-2">
-                        <span className="text-lg text-gray-600 font-medium">₦</span>
+                           <select
+                                className="text-lg text-gray-600 font-medium bg-transparent outline-none"
+                                value={formData.packagePriceCurrency || "NGN"}
+                                onChange={(e) => setFormData({ ...formData, packagePriceCurrency: e.target.value })}
+                            >
+                                <option value="NGN">₦</option>
+                                <option value="USD">$</option>
+                            </select>
+
+                        {/* Price Input */}
                         <input
                             type="number"
                             id="packagePrice"
