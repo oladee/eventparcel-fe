@@ -315,7 +315,7 @@ const ContactModal: React.FC<ContactModalProps> = ({ onClose, contacts }) => {
           title="Nicely done,you're almost there"
           subtitle="Let's setup your payment process and delivery plans"
           route="/payment-delivery"
-          buttonText="continue"
+          buttonText="Continue"
         />
       )}
       <ToastContainer />

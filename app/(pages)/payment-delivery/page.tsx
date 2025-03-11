@@ -1166,7 +1166,7 @@ export default Page;
 //           title="You've successfully uploaded your details"
 //           subtitle="Congratulations you have successfully created your Payment details"
 //           route="/"
-//           buttonText="continue"
+//           buttonText="Continue"
 //         />
 //       )}
 //     </>
