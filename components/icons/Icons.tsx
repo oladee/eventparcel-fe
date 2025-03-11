@@ -6,6 +6,11 @@ interface LogoProps {
   width: number;
   height: number;
 }
+// interface LogoProps2 {
+//   width: number;
+//   height: number;
+//   cla
+// }
 
 // Logo component to display the company logo
 export const Logo: React.FC<LogoProps> = ({ width, height }) => {
@@ -65,6 +70,18 @@ export const Checked: React.FC<LogoProps> = ({ width, height }) => {
     <Image
       src="/icons/checked.svg" // Path relative to the public folder
       alt="Apple Icon"
+      width={width}
+      height={height}
+      priority // Use this prop if the image is critical (e.g., logo)
+    />
+  );
+};
+
+export const Warning: React.FC<LogoProps> = ({ width, height }) => {
+  return (
+    <Image
+      src="/images/warning.png" // Path relative to the public folder
+      alt="warning Icon"
       width={width}
       height={height}
       priority // Use this prop if the image is critical (e.g., logo)
