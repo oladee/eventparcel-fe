@@ -15,7 +15,13 @@ const EventSuccess: React.FC = () => {
           sell according to group
         </p>
         <Link href="/new-group" className="button_v1">
-          <button className="">Continue</button>
+          <button className="">Continue to Group</button>
+        </Link>
+        <Link
+          href="/create-cohost"
+          className="p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827] w-full"
+        >
+          <button className="">Add a Co-Host</button>
         </Link>
       </div>
     </div>
