@@ -102,7 +102,7 @@ const AddCoHost: React.FC = () => {
       Cookies.set("cohost-email", formData.email, { expires: 1, path: "/" }); //expire in one day
 
       // Redirect to OTP verification page
-      router.push("/otp-verification");
+      router.push("/verify-cohost");
     } catch (error: any) {
       toast.error(
         error.response?.data?.message || "Signup failed. Please try again."
