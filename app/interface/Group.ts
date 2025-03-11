@@ -4,6 +4,7 @@ export interface Package {
     packageDescription: string;
     _id: string;
     packageQuantity: number;
+    packagePriceCurrency: string;
     packagePrice: number;
     packageDelivery: string[];
   }
