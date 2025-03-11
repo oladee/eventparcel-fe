@@ -73,7 +73,7 @@ const AddCoHost: React.FC = () => {
     setIsLoading(true);
 
     try {
-      const response = await axiosInstance.post("/create-cohost", formData);
+      const response = await axiosInstance.post("/signup", formData);
       toast.success(response.data.message || "Signup successful!");
 
       Cookies.set("cohost-email", formData.email, { expires: 1, path: "/" }); //expire in one day
