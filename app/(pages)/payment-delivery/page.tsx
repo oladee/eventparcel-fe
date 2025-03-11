@@ -226,6 +226,9 @@ const Page = () => {
     }
   };
 
+  // Get today's date in YYYY-MM-DD format
+  const today = new Date();
+
   return (
     <>
       <ToastContainer />
@@ -382,6 +385,7 @@ const Page = () => {
                     <PiCalendarMinus className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10 text-[#111827]" />
                     <DatePicker
                       selected={formData.paymentDate}
+                      minDate={today}
                       id="paymentDate"
                       onChange={(date) => handleDateChange(date, "paymentDate")}
                       dateFormat="yyyy-MM-dd"
@@ -531,6 +535,7 @@ const Page = () => {
                       <PiCalendarMinus className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10 text-[#111827]" />
                       <DatePicker
                         selected={formData.deliveryDate}
+                        minDate={today}
                         id="deliveryDate"
                         onChange={(date) =>
                           handleDateChange(date, "deliveryDate")
