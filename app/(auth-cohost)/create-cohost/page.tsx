@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Eye, EyeOff } from "lucide-react";
 import "react-phone-input-2/lib/style.css";
 import { useRouter } from "next-nprogress-bar";
@@ -33,29 +33,6 @@ const AddCoHost: React.FC = () => {
   });
 
   const router = useRouter();
-
-  useEffect(() => {
-    const eventDetails = localStorage.getItem("eventDetails");
-
-    if (!eventDetails) {
-      console.warn("No eventDetails found in localStorage.");
-      return;
-    }
-
-    try {
-      const parsedDetails = JSON.parse(eventDetails);
-      console.log("Parsed Event Details:", parsedDetails);
-
-      setFormData((prev) => ({
-        ...prev,
-        firstName: parsedDetails.data.hostFirstName || "",
-        lastName: parsedDetails.data.hostLastName || "",
-        email: parsedDetails.data.hostEmail || ""
-      }));
-    } catch (error) {
-      console.error("Error parsing eventDetails:", error);
-    }
-  }, []);
 
   // Validate input fields
   const validateInput = (name: string, value: string) => {
@@ -153,7 +130,7 @@ const AddCoHost: React.FC = () => {
               Create account to continue
             </h2>
 
-            <div className="grid md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-2 gap-4">
               <div className="mb-4">
                 <input
                   type="text"
