@@ -108,17 +108,17 @@ const Page = () => {
       setFormData((prev) => ({ ...prev, [field]: date }));
     }
 
-    const currentDate = new Date();
-    currentDate.setHours(0, 0, 0, 0);
+    // const currentDate = new Date();
+    // currentDate.setHours(0, 0, 0, 0);
 
-    if (formData.paymentDate < currentDate) {
-      setErrors((prev) => ({
-        ...prev,
-        paymentDate: "Payment date cannot be in the past"
-      }));
-      toast.error("Payment date cannot be in the past");
-      return;
-    }
+    // if (formData.paymentDate < currentDate) {
+    //   setErrors((prev) => ({
+    //     ...prev,
+    //     paymentDate: "Payment date cannot be in the past"
+    //   }));
+    //   toast.error("Payment date cannot be in the past");
+    //   return;
+    // }
   };
 
   const validateField = (id: string, value: any) => {
