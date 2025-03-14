@@ -176,26 +176,26 @@ const PageContent: React.FC = () => {
       setErrors((prev) => ({ ...prev, [field]: "This field is required." }));
     }
 
-    const currentDate = new Date();
-    currentDate.setSeconds(0, 0);
+    // const currentDate = new Date();
+    // currentDate.setSeconds(0, 0);
 
-    if (field === "eventDate" && date && date < currentDate) {
-      setErrors((prev) => ({
-        ...prev,
-        eventDate: "Event date cannot be in the past"
-      }));
-      toast.error("Event date cannot be in the past");
-      return;
-    }
+    // if (field === "eventDate" && date && date < currentDate) {
+    //   setErrors((prev) => ({
+    //     ...prev,
+    //     eventDate: "Event date cannot be in the past"
+    //   }));
+    //   toast.error("Event date cannot be in the past");
+    //   return;
+    // }
 
-    if (field === "eventTime" && date && date < currentDate) {
-      setErrors((prev) => ({
-        ...prev,
-        eventTime: "Event time cannot be in the past"
-      }));
-      toast.error("Event time cannot be in the past");
-      return;
-    }
+    // if (field === "eventTime" && date && date < currentDate) {
+    //   setErrors((prev) => ({
+    //     ...prev,
+    //     eventTime: "Event time cannot be in the past"
+    //   }));
+    //   toast.error("Event time cannot be in the past");
+    //   return;
+    // }
   };
 
   // API call triggered on clicking Continue
