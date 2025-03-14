@@ -1,9 +1,9 @@
 "use client";
 
 import React, { useState, useEffect, FormEvent } from "react";
-// import axiosInstance from "@/lib/axiosInstance";
+import axiosInstance from "@/lib/axiosInstance";
 import { ToastContainer } from "react-toastify";
-// import { toast } from "react-toastify";
+import { toast } from "react-toastify";
 import { BiLoaderCircle } from "react-icons/bi";
 import ReusuableSuccess from "@/components/modals/ReusuableSuccess";
 import RightBar from "@/components/Rightbar";
@@ -73,37 +73,37 @@ const Page = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!isFormValid) return;
-    setLoading(true);
-    setTimeout(() => {
-      setShowModal(true);
-    }, 3000);
-    // try {
-    //   setLoading(true);
-    //   const response = await axiosInstance.post("/add-cohost", {
-    //     firstName: formData.firstName.trim(),
-    //     lastName: formData.lastName.trim(),
-    //     email: formData.email.trim()
-    //   });
-    //   console.log("Response:", response.data);
+    // setLoading(true);
+    // setTimeout(() => {
     //   setShowModal(true);
-    // } catch (error: any) {
-    //   console.error("Error:", error);
-    //   if (error.isAxiosError && !error.response) {
-    //     toast.error("Network error. Please check your internet connection.");
-    //   } else if (error.response?.data?.errors) {
-    //     const serverErrors = error.response.data.errors;
-    //     Object.keys(serverErrors).forEach((key) => {
-    //       setErrors((prev) => ({ ...prev, [key]: serverErrors[key] }));
-    //     });
-    //     toast.error("Please fix the errors in the form.");
-    //   } else {
-    //     toast.error(
-    //       error.response?.data?.message || "An unexpected error occurred."
-    //     );
-    //   }
-    // } finally {
-    //   setLoading(false);
-    // }
+    // }, 3000);
+    try {
+      setLoading(true);
+      const response = await axiosInstance.post("/add-cohost", {
+        firstName: formData.firstName.trim(),
+        lastName: formData.lastName.trim(),
+        email: formData.email.trim()
+      });
+      console.log("Response:", response.data);
+      setShowModal(true);
+    } catch (error: any) {
+      console.error("Error:", error);
+      if (error.isAxiosError && !error.response) {
+        toast.error("Network error. Please check your internet connection.");
+      } else if (error.response?.data?.errors) {
+        const serverErrors = error.response.data.errors;
+        Object.keys(serverErrors).forEach((key) => {
+          setErrors((prev) => ({ ...prev, [key]: serverErrors[key] }));
+        });
+        toast.error("Please fix the errors in the form.");
+      } else {
+        toast.error(
+          error.response?.data?.message || "An unexpected error occurred."
+        );
+      }
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
