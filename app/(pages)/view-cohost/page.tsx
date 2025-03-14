@@ -17,7 +17,7 @@ const Page = () => {
   const router = useRouter();
 
   const handleAddNew = () => {
-    router.push("/create-cohost");
+    router.push("/add-cohost");
   };
 
   const handleContinue = () => {
