@@ -33,7 +33,8 @@ const Page = () => {
         } else {
           toast.error(response.data.message);
         }
-      } catch (error) {
+      } catch (error:any) {
+        console.log(error);
         toast.error("Failed to fetch co-hosts.");
       } finally {
         setLoading(false);
