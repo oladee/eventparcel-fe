@@ -73,16 +73,18 @@ const Page = () => {
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
     if (!isFormValid) return;
+    const eventID = localStorage.getItem("eventId");
     // setLoading(true);
     // setTimeout(() => {
     //   setShowModal(true);
     // }, 3000);
     try {
       setLoading(true);
-      const response = await axiosInstance.post("/add-cohost", {
+      const response = await axiosInstance.post("/add-cohost/", {
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
-        email: formData.email.trim()
+        email: formData.email.trim(),
+        eventId: eventID
       },
       {
         withCredentials: true // Ensure cookies are sent with the request
