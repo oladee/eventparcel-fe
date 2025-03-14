@@ -83,6 +83,9 @@ const Page = () => {
         firstName: formData.firstName.trim(),
         lastName: formData.lastName.trim(),
         email: formData.email.trim()
+      },
+      {
+        withCredentials: true // Ensure cookies are sent with the request
       });
       console.log("Response:", response.data);
       setShowModal(true);
