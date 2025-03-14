@@ -20,6 +20,10 @@ const Page = () => {
     router.push("/create-cohost");
   };
 
+  const handleContinue = () => {
+    router.push("/payment-delivery");
+  };
+
   useEffect(() => {
     const fetchCoHosts = async () => {
       try {
@@ -108,9 +112,10 @@ const Page = () => {
             </button>
             <button
               type="submit"
-              disabled={true}
+              onClick={handleContinue}
+              disabled={false}
               className={`bg-primary text-white py-3 px-8 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center font-extrabold font-manrope ${
-                true ? "opacity-50 cursor-not-allowed" : ""
+                false ? "opacity-50 cursor-not-allowed" : ""
               }`}
             >
               {false ? (
