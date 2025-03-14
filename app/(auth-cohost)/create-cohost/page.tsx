@@ -12,6 +12,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import PhoneNumberInput from "@/components/PhoneNumberInput";
 import { CheckCircle, XCircle } from "lucide-react";
 import Cookies from "js-cookie";
+import SocialSignup from "@/components/auth/SocialSignup";
 
 const AddCoHost: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -122,7 +123,10 @@ const AddCoHost: React.FC = () => {
               Enter the name and email address of your co-host
             </p>
           </div>
-          <form onSubmit={handleSubmit} className="max-w-md w-full bg-white p-4 rounded-[20px] mt-4">
+          <form
+            onSubmit={handleSubmit}
+            className="max-w-md w-full bg-white p-4 rounded-[20px] mt-4"
+          >
             <h2
               role="heading"
               className="text-xl font-bold mb-6 text-black-100"
@@ -272,6 +276,18 @@ const AddCoHost: React.FC = () => {
 
             <div className="text-center text-gray-500 text-sm mb-4">
               Or sign up with
+            </div>
+            <SocialSignup />
+
+            <div className="text-left text-sm text-gray-500 mt-6">
+              Already have an account?{" "}
+              <a
+                href="#"
+                className="text-primary font-bold"
+                onClick={() => router.push("/")}
+              >
+                Sign In
+              </a>
             </div>
           </form>
         </div>
