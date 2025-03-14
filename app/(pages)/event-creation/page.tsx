@@ -12,8 +12,8 @@ import FormButtons2 from "@/components/aboutEvent/FormButtons2";
 import EventSaveSuccess from "@/components/aboutEvent/EventSaveSuccess";
 import { toast, ToastContainer } from "react-toastify";
 import "react-datepicker/dist/react-datepicker.css";
-// import { useRouter } from "next/router";
-import { useSearchParams } from "next/navigation";
+import Cookies from "js-cookie";
+import { useRouter, useSearchParams } from "next/navigation";
 
 // Dynamically import LocationPickerModal with SSR disabled.
 const LocationPickerModal = dynamic(
@@ -47,6 +47,19 @@ interface Errors {
 
 const PageContent: React.FC = () => {
   // const router = useRouter();
+  const router = useRouter();
+
+  useEffect(() => {
+    const redirect = Cookies.get("redirectAfterLogin");
+    if (redirect === "co-host") {
+      const userConfirmed = window.confirm("Do you want to continue co-host creation?");
+      if (userConfirmed) {
+        router.push("/add-cohost");
+      } else {
+        Cookies.remove("redirectAfterLogin");
+      }
+    }
+  }, [router]);
   const searchParams = useSearchParams();
   const [showSuccess, setShowSuccess] = useState(false);
   const [showSuccess2, setShowSuccess2] = useState(false);
@@ -82,6 +95,9 @@ const PageContent: React.FC = () => {
     description: "",
     eventImage: ""
   });
+
+  
+
 
  // Check for token in URL using useSearchParams
  useEffect(() => {

@@ -33,7 +33,7 @@ const Page = () => {
         } else {
           toast.error(response.data.message);
         }
-      } catch (error:any) {
+      } catch (error: any) {
         console.log(error);
         toast.error("Failed to fetch co-hosts.");
       } finally {
@@ -72,6 +72,10 @@ const Page = () => {
           {loading ? (
             <div className="flex justify-center items-center">
               <BiLoaderCircle className="animate-spin" size={32} />
+            </div>
+          ) : coHosts.length === 0 ? (
+            <div className="text-center text-gray-500">
+              No co-hosts found. Please add a co-host.
             </div>
           ) : (
             <div className="grid md:grid-cols-2 gap-6">
@@ -148,6 +152,7 @@ export default Page;
 
 
 
+
 // "use client";
 
 // import RightBar from "@/components/Rightbar";
@@ -157,15 +162,43 @@ export default Page;
 
 // import "react-datepicker/dist/react-datepicker.css";
 // import Image from "next/image";
-// import { useState } from "react";
+// import { useState, useEffect } from "react";
 // import { useRouter } from "next/navigation";
 
 // const Page = () => {
 //   const [isRightBarOpen, setIsRightBarOpen] = useState(false);
-// const router = useRouter()
-// const handleAddNew =()=>{
-//     router.push("/create-cohost")
-// }
+//   const [coHosts, setCoHosts] = useState([]);
+//   const [loading, setLoading] = useState(true);
+//   const router = useRouter();
+
+//   const handleAddNew = () => {
+//     router.push("/create-cohost");
+//   };
+
+//   const handleContinue = () => {
+//     router.push("/payment-delivery");
+//   };
+
+//   useEffect(() => {
+//     const fetchCoHosts = async () => {
+//       try {
+//         const response = await axiosInstance.get("/view-cohosts");
+//         if (response.data.success) {
+//           setCoHosts(response.data.data);
+//         } else {
+//           toast.error(response.data.message);
+//         }
+//       } catch (error:any) {
+//         console.log(error);
+//         toast.error("Failed to fetch co-hosts.");
+//       } finally {
+//         setLoading(false);
+//       }
+//     };
+
+//     fetchCoHosts();
+//   }, []);
+
 //   return (
 //     <>
 //       <ToastContainer />
@@ -191,38 +224,38 @@ export default Page;
 //             </p>
 //           </div>
 
-//           <div className="grid md:grid-cols-2 gap-6">
-//             <div className="flex items-center space-x-4 bg-white rounded-[12px] p-4">
-//               {/* Avatar */}
-//               <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[#C4C4C466] text-gray-800 font-bold text-base">
-//                 JP
-//               </div>
-//               {/* Name & Email */}
-//               <div>
-//                 <h2 className="text-sm font-semibold text-[#101828]">
-//                   James Paul-smith
-//                 </h2>
-//                 <p className="text-sm text-[#667085]">jamesolawale@gmail.com</p>
-//               </div>
+//           {loading ? (
+//             <div className="flex justify-center items-center">
+//               <BiLoaderCircle className="animate-spin" size={32} />
 //             </div>
-//             <div className="flex items-center space-x-4 bg-white rounded-[12px] p-4">
-//               {/* Avatar */}
-//               <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[#C4C4C466] text-gray-800 font-bold text-base">
-//                 JP
-//               </div>
-//               {/* Name & Email */}
-//               <div>
-//                 <h2 className="text-sm font-semibold text-[#101828]">
-//                   James Paul-smith
-//                 </h2>
-//                 <p className="text-sm text-[#667085]">jamesolawale@gmail.com</p>
-//               </div>
+//           ) : (
+//             <div className="grid md:grid-cols-2 gap-6">
+//               {coHosts.map((coHost: any) => (
+//                 <div
+//                   key={coHost._id}
+//                   className="flex items-center space-x-4 bg-white rounded-[12px] p-4"
+//                 >
+//                   {/* Avatar */}
+//                   <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[#C4C4C466] text-gray-800 font-bold text-base">
+//                     {coHost.firstName[0]}
+//                     {coHost.lastName[0]}
+//                   </div>
+//                   {/* Name & Email */}
+//                   <div>
+//                     <h2 className="text-sm font-semibold text-[#101828]">
+//                       {coHost.firstName} {coHost.lastName}
+//                     </h2>
+//                     <p className="text-sm text-[#667085]">{coHost.email}</p>
+//                   </div>
+//                 </div>
+//               ))}
 //             </div>
-//           </div>
+//           )}
 
 //           <div
-//           onClick={handleAddNew}
-//            className="border-2 mt-6 border-dashed border-gray-300 rounded-[20px] flex flex-col items-center justify-center py-6  cursor-pointer hover:bg-gray-50 ">
+//             onClick={handleAddNew}
+//             className="border-2 mt-6 border-dashed border-gray-300 rounded-[20px] flex flex-col items-center justify-center py-6 cursor-pointer hover:bg-gray-50"
+//           >
 //             <Image src="/images/plus.png" alt="plus" width={32} height={32} />
 //             <span className="text-primary text-sm md:text-base">Add New</span>
 //           </div>
@@ -235,9 +268,10 @@ export default Page;
 //             </button>
 //             <button
 //               type="submit"
-//               disabled={true}
+//               onClick={handleContinue}
+//               disabled={false}
 //               className={`bg-primary text-white py-3 px-8 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center font-extrabold font-manrope ${
-//                 true ? "opacity-50 cursor-not-allowed" : ""
+//                 false ? "opacity-50 cursor-not-allowed" : ""
 //               }`}
 //             >
 //               {false ? (
@@ -256,5 +290,3 @@ export default Page;
 // };
 
 // export default Page;
-
-

@@ -2,6 +2,7 @@ import React from "react";
 import { Checked } from "../components/icons/Icons";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import Cookies from "js-cookie"
 
 const EventSuccess: React.FC = () => {
   const router = useRouter();
@@ -11,11 +12,14 @@ const EventSuccess: React.FC = () => {
     if (authToken) {
       router.push("/add-cohost");
     } else {
-      
+      // before routing to "/", we need to save the current page (to cookies) and it should expire in 5 minutes
+      Cookies.set("redirectAfterLogin", "co-host", { expires: 1 / 288 });
       router.push("/");
-  
     }
   };
+
+  console.log(window.location.pathname);
+  
   return (
     <div className="fixed p-4 w-screen inset-0  overflow-y-auto  bg-[#00000098] h-screen left-0 top-0 z-30 flex items-center justify-center md:justify-center px-2">
       <div className="bg-white p-6 rounded-[24px] w-full  max-w-md grid place-items-center text-center gap-4">
