@@ -11,7 +11,9 @@ const EventSuccess: React.FC = () => {
     if (authToken) {
       router.push("/add-cohost");
     } else {
+      
       router.push("/");
+  
     }
   };
   return (

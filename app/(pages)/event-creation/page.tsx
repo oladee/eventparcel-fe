@@ -220,6 +220,7 @@ const PageContent: React.FC = () => {
       }
 
       const response = await axiosInstance.post("/add-event", submissionData, {
+        withCredentials: true, // Ensure cookies are sent with the request
         headers: {
           "Content-Type": "multipart/form-data"
         }
@@ -273,7 +274,8 @@ const PageContent: React.FC = () => {
         submissionData.append("eventImgUrl", formData.eventImage);
       }
 
-      const response = await axiosInstance.post("/add-event", submissionData, {
+      const response = await axiosInstance.post("/add-event", submissionData,  {
+        withCredentials: true, // Ensure cookies are sent with the request
         headers: {
           "Content-Type": "multipart/form-data"
         }
