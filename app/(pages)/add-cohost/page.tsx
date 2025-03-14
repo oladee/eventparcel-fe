@@ -239,7 +239,7 @@ const Page = () => {
                     true ? "opacity-50 cursor-not-allowed" : ""
                   }`}
                 >
-                  {loading ? (
+                  {false ? (
                     <BiLoaderCircle className="animate-spin mr-2" size={22} />
                   ) : (
                     "Continue"
