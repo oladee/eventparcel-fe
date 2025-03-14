@@ -21,7 +21,7 @@ const Page = () => {
   };
 
   const handleContinue = () => {
-    router.push("/payment-delivery");
+    router.push("/new-group");
   };
 
   useEffect(() => {
