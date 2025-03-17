@@ -101,6 +101,18 @@ export const Done: React.FC<LogoProps> = ({ width, height }) => {
   );
 };
 
+export const Logo2: React.FC<LogoProps> = ({ width, height }) => {
+  return (
+    <Image
+      src="/images/logo2.png" // Path relative to the public folder
+      alt="logo"
+      width={width}
+      height={height}
+      priority // Use this prop if the image is critical (e.g., logo)
+    />
+  );
+};
+
 export const Doc: React.FC<LogoProps> = ({ width, height }) => {
   return (
     <Image

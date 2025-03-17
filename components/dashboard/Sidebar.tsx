@@ -11,6 +11,7 @@ import {
   FiHelpCircle,
   FiSettings
 } from "react-icons/fi";
+import { Logo2 } from "../icons/Icons";
 
 interface SidebarProps {
   isOpen: boolean;
@@ -50,7 +51,10 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
     >
       <div className="p-6 h-full flex flex-col">
         {/* Logo / Title */}
-        <h1 className="text-2xl font-bold mb-6">Event Parcel</h1>
+        <div className="flex items-center justify-center space-x-3 mb-6">
+          <Logo2 width={40} height={40} />
+          <h1 className="text-2xl font-bold hidden md:block">Event Parcel</h1>
+        </div>
 
         {/* MENU Section */}
         <div className="mb-4">
@@ -59,18 +63,18 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
           </p>
           <nav className="space-y-2">
             <a
-            onClick={() => handleNavigation("/dashboard")}
-            className={`slide_nav  ${linkClass("/dashboard")}`}
-            //  className="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded"
-             >
+              onClick={() => handleNavigation("/dashboard")}
+              className={`slide_nav  ${linkClass("/dashboard")}`}
+              //  className="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded"
+            >
               <FiHome className="w-5 h-5" />
               <span>Dashboard</span>
             </a>
 
-            <a 
-             onClick={() => handleNavigation("/dashboard/events")}
-             className={`slide_nav  ${linkClass("/dashboard/events")}`}
-            // className="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded"
+            <a
+              onClick={() => handleNavigation("/dashboard/events")}
+              className={`slide_nav  ${linkClass("/dashboard/events")}`}
+              // className="flex items-center space-x-3 p-2 hover:bg-gray-100 rounded"
             >
               <FiCalendar className="w-5 h-5" />
               <span>Events</span>
