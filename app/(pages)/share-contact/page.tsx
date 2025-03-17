@@ -10,6 +10,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ReusuableSuccess from "@/components/modals/ReusuableSuccess";
+import HeaderLayout from "@/components/layout/HeaderLayout";
 
 // Types
 type Contact = {
@@ -182,7 +183,7 @@ const Page: React.FC = () => {
   }, [filteredContacts, selectedTab]);
 
   return (
-    <>
+    <HeaderLayout>
       {showModal && (
         <ReusuableSuccess
           title="Nicely done,you're almost there"
@@ -267,14 +268,13 @@ const Page: React.FC = () => {
             {/* <h2 className="text-xl font-bold mb-4">Select Contacts</h2> */}
             <div className="border-b pb-3">
               <h2
-              id="importContactHeader"
-               className="text-lg lg:text-xl font-bold text-[#111827]">
+                id="importContactHeader"
+                className="text-lg lg:text-xl font-bold text-[#111827]"
+              >
                 Import From Contact List
               </h2>
 
-              <p
-              id="importContactDesc"
-               className="text-sm text-[#718096] mt-2">
+              <p id="importContactDesc" className="text-sm text-[#718096] mt-2">
                 Select the contacts you’d like to invite for the event
               </p>
             </div>
@@ -307,11 +307,38 @@ const Page: React.FC = () => {
         </div>
       )}
       <ToastContainer />
-    </>
+    </HeaderLayout>
   );
 };
 
 export default Page;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // "use client";
 

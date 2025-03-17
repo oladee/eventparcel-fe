@@ -12,6 +12,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import PhoneNumberInput from "@/components/PhoneNumberInput";
 import { CheckCircle, XCircle } from "lucide-react";
 import Cookies from "js-cookie"
+import HeaderLayout from "@/components/layout/HeaderLayout";
 
 const Signup: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -129,7 +130,7 @@ const Signup: React.FC = () => {
     Object.values(errors).every((err) => err === "");
 
   return (
-    <>
+    <HeaderLayout>
       <main
         role="main"
         className="mt-12 md:mt-0 grid lg:grid-cols-2 min-h-screen"
@@ -305,7 +306,7 @@ const Signup: React.FC = () => {
         <AuthLeft />
       </main>
       <ToastContainer role="alert" />
-    </>
+    </HeaderLayout>
   );
 };
 

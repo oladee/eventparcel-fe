@@ -9,6 +9,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import HeaderLayout from "@/components/layout/HeaderLayout";
 
 const Page = () => {
   const [isRightBarOpen, setIsRightBarOpen] = useState(false);
@@ -45,7 +46,7 @@ const Page = () => {
   }, []);
 
   return (
-    <>
+    <HeaderLayout>
       <ToastContainer />
       <section className="bg-[#F9FAFB] !overflow-hidden relative">
         <div className="py-20 lg:py-24 px-3 sm:px-4 mx-auto max-w-screen-md h-screen overflow-y-auto no-scrollbar">
@@ -134,11 +135,22 @@ const Page = () => {
           <RightBar isOpen={isRightBarOpen} setIsOpen={setIsRightBarOpen} />
         </div>
       </section>
-    </>
+    </HeaderLayout>
   );
 };
 
 export default Page;
+
+
+
+
+
+
+
+
+
+
+
 
 
 

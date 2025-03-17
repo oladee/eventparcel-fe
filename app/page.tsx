@@ -1,10 +1,13 @@
 import React from "react";
 import Login from "./(auth)/Login";
+import HeaderLayout from "@/components/layout/HeaderLayout";
 
 const Home = () => {
-  return <div className="">
-    <Login />
-  </div>;
+  return (
+    <HeaderLayout>
+      <Login />
+    </HeaderLayout>
+  );
 };
 
 export default Home;

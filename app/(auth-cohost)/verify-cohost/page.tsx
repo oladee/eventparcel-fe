@@ -11,6 +11,7 @@ import axios from "axios";
 import { z } from "zod";
 import Success from "@/components/auth/Success";
 import Cookies from "js-cookie";
+import HeaderLayout from "@/components/layout/HeaderLayout";
 
 const otpSchema = z
   .array(z.string().length(1, "Each digit must be 1 character"))
@@ -151,7 +152,7 @@ const Verification = () => {
     }
   };
   return (
-    <>
+    <HeaderLayout>
       <ToastContainer role="alert" />
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#F9FAFB] px-4">
         <div className="max-w-md w-full space-y-2 ">
@@ -254,7 +255,7 @@ const Verification = () => {
 
         {onSuccess && <Success />}
       </div>
-    </>
+    </HeaderLayout>
   );
 };
 

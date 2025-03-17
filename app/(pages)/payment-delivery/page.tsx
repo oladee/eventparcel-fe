@@ -15,6 +15,7 @@ import { FormEvent } from "react";
 // import TimeZoneDropdown from "@/components/TimeZoneDropdown";
 import { PiCalendarMinus } from "react-icons/pi";
 import { AiOutlineClockCircle } from "react-icons/ai";
+import HeaderLayout from "@/components/layout/HeaderLayout";
 
 const LocationPickerModal = dynamic(
   () => import("@/components/aboutEvent/LocationPickerModal"),
@@ -230,7 +231,7 @@ const Page = () => {
   const today = new Date();
 
   return (
-    <>
+    <HeaderLayout>
       <ToastContainer />
       {showMapPickerModal && (
         <LocationPickerModal
@@ -628,7 +629,7 @@ const Page = () => {
           buttonText="continue"
         />
       )}
-    </>
+    </HeaderLayout>
   );
 };
 

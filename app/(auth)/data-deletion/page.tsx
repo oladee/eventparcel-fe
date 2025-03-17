@@ -1,7 +1,9 @@
+import HeaderLayout from "@/components/layout/HeaderLayout";
 import React from "react";
 
 const DataDeletionPolicy = () => {
   return (
+    <HeaderLayout>
     <div className="p-8 max-w-3xl mx-auto leading-relaxed font-sans mt-12">
       <h1 className="text-3xl font-bold mb-4">Data Deletion Policy</h1>
       <p className="mb-4"><strong>Effective Date:</strong> January 1, 2025</p>
@@ -49,6 +51,7 @@ const DataDeletionPolicy = () => {
         If you have any questions or concerns about our Data Deletion Policy or need further assistance, please contact us at: <a href="mailto:your-email@example.com" className="text-blue-500 underline">your-email@example.com</a>
       </p>
     </div>
+    </HeaderLayout>
   );
 };
 

@@ -1,8 +1,10 @@
+import HeaderLayout from "@/components/layout/HeaderLayout"
+
 const ResetPass = () => {
   return (
-    <div>
+    <HeaderLayout>
       Reset
-    </div>
+    </HeaderLayout>
   )
 }
 export default ResetPass

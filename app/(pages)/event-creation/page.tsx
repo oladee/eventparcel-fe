@@ -14,6 +14,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-datepicker/dist/react-datepicker.css";
 import Cookies from "js-cookie";
 import { useRouter, useSearchParams } from "next/navigation";
+import HeaderLayout from "@/components/layout/HeaderLayout";
 
 // Dynamically import LocationPickerModal with SSR disabled.
 const LocationPickerModal = dynamic(
@@ -374,7 +375,7 @@ const PageContent: React.FC = () => {
     Object.values(errors).every((err) => err === "");
 
   return (
-    <>
+    <HeaderLayout>
       {showImagePickerModal && (
         <ImagePickerModal
           onSelectGallery={handleSelectGallery}
@@ -432,7 +433,7 @@ const PageContent: React.FC = () => {
         />
       </section>
       <ToastContainer />
-    </>
+    </HeaderLayout>
   );
 };
 

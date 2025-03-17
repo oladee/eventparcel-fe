@@ -7,6 +7,7 @@ import { toast } from "react-toastify";
 import { BiLoaderCircle } from "react-icons/bi";
 import ReusuableSuccess from "@/components/modals/ReusuableSuccess";
 import RightBar from "@/components/Rightbar";
+import HeaderLayout from "@/components/layout/HeaderLayout";
 
 const Page = () => {
   const [isRightBarOpen, setIsRightBarOpen] = useState(false);
@@ -112,7 +113,7 @@ const Page = () => {
   };
 
   return (
-    <>
+    <HeaderLayout>
       <ToastContainer />
       <section className="bg-[#F9FAFB] !overflow-hidden relative">
         <div className="py-20 lg:py-24 px-3 sm:px-4 mx-auto max-w-screen-md h-screen overflow-y-auto no-scrollbar">
@@ -262,7 +263,7 @@ const Page = () => {
           buttonText="Continue"
         />
       )}
-    </>
+    </HeaderLayout>
   );
 };
 

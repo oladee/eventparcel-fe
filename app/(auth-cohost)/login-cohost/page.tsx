@@ -10,6 +10,7 @@ import { BiLoaderCircle } from "react-icons/bi";
 import axiosInstance from "@/lib/axiosInstance";
 import SocialSignup from "@/components/auth/SocialSignup";
 import AuthLeft from "@/components/auth/AuthLeft";
+import HeaderLayout from "@/components/layout/HeaderLayout";
 
 const Page: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -102,7 +103,7 @@ const Page: React.FC = () => {
     email && password && Object.values(errors).every((err) => err === "");
 
   return (
-    <>
+    <HeaderLayout>
       <main
         className="grid lg:grid-cols-2 min-h-screen mt-8 md:mt-4 lg:mt-0"
         role="main"
@@ -245,7 +246,7 @@ const Page: React.FC = () => {
 
       {/* Toast Notifications */}
       <ToastContainer aria-live="polite" />
-    </>
+    </HeaderLayout>
   );
 };
 

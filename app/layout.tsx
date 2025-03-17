@@ -2,7 +2,6 @@ import type { Metadata } from "next";
 import "./globals.css";
 import { Toaster } from "react-hot-toast";
 import ProgressBarProvider from "@/components/ProgressBarProvider";
-import Header from "@/components/Header";
 import { Open_Sans } from "next/font/google";
 
 
@@ -26,7 +25,6 @@ export default function RootLayout({
   return (
     <html lang="en" className={openSans.variable}>
       <body className="w-full max-w-full">
-        <Header />
         <ProgressBarProvider>{children}</ProgressBarProvider>
         <Toaster position="top-right" />
       </body>
