@@ -4,7 +4,7 @@ import React from 'react'
 const Page = () => {
   return (
    <Container>
-    <div className="">Dashboard is coming soon</div>
+    <div className="w-full h-full flex items-center justify-center">Dashboard is coming soon</div>
    </Container>
   )
 }
