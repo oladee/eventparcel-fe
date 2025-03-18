@@ -1,12 +1,17 @@
-import Container from "@/components/dashboard/Container";
 import React from "react";
+import Container from "@/components/dashboard/Container";
+// import PackagesSection from "@/components/dashboard/eventComponents/PackagesSection";
+import EventDetailsSection from "@/components/dashboard/eventComponents/EventDetailsSection";
 
-const Page = () => {
+const Page: React.FC = () => {
+
   return (
     <Container>
-      <div className="w-full h-full flex items-center justify-center">
-        Events Page is Coming soon
-      </div>
+      {/* Top Banner Section */}
+      <EventDetailsSection />
+
+      {/* Packages Section (Separate Component) */}
+      {/* <PackagesSection /> */}
     </Container>
   );
 };

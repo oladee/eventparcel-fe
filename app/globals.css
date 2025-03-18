@@ -163,46 +163,6 @@ input[type="number"] {
   color: #ffff !important;
 }
 
-
-
-
-
-
-
-/* .custom-datepicker {
-  background-color: #751423 !important;
-  border: none;
-  color: white;
-}
-
-.custom-datepicker .react-datepicker__header {
-  background-color: #751423 !important;
-  color: white !important;
-}
-
-.custom-datepicker .react-datepicker__day--selected {
-  background-color: white !important;
-  color: #751423 !important;
-}
-
-.custom-datepicker .react-datepicker__day:hover {
-  background-color: #ffcccc !important;
-} */
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 /* Custom DatePicker Modal Styles */
 .react-datepicker {
   border: 2px solid #751423 !important;
@@ -273,6 +233,42 @@ input[type="number"] {
   background: #751423; /* Darker red on hover */
 }
 
+
+/* Custom Scrollbar for the dropdown */
+.custom-scrollbar::-webkit-scrollbar {
+  width: 8px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #dee5ff;
+  /* background: #111D63; */
+  border-radius: 10px;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background-color: #751423;
+  /* background-color: #DEE5FF; */
+  border-radius: 10px;
+  border: 2px solid #751423;
+}
+
+.custom-scrollbar::-webkit-scrollbar-thumb:hover {
+  background-color: var(--tw-bg-opacity, 1) var(--tw-bg-primary);
+}
+
+.truncate-text {
+  display: -webkit-box;
+  -webkit-line-clamp: 3; /* Default to 3 lines */
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+@media (min-width: 768px) {
+  .truncate-text {
+    -webkit-line-clamp: 2; /* Truncate to 2 lines on desktop */
+  }
+}
 
 
 
