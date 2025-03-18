@@ -4,7 +4,7 @@ import React from "react";
 const page = () => {
   return (
     <Container>
-      <div className="w-full h-[2063px] flex items-center justify-center">
+      <div className="w-full h-full flex items-center justify-center">
         Events Page is Coming soon
       </div>
     </Container>
