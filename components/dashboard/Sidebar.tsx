@@ -51,9 +51,9 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
     >
       <div className="p-6 h-full flex flex-col">
         {/* Logo / Title */}
-        <div className="flex items-center justify-center space-x-3 mb-6">
+        <div className="flex items-center space-x-3 mb-6">
           <Logo2 width={40} height={40} />
-          <h1 className="text-2xl font-bold hidden md:block">Event Parcel</h1>
+          <h1 className="text-base md:text-2xl font-bold">Event Parcel</h1>
         </div>
 
         {/* MENU Section */}
@@ -145,6 +145,13 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
     </aside>
   );
 };
+
+
+
+
+
+
+
 
 // import { FiX, FiHome, FiCalendar, FiShoppingBag, FiUsers, FiTruck, FiCreditCard, FiHelpCircle } from "react-icons/fi";
 

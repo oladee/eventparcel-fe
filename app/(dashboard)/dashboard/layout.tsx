@@ -21,7 +21,7 @@ function Layout({ children }: { children: React.ReactNode }) {
           <HeaderDashboard toggleSidebar={toggleSidebar} />
 
           {/* Main dashboard content */}
-          <main className="p-2 sm:p-3 lg:p-6">{children}</main>
+          <main className="p-2 sm:p-3 lg:p-6 !pt-16">{children}</main>
         </div>
       </AppWrapper>
     </div>

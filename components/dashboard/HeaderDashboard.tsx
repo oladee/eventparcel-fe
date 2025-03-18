@@ -8,7 +8,7 @@ interface HeaderProps {
 
 const HeaderDashboard: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   return (
-    <header className="flex items-center justify-between bg-white h-16 px-4 shadow">
+    <header className="fixed top-0 left-0 right-0 md:pl-64 z-10 flex items-center justify-between bg-white h-16 px-4 ">
       {/* Left side: Hamburger + Greeting */}
       <div className="flex items-center space-x-4">
         {/* Hamburger (mobile only) */}

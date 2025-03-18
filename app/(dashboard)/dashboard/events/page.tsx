@@ -1,11 +1,14 @@
-import React from 'react'
+import Container from "@/components/dashboard/Container";
+import React from "react";
 
 const page = () => {
   return (
-    <div className='w-full mt-[200px] flex items-center justify-center'>
-      Events Page is Coming soon
-    </div>
-  )
-}
+    <Container>
+      <div className="w-full h-[2063px] flex items-center justify-center">
+        Events Page is Coming soon
+      </div>
+    </Container>
+  );
+};
 
-export default page
+export default page;
