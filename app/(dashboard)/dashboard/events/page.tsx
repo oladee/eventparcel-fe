@@ -1,7 +1,7 @@
 import Container from "@/components/dashboard/Container";
 import React from "react";
 
-const page = () => {
+const Page = () => {
   return (
     <Container>
       <div className="w-full h-full flex items-center justify-center">
@@ -11,4 +11,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;
