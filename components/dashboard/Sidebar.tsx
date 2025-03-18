@@ -49,7 +49,7 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, setIsOpen }) => {
         ease-in-out
       `}
     >
-      <div className="p-6 h-full flex flex-col">
+      <div className="p-6 h-max flex flex-col">
         {/* Logo / Title */}
         <div className="flex items-center space-x-3 mb-6">
           <Logo2 width={40} height={40} />
