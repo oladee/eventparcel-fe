@@ -61,7 +61,7 @@ const PageContent: React.FC = () => {
       // Consume the profile endpoint
       const fetchUserProfile = async () => {
         try {
-          const response = await axiosInstance.post("/profile", {
+          const response = await axiosInstance.post("/profile-details", {
             token: authToken
           });
           // Save the response to localStorage as the logged-in user
