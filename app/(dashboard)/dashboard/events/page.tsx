@@ -31,9 +31,9 @@ const Page: React.FC = () => {
           } else {
             setError("Failed to fetch event data.");
           }
-        } catch (err) {
-          console.error("Error fetching event:", err);
-          setError("Error fetching event data.");
+        } catch (error:any) {
+          console.error("Error fetching event:", error);
+          setError(error.response?.data?.message);
         } finally {
           setLoading(false);
         }
