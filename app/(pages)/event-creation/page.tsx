@@ -158,7 +158,67 @@ const PageContent: React.FC = () => {
     setErrors({ ...errors, [e.target.id]: "" });
   };
 
+  // const validateField = (id: string, value: any): string => {
+  //   if (id === "eventDate" || id === "eventTime") {
+  //     if (!(value instanceof Date) || isNaN(value.getTime())) {
+  //       return "This field is required.";
+  //     }
+  //   } else if (id === "numberOfGroups") {
+  //     // Check that the input is a number and within 1 to 99
+  //     if (!value.trim() || isNaN(Number(value))) {
+  //       return "Enter a valid number.";
+  //     }
+  //     const numValue = Number(value);
+  //     if (numValue < 1 || numValue > 99) {
+  //       return "Number must be between 1 and 99.";
+  //     }
+  //   } else if (
+  //     id !== "description" &&
+  //     (typeof value !== "string" || !value.trim())
+  //   ) {
+  //     return "This field is required.";
+  //   } else if (
+  //     id !== "description" &&
+  //     (typeof value !== "string" || !value.trim())
+  //   ) {
+  //     return "This field is required.";
+  //   }
+  //   if (
+  //     id === "email" &&
+  //     !/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(value)
+  //   ) {
+  //     return "Enter a valid email address.";
+  //   }
+  //   if (
+  //     (id === "firstName" || id === "lastName") &&
+  //     /[^a-zA-Z\s]/.test(value)
+  //   ) {
+  //     return "Name cannot include numbers or special characters.";
+  //   }
+  //   if (id === "description" && value.trim() && value.length < 5) {
+  //     return "Description must be at least 5 characters.";
+  //   }
+  //   if (id === "description" && value.length > 300) {
+  //     return "Description must have a maximum of 300 characters.";
+  //   }
+  //   if (id === "eventName" && value.length < 5) {
+  //     return "Event name must be at least 5 characters.";
+  //   }
+  //   if (id === "eventName" && value.length > 60) {
+  //     return "Event name must not exceed 60 characters.";
+  //   }
+  //   return "";
+  // };
+
+
+
+
   const validateField = (id: string, value: any): string => {
+    // Skip personal details validations if user is authenticated
+    if (isAuthenticated && (id === "firstName" || id === "lastName" || id === "email")) {
+      return "";
+    }
+  
     if (id === "eventDate" || id === "eventTime") {
       if (!(value instanceof Date) || isNaN(value.getTime())) {
         return "This field is required.";
@@ -177,38 +237,42 @@ const PageContent: React.FC = () => {
       (typeof value !== "string" || !value.trim())
     ) {
       return "This field is required.";
-    } else if (
-      id !== "description" &&
-      (typeof value !== "string" || !value.trim())
-    ) {
-      return "This field is required.";
     }
-    if (
-      id === "email" &&
-      !/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(value)
+    
+    if (id === "email" &&
+        !/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(value)
     ) {
       return "Enter a valid email address.";
     }
+    
     if (
       (id === "firstName" || id === "lastName") &&
       /[^a-zA-Z\s]/.test(value)
     ) {
       return "Name cannot include numbers or special characters.";
     }
+    
     if (id === "description" && value.trim() && value.length < 5) {
       return "Description must be at least 5 characters.";
     }
+    
     if (id === "description" && value.length > 300) {
       return "Description must have a maximum of 300 characters.";
     }
+    
     if (id === "eventName" && value.length < 5) {
       return "Event name must be at least 5 characters.";
     }
+    
     if (id === "eventName" && value.length > 60) {
       return "Event name must not exceed 60 characters.";
     }
+    
     return "";
   };
+  
+
+
 
   const handleBlur = (
     e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -427,6 +491,7 @@ const PageContent: React.FC = () => {
       (formData.firstName && formData.lastName && formData.email)) &&
     formData.location &&
     formData.eventName &&
+    formData.numberOfGroups &&
     formData.eventTime &&
     Object.values(errors).every((err) => err === "");
 
