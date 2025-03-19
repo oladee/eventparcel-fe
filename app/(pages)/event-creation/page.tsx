@@ -1,6 +1,6 @@
 "use client";
 
-import {Suspense, useState, useRef, useEffect } from "react";
+import { Suspense, useState, useRef, useEffect } from "react";
 import EventSuccess from "@/components/EventSuccess";
 import ImagePickerModal from "@/components/aboutEvent/ImagePickerModal";
 import EventHeader from "@/components/aboutEvent/EventHeader";
@@ -53,7 +53,9 @@ const PageContent: React.FC = () => {
   useEffect(() => {
     const redirect = Cookies.get("redirectAfterLogin");
     if (redirect === "co-host") {
-      const userConfirmed = window.confirm("Do you want to continue co-host creation?");
+      const userConfirmed = window.confirm(
+        "Do you want to continue co-host creation?"
+      );
       if (userConfirmed) {
         router.push("/add-cohost");
       } else {
@@ -97,18 +99,23 @@ const PageContent: React.FC = () => {
     eventImage: ""
   });
 
-  
+  const [isAuthenticated, setIsAuthenticated] = useState(false);
 
+  useEffect(() => {
+    // Check for authToken in localStorage
+    const authToken = localStorage.getItem("authToken");
+    setIsAuthenticated(!!authToken); // Set to true if authToken exists, false otherwise
+  }, []);
 
- // Check for token in URL using useSearchParams
- useEffect(() => {
-  if (typeof window !== "undefined") {
-    const token = searchParams.get("token");
-    if (token) {
-      localStorage.setItem("authToken", token);
+  // Check for token in URL using useSearchParams
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const token = searchParams.get("token");
+      if (token) {
+        localStorage.setItem("authToken", token);
+      }
     }
-  }
-}, [searchParams]);
+  }, [searchParams]);
 
   // Handlers for input changes and validations
   const handleChange = (
@@ -123,7 +130,10 @@ const PageContent: React.FC = () => {
       if (!(value instanceof Date) || isNaN(value.getTime())) {
         return "This field is required.";
       }
-    } else if (id !== "description" && (typeof value !== "string" || !value.trim())) {
+    } else if (
+      id !== "description" &&
+      (typeof value !== "string" || !value.trim())
+    ) {
       return "This field is required.";
     }
     if (
@@ -132,7 +142,10 @@ const PageContent: React.FC = () => {
     ) {
       return "Enter a valid email address.";
     }
-    if ((id === "firstName" || id === "lastName") && /[^a-zA-Z\s]/.test(value)) {
+    if (
+      (id === "firstName" || id === "lastName") &&
+      /[^a-zA-Z\s]/.test(value)
+    ) {
       return "Name cannot include numbers or special characters.";
     }
     if (id === "description" && value.trim() && value.length < 5) {
@@ -220,7 +233,10 @@ const PageContent: React.FC = () => {
       const submissionData = new FormData();
       submissionData.append("eventName", formData.eventName);
       submissionData.append("eventDescription", formData.description);
-      submissionData.append("date", formData.eventDate?.toISOString().split("T")[0] || "");
+      submissionData.append(
+        "date",
+        formData.eventDate?.toISOString().split("T")[0] || ""
+      );
 
       // Convert eventTime if needed
       const formattedTime = formData.eventTime
@@ -275,7 +291,10 @@ const PageContent: React.FC = () => {
       const submissionData = new FormData();
       submissionData.append("eventName", formData.eventName);
       submissionData.append("eventDescription", formData.description);
-      submissionData.append("date", formData.eventDate?.toISOString().split("T")[0] || "");
+      submissionData.append(
+        "date",
+        formData.eventDate?.toISOString().split("T")[0] || ""
+      );
 
       // Convert eventTime if needed
       const formattedTime = formData.eventTime
@@ -291,7 +310,7 @@ const PageContent: React.FC = () => {
         submissionData.append("eventImgUrl", formData.eventImage);
       }
 
-      const response = await axiosInstance.post("/add-event", submissionData,  {
+      const response = await axiosInstance.post("/add-event", submissionData, {
         withCredentials: true, // Ensure cookies are sent with the request
         headers: {
           "Content-Type": "multipart/form-data"
@@ -416,12 +435,15 @@ const PageContent: React.FC = () => {
               handleFileChange={handleFileChange}
               handleMapLocationSelect={handleMapLocationSelect}
             />
-            <PersonalDetails
-              formData={formData}
-              errors={errors}
-              handleChange={handleChange}
-              handleBlur={handleBlur}
-            />
+            {/* Conditionally render PersonalDetails */}
+            {!isAuthenticated && (
+              <PersonalDetails
+                formData={formData}
+                errors={errors}
+                handleChange={handleChange}
+                handleBlur={handleBlur}
+              />
+            )}
           </form>
         </div>
         <FormButtons2
@@ -444,22 +466,6 @@ export default function Page() {
     </Suspense>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 

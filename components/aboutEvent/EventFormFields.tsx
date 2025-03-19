@@ -198,26 +198,30 @@ const EventFormFields: React.FC<EventFormFieldsProps> = ({
           )}
         </div>
       </div>
-         {/*  How many groups do you have */}
-         <div>
+      {/*  How many groups do you have */}
+      <div>
         <label
+          id="totalGroupsLabel"
           htmlFor="eventName"
-          className="block mb-2 font-semibold text-[#111827]"
+          className="block font-semibold text-[#111827]"
         >
           How many groups do you have
         </label>
+        <p id="totalGroups" className="text-sm text-[#718096] mb-3 font-medium">
+          Add your bank account details and payment deadline
+        </p>
         <input
           type="text"
           id="eventName"
-          value={formData.eventName}
+          value={formData.totalGroups}
           onChange={handleChange}
           onBlur={handleBlur}
           className="input-field outline-primary w-full p-2 rounded-[5px] bg-slate-50"
-          placeholder="Enter event name"
+          placeholder="Enter number of groups"
           required
         />
         {errors.eventName && (
-          <p className="text-red-500 text-sm mt-1">{errors.eventName}</p>
+          <p className="text-red-500 text-sm mt-1">{errors.totalGroups}</p>
         )}
       </div>
     </>
@@ -225,6 +229,3 @@ const EventFormFields: React.FC<EventFormFieldsProps> = ({
 };
 
 export default EventFormFields;
-
-
-
