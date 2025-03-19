@@ -1,20 +1,18 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
-import {
-  MdOutlinePowerSettingsNew,
-  MdDeleteOutline
-} from "react-icons/md";
+import { MdOutlinePowerSettingsNew, MdDeleteOutline } from "react-icons/md";
 import { PiCaretRightBold } from "react-icons/pi";
 import { LuPencilLine } from "react-icons/lu";
 import { AiOutlineClose } from "react-icons/ai";
+import { GoShareAndroid } from "react-icons/go";
 
-interface EventOptionsModalProps {
+interface GroupOptionsModalProps {
   isOpen: boolean;
   onClose: () => void;
 }
 
-const EventOptionsModal: React.FC<EventOptionsModalProps> = ({
+const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
   isOpen,
   onClose
 }) => {
@@ -58,47 +56,63 @@ const EventOptionsModal: React.FC<EventOptionsModalProps> = ({
 
         <div className="flex justify-between items-center mb-4">
           <h2 id="modal-title" className="text-lg font-bold">
-            Event Options
+            Group Options
           </h2>
-          <button onClick={onClose} className="text-xl" aria-label="Close Modal">
+          <button
+            onClick={onClose}
+            className="text-xl"
+            aria-label="Close Modal"
+          >
             <AiOutlineClose color="gray" />
           </button>
         </div>
         <div className="grid gap-4">
           <div
             className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
-            onClick={() => console.log("Edit Event clicked")}
+            onClick={() => console.log("Edit Group clicked")}
           >
             <div className="flex items-center">
               <span className="p-2 bg-[#FFF7F2] rounded-full text-primary">
                 <LuPencilLine size={20} />
               </span>
-              <span className="ml-3 font-medium">Edit Event</span>
+              <span className="ml-3 font-medium">Edit Group</span>
             </div>
             <PiCaretRightBold />
           </div>
           <div
             className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
-            onClick={() => console.log("Disable Event clicked")}
+            onClick={() => console.log("Edit Group clicked")}
+          >
+            <div className="flex items-center">
+              <span className="p-2 bg-[#FFF7F2] rounded-full text-primary">
+                <GoShareAndroid size={20} />
+              </span>
+              <span className="ml-3 font-medium">Share Group Link</span>
+            </div>
+            <PiCaretRightBold />
+          </div>
+          <div
+            className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
+            onClick={() => console.log("Disable Group clicked")}
           >
             <div className="flex items-center">
               <span className="p-2 bg-[#FFF7F2] rounded-full text-primary">
                 <MdOutlinePowerSettingsNew size={20} />
               </span>
-              <span className="ml-3 font-medium">Disable Event</span>
+              <span className="ml-3 font-medium">Disable Group</span>
             </div>
             <PiCaretRightBold />
           </div>
           <div
             className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
-            onClick={() => console.log("Delete Event clicked")}
+            onClick={() => console.log("Delete Group clicked")}
           >
             <div className="flex items-center">
               <span className="p-2 bg-[#FFF7F2] rounded-full text-red-500">
                 <MdDeleteOutline size={20} />
               </span>
               <span className="ml-3 font-medium text-red-500">
-                Delete Event
+                Delete Group
               </span>
             </div>
             <PiCaretRightBold />
@@ -109,4 +123,4 @@ const EventOptionsModal: React.FC<EventOptionsModalProps> = ({
   );
 };
 
-export default EventOptionsModal;
+export default GroupOptionsModal;

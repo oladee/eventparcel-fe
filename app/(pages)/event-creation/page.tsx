@@ -30,6 +30,7 @@ interface FormData {
   firstName: string;
   lastName: string;
   email: string;
+  numberOfGroups: string;
   description: string;
   eventImage: File | null;
 }
@@ -43,6 +44,7 @@ interface Errors {
   lastName: string;
   email: string;
   description: string;
+  numberOfGroups: string;
   eventImage: string;
 }
 
@@ -84,6 +86,7 @@ const PageContent: React.FC = () => {
     lastName: "",
     email: "",
     description: "",
+    numberOfGroups: "",
     eventImage: null
   });
 
@@ -96,10 +99,38 @@ const PageContent: React.FC = () => {
     lastName: "",
     email: "",
     description: "",
+    numberOfGroups: "",
     eventImage: ""
   });
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
+
+  useEffect(() => {
+    // Check for authToken in localStorage
+    const authToken = localStorage.getItem("authToken");
+    if (authToken) {
+      setIsAuthenticated(true);
+
+      // Consume the profile endpoint
+      const fetchUserProfile = async () => {
+        try {
+          const response = await axiosInstance.post("/auth/profile", {
+            token: authToken
+          });
+          // Save the response to localStorage as the logged-in user
+          localStorage.setItem("loggedInUser", JSON.stringify(response.data));
+          console.log("User profile fetched successfully:", response.data);
+        } catch (error: any) {
+          console.error("Error fetching user profile:", error);
+          toast.error(
+            error.response?.data?.message || "Failed to fetch user profile."
+          );
+        }
+      };
+
+      fetchUserProfile();
+    }
+  }, []);
 
   useEffect(() => {
     // Check for authToken in localStorage
@@ -130,6 +161,20 @@ const PageContent: React.FC = () => {
       if (!(value instanceof Date) || isNaN(value.getTime())) {
         return "This field is required.";
       }
+    } else if (id === "numberOfGroups") {
+      // Check that the input is a number and within 1 to 99
+      if (!value.trim() || isNaN(Number(value))) {
+        return "Enter a valid number.";
+      }
+      const numValue = Number(value);
+      if (numValue < 1 || numValue > 99) {
+        return "Number must be between 1 and 99.";
+      }
+    } else if (
+      id !== "description" &&
+      (typeof value !== "string" || !value.trim())
+    ) {
+      return "This field is required.";
     } else if (
       id !== "description" &&
       (typeof value !== "string" || !value.trim())
@@ -189,27 +234,6 @@ const PageContent: React.FC = () => {
     } else {
       setErrors((prev) => ({ ...prev, [field]: "This field is required." }));
     }
-
-    // const currentDate = new Date();
-    // currentDate.setSeconds(0, 0);
-
-    // if (field === "eventDate" && date && date < currentDate) {
-    //   setErrors((prev) => ({
-    //     ...prev,
-    //     eventDate: "Event date cannot be in the past"
-    //   }));
-    //   toast.error("Event date cannot be in the past");
-    //   return;
-    // }
-
-    // if (field === "eventTime" && date && date < currentDate) {
-    //   setErrors((prev) => ({
-    //     ...prev,
-    //     eventTime: "Event time cannot be in the past"
-    //   }));
-    //   toast.error("Event time cannot be in the past");
-    //   return;
-    // }
   };
 
   // API call triggered on clicking Continue
@@ -248,6 +272,7 @@ const PageContent: React.FC = () => {
       submissionData.append("hostFirstName", formData.firstName);
       submissionData.append("hostLastName", formData.lastName);
       submissionData.append("hostEmail", formData.email);
+      submissionData.append("numberOfGroups", formData.numberOfGroups);
       if (formData.eventImage) {
         submissionData.append("eventImgUrl", formData.eventImage);
       }
@@ -291,6 +316,7 @@ const PageContent: React.FC = () => {
       const submissionData = new FormData();
       submissionData.append("eventName", formData.eventName);
       submissionData.append("eventDescription", formData.description);
+      submissionData.append("numberOfGroups", formData.numberOfGroups);
       submissionData.append(
         "date",
         formData.eventDate?.toISOString().split("T")[0] || ""
@@ -305,6 +331,7 @@ const PageContent: React.FC = () => {
       submissionData.append("eventLocation", formData.location);
       submissionData.append("hostFirstName", formData.firstName);
       submissionData.append("hostLastName", formData.lastName);
+      submissionData.append("hostLastName", formData.numberOfGroups);
       submissionData.append("hostEmail", formData.email);
       if (formData.eventImage) {
         submissionData.append("eventImgUrl", formData.eventImage);
@@ -466,6 +493,33 @@ export default function Page() {
     </Suspense>
   );
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

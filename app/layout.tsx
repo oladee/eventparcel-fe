@@ -9,7 +9,7 @@ import { Open_Sans } from "next/font/google";
 const openSans = Open_Sans({
   subsets: ["latin"],
   weight: ["300", "400", "500", "600", "700", "800"],
-  variable: "--font-open-sans", // Optional: CSS variable for usage
+  variable: "--font-open-sans" // Optional: CSS variable for usage
 });
 
 export const metadata: Metadata = {
@@ -22,6 +22,7 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+
   return (
     <html lang="en" className={openSans.variable}>
       <body className="w-full max-w-full">

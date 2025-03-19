@@ -10,8 +10,9 @@ import FormButtons from "@/components/aboutEvent/FormButtons";
 import { Group } from "@/app/interface/Group";
 import axiosInstance from "@/lib/axiosInstance";
 import dynamic from "next/dynamic";
-import router from "next/router";
+// import router from "next/router";
 import HeaderLayout from "@/components/layout/HeaderLayout";
+import { useRouter } from "next/navigation";
 
 const AddGroup = dynamic(() => import("@/components/AddGroupCaller"), {
   ssr: false
@@ -25,6 +26,7 @@ const NewGroup: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   console.log(loading, error);
+  const router = useRouter();
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -52,7 +54,7 @@ const NewGroup: React.FC = () => {
 
       fetchGroups();
     }
-  }, []);
+  }, [router]);
 
   const isFormValid =
     groups.length > 0 && groups.some((group) => group.packages.length > 0);
@@ -60,6 +62,14 @@ const NewGroup: React.FC = () => {
   const handleAddGroupClick = () => {
     setIsAddGroupOpen(true);
   };
+
+  if (loading) {
+    return (
+      <p className="text-xl font-semibold h-screen text-center">
+        Loading groups...
+      </p>
+    );
+  }
 
   return (
     <HeaderLayout>
@@ -158,14 +168,6 @@ const NewGroup: React.FC = () => {
 };
 
 export default NewGroup;
-
-
-
-
-
-
-
-
 
 
 
