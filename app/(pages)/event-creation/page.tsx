@@ -439,10 +439,18 @@ const PageContent: React.FC = () => {
     setShowMapPickerModal(true);
   };
 
+  // const isFormValid =
+  //   formData.firstName &&
+  //   formData.lastName &&
+  //   formData.email &&
+  //   formData.location &&
+  //   formData.eventName &&
+  //   formData.eventTime &&
+  //   Object.values(errors).every((err) => err === "");
+
   const isFormValid =
-    formData.firstName &&
-    formData.lastName &&
-    formData.email &&
+    (isAuthenticated ||
+      (formData.firstName && formData.lastName && formData.email)) &&
     formData.location &&
     formData.eventName &&
     formData.eventTime &&
@@ -497,6 +505,7 @@ const PageContent: React.FC = () => {
                 errors={errors}
                 handleChange={handleChange}
                 handleBlur={handleBlur}
+                isAuthenticated={isAuthenticated}
               />
             )}
           </form>
