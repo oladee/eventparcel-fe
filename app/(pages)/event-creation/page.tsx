@@ -49,50 +49,7 @@ interface Errors {
 }
 
 const PageContent: React.FC = () => {
-  // const router = useRouter();
   const router = useRouter();
-
-  useEffect(() => {
-    // Check for authToken in localStorage
-    const authToken = localStorage.getItem("authToken");
-    if (authToken) {
-      setIsAuthenticated(true);
-
-      // Consume the profile endpoint
-      const fetchUserProfile = async () => {
-        try {
-          const response = await axiosInstance.post("/profile-details", {
-            token: authToken
-          });
-          // Save the response to localStorage as the logged-in user
-          localStorage.setItem("loggedInUser", JSON.stringify(response.data));
-          console.log("User profile fetched successfully:", response.data);
-        } catch (error: any) {
-          console.error("Error fetching user profile:", error);
-          toast.error(
-            error.response?.data?.message || "Failed to fetch user profile."
-          );
-        }
-      };
-
-      fetchUserProfile();
-    }
-  }, [router]);
-
-  useEffect(() => {
-    const redirect = Cookies.get("redirectAfterLogin");
-    if (redirect === "co-host") {
-      const userConfirmed = window.confirm(
-        "Do you want to continue co-host creation?"
-      );
-      if (userConfirmed) {
-        router.push("/add-cohost");
-      } else {
-        Cookies.remove("redirectAfterLogin");
-      }
-    }
-  }, [router]);
-
   const searchParams = useSearchParams();
   const [showSuccess, setShowSuccess] = useState(false);
   const [showSuccess2, setShowSuccess2] = useState(false);
@@ -131,6 +88,22 @@ const PageContent: React.FC = () => {
     eventImage: ""
   });
 
+
+  useEffect(() => {
+    const redirect = Cookies.get("redirectAfterLogin");
+    if (redirect === "co-host") {
+      const userConfirmed = window.confirm(
+        "Do you want to continue co-host creation?"
+      );
+      if (userConfirmed) {
+        router.push("/add-cohost");
+      } else {
+        Cookies.remove("redirectAfterLogin");
+      }
+    }
+  }, [router]);
+
+
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
 
@@ -149,6 +122,33 @@ const PageContent: React.FC = () => {
       }
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    // Check for authToken in localStorage
+    const authToken = localStorage.getItem("authToken");
+    if (authToken) {
+      setIsAuthenticated(true);
+
+      // Consume the profile endpoint
+      const fetchUserProfile = async () => {
+        try {
+          const response = await axiosInstance.post("/profile-details", {
+            token: authToken
+          });
+          // Save the response to localStorage as the logged-in user
+          localStorage.setItem("loggedInUser", JSON.stringify(response.data));
+          console.log("User profile fetched successfully:", response.data);
+        } catch (error: any) {
+          console.error("Error fetching user profile:", error);
+          toast.error(
+            error.response?.data?.message || "Failed to fetch user profile."
+          );
+        }
+      };
+
+      fetchUserProfile();
+    }
+  }, [router]);
 
   // Handlers for input changes and validations
   const handleChange = (
