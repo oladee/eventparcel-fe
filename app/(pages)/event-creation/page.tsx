@@ -1,5 +1,4 @@
 "use client";
-
 import { Suspense, useState, useRef, useEffect } from "react";
 import EventSuccess from "@/components/EventSuccess";
 import ImagePickerModal from "@/components/aboutEvent/ImagePickerModal";
