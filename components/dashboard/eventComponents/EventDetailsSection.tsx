@@ -28,7 +28,7 @@ const EventDetailsSection: React.FC<EventDetailsProps> = ({ eventData }) => {
       {/* Image Section */}
       <div className="relative w-full rounded-xl overflow-hidden">
         <Image
-          src={eventImgUrl}
+          src={eventImgUrl? eventImgUrl :  "https://placehold.co/600x400/png"}
           alt={eventName}
           className="w-full h-48 object-cover rounded-xl"
           width={600}

@@ -134,7 +134,7 @@ const EventFormFields: React.FC<EventFormFieldsProps> = ({
               onChange={(date) => handleDateChange(date, "eventDate")}
               dateFormat="yyyy-MM-dd"
               popperClassName="custom-datepicker"
-              className="pl-10 px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50"
+              className="!w-full pl-10 px-3 py-2 input-field outline-primary rounded-[5px] bg-slate-50"
             />
           </div>
           {errors.eventDate && (
