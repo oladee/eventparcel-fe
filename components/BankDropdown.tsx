@@ -60,7 +60,7 @@ const BankDropdown: React.FC<BankDropdownProps> = ({
       </div>
       {isDropdownOpen && (
         <div
-          id="bank-list"
+          id="nairaAccount.bank-list"
           role="listbox"
           className="absolute z-10 w-full bg-white border rounded mt-2 max-h-60 overflow-y-auto"
         >
@@ -82,13 +82,13 @@ const BankDropdown: React.FC<BankDropdownProps> = ({
                 onClick={() => {
                   setSelectedBank(bank);
                   setIsDropdownOpen(false);
-                  setFormData((prev: any) => ({ ...prev, bankName: bank.name }));
+                  setFormData((prev: any) => ({ ...prev, nairaAccount: {...prev.nairaAccount, bankName: bank.name }}));
                 }}
                 onKeyDown={(e) => {
                   if (e.key === "Enter" || e.key === " ") {
                     setSelectedBank(bank);
                     setIsDropdownOpen(false);
-                    setFormData((prev: any) => ({ ...prev, bankName: bank.name }));
+                    setFormData((prev: any) => ({ ...prev, nairaAccount: {...prev.nairaAccount, bankName: bank.name }}));
                   }
                 }}
                 tabIndex={0}

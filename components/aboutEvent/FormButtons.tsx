@@ -1,15 +1,18 @@
-"use client"; // Ensures this runs only on the client side
+"use client"; 
 
+import { Group } from "@/app/interface/Group";
 import { useRouter } from "next/navigation";
 import React, { useState } from "react";
 
 interface FormButtonsProps {
   isFormValid: boolean;
+  groups: Group[] | null
 }
 
-const FormButtons: React.FC<FormButtonsProps> = ({ isFormValid }) => {
+const FormButtons: React.FC<FormButtonsProps> = ({ isFormValid, groups }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+
 
   const handleContinue = async () => {
     if (!isFormValid || loading) return;
@@ -19,8 +22,12 @@ const FormButtons: React.FC<FormButtonsProps> = ({ isFormValid }) => {
     const authToken = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
   
     try {
-      const destination = authToken ? "/share-contact" : "/signup";
-      router.push(destination);
+      if (authToken) {
+        const groupQuery = encodeURIComponent(JSON.stringify(groups));
+        router.push(`/payment-setup?groups=${groupQuery}`);
+      } else {
+        router.push("/signup")
+      }
     } finally {
       setLoading(false);
     }

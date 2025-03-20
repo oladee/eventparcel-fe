@@ -72,12 +72,12 @@ const GeneralModal: React.FC<generalGroupProps>  = ({ group }) => {
     };
 };
 
-    const handleDeletePackage = async (id: any) => {
+    // const handleDeletePackage = async (id: any) => {
 
-        setDeleteId(id);
-        setDeletEndPoint("delete-package")
-        setIsDialogOpen(true);
-        };
+    //     setDeleteId(id);
+    //     setDeletEndPoint("delete-package")
+    //     setIsDialogOpen(true);
+    //     };
 
         const handleDeleteModal = () => {
             setDeleteId(group._id);
@@ -187,18 +187,7 @@ const GeneralModal: React.FC<generalGroupProps>  = ({ group }) => {
                                     </div>
                                 </div>
                                 <div className="flex flex-col justify-center items-center gap-5">
-                                <Image 
-                                    src="/images/trash.png"
-                                    alt="delete"
-                                    id="deletePackage"
-                                    width={12}
-                                    height={12}
-                                    onClick={() => {
-                                        handleDeletePackage(item._id);
-                                        setSelectedPackage(item); 
-                                    }}
-                                    className="cursor-pointer"
-                                />
+                               
                                 <Image 
                                     src="/images/edit.png"
                                     alt="edit"
@@ -245,6 +234,7 @@ const GeneralModal: React.FC<generalGroupProps>  = ({ group }) => {
                             mode={modalMode}
                             packageData={selectedPackage}
                             groudId={group._id}
+                            groupCurrency={group.groupCurrency}
                         />
                     </div>
                 )}

@@ -27,9 +27,9 @@ const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode, selectedGr
     groupName: selectedGroup?.groupName || "",
     groupDescription: selectedGroup?.groupDescription || "",
     groupPrivacy: selectedGroup?.groupPrivacy.toLocaleLowerCase() || "private",
+    groupCurrency: selectedGroup?.groupCurrency || "",
   });
 
-  console.log(selectedGroup)
 
   const [errors, setErrors] = useState({
     groupName: "",
@@ -50,10 +50,13 @@ const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode, selectedGr
     if (id === "groupDescription") {
       if (value.length > 150) return "Description must not exceed 150 characters";
     }
+    if (id === "groupCurrency") {
+      if (!value || value === "Select Currency") return "Please select a currency";
+    }
     return "";
   };
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
     const { id, value } = e.target;
 
     setFormData((prev) => ({
@@ -103,9 +106,13 @@ const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode, selectedGr
       formDataToSend.append("groupName", formData.groupName);
       formDataToSend.append("groupDescription", formData.groupDescription);
       formDataToSend.append("groupPrivacy", formData.groupPrivacy.toLowerCase());
+      formDataToSend.append("groupCurrency", formData.groupCurrency);
+
+      for (const [key, value] of formDataToSend.entries()) {
+          console.log(key, value)
+      }
 
     try {
-       
         if(selectedGroup) {
           await axiosInstance.put(`/update-group/${selectedGroup._id}`, formDataToSend);
         }else {
@@ -144,12 +151,14 @@ const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode, selectedGr
     }
   };
 
- const isFormValid = Boolean(
+  const isFormValid = Boolean(
     formData.groupName.trim().length >= 5 &&
     formData.groupName.trim().length <= 60 &&
     (formData.groupDescription.trim().length === 0 || formData.groupDescription.trim().length <= 150) &&
-    Object.values(errors).every((err) => !err)
+    Object.values(errors).every((err) => !err) &&
+    formData.groupCurrency && formData.groupCurrency !== "Select Currency"
   );
+  
 
   return (
     <>

@@ -10,6 +10,7 @@ import "react-toastify/dist/ReactToastify.css";
 
 interface PackageFormData {
     groupId?: string | number;
+    groupCurrency?: string;
     packageTitle?: string;
     packageDescription?: string;
     packagePriceCurrency?: string;
@@ -26,10 +27,10 @@ interface CreatePackageModalProps {
     mode: "create" | "update";
     packageData?: Package | null;
     groudId: string | number;
+    groupCurrency: string;
 }
 
-const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpenModalPackage, mode, packageData }) => {
-    
+const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupCurrency, setOpenModalPackage, mode, packageData }) => {
     const [errors, setErrors] = useState<FormErrors>({});
     const [loading, setLoading] = useState(false);
     const [, setError] = useState(false);
@@ -38,7 +39,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
         groupId: groudId,
         packageTitle: packageData?.packageTitle || "",
         packageDescription: packageData?.packageDescription || "",
-        packagePriceCurrency: packageData?.packagePriceCurrency || "NGN",
+        packagePriceCurrency: groupCurrency,
         packagePrice: packageData?.packagePrice || "",
         packageQuantity: packageData?.packageQuantity || "",
         packageDelivery: typeof packageData?.packageDelivery === "string"
@@ -414,14 +415,15 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, setOpe
                     {/* Price Input */}
                     <div className="w-full flex items-center rounded-[10px] px-4 py-2 bg-[#FAFAFA] flex-1 
                         focus-within:outline focus-within:outline-primary focus-within:outline-2">
-                           <select
+                           {/* <select
                                 className="text-lg text-gray-600 font-medium bg-transparent outline-none"
                                 value={formData.packagePriceCurrency || "NGN"}
                                 onChange={(e) => setFormData({ ...formData, packagePriceCurrency: e.target.value })}
                             >
                                 <option value="NGN">₦</option>
                                 <option value="USD">$</option>
-                            </select>
+                            </select> */}
+                        <span className="font-general font-bold text-[#111827]">{groupCurrency === "NGN" ? "₦" : "$"}</span>
 
                         {/* Price Input */}
                         <input

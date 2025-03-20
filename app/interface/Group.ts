@@ -14,5 +14,6 @@ export interface Package {
     groupName: string;
     groupDescription: string;
     groupPrivacy: "General" | "Private";
+    groupCurrency: string;
     packages: Package[];
   }
