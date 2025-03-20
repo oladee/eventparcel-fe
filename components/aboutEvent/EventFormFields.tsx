@@ -208,7 +208,7 @@ const EventFormFields: React.FC<EventFormFieldsProps> = ({
           How many groups do you have?
         </label>
         <p id="numberOfGroups" className="text-sm text-[#718096] mb-3 font-medium">
-          This caters for the number of aso Ebi types
+          This caters for the number of Aso Ebi types
         </p>
         <input
           type="number"
