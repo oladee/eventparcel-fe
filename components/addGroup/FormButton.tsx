@@ -17,7 +17,7 @@ const FormButton: React.FC<FormButtonsProps> = ({ isFormValid, onSubmit, loading
         !isFormValid ? "opacity-50 cursor-not-allowed" : ""
       }`}
     >
-      {loading ? "Continue to package..." : "Continue to package"}
+      {loading ? "Creating..." : "Create Group"}
     </button>
   );
 };
