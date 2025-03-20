@@ -204,7 +204,7 @@ useEffect(() => {
 
       await axiosInstance.post("/add-payment", formattedData);
       toast.success("Payment and Delivery details submitted successfully!");
-      router.push("/success");
+      router.push("/dashboard/events");
     } catch (error) {
       toast.error("Error submitting Payment and delivery details");
       console.error("Submission Error:", error);
