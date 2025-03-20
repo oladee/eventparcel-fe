@@ -150,7 +150,7 @@ useEffect(() => {
       console.error("Error parsing form data:", error);
     }
   }
-}, [searchParams]);
+}, [searchParams, formData.paymentDate]);
 
 // Validate form whenever formData changes
 useEffect(() => {
