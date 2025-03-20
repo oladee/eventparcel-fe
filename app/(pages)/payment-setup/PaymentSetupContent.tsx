@@ -202,9 +202,6 @@ const PaymentSetupContent = () => {
     setErrors((prev) => ({ ...prev, [id]: validateField(id, value) }));
   };
 
-  // const handleMapLocationSelect = () => {
-  //   setShowMapPickerModal(true);
-  // };
 
   // Helper function to format a Date object to a 12-hour time string.
   const formatTime12Hour = (date: Date): string => {
@@ -246,11 +243,6 @@ const PaymentSetupContent = () => {
     <HeaderLayout>
       <ToastContainer />
       {showMapPickerModal && (
-        // <LocationPickerModal
-        //   onLocationSelect={(pickupLocation: string) => {
-        //     // setFormData({ ...formData, pickupLocation });
-        //     setShowMapPickerModal(false);
-        //   }}
         <LocationPickerModal
         onLocationSelect={() => {
           setShowMapPickerModal(false);

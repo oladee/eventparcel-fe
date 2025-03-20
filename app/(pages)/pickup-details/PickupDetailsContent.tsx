@@ -13,6 +13,7 @@ import { BiLoaderCircle } from "react-icons/bi";
 import PhoneNumberInput from "@/components/PhoneNumberInput";
 import axiosInstance from "@/lib/axiosInstance";
 import { useCallback } from "react";
+import LocationPickerModal from "@/components/aboutEvent/LocationPickerModal";
 
 const PickupDetails = () => {
   const router = useRouter();
@@ -21,6 +22,7 @@ const PickupDetails = () => {
   const [loading, setLoading] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [showMapPickerModal, setShowMapPickerModal] = useState(false);
   const [formData, setFormData] = useState({
     nairaAccount: {
       accountNumber: "",
@@ -139,10 +141,10 @@ useEffect(() => {
         ...parsedData,
         nairaAccount: { ...prev.nairaAccount, ...parsedData.nairaAccount },
         dollarAccount: { ...prev.dollarAccount, ...parsedData.dollarAccount },
-        paymentDate: new Date(parsedData.paymentDate), // Ensure it's a Date object
+        paymentDate: formData.paymentDate.toISOString().split("T")[0],
         paymentTime: parsedData.paymentTime,
-        deliveryDate: new Date(parsedData.deliveryDate), // Ensure it's a Date object
-        deliveryTime: new Date(parsedData.deliveryTime), // Ensure it's a Date object
+        deliveryDate: parsedData.deliveryDate,
+        deliveryTime: parsedData.deliveryTime,
       }));
     } catch (error) {
       console.error("Error parsing form data:", error);
@@ -202,7 +204,7 @@ useEffect(() => {
 
       await axiosInstance.post("/add-payment", formattedData);
       toast.success("Payment and Delivery details submitted successfully!");
-      router.push("/success");
+      router.push("/dashboard/events");
     } catch (error) {
       toast.error("Error submitting Payment and delivery details");
       console.error("Submission Error:", error);
@@ -212,11 +214,20 @@ useEffect(() => {
   };
 
   const handleMapLocationSelect = () => {
-    console.log("Map location selected");
+    setShowMapPickerModal(true);
   };
 
   return (
     <HeaderLayout>
+       {showMapPickerModal && (
+        <LocationPickerModal
+          onLocationSelect={(location) => {
+            setFormData({ ...formData, pickupLocation: location });
+            setShowMapPickerModal(false);
+          }}
+          onCancel={() => setShowMapPickerModal(false)}
+        />
+      )}
       <div className="py-20 bg-[#EEEFF2] lg:py-24 px-6 sm:px-4 mx-auto max-w-screen-md h-screen overflow-y-auto no-scrollbar relative">
         <div className="mt-8">
           <div className="mb-5">
