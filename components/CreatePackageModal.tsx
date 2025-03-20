@@ -97,51 +97,37 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
 
     const toggleDeliveryOption = (option: "pickUp" | "homeDelivery:platformDelivery" | "homeDelivery:selfManaged") => {
         setFormData((prev) => {
-            const updatedSelections = new Set(prev.packageDelivery || []);
+            let updatedSelections = new Set(prev.packageDelivery || []);
     
             if (option === "pickUp") {
-                // Toggle pickUp independently
-                if (updatedSelections.has(option)) {
-                  updatedSelections.delete(option);
-                } else {
-                  updatedSelections.add(option);
-                }
-              
-                return { ...prev, packageDelivery: Array.from(updatedSelections) };
-              }
-              
+                // If pickUp is selected, remove any home delivery options
+                updatedSelections.clear();
+                updatedSelections.add("pickUp");
+            } else {
+                // If a home delivery option is selected, remove pickUp and other home delivery options
+                updatedSelections.delete("pickUp");
+                updatedSelections.delete("homeDelivery:platformDelivery");
+                updatedSelections.delete("homeDelivery:selfManaged");
     
-            if (option.startsWith("homeDelivery")) {
-                // If clicked option is already selected, deselect it
-                if (updatedSelections.has(option)) {
-                    updatedSelections.delete(option);
-                } else {
-                    // Remove other homeDelivery options before selecting a new one
-                    updatedSelections.delete("homeDelivery:platformDelivery");
-                    updatedSelections.delete("homeDelivery:selfManaged");
-                    updatedSelections.add(option);
-                }
+                updatedSelections.add(option);
             }
     
             return { ...prev, packageDelivery: Array.from(updatedSelections) };
         });
     
+        // Update state for UI toggling
         if (option === "pickUp") {
-            setSelectedOptions((prev) => ({ ...prev, pickUp: !prev.pickUp }));
+            setSelectedOptions({ pickUp: true, homeDelivery: false });
+            setHomeDeliverySelectedOptions({ platformDelivery: false, selfManaged: false });
         } else {
-            setHomeDeliverySelectedOptions((prev) => ({
-                platformDelivery: option === "homeDelivery:platformDelivery" ? !prev.platformDelivery : false,
-                selfManaged: option === "homeDelivery:selfManaged" ? !prev.selfManaged : false,
-            }));
-    
-            setSelectedOptions((prev) => ({
-                ...prev,
-                homeDelivery: option === "homeDelivery:platformDelivery"
-                    ? !homeDeliverySelectedOptions.platformDelivery
-                    : !homeDeliverySelectedOptions.selfManaged,
-            }));
+            setSelectedOptions({ pickUp: false, homeDelivery: true });
+            setHomeDeliverySelectedOptions({
+                platformDelivery: option === "homeDelivery:platformDelivery",
+                selfManaged: option === "homeDelivery:selfManaged",
+            });
         }
     };
+    
     
     
 
