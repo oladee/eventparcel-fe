@@ -290,7 +290,7 @@ useEffect(() => {
                     value={formData.pickupLocation}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    className="input-field outline-primary pl-12 w-full p-2 rounded-[5px] bg-[#FAFAFA]"
+                    className="input-field outline-primary pl-12 w-full p-2 rounded-[8px] bg-[#FAFAFA]"
                     required
                   />
                   {errors.pickupLocation && (
@@ -313,7 +313,7 @@ useEffect(() => {
                         id="deliveryDate"
                         onChange={(date) => handleDateChange(date, "deliveryDate")}
                         dateFormat="yyyy-MM-dd"
-                        className="pl-10 px-3 py-2 input-field outline-primary rounded-[5px] bg-slate-50"
+                        className="pl-10 px-3 py-2 input-field outline-primary rounded-[8px] bg-slate-50"
                         popperClassName="custom-datepicker"
                       />
                     </div>
@@ -340,14 +340,14 @@ useEffect(() => {
                         timeCaption="Time"
                         dateFormat="hh:mm aa"
                         popperClassName="custom-datepicker"
-                        className="pl-10 px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50"
+                        className="pl-10 px-3 py-2 input-field outline-primary w-full rounded-[8px] bg-slate-50"
                       />
                     </div>
                     <select
                       id="deliveryTimeZone"
                       value={formData.deliveryTimeZone}
                       onChange={handleChange}
-                      className="px-3 py-2 input-field outline-primary rounded-[5px] bg-slate-50"
+                      className="px-3 py-2 input-field outline-primary rounded-[8px] bg-slate-50"
                     >
                       {validTimeZones.map((zone) => (
                         <option key={zone} value={zone}>
