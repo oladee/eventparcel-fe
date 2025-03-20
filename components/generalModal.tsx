@@ -215,7 +215,7 @@ const GeneralModal: React.FC<generalGroupProps> = ({ group }) => {
                         id="packagePrice"
                         className="font-general font-medium text-xs text-[#718096]"
                       >
-                        ₦{item.packagePrice}
+                        {group.groupCurrency === "NGN" ? "₦" : "$"}{item.packagePrice}
                       </p>
                     </div>
                   </div>
