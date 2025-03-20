@@ -203,12 +203,12 @@ const EventFormFields: React.FC<EventFormFieldsProps> = ({
         <label
           id="numberOfGroupsLabel"
           htmlFor="numberOfGroups"
-          className="block font-semibold text-[#111827]"
+          className="block font-semibold text-[#111827] capitalize"
         >
-          How many groups do you have
+          How many groups do you have?
         </label>
         <p id="numberOfGroups" className="text-sm text-[#718096] mb-3 font-medium">
-          Add your bank account details and payment deadline
+          This caters for the number of aso Ebi types
         </p>
         <input
           type="number"
