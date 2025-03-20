@@ -31,7 +31,7 @@ const EventSuccess: React.FC = () => {
         Would you like to add a co-host to this event or continue with the group creation?
         </p>
         <Link href="/new-group" className="button_v1">
-          <button className="">Continue to Group</button>
+          <button className="font-bold">Continue to Group</button>
         </Link>
 
         <button
