@@ -12,6 +12,7 @@ import HeaderLayout from "@/components/layout/HeaderLayout";
 import { BiLoaderCircle } from "react-icons/bi";
 import PhoneNumberInput from "@/components/PhoneNumberInput";
 import axiosInstance from "@/lib/axiosInstance";
+import { useCallback } from "react";
 
 const PickupDetails = () => {
   const router = useRouter();
@@ -72,44 +73,87 @@ const PickupDetails = () => {
 
   
   // Retrieve formData from query parameters
-  useEffect(() => {
-    const data = searchParams.get("data");
-    if (data) {
-      try {
-        const parsedData = JSON.parse(data);
+  // useEffect(() => {
+  //   const data = searchParams.get("data");
+  //   if (data) {
+  //     try {
+  //       const parsedData = JSON.parse(data);
 
-        setFormData((prev) => ({
-          ...prev,
-          ...parsedData,
-          nairaAccount: { ...prev.nairaAccount, ...parsedData.nairaAccount },
-          dollarAccount: { ...prev.dollarAccount, ...parsedData.dollarAccount },
-          paymentDate: formData.paymentDate.toISOString().split("T")[0],
-          paymentTime: parsedData.paymentTime,
-          deliveryDate: parsedData.deliveryDate,
-          deliveryTime: parsedData.deliveryTime,
-        }));
-      } catch (error) {
-        console.error("Error parsing form data:", error);
-      }
+  //       setFormData((prev) => ({
+  //         ...prev,
+  //         ...parsedData,
+  //         nairaAccount: { ...prev.nairaAccount, ...parsedData.nairaAccount },
+  //         dollarAccount: { ...prev.dollarAccount, ...parsedData.dollarAccount },
+  //         paymentDate: formData.paymentDate.toISOString().split("T")[0],
+  //         paymentTime: parsedData.paymentTime,
+  //         deliveryDate: parsedData.deliveryDate,
+  //         deliveryTime: parsedData.deliveryTime,
+  //       }));
+  //     } catch (error) {
+  //       console.error("Error parsing form data:", error);
+  //     }
+  //   }
+  // }, [searchParams]);
+
+
+  // // Validate form whenever formData changes
+  // useEffect(() => {
+  //   validateForm();
+  // }, [formData]);
+
+  // const validateForm = () => {
+  //   const { contactName, contactPhoneNumber, pickupLocation, deliveryDate, deliveryTime } = formData;
+  //   const isValid =
+  //     contactName.trim() !== "" &&
+  //     contactPhoneNumber.trim() !== "" &&
+  //     pickupLocation.trim() !== "" &&
+  //     deliveryDate instanceof Date &&
+  //     deliveryTime instanceof Date;
+  //   setIsFormValid(isValid);
+  // };
+
+
+
+  
+// Refactor validateForm to use useCallback
+const validateForm = useCallback(() => {
+  const { contactName, contactPhoneNumber, pickupLocation, deliveryDate, deliveryTime } = formData;
+  const isValid =
+    contactName.trim() !== "" &&
+    contactPhoneNumber.trim() !== "" &&
+    pickupLocation.trim() !== "" &&
+    deliveryDate instanceof Date &&
+    deliveryTime instanceof Date;
+  setIsFormValid(isValid);
+}, [formData]);
+
+// Retrieve formData from query parameters
+useEffect(() => {
+  const data = searchParams.get("data");
+  if (data) {
+    try {
+      const parsedData = JSON.parse(data);
+
+      setFormData((prev) => ({
+        ...prev,
+        ...parsedData,
+        nairaAccount: { ...prev.nairaAccount, ...parsedData.nairaAccount },
+        dollarAccount: { ...prev.dollarAccount, ...parsedData.dollarAccount },
+        paymentDate: new Date(parsedData.paymentDate), // Ensure it's a Date object
+        paymentTime: parsedData.paymentTime,
+        deliveryDate: new Date(parsedData.deliveryDate), // Ensure it's a Date object
+        deliveryTime: new Date(parsedData.deliveryTime), // Ensure it's a Date object
+      }));
+    } catch (error) {
+      console.error("Error parsing form data:", error);
     }
-  }, [searchParams]);
+  }
+}, [searchParams]);
 
-
-  // Validate form whenever formData changes
-  useEffect(() => {
-    validateForm();
-  }, [formData]);
-
-  const validateForm = () => {
-    const { contactName, contactPhoneNumber, pickupLocation, deliveryDate, deliveryTime } = formData;
-    const isValid =
-      contactName.trim() !== "" &&
-      contactPhoneNumber.trim() !== "" &&
-      pickupLocation.trim() !== "" &&
-      deliveryDate instanceof Date &&
-      deliveryTime instanceof Date;
-    setIsFormValid(isValid);
-  };
+// Validate form whenever formData changes
+useEffect(() => {
+  validateForm();
+}, [formData, validateForm]);
 
   const handleDateChange = (date: Date | null, field: string) => {
     if (date) setFormData((prev) => ({ ...prev, [field]: date }));

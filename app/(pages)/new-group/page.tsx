@@ -62,13 +62,13 @@ const NewGroup: React.FC = () => {
     setIsAddGroupOpen(true);
   };
 
-  if (loading) {
-    return (
-      <p className="text-xl font-semibold h-screen text-center">
-        Loading groups...
-      </p>
-    );
-  }
+  // if (loading) {
+  //   return (
+  //     <p className="text-xl font-semibold h-screen text-center">
+  //       Loading groups...
+  //     </p>
+  //   );
+  // }
 
   return (
     <HeaderLayout>
