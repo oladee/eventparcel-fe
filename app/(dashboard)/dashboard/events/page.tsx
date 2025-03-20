@@ -1,5 +1,6 @@
 "use client";
 
+
 import React, { useEffect, useState } from "react";
 import Container from "@/components/dashboard/Container";
 import PackagesSection from "@/components/dashboard/eventComponents/PackagesSection";
