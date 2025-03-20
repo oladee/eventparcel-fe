@@ -1,7 +1,11 @@
 "use client";
 
 import { Suspense } from "react";
-import PickupDetailsContent from "./PickupDetailsContent";
+// import PickupDetailsContent from "./PickupDetailsContent";
+import dynamic from "next/dynamic";
+
+const PickupDetailsContent = dynamic(() => import("./PickupDetailsContent"), { ssr: false });
+
 
 const PickupDetails = () => {
   return (
