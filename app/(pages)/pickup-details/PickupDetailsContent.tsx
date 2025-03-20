@@ -176,6 +176,10 @@ useEffect(() => {
 
     // Helper function to format a Date object to a 12-hour time string.
     const formatTime12Hour = (date: Date): string => {
+      if (isNaN(date.getTime())) {
+        // Return a fallback value if the date is invalid
+        return "12:00 AM";
+      }
       let hours = date.getHours();
       const minutes = date.getMinutes();
       const ampm = hours >= 12 ? "PM" : "AM";
