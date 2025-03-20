@@ -1,133 +1,315 @@
-import Image from "next/image";
-import React from "react";
-import { FaShareAlt } from "react-icons/fa";
+"use client";
 
-const PackagesSection: React.FC = () => {
-  const packages = [
-    {
-      id: 1,
-      title: "General Aso Ebi",
-      privacy: "Public",
-      packagePrice: "0.00",
-      imageUrl: "/images/aso-ebi-1.jpg", // Replace with your actual image
-      items: [
-        {
-          name: "4 Yards of Aso Oke and Cap for Men",
-          price: "0.00",
-          link: "https://eventparcel.com/p3..."
-        }
-      ]
-    },
-    {
-      id: 2,
-      title: "Olawale Aso Ebi",
-      privacy: "Private",
-      packagePrice: "0.00",
-      imageUrl: "/images/aso-ebi-2.jpg", // Replace with your actual image
-      items: [
-        {
-          name: "4 Yards of Aso Oke and Cap for Men",
-          price: "0.00",
-          link: "https://eventparcel.com/p3..."
-        }
-      ]
-    },
-    {
-      id: 3,
-      title: "Ogunmekun Family",
-      privacy: "Private",
-      packagePrice: "0.00",
-      imageUrl: "/images/aso-ebi-3.jpg", // Replace with your actual image
-      items: [
-        {
-          name: "4 Yards of Aso Oke and Cap for Men",
-          price: "0.00",
-          link: "https://eventparcel.com/p3..."
-        }
-      ]
-    }
-  ];
+import React, { useState } from "react";
+import { FiMoreHorizontal } from "react-icons/fi";
+import { AiOutlinePlus, AiOutlineEdit } from "react-icons/ai";
+import { IoIosSend } from "react-icons/io";
+import GroupOptionsModal from "./GroupOptionsModal";
+import Image from "next/image";
+
+interface Package {
+  _id: string;
+  packageImgUrls: string[];
+  packageTitle: string;
+  packagePrice: number;
+}
+
+interface Group {
+  _id: string;
+  groupName: string;
+  groupDescription: string;
+  groupPrivacy: string;
+  packages: Package[];
+  link?: string; // Optional: include the group link
+}
+
+interface PackagesSectionProps {
+  eventData: {
+    eventGroups: Group[];
+  };
+}
+
+const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  // New state to keep track of the selected group for sharing
+  const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
+
+  // Use groups from eventData
+  const groups = eventData.eventGroups || [];
+
+  // Open modal and store selected group
+  const openGroupOptions = (group: Group) => {
+    setSelectedGroup(group);
+    setIsModalOpen(true);
+  };
+
+  const toggleModal = () => setIsModalOpen((prev) => !prev);
+
+  const formatNumber = (value: number): string => {
+    return value.toLocaleString("en-US");
+  };
 
   return (
-    <div className="mt-8 px-4 md:px-8 lg:px-16">
-      <div
-        className="
-          grid 
-          grid-cols-1 
-          md:grid-cols-2 
-          lg:grid-cols-3 
-          gap-6
-        "
-      >
-        {packages.map((pkg) => (
-          <div
-            key={pkg.id}
-            className="border rounded-lg shadow-sm p-4 flex flex-col justify-between"
-          >
-            {/* Title + Privacy */}
-            <div className="flex items-center justify-between mb-2">
-              <h2 className="text-base font-semibold text-gray-800">
-                {pkg.title}
-              </h2>
+    <>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-11">
+        {groups.map((group) => (
+          <div key={group._id} className="bg-white rounded-2xl p-6">
+            {/* Header Section */}
+            <div className="flex justify-between items-start">
               <span
-                className={`text-xs font-medium px-2 py-1 rounded ${
-                  pkg.privacy === "Public"
-                    ? "bg-green-100 text-green-800"
-                    : "bg-red-100 text-red-800"
-                }`}
+                className={`${
+                  group.groupPrivacy.toLowerCase() === "private"
+                    ? "text-red-600 border-red-600 bg-[#DE42221F]"
+                    : "text-[#2B9EA0] border-[#2B9EA0] bg-[#2B9EA01F]"
+                } border px-3 rounded-full text-sm font-medium`}
               >
-                {pkg.privacy}
+                {group.groupPrivacy}
+              </span>
+              <span onClick={() => openGroupOptions(group)}>
+                <FiMoreHorizontal
+                  size={24}
+                  className="text-gray-500 cursor-pointer"
+                />
               </span>
             </div>
 
-            {/* Packages + Price */}
-            <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-semibold text-gray-700">
-                Packages
-              </span>
-              <span className="text-sm text-gray-600">{pkg.packagePrice}</span>
+            {/* Group Title and Description */}
+            <h2 className="text-xl font-bold text-[#111827] mt-2 capitalize">
+              {group.groupName}
+            </h2>
+            <p className="text-[#718096] text-sm mt-1 truncate-text2">
+              {group.groupDescription}
+            </p>
+
+            {/* Packages Section */}
+            <div className="flex justify-between items-center mt-6">
+              <h3 className="text-lg font-bold text-gray-900">Packages</h3>
+              <button className="text-primary flex items-center gap-1 font-medium">
+                <AiOutlinePlus size={18} /> Add New
+              </button>
             </div>
 
-            {/* Package Items */}
-            {pkg.items.map((item, index) => (
-              <div key={index} className="mb-4">
-                <div className="flex items-center space-x-3">
-                  {/* Image of cloth */}
+            {/* Packages List */}
+            <div className="max-h-56 overflow-y-auto no-scrollbar space-y-4 mt-4">
+              {group.packages.map((pkg) => (
+                <div
+                  key={pkg._id}
+                  className="border rounded-xl p-3 flex items-center gap-4"
+                >
                   <Image
-                    src={pkg.imageUrl}
-                    alt={item.name}
-                    className="w-16 h-16 object-cover rounded"
+                    src={
+                      pkg.packageImgUrls && pkg.packageImgUrls.length > 0
+                        ? pkg.packageImgUrls[0]
+                        : "https://placehold.co/600x400/png"
+                    }
+                    alt={pkg.packageTitle}
+                    className="w-16 h-16 rounded-lg object-cover"
                     width={64}
                     height={64}
                   />
                   <div className="flex-1">
-                    <p className="text-sm font-medium text-gray-800">
-                      {item.name}
+                    <h4 className="text-sm font-bold text-gray-900 truncate-text2">
+                      {pkg.packageTitle
+                        .split(" ")
+                        .map(
+                          (word) =>
+                            word.charAt(0).toUpperCase() + word.slice(1)
+                        )
+                        .join(" ")}
+                    </h4>
+                    <p className="text-gray-500 text-sm">
+                      ₦{formatNumber(pkg.packagePrice)}
                     </p>
-                    <a
-                      href={item.link}
-                      target="_blank"
-                      rel="noreferrer"
-                      className="text-blue-600 underline text-xs"
-                    >
-                      {item.link}
-                    </a>
                   </div>
-                  <span className="text-sm text-gray-600">{item.price}</span>
-                  <button
-                    type="button"
-                    className="text-gray-500 hover:text-gray-700"
-                  >
-                    <FaShareAlt />
-                  </button>
+                  <AiOutlineEdit size={20} className="text-gray-500 cursor-pointer" />
                 </div>
-              </div>
-            ))}
+              ))}
+            </div>
+
+            {/* Contacts and Invite Section */}
+            <div className="mt-6 flex justify-between items-center">
+              <p className="text-gray-500 text-sm font-medium">
+                Contacts: <span className="text-gray-900 font-bold">0</span>
+              </p>
+              <button className="text-primary flex items-center gap-1 font-medium">
+                <IoIosSend size={18} /> Send Invite
+              </button>
+            </div>
           </div>
         ))}
       </div>
-    </div>
+      {/* Pass the selected group to the modal */}
+      <GroupOptionsModal
+        isOpen={isModalOpen}
+        onClose={toggleModal}
+        group={selectedGroup}
+      />
+    </>
   );
 };
 
 export default PackagesSection;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// "use client";
+
+// import React, { useState } from "react";
+// import { FiMoreHorizontal } from "react-icons/fi";
+// import { AiOutlinePlus, AiOutlineEdit } from "react-icons/ai";
+// import { IoIosSend } from "react-icons/io";
+// import GroupOptionsModal from "./GroupOptionsModal";
+// // import { useRouter } from "next-nprogress-bar";
+// import Image from "next/image";
+
+// interface Package {
+//   _id: string;
+//   packageImgUrls: string[];
+//   packageTitle: string;
+//   packagePrice: number;
+//   // ... any additional fields you need
+// }
+
+// interface Group {
+//   _id: string;
+//   groupName: string;
+//   groupDescription: string;
+//   groupPrivacy: string;
+//   packages: Package[];
+//   // ... any additional fields you need
+// }
+
+// interface PackagesSectionProps {
+//   eventData: {
+//     eventGroups: Group[];
+//   };
+// }
+
+// const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
+//   const [isModalOpen, setIsModalOpen] = useState(false);
+//   // const router = useRouter();
+//   const toggleModal = () => setIsModalOpen((prev) => !prev);
+
+//   const formatNumber = (value: number): string => {
+//     return value.toLocaleString("en-US");
+//   };
+
+//   // Use groups from eventData
+//   const groups = eventData.eventGroups || [];
+
+//   return (
+//     <>
+//       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-11">
+//         {groups.map((group) => (
+//           <div key={group._id} className="bg-white rounded-2xl p-6">
+//             {/* Header Section */}
+//             <div className="flex justify-between items-start">
+//               <span
+//                 className={`${
+//                   group.groupPrivacy.toLowerCase() === "private"
+//                     ? "text-red-600 border-red-600 bg-[#DE42221F]"
+//                     : "text-[#2B9EA0] border-[#2B9EA0] bg-[#2B9EA01F]"
+//                 } border px-3 rounded-full text-sm font-medium`}
+//               >
+//                 {group.groupPrivacy}
+//               </span>
+//               <span onClick={toggleModal}>
+//                 <FiMoreHorizontal size={24} className="text-gray-500 cursor-pointer" />
+//               </span>
+//             </div>
+
+//             {/* Group Title and Description */}
+//             <h2 className="text-xl font-bold text-[#111827] mt-2 capitalize">{group.groupName}</h2>
+//             <p className="text-[#718096] text-sm mt-1 truncate-text2">
+//               {group.groupDescription}
+//             </p>
+
+//             {/* Packages Section */}
+//             <div className="flex justify-between items-center mt-6">
+//               <h3 className="text-lg font-bold text-gray-900">Packages</h3>
+//               <button className="text-primary flex items-center gap-1 font-medium">
+//                 <AiOutlinePlus size={18} /> Add New
+//               </button>
+//             </div>
+
+//             {/* Packages List */}
+//             <div className="max-h-56 overflow-y-auto no-scrollbar space-y-4 mt-4">
+//               {group.packages.map((pkg) => (
+//                 <div key={pkg._id} className="border rounded-xl p-3 flex items-center gap-4">
+//                   <Image
+//                     src={
+//                       pkg.packageImgUrls && pkg.packageImgUrls.length > 0
+//                         ? pkg.packageImgUrls[0]
+//                         : "https://placehold.co/600x400/png"
+//                     }
+//                     alt={pkg.packageTitle}
+//                     className="w-16 h-16 rounded-lg object-cover"
+//                     width={64}
+//                     height={64}
+//                   />
+//                   <div className="flex-1">
+//                     <h4 className="text-sm font-bold text-gray-900 truncate-text2">
+//                       {pkg.packageTitle
+//                         .split(" ")
+//                         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+//                         .join(" ")}
+//                     </h4>
+//                     <p className="text-gray-500 text-sm">₦{formatNumber(pkg.packagePrice)}</p>
+//                   </div>
+//                   <AiOutlineEdit size={20} className="text-gray-500 cursor-pointer" />
+//                 </div>
+//               ))}
+//             </div>
+
+//             {/* Contacts and Invite Section */}
+//             <div className="mt-6 flex justify-between items-center">
+//               <p className="text-gray-500 text-sm font-medium">
+//                 Contacts: <span className="text-gray-900 font-bold">0</span>
+//               </p>
+//               <button className="text-primary flex items-center gap-1 font-medium">
+//                 <IoIosSend size={18} /> Send Invite
+//               </button>
+//             </div>
+//           </div>
+//         ))}
+//       </div>
+//       <GroupOptionsModal isOpen={isModalOpen} onClose={toggleModal} />
+//     </>
+//   );
+// };
+
+// export default PackagesSection;
+
+
+

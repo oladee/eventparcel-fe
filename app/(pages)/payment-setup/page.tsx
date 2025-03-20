@@ -462,6 +462,7 @@ const Page = () => {
 
 export default Page;
 
+<<<<<<< HEAD:app/(pages)/payment-setup/page.tsx
 
 
 
@@ -1062,3 +1063,5 @@ export default Page;
 // };
 
 // export default Page;
+=======
+>>>>>>> 384a62119b333e3a752ede669ad0fe5c3e3bcdcd:app/(pages)/payment-delivery/page.tsx

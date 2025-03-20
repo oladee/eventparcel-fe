@@ -111,6 +111,13 @@ export const Sidebar: React.FC = () => {
   const router = useRouter();
   const sidebarRef = useRef<HTMLDivElement>(null);
 
+  useEffect(() => {
+    const authToken = localStorage.getItem("authToken");
+    if (!authToken) {
+      router.push("/");
+    }
+  }, [router]);
+
   // For swipe gesture detection on mobile devices
   const [touchStartX, setTouchStartX] = useState<number | null>(null);
   const [touchCurrentX, setTouchCurrentX] = useState<number | null>(null);
