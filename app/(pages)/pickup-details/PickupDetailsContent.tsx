@@ -186,6 +186,31 @@ useEffect(() => {
     };
   
 
+    // const handleSubmit = async (e: React.FormEvent) => {
+    //   e.preventDefault();
+    //   if (!isFormValid) return;
+    
+    //   setLoading(true);
+    //   try {
+    //     const formattedData = {
+    //       ...formData,
+    //       deliveryDate: formData.deliveryDate instanceof Date ? formData.deliveryDate.toISOString().split("T")[0] : "",
+    //       deliveryTime: formData.deliveryTime instanceof Date ? formatTime12Hour(formData.deliveryTime) : "",
+    //     };
+    
+    //     console.log("formattedData", formattedData);
+    
+    //     await axiosInstance.post("/add-payment", formattedData);
+    //     toast.success("Payment and Delivery details submitted successfully!");
+    //     router.push("/dashboard/events");
+    //   } catch (error) {
+    //     toast.error("Error submitting Payment and delivery details");
+    //     console.error("Submission Error:", error);
+    //   } finally {
+    //     setLoading(false);
+    //   }
+    // };
+
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
       if (!isFormValid) return;
@@ -196,6 +221,7 @@ useEffect(() => {
           ...formData,
           deliveryDate: formData.deliveryDate instanceof Date ? formData.deliveryDate.toISOString().split("T")[0] : "",
           deliveryTime: formData.deliveryTime instanceof Date ? formatTime12Hour(formData.deliveryTime) : "",
+          paymentTime: formData.paymentTime instanceof Date ? formatTime12Hour(formData.paymentTime) : "", // Format paymentTime as a string
         };
     
         console.log("formattedData", formattedData);
