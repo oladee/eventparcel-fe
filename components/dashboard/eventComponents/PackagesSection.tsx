@@ -36,6 +36,10 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
   // const router = useRouter();
   const toggleModal = () => setIsModalOpen((prev) => !prev);
 
+  const formatNumber = (value: number): string => {
+    return value.toLocaleString("en-US");
+  };
+
   // Use groups from eventData
   const groups = eventData.eventGroups || [];
 
@@ -61,7 +65,7 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
             </div>
 
             {/* Group Title and Description */}
-            <h2 className="text-xl font-bold text-[#111827] mt-2">{group.groupName}</h2>
+            <h2 className="text-xl font-bold text-[#111827] mt-2 capitalize">{group.groupName}</h2>
             <p className="text-[#718096] text-sm mt-1 truncate-text2">
               {group.groupDescription}
             </p>
@@ -82,7 +86,7 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
                     src={
                       pkg.packageImgUrls && pkg.packageImgUrls.length > 0
                         ? pkg.packageImgUrls[0]
-                        : "/images/placeholder.png"
+                        : "https://placehold.co/600x400/png"
                     }
                     alt={pkg.packageTitle}
                     className="w-16 h-16 rounded-lg object-cover"
@@ -96,7 +100,7 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
                         .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
                         .join(" ")}
                     </h4>
-                    <p className="text-gray-500 text-sm">₦{pkg.packagePrice}</p>
+                    <p className="text-gray-500 text-sm">₦{formatNumber(pkg.packagePrice)}</p>
                   </div>
                   <AiOutlineEdit size={20} className="text-gray-500 cursor-pointer" />
                 </div>

@@ -45,7 +45,7 @@ const EventDetailsSection: React.FC<EventDetailsProps> = ({ eventData }) => {
 
       {/* Details Section */}
       <div className="mt-4">
-        <h2 className="text-xl font-bold text-gray-900">{eventName}</h2>
+        <h2 className="text-xl font-bold text-gray-900 capitalize">{eventName}</h2>
         <p className="text-gray-600 text-sm mt-1 w-full max-w-3xl truncate-text">
           {eventDescription}
         </p>
