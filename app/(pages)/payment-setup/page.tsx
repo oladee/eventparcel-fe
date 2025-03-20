@@ -71,7 +71,7 @@ const Page = () => {
   const firstEventId = groups.length > 0 && groups[0].event ? groups[0].event._id : "";
 
   const [isRightBarOpen, setIsRightBarOpen] = useState(false);
-  const [showMapPickerModal, setShowMapPickerModal] = useState(false);
+  // const [showMapPickerModal, setShowMapPickerModal] = useState(false);
   const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
   const [selectedUSBank, setSelectedUSBank] = useState<USBank | null>(null);
   const [showModal] = useState<boolean>(false);
@@ -202,10 +202,6 @@ const Page = () => {
     setErrors((prev) => ({ ...prev, [id]: validateField(id, value) }));
   };
 
-  // const handleMapLocationSelect = () => {
-  //   setShowMapPickerModal(true);
-  // };
-
   // Helper function to format a Date object to a 12-hour time string.
   const formatTime12Hour = (date: Date): string => {
     let hours = date.getHours();
@@ -245,19 +241,6 @@ const Page = () => {
   return (
     <HeaderLayout>
       <ToastContainer />
-      {showMapPickerModal && (
-        // <LocationPickerModal
-        //   onLocationSelect={(pickupLocation: string) => {
-        //     // setFormData({ ...formData, pickupLocation });
-        //     setShowMapPickerModal(false);
-        //   }}
-        <LocationPickerModal
-        onLocationSelect={() => {
-          setShowMapPickerModal(false);
-        }}
-          onCancel={() => setShowMapPickerModal(false)}
-        />
-      )}
       <section className="bg-[#EEEFF2] !overflow-hidden relative">
         <div className="py-20 lg:py-24 px-3 sm:px-4 mx-auto max-w-screen-md h-[98vh] overflow-y-auto no-scrollbar">
           <div className="md:mb-12 text-center p-3 sm:p-0 space-y-3">

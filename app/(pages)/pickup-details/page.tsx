@@ -12,6 +12,7 @@ import HeaderLayout from "@/components/layout/HeaderLayout";
 import { BiLoaderCircle } from "react-icons/bi";
 import PhoneNumberInput from "@/components/PhoneNumberInput";
 import axiosInstance from "@/lib/axiosInstance";
+import LocationPickerModal from "@/components/aboutEvent/LocationPickerModal";
 
 const PickupDetails = () => {
   const router = useRouter();
@@ -19,6 +20,7 @@ const PickupDetails = () => {
 
   const [loading, setLoading] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
+  const [showMapPickerModal, setShowMapPickerModal] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [formData, setFormData] = useState({
     nairaAccount: {
@@ -142,7 +144,6 @@ const PickupDetails = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
 
-    console.log("formData:", formData)
     e.preventDefault();
     if (!isFormValid) return;
 
@@ -153,8 +154,6 @@ const PickupDetails = () => {
         deliveryDate: formData.deliveryDate.toISOString().split("T")[0],
         deliveryTime: formatTime12Hour(formData.deliveryTime), 
       };
-
-      console.log("formattedData",formattedData)
 
       await axiosInstance.post("/add-payment", formattedData);
       toast.success("Payment and Delivery details submitted successfully!");
@@ -167,12 +166,21 @@ const PickupDetails = () => {
     }
   };
 
-  const handleMapLocationSelect = () => {
-    console.log("Map location selected");
+   const handleMapLocationSelect = () => {
+    setShowMapPickerModal(true);
   };
 
   return (
     <HeaderLayout>
+       {showMapPickerModal && (
+        <LocationPickerModal
+        onLocationSelect={(pickupLocation: string) => {
+          setFormData({ ...formData, pickupLocation }); 
+          setShowMapPickerModal(false);
+        }}
+          onCancel={() => setShowMapPickerModal(false)}
+        />
+      )}
       <div className="py-20 bg-[#EEEFF2] lg:py-24 px-6 sm:px-4 mx-auto max-w-screen-md h-screen overflow-y-auto no-scrollbar relative">
         <div className="mt-8">
           <div className="mb-5">
