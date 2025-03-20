@@ -179,11 +179,21 @@ useEffect(() => {
       let hours = date.getHours();
       const minutes = date.getMinutes();
       const ampm = hours >= 12 ? "PM" : "AM";
-      hours = hours % 12 || 12;
+      hours = hours % 12 || 12; // Convert 0 to 12 for 12-hour format
       const paddedHours = hours < 10 ? `0${hours}` : `${hours}`;
       const paddedMinutes = minutes < 10 ? `0${minutes}` : `${minutes}`;
       return `${paddedHours}:${paddedMinutes} ${ampm}`;
     };
+
+    // const formatTime12Hour = (date: Date): string => {
+    //   let hours = date.getHours();
+    //   const minutes = date.getMinutes();
+    //   const ampm = hours >= 12 ? "PM" : "AM";
+    //   hours = hours % 12 || 12;
+    //   const paddedHours = hours < 10 ? `0${hours}` : `${hours}`;
+    //   const paddedMinutes = minutes < 10 ? `0${minutes}` : `${minutes}`;
+    //   return `${paddedHours}:${paddedMinutes} ${ampm}`;
+    // };
   
 
     // const handleSubmit = async (e: React.FormEvent) => {
@@ -211,31 +221,31 @@ useEffect(() => {
     //   }
     // };
 
-    const handleSubmit = async (e: React.FormEvent) => {
-      e.preventDefault();
-      if (!isFormValid) return;
-    
-      setLoading(true);
-      try {
-        const formattedData = {
-          ...formData,
-          deliveryDate: formData.deliveryDate instanceof Date ? formData.deliveryDate.toISOString().split("T")[0] : "",
-          deliveryTime: formData.deliveryTime instanceof Date ? formatTime12Hour(formData.deliveryTime) : "",
-          paymentTime: formData.paymentTime instanceof Date ? formatTime12Hour(formData.paymentTime) : "", // Format paymentTime as a string
-        };
-    
-        console.log("formattedData", formattedData);
-    
-        await axiosInstance.post("/add-payment", formattedData);
-        toast.success("Payment and Delivery details submitted successfully!");
-        router.push("/dashboard/events");
-      } catch (error) {
-        toast.error("Error submitting Payment and delivery details");
-        console.error("Submission Error:", error);
-      } finally {
-        setLoading(false);
-      }
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
+  if (!isFormValid) return;
+
+  setLoading(true);
+  try {
+    const formattedData = {
+      ...formData,
+      deliveryDate: formData.deliveryDate instanceof Date ? formData.deliveryDate.toISOString().split("T")[0] : "",
+      deliveryTime: formData.deliveryTime instanceof Date ? formatTime12Hour(formData.deliveryTime) : "",
+      paymentTime: formData.paymentTime instanceof Date ? formatTime12Hour(formData.paymentTime) : "", // Ensure 12-hour format
     };
+
+    console.log("formattedData", formattedData);
+
+    await axiosInstance.post("/add-payment", formattedData);
+    toast.success("Payment and Delivery details submitted successfully!");
+    router.push("/dashboard/events");
+  } catch (error) {
+    toast.error("Error submitting Payment and delivery details");
+    console.error("Submission Error:", error);
+  } finally {
+    setLoading(false);
+  }
+};
 
   const handleMapLocationSelect = () => {
     setShowMapPickerModal(true);
