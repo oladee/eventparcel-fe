@@ -230,6 +230,14 @@ const Page: React.FC = () => {
               }
             />
           </div>
+          <div className="mt-8 w-full max-w-md bg-[#FFF7F2] p-4">
+            <span className="font-semibold text-black-100"> P.S</span>
+            <span className="italic text-[#718096] text-sm font-semibold">
+              : Data retention policy will apply i.e we will nudge them after a
+              period asking if they want us to keep the data. If no consent is
+              given, we will expunge it.
+            </span>
+          </div>
         </div>
         <div className="bg-white py-10 flex justify-center">
           <div className="max-w-md flex gap-4 items-center justify-center sm:justify-end w-full">
@@ -312,33 +320,6 @@ const Page: React.FC = () => {
 };
 
 export default Page;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // "use client";
 
