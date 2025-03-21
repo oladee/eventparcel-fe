@@ -119,7 +119,7 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
                         .join(" ")}
                     </h4>
                     <p className="text-gray-500 text-sm">
-                      {pkg.packagePriceCurrency}{formatNumber(pkg.packagePrice)}
+                      <span className="font-bold text-black">{pkg.packagePriceCurrency === "NGN" ? "₦" : "$"}</span>{formatNumber(pkg.packagePrice)}
                     </p>
                   </div>
                   <AiOutlineEdit size={20} className="text-gray-500 cursor-pointer" />
