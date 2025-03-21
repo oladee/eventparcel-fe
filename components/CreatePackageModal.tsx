@@ -97,7 +97,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
 
     const toggleDeliveryOption = (option: "pickUp" | "homeDelivery:platformDelivery" | "homeDelivery:selfManaged") => {
         setFormData((prev) => {
-            let updatedSelections = new Set(prev.packageDelivery || []);
+            const updatedSelections = new Set(prev.packageDelivery || []);
     
             if (option === "pickUp") {
                 // If pickUp is selected, remove any home delivery options
