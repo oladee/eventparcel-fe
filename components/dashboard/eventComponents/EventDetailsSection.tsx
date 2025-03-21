@@ -27,12 +27,21 @@ const EventDetailsSection: React.FC<EventDetailsProps> = ({ eventData }) => {
     <div className="bg-[#fff4ed] p-4 rounded-2xl">
       {/* Image Section */}
       <div className="relative w-full rounded-xl overflow-hidden">
-        <Image
-          src={eventImgUrl? eventImgUrl :  "https://placehold.co/600x400/png"}
+        {/* <Image
+          src="/images/placeholder_eventCover.jpg"
           alt={eventName}
           className="w-full h-48 object-cover rounded-xl"
           width={600}
           height={400}
+          priority
+        /> */}
+        <Image
+          src={eventImgUrl? eventImgUrl :  "/images/placeholder_eventCover.jpg"}
+          alt={eventName}
+          className="w-full h-48 object-cover rounded-xl"
+          width={600}
+          height={400}
+          priority
         />
         {/* More Options Button */}
         <button
