@@ -118,7 +118,7 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
                         )
                         .join(" ")}
                     </h4>
-                    <p className="text-[#718096] font-medium text-sm">
+                    <p className="text-[#718096] font-medium text-xs">
                       <span className="">{pkg.packagePriceCurrency === "NGN" ? "₦" : "$"}</span>{formatNumber(pkg.packagePrice)}
                     </p>
                   </div>
