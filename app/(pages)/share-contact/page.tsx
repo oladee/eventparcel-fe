@@ -3,13 +3,13 @@
 import { CSV, Doc, Done } from "@/components/icons/Icons";
 import CsvModal from "@/components/shareContact/CsvModal";
 import { useState, useEffect, useMemo, useCallback } from "react";
-import axiosInstance from "@/lib/axiosInstance";
-import { toast, ToastContainer } from "react-toastify";
+// import axiosInstance from "@/lib/axiosInstance";
+import {  ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ReusuableSuccess from "@/components/modals/ReusuableSuccess";
 import HeaderLayout from "@/components/layout/HeaderLayout";
 import ContactModal, { Contact } from "@/components/shareContact/ContactModal";
-// import ContactModal, { Contact } from "@/components/ContactModal";
+import SendContactModal from "@/components/shareContact/SendContactModal";
 
 // Types
 // (If Contact type is defined elsewhere you can remove this duplicate definition)
@@ -66,16 +66,21 @@ const Page: React.FC = () => {
   // State declarations
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState<"contact" | "csv" | null>(null);
+  const [selectedOption, setSelectedOption] = useState<
+    "contact" | "csv" | null
+  >(null);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [selectedContacts, setSelectedContacts] = useState<Contact[]>([]);
   const [isContactsSupported, setIsContactsSupported] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedTab, setSelectedTab] = useState<"All" | "Work" | "Family">("All");
+  const [selectedTab, setSelectedTab] = useState<"All" | "Work" | "Family">(
+    "All"
+  );
   const [contactError, setContactError] = useState("");
   const [isLoadingContacts, setIsLoadingContacts] = useState(false);
-  const [isImportingContacts, setIsImportingContacts] = useState(false);
-  const [showModal, setShowModal] = useState<boolean>(false);
+  const [isImportingContacts] = useState(false);
+  const [showModal] = useState<boolean>(false);
+  const [optionModal, setOptionModal] = useState(false);
 
   // Check if Contact Picker API is supported
   useEffect(() => {
@@ -126,27 +131,31 @@ const Page: React.FC = () => {
     );
   }, []);
 
-  const handleImportContacts = useCallback(async () => {
-    setIsImportingContacts(true);
-    try {
-      await axiosInstance.post("/save-contacts", {
-        contacts: selectedContacts.map((contact) => ({
-          guestName: contact.name.join(" "),
-          guestPhoneNumber: contact.tel?.join("").replace(/\D/g, "")
-        }))
-      });
-      setIsContactModalOpen(false);
-      setSelectedContacts([]);
-      setShowModal(true);
-    } catch (error: any) {
-      console.error("Error saving contacts:", error);
-      toast.error(
-        error.response?.data?.message || "Failed to import contacts."
-      );
-    } finally {
-      setIsImportingContacts(false);
-    }
-  }, [selectedContacts]);
+  // const handleImportContacts = useCallback(async () => {
+  //   setIsImportingContacts(true);
+  //   try {
+  //     await axiosInstance.post("/save-contacts", {
+  //       contacts: selectedContacts.map((contact) => ({
+  //         guestName: contact.name.join(" "),
+  //         guestPhoneNumber: contact.tel?.join("").replace(/\D/g, "")
+  //       }))
+  //     });
+  //     setIsContactModalOpen(false);
+  //     setSelectedContacts([]);
+  //     setShowModal(true);
+  //   } catch (error: any) {
+  //     console.error("Error saving contacts:", error);
+  //     toast.error(
+  //       error.response?.data?.message || "Failed to import contacts."
+  //     );
+  //   } finally {
+  //     setIsImportingContacts(false);
+  //   }
+  // }, [selectedContacts]);
+
+  const handleImportContacts = () => {
+    setOptionModal((prev) => !prev);
+  };
 
   // Memoized computed values
   const filteredContacts = useMemo(() => {
@@ -158,9 +167,7 @@ const Page: React.FC = () => {
       const emailMatch = contact.email?.some((e) =>
         e.toLowerCase().includes(term)
       );
-      const telMatch = contact.tel?.some((t) =>
-        t.toLowerCase().includes(term)
-      );
+      const telMatch = contact.tel?.some((t) => t.toLowerCase().includes(term));
       return nameMatch || emailMatch || telMatch;
     });
   }, [contacts, searchTerm]);
@@ -184,12 +191,15 @@ const Page: React.FC = () => {
       {/* Main Page */}
       <div className="h-screen bg-gray-50 flex flex-col justify-between">
         <div className="flex flex-col items-center justify-center p-6 mt-28">
-          <h2 className="text-2xl md:text-3xl font-bold text-gray-900 text-center">
-            Share Invite & Import Contacts
-          </h2>
-          <p className="text-gray-600 text-center mt-2">
-            Get invite link and import contacts for direct share
-          </p>
+          <div className="w-full max-w-md">
+            <h2 className="text-2xl md:text-3xl font-bold text-[#111827] md:text-center capitalize">
+              Import Contacts
+            </h2>
+            <p className="text-gray-600 md:text-center mt-2">
+              Import contacts to send a unique invite to each of your imported
+              contacts
+            </p>
+          </div>
 
           <div className="mt-8 w-full max-w-md grid gap-4">
             <OptionCard
@@ -200,7 +210,8 @@ const Page: React.FC = () => {
               title="Import from contact list"
               description={
                 <>
-                  You can import directly from your <br /> device linked contacts
+                  You can import directly from your <br /> device linked
+                  contacts
                 </>
               }
             />
@@ -212,7 +223,8 @@ const Page: React.FC = () => {
               title="Upload CSV"
               description={
                 <>
-                  You can upload a csv file exported <br /> from your contact list
+                  You can upload a csv file exported <br /> from your contact
+                  list
                 </>
               }
             />
@@ -220,7 +232,9 @@ const Page: React.FC = () => {
           <div className="mt-8 w-full max-w-md bg-[#FFF7F2] p-4">
             <span className="font-semibold text-black-100"> P.S</span>
             <span className="italic text-[#718096] text-sm font-semibold">
-              : Data retention policy will apply i.e we will nudge them after a period asking if they want us to keep the data. If no consent is given, we will expunge it.
+              : Data retention policy will apply i.e we will nudge them after a
+              period asking if they want us to keep the data. If no consent is
+              given, we will expunge it.
             </span>
           </div>
         </div>
@@ -264,45 +278,12 @@ const Page: React.FC = () => {
         isImportingContacts={isImportingContacts}
       />
       <ToastContainer />
+      <SendContactModal isOpen={optionModal} onClose={handleImportContacts} />
     </HeaderLayout>
   );
 };
 
 export default Page;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // "use client";
 
@@ -626,4 +607,3 @@ export default Page;
 // };
 
 // export default Page;
-
