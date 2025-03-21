@@ -109,7 +109,7 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
                     height={64}
                   />
                   <div className="flex-1">
-                    <h4 className="text-sm font-bold text-gray-900 truncate-text2">
+                    <h4 className="text-sm font-bold text-[#111827] truncate-text2">
                       {pkg.packageTitle
                         .split(" ")
                         .map(
