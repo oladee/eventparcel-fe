@@ -12,6 +12,7 @@ interface Package {
   packageImgUrls: string[];
   packageTitle: string;
   packagePrice: number;
+  packagePriceCurrency: string;
 }
 
 interface Group {
@@ -118,7 +119,7 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
                         .join(" ")}
                     </h4>
                     <p className="text-gray-500 text-sm">
-                      ₦{formatNumber(pkg.packagePrice)}
+                      {pkg.packagePriceCurrency}{formatNumber(pkg.packagePrice)}
                     </p>
                   </div>
                   <AiOutlineEdit size={20} className="text-gray-500 cursor-pointer" />

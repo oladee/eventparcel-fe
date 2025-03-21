@@ -100,7 +100,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
             const updatedSelections = new Set(prev.packageDelivery || []);
     
             if (option === "pickUp") {
-                // If pickUp is selected, remove any home delivery options
+                // If pickUp is selected, remove any home delivery options  
                 updatedSelections.clear();
                 updatedSelections.add("pickUp");
             } else {
