@@ -12,12 +12,12 @@ interface Contact {
   initials: string;
 }
 
-interface ContactModalProps {
+interface CSVContactModalProps {
   onClose: () => void;
   contacts: Contact[];
 }
 
-const ContactModal: React.FC<ContactModalProps> = ({ onClose, contacts }) => {
+const CSVContactModal: React.FC<CSVContactModalProps> = ({ onClose, contacts }) => {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [selectedContacts, setSelectedContacts] = useState<number[]>([]);
   const [searchTerm, setSearchTerm] = useState("");
@@ -323,4 +323,4 @@ const ContactModal: React.FC<ContactModalProps> = ({ onClose, contacts }) => {
   );
 };
 
-export default ContactModal;
+export default CSVContactModal;
