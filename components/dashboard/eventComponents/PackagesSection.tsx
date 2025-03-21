@@ -122,7 +122,7 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
                       <span className="">{pkg.packagePriceCurrency === "NGN" ? "₦" : "$"}</span>{formatNumber(pkg.packagePrice)}
                     </p>
                   </div>
-                  <AiOutlineEdit size={20} className="text-gray-500 cursor-pointer" />
+                  <AiOutlineEdit size={20} className="text-[#718096] cursor-pointer" />
                 </div>
               ))}
             </div>
