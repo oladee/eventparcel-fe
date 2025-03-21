@@ -28,7 +28,7 @@ const EventDetailsSection: React.FC<EventDetailsProps> = ({ eventData }) => {
       {/* Image Section */}
       <div className="relative w-full rounded-xl overflow-hidden">
         {/* <Image
-          src="/images/placeholder_eventCover.jpg"
+          src="/images/placeholder_eventCover2.jpg"
           alt={eventName}
           className="w-full h-48 object-cover rounded-xl"
           width={600}
@@ -36,7 +36,7 @@ const EventDetailsSection: React.FC<EventDetailsProps> = ({ eventData }) => {
           priority
         /> */}
         <Image
-          src={eventImgUrl? eventImgUrl :  "/images/placeholder_eventCover.jpg"}
+          src={eventImgUrl? eventImgUrl :  "/images/placeholder_eventCover2.jpg"}
           alt={eventName}
           className="w-full h-48 object-cover rounded-xl"
           width={600}
