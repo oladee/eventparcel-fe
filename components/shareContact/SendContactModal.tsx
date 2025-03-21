@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef } from "react";
 import { PiCaretRightBold } from "react-icons/pi";
-import { LuMessagesSquare, LuPencilLine } from "react-icons/lu";
+import { LuMessagesSquare } from "react-icons/lu";
 import { AiOutlineClose } from "react-icons/ai";
 import { BiMessageSquareDetail } from "react-icons/bi";
 import { FaWhatsapp } from "react-icons/fa";
