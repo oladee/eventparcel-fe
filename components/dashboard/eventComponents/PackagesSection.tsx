@@ -6,6 +6,7 @@ import { AiOutlinePlus, AiOutlineEdit } from "react-icons/ai";
 import { IoIosSend } from "react-icons/io";
 import GroupOptionsModal from "./GroupOptionsModal";
 import Image from "next/image";
+import { useRouter } from "next-nprogress-bar";
 
 interface Package {
   _id: string;
@@ -34,6 +35,7 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   // New state to keep track of the selected group for sharing
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
+  const router = useRouter();
 
   // Use groups from eventData
   const groups = eventData.eventGroups || [];
@@ -49,6 +51,10 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
   const formatNumber = (value: number): string => {
     return value.toLocaleString("en-US");
   };
+
+  const handleSendInviteClick = () => {
+    router.push('/share-contact')
+  }
 
   return (
     <>
@@ -85,7 +91,8 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
             {/* Packages Section */}
             <div className="flex justify-between items-center mt-6">
               <h3 className="text-lg font-bold text-gray-900">Packages</h3>
-              <button className="text-primary flex items-center gap-1 font-medium">
+              <button
+               className="text-primary flex items-center gap-1 font-medium">
                 <AiOutlinePlus size={18} /> Add New
               </button>
             </div>
@@ -132,7 +139,9 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
               <p className="text-gray-500 text-sm font-medium">
                 Contacts: <span className="text-gray-900 font-bold">0</span>
               </p>
-              <button className="text-primary flex items-center gap-1 font-medium">
+              <button
+              onClick={handleSendInviteClick}
+               className="text-primary flex items-center gap-1 font-medium outline-none">
                 <IoIosSend size={18} /> Send Invite
               </button>
             </div>
