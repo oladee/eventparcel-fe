@@ -1,6 +1,5 @@
 "use client";
 
-
 import React, { useEffect, useState } from "react";
 import Container from "@/components/dashboard/Container";
 import PackagesSection from "@/components/dashboard/eventComponents/PackagesSection";
@@ -32,6 +31,10 @@ const Page: React.FC = () => {
           );
           if (response.data.success) {
             setEventData(response.data.data);
+            localStorage.setItem(
+              "eventData",
+              JSON.stringify(response.data.data)
+            );
           } else {
             setError("Failed to fetch event data.");
           }
@@ -44,6 +47,12 @@ const Page: React.FC = () => {
       };
 
       fetchEventData();
+
+      window.addEventListener("refreshEvents", fetchEventData);
+
+      return () => {
+        window.removeEventListener("refreshEvents", fetchEventData);
+      };
     }
   }, [router]);
 
@@ -106,6 +115,31 @@ const Page: React.FC = () => {
 };
 
 export default Page;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // "use client";
 

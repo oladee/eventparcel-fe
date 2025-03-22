@@ -63,7 +63,7 @@ const EventDetailsSection: React.FC<EventDetailsProps> = ({ eventData }) => {
           <p className="text-sm mt-1 text-gray-500">{eventLocation}</p>
         </div>
       </div>
-      <EventOptionsModal isOpen={isModalOpen} onClose={toggleModal} />
+      <EventOptionsModal isOpen={isModalOpen} onClose={toggleModal} eventData={eventData} />
     </div>
   );
 };
