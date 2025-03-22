@@ -6,7 +6,6 @@ import { PiCaretRightBold } from "react-icons/pi";
 import { LuPencilLine } from "react-icons/lu";
 import { AiOutlineClose } from "react-icons/ai";
 import UpdateEventModal from "./UpdateEventModal";
-import { handleClientScriptLoad } from "next/script";
 
 interface EventOptionsModalProps {
   isOpen: boolean;
