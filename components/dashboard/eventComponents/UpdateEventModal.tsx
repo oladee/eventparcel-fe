@@ -4,7 +4,6 @@ import React, { useEffect, useState, useRef } from "react";
 import { AiOutlineClose } from "react-icons/ai";
 import EventFormFields from "@/components/aboutEvent/EventFormFields";
 import PersonalDetails from "@/components/aboutEvent/PersonalDetails";
-import FormButtons2 from "@/components/aboutEvent/FormButtons2";
 import ImagePickerModal from "@/components/aboutEvent/ImagePickerModal";
 import { toast, ToastContainer } from "react-toastify";
 import axiosInstance from "@/lib/axiosInstance";
