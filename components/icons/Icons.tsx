@@ -108,7 +108,7 @@ export const Logo2: React.FC<LogoProps> = ({ width, height }) => {
       alt="logo"
       width={width}
       height={height}
-      priority // Use this prop if the image is critical (e.g., logo)
+      // priority 
     />
   );
 };
