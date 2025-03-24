@@ -15,7 +15,7 @@ const FormButtons3: React.FC<FormButtonsProps> = ({
   loading,
   loading2,
 }) => (
-  <div className="bg-[#FFFF] pb-6 md:pb-3 pt-3 flex justify-center">
+  <div className="bg-[#FFFF] pb-8 md:pb-3 pt-3 flex justify-center">
     <div className="max-w-screen-md flex gap-4 items-center justify-center sm:justify-end w-full px-3 lg:px-0">
       <button disabled={!isFormValid || loading} onClick={onContinue2} className="p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827]">
        
