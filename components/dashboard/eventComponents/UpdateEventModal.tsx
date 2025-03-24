@@ -2,7 +2,6 @@
 
 import React, { useEffect, useState, useRef } from "react";
 import { AiOutlineClose } from "react-icons/ai";
-import EventFormFields from "@/components/aboutEvent/EventFormFields";
 import PersonalDetails from "@/components/aboutEvent/PersonalDetails";
 import ImagePickerModal from "@/components/aboutEvent/ImagePickerModal";
 import { toast, ToastContainer } from "react-toastify";
@@ -11,6 +10,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import { convertTo12Hour } from "@/utils/timeUtils";
 import Container from "../Container";
 import FormButtons3 from "./FormButton3";
+import EventFormFields2 from "./EventFormFields2";
 
 interface UpdateEventModalProps {
   isOpen: boolean;
@@ -93,7 +93,8 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
   const parseTimeString = (timeString: string): Date => {
     try {
       const [time, modifier] = timeString.split(" ");
-      let [hours, minutes] = time.split(":");
+      let [hours] = time.split(":");
+      const [minutes] = time.split(":");
 
       if (modifier === "PM" && parseInt(hours) !== 12) {
         hours = (parseInt(hours) + 12).toString();
@@ -180,10 +181,19 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
     setErrors((prev) => ({ ...prev, [id]: validateField(id, value) }));
   };
 
+  //   const handleDateChange = (date: Date | null, field: string) => {
+  //     if (date) {
+  //       setFormData((prev) => ({ ...prev, [field]: date }));
+  //       setErrors((prev) => ({ ...prev, [field]: "" }));
+  //     }
+  //   };
+
   const handleDateChange = (date: Date | null, field: string) => {
     if (date) {
       setFormData((prev) => ({ ...prev, [field]: date }));
       setErrors((prev) => ({ ...prev, [field]: "" }));
+    } else {
+      setErrors((prev) => ({ ...prev, [field]: "This field is required." }));
     }
   };
 
@@ -264,7 +274,7 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
           </div>
 
           <div className="relative space-y-8 p-5">
-            <EventFormFields
+            <EventFormFields2
               formData={formData}
               errors={errors}
               selectedImage={selectedImage}
@@ -297,28 +307,17 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
                 isAuthenticated={isAuthenticated}
               />
             )}
+          </div>
 
-           {/* <div className="bg-black-100 h-max fixed buttom-0">
-           <FormButtons2
+          <div className="sticky bottom-0 w-full bg-white p-5 border-t border-gray-200">
+            <FormButtons3
               isFormValid={Object.values(errors).every((err) => err === "")}
               onContinue={() => handleSubmit()}
               onContinue2={() => handleSubmit(true)}
               loading={loading}
               loading2={loading2}
             />
-           </div> */}
           </div>
-
-
-            <div className="sticky bottom-0 w-full bg-white p-5 border-t border-gray-200">
-                <FormButtons3
-                isFormValid={Object.values(errors).every((err) => err === "")}
-                onContinue={() => handleSubmit()}
-                onContinue2={() => handleSubmit(true)}
-                loading={loading}
-                loading2={loading2}
-                />
-     </div>
           {showImagePickerModal && (
             <ImagePickerModal
               onSelectGallery={() => {
@@ -341,19 +340,30 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
 
 export default UpdateEventModal;
 
+
+
+
+
+
+
+
+
+
+
+
 // "use client";
 
 // import React, { useEffect, useState, useRef } from "react";
 // import { AiOutlineClose } from "react-icons/ai";
 // import EventFormFields from "@/components/aboutEvent/EventFormFields";
 // import PersonalDetails from "@/components/aboutEvent/PersonalDetails";
-// import FormButtons2 from "@/components/aboutEvent/FormButtons2";
 // import ImagePickerModal from "@/components/aboutEvent/ImagePickerModal";
-// import { toast } from "react-toastify";
+// import { toast, ToastContainer } from "react-toastify";
 // import axiosInstance from "@/lib/axiosInstance";
-// import DatePicker from "react-datepicker";
+// // import DatePicker from "react-datepicker";
 // import { convertTo12Hour } from "@/utils/timeUtils";
 // import Container from "../Container";
+// import FormButtons3 from "./FormButton3";
 
 // interface UpdateEventModalProps {
 //   isOpen: boolean;
@@ -381,7 +391,7 @@ export default UpdateEventModal;
 //     firstName: "",
 //     lastName: "",
 //     email: "",
-//     description: "Hello",
+//     description: "",
 //     numberOfGroups: "",
 //     eventImage: null as File | null
 //   });
@@ -399,57 +409,57 @@ export default UpdateEventModal;
 //     eventImage: ""
 //   });
 
-//   //   useEffect(() => {
-//   //     const authToken = localStorage.getItem("authToken");
-//   //     setIsAuthenticated(!!authToken);
-
-//   //     if (eventData) {
-//   //       const event = eventData.data;
-//   //       setFormData({
-//   //         eventName: event.eventName,
-//   //         eventDate: new Date(event.date),
-//   //         eventTime: parseTimeString(event.time),
-//   //         location: event.eventLocation,
-//   //         firstName: event.hostFirstName,
-//   //         lastName: event.hostLastName,
-//   //         email: event.hostEmail,
-//   //         description: event.eventDescription,
-//   //         numberOfGroups: event.numberOfGroups.toString(),
-//   //         eventImage: null
-//   //       });
-//   //       setSelectedImage(event.eventImgUrl);
-//   //     }
-//   //   }, [eventData]);
-
 //   useEffect(() => {
-//     if (eventData?.data) {
-//       const event = eventData.data;
+//     const authToken = localStorage.getItem("authToken");
+//     setIsAuthenticated(!!authToken);
+
+//     if (eventData) {
+//       const {
+//         eventName = "",
+//         date = new Date().toISOString(),
+//         time = "12:00 PM",
+//         eventLocation = "",
+//         hostFirstName = "",
+//         hostLastName = "",
+//         hostEmail = "",
+//         eventDescription = "",
+//         numberOfGroups = "1",
+//         eventImgUrl = null
+//       } = eventData;
+
 //       setFormData({
-//         eventName: event.eventName || "",
-//         eventDate: event.date ? new Date(event.date) : new Date(),
-//         eventTime: event.time ? parseTimeString(event.time) : new Date(),
-//         location: event.eventLocation || "",
-//         firstName: event.hostFirstName || "",
-//         lastName: event.hostLastName || "",
-//         email: event.hostEmail || "",
-//         description: event.eventDescription || "",
-//         numberOfGroups: event.numberOfGroups?.toString() || "",
+//         eventName,
+//         eventDate: new Date(date),
+//         eventTime: parseTimeString(time),
+//         location: eventLocation,
+//         firstName: hostFirstName,
+//         lastName: hostLastName,
+//         email: hostEmail,
+//         description: eventDescription,
+//         numberOfGroups: numberOfGroups.toString(),
 //         eventImage: null
 //       });
-//       setSelectedImage(event.eventImgUrl || null);
+//       setSelectedImage(eventImgUrl);
 //     }
 //   }, [eventData]);
 
-//   const parseTimeString = (timeString: string) => {
-//     const [time, modifier] = timeString.split(" ");
-//     let [hours, minutes] = time.split(":");
-//     if (modifier === "PM" && parseInt(hours) !== 12) {
-//       hours = (parseInt(hours) + 12).toString();
+//   const parseTimeString = (timeString: string): Date => {
+//     try {
+//       const [time, modifier] = timeString.split(" ");
+//       let [hours, minutes] = time.split(":");
+
+//       if (modifier === "PM" && parseInt(hours) !== 12) {
+//         hours = (parseInt(hours) + 12).toString();
+//       }
+//       if (modifier === "AM" && hours === "12") {
+//         hours = "00";
+//       }
+
+//       return new Date(`1970-01-01T${hours.padStart(2, "0")}:${minutes}:00`);
+//     } catch (error) {
+//       console.error("Error parsing time string:", error);
+//       return new Date(); // Fallback to current time
 //     }
-//     if (modifier === "AM" && hours === "12") {
-//       hours = "00";
-//     }
-//     return new Date(`1970-01-01T${hours}:${minutes}:00`);
 //   };
 
 //   const validateField = (id: string, value: any): string => {
@@ -573,15 +583,18 @@ export default UpdateEventModal;
 
 //     try {
 //       isSaveLater ? setLoading2(true) : setLoading(true);
-//       const response = await axiosInstance.patch(
-//         `/update-event/${eventData.data._id}`,
+//       const response = await axiosInstance.put(
+//         `/update-event/${eventData._id}`,
 //         submissionData,
 //         { headers: { "Content-Type": "multipart/form-data" } }
 //       );
 
 //       localStorage.setItem("eventData", JSON.stringify(response.data));
+//       window.dispatchEvent(new Event("refreshEvents"));
 //       toast.success("Event updated successfully!");
-//       onClose();
+//       setTimeout(() => {
+//         onClose();
+//       }, 3000);
 //     } catch (error: any) {
 //       toast.error(error.response?.data?.message || "Failed to update event");
 //     } finally {
@@ -593,16 +606,17 @@ export default UpdateEventModal;
 
 //   return (
 //     <Container>
-//       <div className="fixed  inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50 md:items-center">
-//         <div className="bg-white w-full max-w-md rounded-t-[35px] p-5 pb-10 shadow-lg md:rounded-xl md:max-w-2xl">
-//           <div className="flex justify-between items-center mb-4">
+//       <ToastContainer />
+//       <div className="fixed h-screen overflow-y-auto inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50 md:items-center md:p-11">
+//         <div className="relative bg-white w-full h-full overflow-y-auto no-scrollbar z-[99] max-w-md md:rounded-t-[35px] shadow-lg md:rounded-xl md:max-w-2xl">
+//           <div className="sticky top-0 right-0 !z-50 flex w-full justify-between items-center mb-4 p-4 bg-white border-b">
 //             <h2 className="text-lg font-bold">Update Event</h2>
 //             <button onClick={onClose} className="text-xl">
 //               <AiOutlineClose />
 //             </button>
 //           </div>
 
-//           <div className="space-y-8">
+//           <div className="relative space-y-8 p-5">
 //             <EventFormFields
 //               formData={formData}
 //               errors={errors}
@@ -624,7 +638,7 @@ export default UpdateEventModal;
 //               handleDateChange={handleDateChange}
 //               fileInputRef={fileInputRef}
 //               handleFileChange={handleFileChange}
-//               handleMapLocationSelect={() => {}} // Implement if needed
+//               handleMapLocationSelect={() => {}}
 //             />
 
 //             {!isAuthenticated && (
@@ -637,15 +651,26 @@ export default UpdateEventModal;
 //               />
 //             )}
 
-//             <FormButtons2
+//            {/* <div className="bg-black-100 h-max fixed buttom-0">
+//            <FormButtons2
 //               isFormValid={Object.values(errors).every((err) => err === "")}
 //               onContinue={() => handleSubmit()}
 //               onContinue2={() => handleSubmit(true)}
 //               loading={loading}
 //               loading2={loading2}
 //             />
+//            </div> */}
 //           </div>
 
+//             <div className="sticky bottom-0 w-full bg-white p-5 border-t border-gray-200">
+//                 <FormButtons3
+//                 isFormValid={Object.values(errors).every((err) => err === "")}
+//                 onContinue={() => handleSubmit()}
+//                 onContinue2={() => handleSubmit(true)}
+//                 loading={loading}
+//                 loading2={loading2}
+//                 />
+//      </div>
 //           {showImagePickerModal && (
 //             <ImagePickerModal
 //               onSelectGallery={() => {
