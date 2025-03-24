@@ -23,7 +23,7 @@ const FormButtons3: React.FC<FormButtonsProps> = ({
       </button>
       <button
         disabled={!isFormValid || loading}
-        className={`bg-primary text-white py-3 px-8 rounded-[12px] transition flex items-center justify-center font-extrabold font-manrope ${
+        className={`bg-primary text-white pt-3 pb-6 md:pb-3 px-8 rounded-[12px] transition flex items-center justify-center font-extrabold font-manrope ${
           !isFormValid || loading
             ? "opacity-50 cursor-not-allowed"
             : "hover:bg-red-800"
