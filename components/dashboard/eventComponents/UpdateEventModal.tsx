@@ -6,7 +6,6 @@ import PersonalDetails from "@/components/aboutEvent/PersonalDetails";
 import ImagePickerModal from "@/components/aboutEvent/ImagePickerModal";
 import { toast, ToastContainer } from "react-toastify";
 import axiosInstance from "@/lib/axiosInstance";
-// import DatePicker from "react-datepicker";
 import { convertTo12Hour } from "@/utils/timeUtils";
 import Container from "../Container";
 import FormButtons3 from "./FormButton3";
@@ -56,14 +55,46 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
     eventImage: ""
   });
 
-  useEffect(() => {
-    const authToken = localStorage.getItem("authToken");
-    setIsAuthenticated(!!authToken);
+//   useEffect(() => {
+//     const authToken = localStorage.getItem("authToken");
+//     setIsAuthenticated(!!authToken);
 
+//     if (eventData) {
+//       const {
+//         eventName = "",
+//         date = new Date().toISOString(),
+//         time = "12:00 PM",
+//         eventLocation = "",
+//         hostFirstName = "",
+//         hostLastName = "",
+//         hostEmail = "",
+//         eventDescription = "",
+//         numberOfGroups = "1",
+//         eventImgUrl = null
+//       } = eventData;
+
+//       setFormData({
+//         eventName,
+//         eventDate: new Date(date),
+//         eventTime: parseTimeString(time),
+//         location: eventLocation,
+//         firstName: hostFirstName,
+//         lastName: hostLastName,
+//         email: hostEmail,
+//         description: eventDescription,
+//         numberOfGroups: numberOfGroups.toString(),
+//         eventImage: null
+//       });
+//       setSelectedImage(eventImgUrl);
+//     }
+//   }, [eventData]);
+
+
+useEffect(() => {
     if (eventData) {
       const {
         eventName = "",
-        date = new Date().toISOString(),
+        date = new Date().toISOString().split("T")[0], // Ensures date is in 'YYYY-MM-DD' format
         time = "12:00 PM",
         eventLocation = "",
         hostFirstName = "",
@@ -73,11 +104,11 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
         numberOfGroups = "1",
         eventImgUrl = null
       } = eventData;
-
+  
       setFormData({
         eventName,
-        eventDate: new Date(date),
-        eventTime: parseTimeString(time),
+        eventDate: new Date(date), // Ensures a valid date object
+        eventTime: parseTimeString(time), // Parse time correctly
         location: eventLocation,
         firstName: hostFirstName,
         lastName: hostLastName,
@@ -86,9 +117,11 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
         numberOfGroups: numberOfGroups.toString(),
         eventImage: null
       });
+  
       setSelectedImage(eventImgUrl);
     }
   }, [eventData]);
+  
 
   const parseTimeString = (timeString: string): Date => {
     try {

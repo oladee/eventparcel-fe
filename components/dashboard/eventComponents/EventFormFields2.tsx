@@ -3,6 +3,7 @@
 import React from "react";
 import { MapPin } from "lucide-react";
 import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { FaCalendarAlt, FaClock } from "react-icons/fa";
 import EventCoverImage from "@/components/aboutEvent/EventCoverImage";
 
