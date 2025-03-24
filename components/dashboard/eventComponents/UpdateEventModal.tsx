@@ -55,42 +55,43 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
     eventImage: ""
   });
 
-//   useEffect(() => {
-//     const authToken = localStorage.getItem("authToken");
-//     setIsAuthenticated(!!authToken);
+  //   useEffect(() => {
+  //     const authToken = localStorage.getItem("authToken");
+  //     setIsAuthenticated(!!authToken);
 
-//     if (eventData) {
-//       const {
-//         eventName = "",
-//         date = new Date().toISOString(),
-//         time = "12:00 PM",
-//         eventLocation = "",
-//         hostFirstName = "",
-//         hostLastName = "",
-//         hostEmail = "",
-//         eventDescription = "",
-//         numberOfGroups = "1",
-//         eventImgUrl = null
-//       } = eventData;
+  //     if (eventData) {
+  //       const {
+  //         eventName = "",
+  //         date = new Date().toISOString(),
+  //         time = "12:00 PM",
+  //         eventLocation = "",
+  //         hostFirstName = "",
+  //         hostLastName = "",
+  //         hostEmail = "",
+  //         eventDescription = "",
+  //         numberOfGroups = "1",
+  //         eventImgUrl = null
+  //       } = eventData;
 
-//       setFormData({
-//         eventName,
-//         eventDate: new Date(date),
-//         eventTime: parseTimeString(time),
-//         location: eventLocation,
-//         firstName: hostFirstName,
-//         lastName: hostLastName,
-//         email: hostEmail,
-//         description: eventDescription,
-//         numberOfGroups: numberOfGroups.toString(),
-//         eventImage: null
-//       });
-//       setSelectedImage(eventImgUrl);
-//     }
-//   }, [eventData]);
+  //       setFormData({
+  //         eventName,
+  //         eventDate: new Date(date),
+  //         eventTime: parseTimeString(time),
+  //         location: eventLocation,
+  //         firstName: hostFirstName,
+  //         lastName: hostLastName,
+  //         email: hostEmail,
+  //         description: eventDescription,
+  //         numberOfGroups: numberOfGroups.toString(),
+  //         eventImage: null
+  //       });
+  //       setSelectedImage(eventImgUrl);
+  //     }
+  //   }, [eventData]);
 
-
-useEffect(() => {
+  useEffect(() => {
+    const authToken = localStorage.getItem("authToken");
+    setIsAuthenticated(!!authToken);
     if (eventData) {
       const {
         eventName = "",
@@ -104,7 +105,7 @@ useEffect(() => {
         numberOfGroups = "1",
         eventImgUrl = null
       } = eventData;
-  
+
       setFormData({
         eventName,
         eventDate: new Date(date), // Ensures a valid date object
@@ -117,11 +118,10 @@ useEffect(() => {
         numberOfGroups: numberOfGroups.toString(),
         eventImage: null
       });
-  
+
       setSelectedImage(eventImgUrl);
     }
   }, [eventData]);
-  
 
   const parseTimeString = (timeString: string): Date => {
     try {
@@ -372,17 +372,6 @@ useEffect(() => {
 };
 
 export default UpdateEventModal;
-
-
-
-
-
-
-
-
-
-
-
 
 // "use client";
 
