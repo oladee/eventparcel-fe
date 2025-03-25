@@ -62,6 +62,10 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
     router.push("/share-contact");
   };
 
+  const handleInvitedContacts = () => {
+    router.push("/dashboard/invited-contacts");
+  };
+
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-11">
@@ -159,9 +163,11 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
 
             {/* Contacts and Invite Section */}
             <div className="mt-6 flex justify-between items-center">
-              <p className="text-gray-500 text-sm font-medium">
+              <button
+              onClick={handleInvitedContacts}
+               className="text-gray-500 text-sm font-medium outline-none">
                 Contacts: <span className="text-gray-900 font-bold">0</span>
-              </p>
+              </button>
               <button
                 onClick={handleSendInviteClick}
                 className="text-primary flex items-center gap-1 font-medium outline-none"
