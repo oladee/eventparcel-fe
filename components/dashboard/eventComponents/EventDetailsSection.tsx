@@ -13,18 +13,15 @@ interface EventDetailsProps {
     date: string;
     time: string;
     eventLocation: string;
-    // ... include any additional fields you want to use
   };
 }
 
-const EventDetailsSection: React.FC<EventDetailsProps> = ({
-  eventData,
-}) => {
+const EventDetailsSection: React.FC<EventDetailsProps> = ({ eventData }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [expanded, setExpanded] = useState(false);
 
   const toggleModal = () => setIsModalOpen((prev) => !prev);
-  // const toggleDescription = () => setExpanded((prev) => !prev);
+  const toggleDescription = () => setExpanded((prev) => !prev);
 
   const {
     eventImgUrl,
@@ -63,17 +60,23 @@ const EventDetailsSection: React.FC<EventDetailsProps> = ({
         </h2>
         <p
           className={`text-gray-600 text-sm mt-1 w-full max-w-3xl ${
-            expanded ? "h-auto" : "h-12 overflow-hidden"
+            expanded ? "" : "truncate-text"
           }`}
         >
-          {eventDescription}
+          {eventDescription}{" "}
           {expanded ? (
-            <span className="text-primary text-sm capitalize">
-              Show less
+            <span
+              onClick={toggleDescription}
+              className="text-blue-500 cursor-pointer"
+            >
+              Show Less
             </span>
           ) : (
-            <span className="text-primary text-sm capitalize">
-              Read more
+            <span
+              onClick={toggleDescription}
+              className="text-blue-500 cursor-pointer"
+            >
+              Read More
             </span>
           )}
         </p>
