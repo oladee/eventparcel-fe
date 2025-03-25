@@ -1,28 +1,20 @@
 "use client";
 
 import React, { useEffect, useRef } from "react";
-import { MdOutlinePowerSettingsNew, MdDeleteOutline } from "react-icons/md";
 import { PiCaretRightBold } from "react-icons/pi";
-import { LuPencilLine } from "react-icons/lu";
+import { LuMessagesSquare } from "react-icons/lu";
 import { AiOutlineClose } from "react-icons/ai";
-import { GoShareAndroid } from "react-icons/go";
+import { BiMessageSquareDetail } from "react-icons/bi";
+import { FaWhatsapp } from "react-icons/fa";
 
-interface Group {
-  _id: string;
-  groupName: string;
-  link?: string;
-}
-
-interface GroupOptionsModalProps {
+interface EventOptionsModalProps {
   isOpen: boolean;
   onClose: () => void;
-  group: Group | null;
 }
 
-const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
+const SendContactModal: React.FC<EventOptionsModalProps> = ({
   isOpen,
-  onClose,
-  group
+  onClose
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
 
@@ -36,32 +28,6 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "Escape") {
       onClose();
-    }
-  };
-
-  // Share group link function
-  const handleShareGroupLink = async () => {
-    if (!group) return;
-    // Use group.link if it exists, otherwise create a default link.
-    const shareUrl = group.link || `https://yourwebsite.com/groups/${group._id}`;
-
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: group.groupName,
-          text: `Check out the group: ${group.groupName}`,
-          url: shareUrl,
-        });
-        console.log("Group link shared successfully");
-      } catch (error) {
-        console.error("Error sharing:", error);
-      }
-    } else if (navigator.clipboard) {
-      // Fallback: copy the link to clipboard
-      navigator.clipboard.writeText(shareUrl);
-      alert("Link copied to clipboard!");
-    } else {
-      alert("Sharing not supported on this browser.");
     }
   };
 
@@ -81,7 +47,7 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
         aria-labelledby="modal-title"
         onKeyDown={handleKeyDown}
         onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
-        className="bg-white w-full max-w-md rounded-t-[35px] p-5 pb-10 shadow-lg transition-transform transform translate-y-0"
+        className="bg-white w-full max-w-md rounded-t-[35px] p-5 pb-10 shadow-lg transition-transform transform translate-y-0 outline-none"
       >
         {/* Slider indicator */}
         <div className="w-full flex justify-center">
@@ -90,7 +56,7 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
 
         <div className="flex justify-between items-center mb-4">
           <h2 id="modal-title" className="text-lg font-bold">
-            Group Options
+            Invite Options
           </h2>
           <button
             onClick={onClose}
@@ -103,51 +69,53 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
         <div className="grid gap-4">
           <div
             className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
-            onClick={() => console.log("Edit Group clicked")}
+            onClick={() => console.log("Edit Event clicked")}
           >
             <div className="flex items-center">
               <span className="p-2 bg-[#FFF7F2] rounded-full text-primary">
-                <LuPencilLine size={20} />
+                <BiMessageSquareDetail size={20} />
               </span>
-              <span className="ml-3 font-medium">Edit Group</span>
+              <div className="ml-3 font-medium">
+                <span className="capitalize">Send Via SMS</span>
+                <p className="text-xs text-[#667085]">
+                  Invite using text message only, charges apply
+                </p>
+              </div>
             </div>
             <PiCaretRightBold />
           </div>
           <div
             className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
-            onClick={handleShareGroupLink}
+            onClick={() => console.log("Disable Event clicked")}
           >
             <div className="flex items-center">
               <span className="p-2 bg-[#FFF7F2] rounded-full text-primary">
-                <GoShareAndroid size={20} />
+                <FaWhatsapp size={20} />
               </span>
-              <span className="ml-3 font-medium">Share Group Link</span>
+              <div className="ml-3 font-medium">
+                <span className="capitalize">Send Via Whatsapp</span>
+                <p className="text-xs text-[#667085]">
+                  Invite using Whatsapp only
+                </p>
+              </div>
             </div>
             <PiCaretRightBold />
           </div>
           <div
             className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
-            onClick={() => console.log("Disable Group clicked")}
+            onClick={() => console.log("Delete Event clicked")}
           >
             <div className="flex items-center">
               <span className="p-2 bg-[#FFF7F2] rounded-full text-primary">
-                <MdOutlinePowerSettingsNew size={20} />
+                <LuMessagesSquare size={20} />
               </span>
-              <span className="ml-3 font-medium">Disable Group</span>
-            </div>
-            <PiCaretRightBold />
-          </div>
-          <div
-            className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
-            onClick={() => console.log("Delete Group clicked")}
-          >
-            <div className="flex items-center">
-              <span className="p-2 bg-[#FFF7F2] rounded-full text-red-500">
-                <MdDeleteOutline size={20} />
-              </span>
-              <span className="ml-3 font-medium text-red-500">
-                Delete Group
-              </span>
+              <div className="ml-3 font-medium">
+                <span className="capitalize"> Send Via Both</span>
+                <p className="text-xs text-[#667085]">
+                  This will try via Whatsapp before sending text messges,
+                  charges applies
+                </p>
+              </div>
             </div>
             <PiCaretRightBold />
           </div>
@@ -157,4 +125,4 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
   );
 };
 
-export default GroupOptionsModal;
+export default SendContactModal;

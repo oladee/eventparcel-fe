@@ -25,10 +25,20 @@ const Page = () => {
     router.push("/new-group");
   };
 
+  
+
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedEventId = localStorage.getItem("eventId");
+      // const storedEventId = "67d4b39a98acd292aa0daa32";
+      if (!storedEventId) {
+        router.replace("/event-creation");
+        return;
+      }
+      
     const fetchCoHosts = async () => {
       try {
-        const response = await axiosInstance.get("/view-cohosts");
+        const response = await axiosInstance.get(`/view-cohosts/${storedEventId}`);
         if (response.data.success) {
           setCoHosts(response.data.data);
         } else {
@@ -43,7 +53,8 @@ const Page = () => {
     };
 
     fetchCoHosts();
-  }, []);
+  }
+  }, [router]);
 
   return (
     <HeaderLayout>

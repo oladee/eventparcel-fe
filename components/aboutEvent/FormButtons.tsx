@@ -7,9 +7,10 @@ import React, { useState } from "react";
 interface FormButtonsProps {
   isFormValid: boolean;
   groups: Group[] | null
+  fromDashboard: boolean;
 }
 
-const FormButtons: React.FC<FormButtonsProps> = ({ isFormValid, groups }) => {
+const FormButtons: React.FC<FormButtonsProps> = ({ isFormValid, groups, fromDashboard }) => {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
@@ -24,7 +25,11 @@ const FormButtons: React.FC<FormButtonsProps> = ({ isFormValid, groups }) => {
     try {
       if (authToken) {
         const groupQuery = encodeURIComponent(JSON.stringify(groups));
-        router.push(`/payment-setup?groups=${groupQuery}`);
+        if(fromDashboard) {
+          router.push(`/dashboard/payment-setup?groups=${groupQuery}`);
+        } else {
+          router.push(`/payment-setup?groups=${groupQuery}`);
+        }
       } else {
         router.push("/signup")
       }
@@ -84,53 +89,3 @@ const FormButtons: React.FC<FormButtonsProps> = ({ isFormValid, groups }) => {
 };
 
 export default FormButtons;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // components/FormButtons.tsx
-// import React from "react";
-
-// interface FormButtonsProps {
-//   isFormValid: boolean;
-//   onContinue: () => void;
-// }
-
-// const FormButtons: React.FC<FormButtonsProps> = ({ isFormValid, onContinue }) => (
-//   <div className="bg-[#FFFF] h-32 py-10 flex justify-center">
-//     <div className="max-w-screen-md flex gap-4 items-center justify-center sm:justify-end w-full">
-//       <button className="p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827]">
-//         Save for later
-//       </button>
-//       <button
-//         disabled={!isFormValid}
-//         className={`bg-primary text-white py-3 px-8 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center font-extrabold font-manrope ${
-//           !isFormValid ? "opacity-50 cursor-not-allowed" : ""
-//         }`}
-//         onClick={onContinue}
-//       >
-//         Continue
-//       </button>
-//     </div>
-//   </div>
-// );
-
-// export default FormButtons;

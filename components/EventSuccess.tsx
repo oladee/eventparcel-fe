@@ -27,11 +27,11 @@ const EventSuccess: React.FC = () => {
         <p className="font-bold text-2xl md:text-3xl">
           You&apos;ve successfully created an event
         </p>
-        <p className="font-medium text-[#718096]">
+        <p className="font-medium text-sm text-[#718096]">
         Would you like to add a co-host to this event or continue with the group creation?
         </p>
         <Link href="/new-group" className="button_v1">
-          <button className="">Continue to Group</button>
+          <button className="font-bold">Continue to Group</button>
         </Link>
 
         <button

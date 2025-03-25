@@ -29,7 +29,7 @@ const ReusuableSuccess: React.FC<SuccessModalProps> = ({
           onClick={() => {
             router.push(route);
           }}
-          className="button_v1"
+          className="button_v1 !font-bold"
         >
           {buttonText}
         </button>

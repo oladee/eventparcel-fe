@@ -2,9 +2,10 @@
 
 import React from "react";
 import { MapPin } from "lucide-react";
-import EventCoverImage from "./EventCoverImage";
 import DatePicker from "react-datepicker";
+import "react-datepicker/dist/react-datepicker.css";
 import { FaCalendarAlt, FaClock } from "react-icons/fa";
+import EventCoverImage from "@/components/aboutEvent/EventCoverImage";
 
 interface EventFormFieldsProps {
   formData: any;
@@ -27,7 +28,7 @@ interface EventFormFieldsProps {
   handleDateChange: (date: Date | null, field: string) => void;
 }
 
-const EventFormFields: React.FC<EventFormFieldsProps> = ({
+const EventFormFields2: React.FC<EventFormFieldsProps> = ({
   formData,
   errors,
   selectedImage,
@@ -134,7 +135,7 @@ const EventFormFields: React.FC<EventFormFieldsProps> = ({
               onChange={(date) => handleDateChange(date, "eventDate")}
               dateFormat="yyyy-MM-dd"
               popperClassName="custom-datepicker"
-              className="!w-full pl-10 px-3 py-2 input-field outline-primary rounded-[5px] bg-slate-50"
+              className="!w-full pl-10 px-3 py-2 input-field outline-primary rounded-[5px] bg-slate-50 !z-50"
             />
           </div>
           {errors.eventDate && (
@@ -228,4 +229,4 @@ const EventFormFields: React.FC<EventFormFieldsProps> = ({
   );
 };
 
-export default EventFormFields;
+export default EventFormFields2;

@@ -1,12 +1,6 @@
 "use client";
 
-import React, {
-  useState,
-  useEffect,
-  useRef,
-  Suspense,
-  useMemo
-} from "react";
+import React, { useState, useEffect, useRef, Suspense, useMemo } from "react";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next-nprogress-bar";
 import dynamic from "next/dynamic";
@@ -33,13 +27,11 @@ const RiHome5Line = dynamic(
   { ssr: false }
 );
 const BsFillCalendarEventFill = dynamic(
-  () =>
-    import("react-icons/bs").then((mod) => mod.BsFillCalendarEventFill),
+  () => import("react-icons/bs").then((mod) => mod.BsFillCalendarEventFill),
   { ssr: false }
 );
 const PiShoppingCartLight = dynamic(
-  () =>
-    import("react-icons/pi").then((mod) => mod.PiShoppingCartLight),
+  () => import("react-icons/pi").then((mod) => mod.PiShoppingCartLight),
   { ssr: false }
 );
 const FaRegUser = dynamic(
@@ -51,13 +43,13 @@ const BsBoxSeam = dynamic(
   { ssr: false }
 );
 const RiExchange2Line = dynamic(
-  () =>
-    import("react-icons/ri").then((mod) => mod.RiExchange2Line),
+  () => import("react-icons/ri").then((mod) => mod.RiExchange2Line),
   { ssr: false }
 );
 
 // Static import for Logo
 import { Logo2 } from "../icons/Icons";
+import Image from "next/image";
 
 interface MenuItemProps {
   label: string;
@@ -283,11 +275,20 @@ export const Sidebar: React.FC = () => {
         >
           <div className="p-6 h-max flex flex-col">
             {/* Logo / Title */}
-            <div className="flex items-center space-x-3 mb-6">
+            <div className="hidden md:flex items-center space-x-3 mb-6">
               <Logo2 width={40} height={40} />
               <h1 className="text-base md:text-2xl font-bold">
-                Event Parcel
+                Event <br className="md:hidden" /> Parcel
               </h1>
+            </div>
+            <div className="flex items-center space-x-3 mb-6 md:hidden">
+              <Image
+                src="/images/logo4.png"
+                alt="logo"
+                width={100}
+                height={100}
+                style={{ width: "auto", height: "auto" }} // Maintain aspect ratio
+              />
             </div>
 
             {/* MENU Section */}
@@ -360,16 +361,6 @@ export const Sidebar: React.FC = () => {
     </>
   );
 };
-
-
-
-
-
-
-
-
-
-
 
 // import { usePathname } from "next/navigation";
 // import { useRouter } from "next-nprogress-bar";
@@ -520,4 +511,3 @@ export const Sidebar: React.FC = () => {
 //     </aside>
 //   );
 // };
-

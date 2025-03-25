@@ -28,11 +28,13 @@ const EventDetailsSection: React.FC<EventDetailsProps> = ({ eventData }) => {
       {/* Image Section */}
       <div className="relative w-full rounded-xl overflow-hidden">
         <Image
-          src={eventImgUrl? eventImgUrl :  "https://placehold.co/600x400/png"}
+          src={eventImgUrl? eventImgUrl :  "/images/placeholder_eventCover2.jpg"}
           alt={eventName}
           className="w-full h-48 object-cover rounded-xl"
           width={600}
           height={400}
+          quality={100}
+          priority
         />
         {/* More Options Button */}
         <button
@@ -61,7 +63,7 @@ const EventDetailsSection: React.FC<EventDetailsProps> = ({ eventData }) => {
           <p className="text-sm mt-1 text-gray-500">{eventLocation}</p>
         </div>
       </div>
-      <EventOptionsModal isOpen={isModalOpen} onClose={toggleModal} />
+      <EventOptionsModal isOpen={isModalOpen} onClose={toggleModal} eventData={eventData} />
     </div>
   );
 };
