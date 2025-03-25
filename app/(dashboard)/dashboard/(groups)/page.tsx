@@ -1,7 +1,7 @@
 "use client";
 
 import { Suspense } from "react";
-import PaymentSetupContent from "./PaymentSetupContent";
+import PaymentSetupContent from "./payment-setup/page";
 
 const Page = () => {
   return (

@@ -39,7 +39,7 @@ const NairaPayoutForm: React.FC<NairaPayoutFormProps> = ({
     const { value } = e.target;
     handleChange(e);
   
-    let newErrors = { ...errors };
+    const newErrors = { ...errors };
   
     if (e.target.name === "nairaAccount.accountNumber") {
       if (!/^\d{10}$/.test(value)) {

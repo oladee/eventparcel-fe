@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Checked } from "../components/icons/Icons";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
@@ -6,9 +6,13 @@ import Cookies from "js-cookie"
 
 const EventSuccess: React.FC = () => {
   const router = useRouter();
+  const [authToken, setAuthToken] = useState<string | null>(null);
+
+  useEffect(() => {
+    setAuthToken(localStorage.getItem("authToken"));
+  },[]);
 
   const handleAddCoHost = () => {
-    const authToken = localStorage.getItem("authToken");
     if (authToken) {
       router.push("/add-cohost");
     } else {
@@ -18,7 +22,6 @@ const EventSuccess: React.FC = () => {
     }
   };
 
-  console.log(window.location.pathname);
   
   return (
     <div className="fixed py-4 !px-4 w-screen inset-0  overflow-y-auto  bg-[#00000098] h-screen left-0 top-0 z-30 flex items-center justify-center md:justify-center">
@@ -30,7 +33,7 @@ const EventSuccess: React.FC = () => {
         <p className="font-medium text-sm text-[#718096]">
         Would you like to add a co-host to this event or continue with the group creation?
         </p>
-        <Link href="/new-group" className="button_v1">
+        <Link href={authToken ? "/create-group" : "/new-group"} className="button_v1">
           <button className="font-bold">Continue to Group</button>
         </Link>
 

@@ -52,7 +52,7 @@ const DollarPayoutForm: React.FC<DollarPayoutFormProps> = ({
   const { value } = e.target;
   handleChange(e);
 
-  let newErrors = { ...errors };
+  const newErrors = { ...errors };
 
   if (selectedUSBank) {
     if (!/^\d{9}$/.test(value)) {

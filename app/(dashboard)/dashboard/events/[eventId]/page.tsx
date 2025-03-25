@@ -51,7 +51,7 @@ const Page: React.FC = () => {
   }, [router]);
 
   const handleAddGroupClick = () => {
-    router.push("/new-group");
+    router.push("/dashboard/create-group");
   };
 
   if (loading) {

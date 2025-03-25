@@ -11,7 +11,6 @@ import "react-datepicker/dist/react-datepicker.css";
 import { FormEvent } from "react";
 import { PiCalendarMinus } from "react-icons/pi";
 import { AiOutlineClockCircle } from "react-icons/ai";
-import HeaderLayout from "@/components/layout/HeaderLayout";
 import { useRouter, useSearchParams } from "next/navigation";
 import NairaPayoutForm from "@/components/NairaPayoutForm";
 import DollarPayoutForm from "@/components/DollarPayoutForm";
@@ -239,9 +238,9 @@ const PaymentSetupContent = () => {
           onCancel={() => setShowMapPickerModal(false)}
         />
       )}
-      <section className="bg-[#EEEFF2] !overflow-hidden relative">
-        <div className="py-20 lg:py-24 px-3 sm:px-4 mx-auto max-w-screen-md h-[98vh] overflow-y-auto no-scrollbar">
-          <div className="md:mb-12 text-center p-3 sm:p-0 space-y-3">
+      <section className="!overflow-hidden relative pb-20">
+        <div className="lg:py-24 px-3 sm:px-4 mx-auto max-w-screen-md h-[98vh] overflow-y-auto no-scrollbar">
+          <div className="md:mb-12  sm:p-0 space-y-3">
             <h2
               id="payment_deliveryHeader"
               className="flex justify-start text-xl sm:text-2xl font-bold text-[#111827]"
@@ -250,10 +249,10 @@ const PaymentSetupContent = () => {
             </h2>
             <div id="payment_deliveryDesc" className="flex justify-center items-center gap-3">
               <div className="flex flex-col">
-                <span className="flex justify-start w-[313px] whitespace-nowrap h-6 font-general font-medium text-sm text-[#718096]">
+                <span className="flex justify-start w-[313px] pl-2 whitespace-nowrap h-6 font-general font-medium text-sm text-[#718096]">
                   Let&apos;s setup your payout process and payment
                 </span>
-                <span className="flex justify-start w-[313px] h-11 font-general font-medium text-sm text-[#718096]">
+                <span className="flex justify-start w-[313px] pl-2 h-11 font-general font-medium text-sm text-[#718096]">
                   deadline
                 </span>
               </div>

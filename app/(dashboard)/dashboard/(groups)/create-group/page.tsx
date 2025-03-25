@@ -63,11 +63,10 @@ const NewGroup: React.FC = () => {
 
   return (
     <Container>
-
-      <section className="w-auto border border-gray-300 bg-[#EEEFF2] mt-14 h-full">
+      <section className="w-auto h-full">
         <div className="py-6 lg:py-12">
           {/* Header Section */}
-          <div className="mb-6 lg:mb-12 text-start pl-8 lg:text-center">
+          <div className="mb-6 lg:mb-12 text-start pl-5 lg:text-center">
             <h3
               id="header"
               className="text-2xl sm:text-3xl font-bold text-gray-900"
@@ -102,7 +101,7 @@ const NewGroup: React.FC = () => {
               <AddGroup mode="noGroup" setIsAddGroupOpen={setIsAddGroupOpen} />
             </div>
           ) : groups.length === 1 ? (
-            <div className="flex flex-col md:flex-row gap-7 justify-center px-8">
+            <div className="flex flex-col md:flex-row gap-7 justify-center px-5">
               {groups.map((group) => (
                 <GeneralModal key={group._id} group={group} />
               ))}

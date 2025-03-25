@@ -280,8 +280,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
     return (
         <>
             <ToastContainer aria-live="polite" />
-            <div className="w-[95vw] lg:w-[680px] max-h-[80vh] lg:max-h-[97vh] bg-[#FFFFFF] rounded-2xl shadow-lg px-5 pb-3 md:p-5 flex flex-col  overflow-y-auto">
-                {/* Header */}
+            <div className="w-[94vw] lg:w-[680px] max-h-[80vh] lg:max-h-[97vh] bg-[#FFFFFF] rounded-2xl shadow-lg px-5  md:p-5 flex flex-col overflow-y-auto">                {/* Header */}
                 <div className="sticky top-0 z-10 flex justify-between items-center py-4 bg-[#FFFFFF]">
                     <div className="flex flex-col items-start">
                         <div id="header" className="font-bold text-lg text-[#111827]">
@@ -525,32 +524,34 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
                         </div>
                     <div className="border border-gray-100"></div>
                     {/* Buttons */}
-                    <div className="flex justify-center md:justify-end gap-2">
-                        <button 
-                            id="cancel"
-                            onClick={() => setOpenModalPackage(false)} 
-                            className="w-[147px] h[48px] px-4 py-2 rounded-xl border"
-                            >
-                            Cancel
-                        </button>
-                        <button 
-                            id="createPackage"
-                            onClick={handleSubmit} 
-                            disabled={loading}  
-                            className={`w-[147px] h[48px] px-4 py-2 text-white whitespace-nowrap rounded-xl ${
-                                loading 
-                                ? "bg-gray-400 cursor-not-allowed" 
-                                : isFormValid 
-                                ? "bg-[#751423]"
-                                : "bg-[#75142399]"
-                            }`}
-                            >
-                         {loading 
-                            ? (mode === "create" ? "Creating..." : "Updating...") 
-                            : (mode === "create" ? "Create Package" : "Update Package")
-                        }
-                        </button>
-                    </div>
+                    <div className="mt-auto sticky bottom-0 bg-white pt-4 pb-3 -mx-5 px-5 border-t border-gray-100">
+    <div className="flex justify-center md:justify-end gap-2">
+        <button 
+            id="cancel"
+            onClick={() => setOpenModalPackage(false)} 
+            className="w-[147px] h-[48px] px-4 py-2 rounded-xl border"
+        >
+            Cancel
+        </button>
+        <button 
+            id="createPackage"
+            onClick={handleSubmit} 
+            disabled={loading}  
+            className={`w-[147px] h-[48px] px-4 py-2 text-white whitespace-nowrap rounded-xl ${
+                loading 
+                ? "bg-gray-400 cursor-not-allowed" 
+                : isFormValid 
+                ? "bg-[#751423]"
+                : "bg-[#75142399]"
+            }`}
+        >
+            {loading 
+                ? (mode === "create" ? "Creating..." : "Updating...") 
+                : (mode === "create" ? "Create Package" : "Update Package")
+            }
+        </button>
+    </div>
+</div>
                 </div>
             </div>
             </div>

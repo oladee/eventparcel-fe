@@ -287,8 +287,7 @@ const PaymentSetupContent = () => {
 
               {/* NAIRA PAYOUT */}
               <div className=" rounded-[10px]">
-              {/* {hasNGN && (
-              )} */}
+              {hasNGN && (
                 <div className="border border-[#CBD5E0] mb-7 p-4 rounded-[10px]">
                   <NairaPayoutForm
                     formData={formData}
@@ -301,6 +300,7 @@ const PaymentSetupContent = () => {
                     setErrors={setErrors}
                   />
                 </div>
+              )}
 
 
                 {/* DOLLAR PAYOUT */}

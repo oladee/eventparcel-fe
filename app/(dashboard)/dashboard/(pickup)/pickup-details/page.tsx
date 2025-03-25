@@ -187,7 +187,7 @@ const handleSubmit = async (e: React.FormEvent) => {
           onCancel={() => setShowMapPickerModal(false)}
         />
       )}
-      <div className="py-20 bg-[#EEEFF2] lg:py-24 px-6 sm:px-4 mx-auto max-w-screen-md h-screen overflow-y-auto no-scrollbar relative">
+      <div className="lg:py-24 px-6 sm:px-4 mx-auto max-w-screen-md h-screen overflow-y-auto no-scrollbar relative">
         <div className="mt-8">
           <div className="mb-5">
             <h4 id="deliveryDetailsHeader" className="text-2xl font-semibold text-[#111827] mb-2">
