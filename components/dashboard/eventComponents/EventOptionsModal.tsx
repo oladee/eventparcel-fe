@@ -6,6 +6,9 @@ import { PiCaretRightBold } from "react-icons/pi";
 import { LuPencilLine } from "react-icons/lu";
 import { AiOutlineClose } from "react-icons/ai";
 import UpdateEventModal from "./UpdateEventModal";
+import DeleteConfirmationDialog from "@/components/modals/DeleteConfirmationDialog";
+import axiosInstance from "@/lib/axiosInstance";
+import { useRouter } from "next/navigation";
 
 interface EventOptionsModalProps {
   isOpen: boolean;
@@ -20,6 +23,8 @@ const EventOptionsModal: React.FC<EventOptionsModalProps> = ({
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
+  const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const router = useRouter();
 
   // Focus on the modal when it opens and add Escape key support
   useEffect(() => {
@@ -39,6 +44,22 @@ const EventOptionsModal: React.FC<EventOptionsModalProps> = ({
     onClose();
   };
 
+  const handleDeleteEvent = async () => {
+    if (!eventData?._id) return;
+
+    try {
+      await axiosInstance.delete(`/delete-event/${eventData._id}`);
+      console.log("Event deleted successfully");
+      setIsDeleteDialogOpen(false);
+      onClose();
+      // Optionally, refresh or update the event list:
+      router.refresh();
+    } catch (error) {
+      console.error("Error deleting event:", error);
+      alert("Failed to delete event. Please try again later.");
+    }
+  };
+
   if (!isOpen) return null; // Don't render if modal is closed
 
   return (
@@ -51,8 +72,16 @@ const EventOptionsModal: React.FC<EventOptionsModalProps> = ({
           eventData={eventData}
         />
       )}
+
+      <DeleteConfirmationDialog
+        isOpen={isDeleteDialogOpen}
+        onClose={() => setIsDeleteDialogOpen(false)}
+        onDelete={handleDeleteEvent}
+      />
       <div
-        className={`fixed inset-0 bg-black bg-opacity-50 ${showUpdateModal? "hidden": "flex"} items-end justify-center z-50`}
+        className={`fixed inset-0 bg-black bg-opacity-50 ${
+          showUpdateModal ? "hidden" : "flex"
+        } items-end justify-center z-50`}
         onClick={onClose}
         role="presentation"
       >
@@ -113,7 +142,7 @@ const EventOptionsModal: React.FC<EventOptionsModalProps> = ({
             </div>
             <div
               className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
-              onClick={() => console.log("Delete Event clicked")}
+              onClick={() => setIsDeleteDialogOpen(true)}
             >
               <div className="flex items-center">
                 <span className="p-2 bg-[#FFF7F2] rounded-full text-red-500">

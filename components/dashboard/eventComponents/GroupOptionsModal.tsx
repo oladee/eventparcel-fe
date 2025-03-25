@@ -1,17 +1,23 @@
 "use client";
 
-import React, { useEffect, useRef } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { MdOutlinePowerSettingsNew, MdDeleteOutline } from "react-icons/md";
 import { PiCaretRightBold } from "react-icons/pi";
 import { LuPencilLine } from "react-icons/lu";
 import { AiOutlineClose } from "react-icons/ai";
 import { GoShareAndroid } from "react-icons/go";
+import AddGroup from "@/components/AddGroupCaller";
+import { Group } from "@/app/interface/Group";
+import axiosInstance from "@/lib/axiosInstance";
+import axios from "axios";
+import { toast, ToastContainer } from "react-toastify";
+import DeleteConfirmationDialog from "@/components/modals/DeleteConfirmationDialog";
 
-interface Group {
-  _id: string;
-  groupName: string;
-  link?: string;
-}
+// interface Group {
+//   _id: string;
+//   groupName: string;
+//   link?: string;
+// }
 
 interface GroupOptionsModalProps {
   isOpen: boolean;
@@ -25,6 +31,8 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
   group
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
+  const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
+  const [isDeleteModal, setIsDeleteModal] = useState(false);
 
   // Focus on the modal when it opens and add Escape key support
   useEffect(() => {
@@ -43,14 +51,15 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
   const handleShareGroupLink = async () => {
     if (!group) return;
     // Use group.link if it exists, otherwise create a default link.
-    const shareUrl = group.link || `https://yourwebsite.com/groups/${group._id}`;
+    const shareUrl =
+      group.link || `https://yourwebsite.com/groups/${group._id}`;
 
     if (navigator.share) {
       try {
         await navigator.share({
           title: group.groupName,
           text: `Check out the group: ${group.groupName}`,
-          url: shareUrl,
+          url: shareUrl
         });
         console.log("Group link shared successfully");
       } catch (error) {
@@ -65,95 +74,157 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
     }
   };
 
+  // const handleDeleteEvent = async () => {
+  //   if (!eventData?._id) return;
+
+  //   try {
+  //     await axiosInstance.delete(`/delete-event/${eventData._id}`);
+  //     console.log("Event deleted successfully");
+  //     setIsDeleteDialogOpen(false);
+  //     onClose();
+  //     // Optionally, refresh or update the event list:
+  //     router.refresh();
+  //   } catch (error) {
+  //     console.error("Error deleting event:", error);
+  //     alert("Failed to delete event. Please try again later.");
+  //   }
+  // };
+
+  const handleDelete = async () => {
+    if (!group?._id) return;
+
+    try {
+      await axiosInstance.delete(`/delete-group/${group._id}`);
+
+      toast.success(`Group deleted successfully`);
+
+      setIsDeleteModal(false);
+      window.location.reload();
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        const errorMessage =
+          error.response?.data?.message ||
+          error.message ||
+          "An unknown error occurred.";
+        // setError(errorMessage);
+
+        // Show toast notification
+        toast.error(errorMessage);
+      } else {
+        console.error("Unexpected Error:", error);
+      }
+    }
+  };
+
   if (!isOpen) return null; // Don't render if modal is closed
 
   return (
-    <div
-      className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50"
-      onClick={onClose}
-      role="presentation"
-    >
+    <>
       <div
-        ref={modalRef}
-        tabIndex={0}
-        role="dialog"
-        aria-modal="true"
-        aria-labelledby="modal-title"
-        onKeyDown={handleKeyDown}
-        onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
-        className="bg-white w-full max-w-md rounded-t-[35px] p-5 pb-10 shadow-lg transition-transform transform translate-y-0"
+        className="fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50"
+        onClick={onClose}
+        role="presentation"
       >
-        {/* Slider indicator */}
-        <div className="w-full flex justify-center">
-          <div className="w-10 h-[6px] rounded-full bg-[#E8EAED]"></div>
-        </div>
+        <div
+          ref={modalRef}
+          tabIndex={0}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="modal-title"
+          onKeyDown={handleKeyDown}
+          onClick={(e) => e.stopPropagation()} // Prevent closing when clicking inside
+          className={`bg-white ${
+            isAddGroupOpen ? "hidden" : "block"
+          } w-full max-w-md rounded-t-[35px] p-5 pb-10 shadow-lg transition-transform transform translate-y-0`}
+        >
+          {/* Slider indicator */}
+          <div className="w-full flex justify-center">
+            <div className="w-10 h-[6px] rounded-full bg-[#E8EAED]"></div>
+          </div>
 
-        <div className="flex justify-between items-center mb-4">
-          <h2 id="modal-title" className="text-lg font-bold">
-            Group Options
-          </h2>
-          <button
-            onClick={onClose}
-            className="text-xl"
-            aria-label="Close Modal"
-          >
-            <AiOutlineClose color="gray" />
-          </button>
-        </div>
-        <div className="grid gap-4">
-          <div
-            className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
-            onClick={() => console.log("Edit Group clicked")}
-          >
-            <div className="flex items-center">
-              <span className="p-2 bg-[#FFF7F2] rounded-full text-primary">
-                <LuPencilLine size={20} />
-              </span>
-              <span className="ml-3 font-medium">Edit Group</span>
-            </div>
-            <PiCaretRightBold />
+          <div className="flex justify-between items-center mb-4">
+            <h2 id="modal-title" className="text-lg font-bold">
+              Group Options
+            </h2>
+            <button
+              onClick={onClose}
+              className="text-xl"
+              aria-label="Close Modal"
+            >
+              <AiOutlineClose color="gray" />
+            </button>
           </div>
-          <div
-            className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
-            onClick={handleShareGroupLink}
-          >
-            <div className="flex items-center">
-              <span className="p-2 bg-[#FFF7F2] rounded-full text-primary">
-                <GoShareAndroid size={20} />
-              </span>
-              <span className="ml-3 font-medium">Share Group Link</span>
+          <div className="grid gap-4">
+            <div
+              className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
+              onClick={() => setIsAddGroupOpen(true)}
+            >
+              <div className="flex items-center">
+                <span className="p-2 bg-[#FFF7F2] rounded-full text-primary">
+                  <LuPencilLine size={20} />
+                </span>
+                <span className="ml-3 font-medium">Edit Group</span>
+              </div>
+              <PiCaretRightBold />
             </div>
-            <PiCaretRightBold />
-          </div>
-          <div
-            className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
-            onClick={() => console.log("Disable Group clicked")}
-          >
-            <div className="flex items-center">
-              <span className="p-2 bg-[#FFF7F2] rounded-full text-primary">
-                <MdOutlinePowerSettingsNew size={20} />
-              </span>
-              <span className="ml-3 font-medium">Disable Group</span>
+            <div
+              className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
+              onClick={handleShareGroupLink}
+            >
+              <div className="flex items-center">
+                <span className="p-2 bg-[#FFF7F2] rounded-full text-primary">
+                  <GoShareAndroid size={20} />
+                </span>
+                <span className="ml-3 font-medium">Share Group Link</span>
+              </div>
+              <PiCaretRightBold />
             </div>
-            <PiCaretRightBold />
-          </div>
-          <div
-            className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
-            onClick={() => console.log("Delete Group clicked")}
-          >
-            <div className="flex items-center">
-              <span className="p-2 bg-[#FFF7F2] rounded-full text-red-500">
-                <MdDeleteOutline size={20} />
-              </span>
-              <span className="ml-3 font-medium text-red-500">
-                Delete Group
-              </span>
+            <div
+              className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
+              onClick={() => console.log("Disable Group clicked")}
+            >
+              <div className="flex items-center">
+                <span className="p-2 bg-[#FFF7F2] rounded-full text-primary">
+                  <MdOutlinePowerSettingsNew size={20} />
+                </span>
+                <span className="ml-3 font-medium">Disable Group</span>
+              </div>
+              <PiCaretRightBold />
             </div>
-            <PiCaretRightBold />
+            <div
+              className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
+              onClick={() => setIsDeleteModal(true)}
+            >
+              <div className="flex items-center">
+                <span className="p-2 bg-[#FFF7F2] rounded-full text-red-500">
+                  <MdDeleteOutline size={20} />
+                </span>
+                <span className="ml-3 font-medium text-red-500">
+                  Delete Group
+                </span>
+              </div>
+              <PiCaretRightBold />
+            </div>
           </div>
         </div>
       </div>
-    </div>
+      {isAddGroupOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-5 z-50">
+          <AddGroup
+            mode="availGroup"
+            setIsAddGroupOpen={setIsAddGroupOpen}
+            selectedGroup={group}
+          />
+        </div>
+      )}
+
+      <DeleteConfirmationDialog
+        isOpen={isDeleteModal}
+        onClose={() => setIsDeleteModal(false)}
+        onDelete={handleDelete}
+      />
+      <ToastContainer aria-live="polite" className="absolute " />
+    </>
   );
 };
 

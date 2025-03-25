@@ -75,10 +75,10 @@ const Login: React.FC = () => {
       localStorage.setItem("authToken", response.data.accessToken);
       // Save the response to localStorage as the logged-in user
       localStorage.setItem("loggedInUser", JSON.stringify(response.data));
-
+      localStorage.setItem("loggedInUserEmail", response.data.email)
       toast.success(response?.data?.message);
 
-      router.push("/event-creation");
+      router.push("/dashboard/event-creation");
     } catch (error: any) {
       if (
         error.response?.data?.message ===

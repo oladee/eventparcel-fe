@@ -7,23 +7,25 @@ import { IoIosSend } from "react-icons/io";
 import GroupOptionsModal from "./GroupOptionsModal";
 import Image from "next/image";
 import { useRouter } from "next-nprogress-bar";
+import { Group,Package } from "@/app/interface/Group";
+import CreatePackageModal from "@/components/CreatePackageModal";
 
-interface Package {
-  _id: string;
-  packageImgUrls: string[];
-  packageTitle: string;
-  packagePrice: number;
-  packagePriceCurrency: string;
-}
+// interface Package {
+//   _id: string;
+//   packageImgUrls: string[];
+//   packageTitle: string;
+//   packagePrice: number;
+//   packagePriceCurrency: string;
+// }
 
-interface Group {
-  _id: string;
-  groupName: string;
-  groupDescription: string;
-  groupPrivacy: string;
-  packages: Package[];
-  link?: string; // Optional: include the group link
-}
+// interface Group {
+//   _id: string;
+//   groupName: string;
+//   groupDescription: string;
+//   groupPrivacy: string;
+//   packages: Package[];
+//   link?: string; // Optional: include the group link
+// }
 
 interface PackagesSectionProps {
   eventData: {
@@ -32,7 +34,11 @@ interface PackagesSectionProps {
 }
 
 const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
+    const [openModalPackage, setOpenModalPackage] = useState(false);
+      const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [group1, setGroup1] = useState<Group | null>(null);
+  const [modalMode, setModalMode] = useState<"create" | "update">("create");
   // New state to keep track of the selected group for sharing
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const router = useRouter();
@@ -53,8 +59,8 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
   };
 
   const handleSendInviteClick = () => {
-    router.push('/share-contact')
-  }
+    router.push("/share-contact");
+  };
 
   return (
     <>
@@ -68,7 +74,7 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
                   group.groupPrivacy.toLowerCase() === "private"
                     ? "text-red-600 border-red-600 bg-[#DE42221F]"
                     : "text-[#2B9EA0] border-[#2B9EA0] bg-[#2B9EA01F]"
-                } border px-3 rounded-full text-sm font-medium`}
+                } border px-3 rounded-full text-sm font-medium capitalize`}
               >
                 {group.groupPrivacy}
               </span>
@@ -92,7 +98,14 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
             <div className="flex justify-between items-center mt-6">
               <h3 className="text-lg font-bold text-gray-900">Packages</h3>
               <button
-               className="text-primary flex items-center gap-1 font-medium">
+                onClick={() => {
+                  setModalMode("create");
+                  setSelectedPackage(null);
+                  setOpenModalPackage(true);
+                  setGroup1(group)
+                }}
+                className="text-primary flex items-center gap-1 font-medium"
+              >
                 <AiOutlinePlus size={18} /> Add New
               </button>
             </div>
@@ -120,16 +133,26 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
                       {pkg.packageTitle
                         .split(" ")
                         .map(
-                          (word) =>
-                            word.charAt(0).toUpperCase() + word.slice(1)
+                          (word) => word.charAt(0).toUpperCase() + word.slice(1)
                         )
                         .join(" ")}
                     </h4>
                     <p className="text-[#718096] font-medium text-xs">
-                      <span className="">{pkg.packagePriceCurrency === "NGN" ? "₦" : "$"}</span>{formatNumber(pkg.packagePrice)}
+                      <span className="">
+                        {pkg.packagePriceCurrency === "NGN" ? "₦" : "$"}
+                      </span>
+                      {formatNumber(pkg.packagePrice)}
                     </p>
                   </div>
-                  <AiOutlineEdit size={20} className="text-[#718096] cursor-pointer" />
+                  <AiOutlineEdit
+                   onClick={() => {
+                    setModalMode("update");
+                    setSelectedPackage(pkg);
+                    setOpenModalPackage(true);
+                  }}
+                    size={20}
+                    className="text-[#718096] cursor-pointer"
+                  />
                 </div>
               ))}
             </div>
@@ -140,14 +163,27 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
                 Contacts: <span className="text-gray-900 font-bold">0</span>
               </p>
               <button
-              onClick={handleSendInviteClick}
-               className="text-primary flex items-center gap-1 font-medium outline-none">
+                onClick={handleSendInviteClick}
+                className="text-primary flex items-center gap-1 font-medium outline-none"
+              >
                 <IoIosSend size={18} /> Send Invite
               </button>
             </div>
           </div>
         ))}
       </div>
+
+      {openModalPackage && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
+          <CreatePackageModal
+            setOpenModalPackage={setOpenModalPackage}
+            mode={modalMode}
+            packageData={selectedPackage}
+            groudId={group1?._id}
+            groupCurrency={group1?.groupCurrency}
+          />
+        </div>
+      )}
       {/* Pass the selected group to the modal */}
       <GroupOptionsModal
         isOpen={isModalOpen}
@@ -159,39 +195,6 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
 };
 
 export default PackagesSection;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // "use client";
 
@@ -320,6 +323,3 @@ export default PackagesSection;
 // };
 
 // export default PackagesSection;
-
-
-

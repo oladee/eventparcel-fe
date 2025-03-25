@@ -1,5 +1,4 @@
 "use client";
-
 import Image from "next/image";
 import React, { useState } from "react";
 import { FiMoreHorizontal } from "react-icons/fi";
@@ -18,17 +17,30 @@ interface EventDetailsProps {
   };
 }
 
-const EventDetailsSection: React.FC<EventDetailsProps> = ({ eventData }) => {
+const EventDetailsSection: React.FC<EventDetailsProps> = ({
+  eventData,
+}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [expanded, setExpanded] = useState(false);
+
   const toggleModal = () => setIsModalOpen((prev) => !prev);
-  const { eventImgUrl, eventName, eventDescription, date, time, eventLocation } = eventData;
+  // const toggleDescription = () => setExpanded((prev) => !prev);
+
+  const {
+    eventImgUrl,
+    eventName,
+    eventDescription,
+    date,
+    time,
+    eventLocation,
+  } = eventData;
 
   return (
     <div className="bg-[#fff4ed] p-4 rounded-2xl">
       {/* Image Section */}
       <div className="relative w-full rounded-xl overflow-hidden">
         <Image
-          src={eventImgUrl? eventImgUrl :  "/images/placeholder_eventCover2.jpg"}
+          src={eventImgUrl || "/images/placeholder_eventCover2.jpg"}
           alt={eventName}
           className="w-full h-48 object-cover rounded-xl"
           width={600}
@@ -44,14 +56,27 @@ const EventDetailsSection: React.FC<EventDetailsProps> = ({ eventData }) => {
           <FiMoreHorizontal size={20} className="text-gray-600" />
         </button>
       </div>
-
       {/* Details Section */}
       <div className="mt-4">
-        <h2 className="text-xl font-bold text-gray-900 capitalize">{eventName}</h2>
-        <p className="text-gray-600 text-sm mt-1 w-full max-w-3xl truncate-text">
+        <h2 className="text-xl font-bold text-gray-900 capitalize">
+          {eventName}
+        </h2>
+        <p
+          className={`text-gray-600 text-sm mt-1 w-full max-w-3xl ${
+            expanded ? "h-auto" : "h-12 overflow-hidden"
+          }`}
+        >
           {eventDescription}
+          {expanded ? (
+            <span className="text-primary text-sm capitalize">
+              Show less
+            </span>
+          ) : (
+            <span className="text-primary text-sm capitalize">
+              Read more
+            </span>
+          )}
         </p>
-
         {/* Event Info */}
         <div className="mt-4 border-t pt-3 text-gray-700">
           <div className="flex items-center gap-2 text-sm font-semibold">
@@ -63,12 +88,111 @@ const EventDetailsSection: React.FC<EventDetailsProps> = ({ eventData }) => {
           <p className="text-sm mt-1 text-gray-500">{eventLocation}</p>
         </div>
       </div>
-      <EventOptionsModal isOpen={isModalOpen} onClose={toggleModal} eventData={eventData} />
+      <EventOptionsModal
+        isOpen={isModalOpen}
+        onClose={toggleModal}
+        eventData={eventData}
+      />
     </div>
   );
 };
 
 export default EventDetailsSection;
+
+
+
+
+
+
+
+
+
+
+
+// "use client";
+
+// import Image from "next/image";
+// import React, { useState } from "react";
+// import { FiMoreHorizontal } from "react-icons/fi";
+// import { MdOutlineCalendarToday } from "react-icons/md";
+// import EventOptionsModal from "./EventOptionsModal";
+
+// interface EventDetailsProps {
+//   eventData: {
+//     eventImgUrl: string;
+//     eventName: string;
+//     eventDescription: string;
+//     date: string;
+//     time: string;
+//     eventLocation: string;
+//     // ... include any additional fields you want to use
+//   };
+// }
+
+// const EventDetailsSection: React.FC<EventDetailsProps> = ({ eventData }) => {
+//   const [isModalOpen, setIsModalOpen] = useState(false);
+//   const [expanded, setExpanded] = useState(false);
+
+//   const toggleDescription = () => {
+//     setExpanded((prev) => !prev);
+//   };
+//   const toggleModal = () => setIsModalOpen((prev) => !prev);
+//   const { eventImgUrl, eventName, eventDescription, date, time, eventLocation } = eventData;
+
+//   return (
+//     <div className="bg-[#fff4ed] p-4 rounded-2xl">
+//       {/* Image Section */}
+//       <div className="relative w-full rounded-xl overflow-hidden">
+//         <Image
+//           src={eventImgUrl? eventImgUrl :  "/images/placeholder_eventCover2.jpg"}
+//           alt={eventName}
+//           className="w-full h-48 object-cover rounded-xl"
+//           width={600}
+//           height={400}
+//           quality={100}
+//           priority
+//         />
+//         {/* More Options Button */}
+//         <button
+//           onClick={toggleModal}
+//           className="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md"
+//         >
+//           <FiMoreHorizontal size={20} className="text-gray-600" />
+//         </button>
+//       </div>
+
+//       {/* Details Section */}
+//       <div className="mt-4">
+//         <h2 className="text-xl font-bold text-gray-900 capitalize">{eventName}</h2>
+//         {/* <p className="text-gray-600 text-sm mt-1 w-full max-w-3xl truncate-text">
+//           {eventDescription}
+//         </p> */}
+//           <p
+//           className={`text-gray-600 text-sm mt-1 w-full max-w-3xl ${
+//             expanded ? "" : "truncate-text"
+//           }`}
+//         >
+//           {eventDescription}<span className="text-primary text-sm capitalize">Read more</span>
+//         </p>
+        
+
+//         {/* Event Info */}
+//         <div className="mt-4 border-t pt-3 text-gray-700">
+//           <div className="flex items-center gap-2 text-sm font-semibold">
+//             <MdOutlineCalendarToday size={18} />
+//             <span>
+//               {date} at {time}
+//             </span>
+//           </div>
+//           <p className="text-sm mt-1 text-gray-500">{eventLocation}</p>
+//         </div>
+//       </div>
+//       <EventOptionsModal isOpen={isModalOpen} onClose={toggleModal} eventData={eventData} />
+//     </div>
+//   );
+// };
+
+// export default EventDetailsSection;
 
 
 
