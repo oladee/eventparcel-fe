@@ -100,21 +100,7 @@ const PaymentSetupContent = () => {
 
 
   // Initialize error messages as strings, not dates.
-  const [errors, setErrors] = useState({
-    accountNumber: "",
-    accountName: "",
-    bankName: "",
-    usAccountNumber: "",
-    routingNumber: "",
-    usBankName: "",
-    usAccountName: "",
-    paymentDate: "",
-    paymentTime: "",
-    contactName: "",
-    pickupLocation: "",
-    deliveryDate: "",
-    deliveryTime: ""
-  });
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const [isFormValid, setIsFormValid] = useState(false);
 
@@ -140,7 +126,9 @@ const PaymentSetupContent = () => {
   };
   
   const validateField = (id: string, value: any) => {
-    switch (id) {
+    const fieldName = id.split(".").pop();
+
+    switch (fieldName) {
       case "accountNumber":
         if (!/^\d+$/.test(value)) return "Account number must be a number";
         if (value.length !== 10) return "Account number must be 10 digits";
@@ -299,7 +287,8 @@ const PaymentSetupContent = () => {
 
               {/* NAIRA PAYOUT */}
               <div className=" rounded-[10px]">
-              {hasNGN && (
+              {/* {hasNGN && (
+              )} */}
                 <div className="border border-[#CBD5E0] mb-7 p-4 rounded-[10px]">
                   <NairaPayoutForm
                     formData={formData}
@@ -309,9 +298,9 @@ const PaymentSetupContent = () => {
                     selectedBank={selectedBank}
                     setSelectedBank={setSelectedBank}
                     setFormData={setFormData}
+                    setErrors={setErrors}
                   />
                 </div>
-              )}
 
 
                 {/* DOLLAR PAYOUT */}
@@ -325,6 +314,7 @@ const PaymentSetupContent = () => {
                     selectedUSBank={selectedUSBank}
                     setSelectedUSBank={setSelectedUSBank}
                     setFormData={setFormData}
+                    setErrors={setErrors}
                   />
                 </div> 
                 )}        

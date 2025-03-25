@@ -21,6 +21,7 @@ interface NairaPayoutFormProps {
   selectedBank: Bank | null;
   setSelectedBank: (bank: Bank) => void;
   setFormData: React.Dispatch<React.SetStateAction<any>>;
+  setErrors: React.Dispatch<React.SetStateAction<{ [key: string]: string }>>;
 }
 
 const NairaPayoutForm: React.FC<NairaPayoutFormProps> = ({
@@ -31,7 +32,27 @@ const NairaPayoutForm: React.FC<NairaPayoutFormProps> = ({
   selectedBank,
   setSelectedBank,
   setFormData,
+  setErrors
 }) => {
+
+   const handleValidation = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value } = e.target;
+    handleChange(e);
+  
+    let newErrors = { ...errors };
+  
+    if (e.target.name === "nairaAccount.accountNumber") {
+      if (!/^\d{10}$/.test(value)) {
+        newErrors.accountNumber = "Account number must be 10 digits.";
+      } else {
+        delete newErrors.accountNumber;
+      }
+    }
+  
+    setErrors(newErrors);
+  };
+  
+
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {/* Account Number Field */}
@@ -48,9 +69,10 @@ const NairaPayoutForm: React.FC<NairaPayoutFormProps> = ({
           type="number"
           id="nairaAccount.accountNumber"
           placeholder="Enter account number"
+          name="nairaAccount.accountNumber"
           value={formData.nairaAccount.accountNumber}
           maxLength={10}
-          onChange={handleChange}
+          onChange={handleValidation}
           onBlur={handleBlur}
           className="px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50"
           aria-describedby="accountNumberError"
@@ -75,7 +97,7 @@ const NairaPayoutForm: React.FC<NairaPayoutFormProps> = ({
       </div>
 
       {/* Account Name Field */}
-      <div className="flex flex-col">
+      <div className="flex flex-col -mt-5">
         <label htmlFor="accountName" className="block mb-2 font-semibold text-[#111827]">
           Account Name
         </label>
