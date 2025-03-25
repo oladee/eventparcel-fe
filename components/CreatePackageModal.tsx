@@ -26,8 +26,8 @@ interface CreatePackageModalProps {
     setOpenModalPackage: React.Dispatch<React.SetStateAction<boolean>>;
     mode: "create" | "update";
     packageData?: Package | null;
-    groudId: string | number;
-    groupCurrency: string;
+    groudId: string | number | undefined;
+    groupCurrency: string | undefined;
 }
 
 const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupCurrency, setOpenModalPackage, mode, packageData }) => {

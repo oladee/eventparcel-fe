@@ -51,6 +51,7 @@ const EventDetailsSection: React.FC<EventDetailsProps> = ({ eventData }) => {
         <p className="text-gray-600 text-sm mt-1 w-full max-w-3xl truncate-text">
           {eventDescription}
         </p>
+    
 
         {/* Event Info */}
         <div className="mt-4 border-t pt-3 text-gray-700">

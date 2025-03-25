@@ -17,7 +17,9 @@ const HeaderDashboard: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   useEffect(() => {
     // Retrieve the loggedInUser data from localStorage
     const loggedInUser = localStorage.getItem("loggedInUser");
+    console.log("checking if a user is logged in")
     if (loggedInUser) {
+      console.log("A User is logged in")
       const parsedUser = JSON.parse(loggedInUser);
       setUser({
         firstName: parsedUser.firstName || "",
