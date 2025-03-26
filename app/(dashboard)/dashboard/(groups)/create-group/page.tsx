@@ -9,9 +9,8 @@ import FormButtons from "@/components/aboutEvent/FormButtons";
 import { Group } from "@/app/interface/Group";
 import axiosInstance from "@/lib/axiosInstance";
 import dynamic from "next/dynamic";
-// import router from "next/router";
-import HeaderLayout from "@/components/layout/HeaderLayout";
 import { useRouter } from "next/navigation";
+import Container from "@/components/dashboard/Container";
 
 const AddGroup = dynamic(() => import("@/components/AddGroupCaller"), {
   ssr: false
@@ -62,24 +61,16 @@ const NewGroup: React.FC = () => {
     setIsAddGroupOpen(true);
   };
 
-  // if (loading) {
-  //   return (
-  //     <p className="text-xl font-semibold h-screen text-center">
-  //       Loading groups...
-  //     </p>
-  //   );
-  // }
-
   return (
-    <HeaderLayout>
-      <section className="w-auto border border-gray-300 bg-[#EEEFF2] mt-14 h-full">
+    <Container>
+      <section className="w-auto h-full">
         <div className="py-6 lg:py-12">
           {/* Header Section */}
-          <div className="mb-6 lg:mb-12 text-start pl-8 lg:text-center">
+          <div className="mb-6 lg:mb-12 text-start pl-5 lg:text-center">
             <h3
               id="header"
               className="text-2xl sm:text-3xl font-bold text-gray-900"
-            >
+              >
               Event Groups & Packages
             </h3>
             <div className="flex items-center justify-center gap-2 text-sm sm:text-base text-gray-600">
@@ -94,7 +85,7 @@ const NewGroup: React.FC = () => {
                 alt="information"
                 className="cursor-pointer"
                 id="infoButton"
-              />
+                />
             </div>
           </div>
 
@@ -106,19 +97,19 @@ const NewGroup: React.FC = () => {
             <div
               onClick={handleAddGroupClick}
               className="w-full flex justify-center xl:justify-start xl:pl-[380px]"
-            >
+              >
               <AddGroup mode="noGroup" setIsAddGroupOpen={setIsAddGroupOpen} />
             </div>
           ) : groups.length === 1 ? (
-            <div className="flex flex-col md:flex-row gap-7 justify-center px-8">
+            <div className="flex flex-col md:flex-row gap-7 justify-center px-5">
               {groups.map((group) => (
                 <GeneralModal key={group._id} group={group} />
               ))}
 
               {isAddSingleGroupOpen && (
                 <AddGroup
-                  setIsAddGroupOpen={setIsAddGroupOpen}
-                  mode="noGroup"
+                setIsAddGroupOpen={setIsAddGroupOpen}
+                mode="noGroup"
                 />
               )}
               {/* Clicking this will open AddGroup */}
@@ -139,8 +130,8 @@ const NewGroup: React.FC = () => {
 
                 {isAddSingleGroupOpen && (
                   <AddGroup
-                    setIsAddGroupOpen={setIsAddGroupOpen}
-                    mode="noGroup"
+                  setIsAddGroupOpen={setIsAddGroupOpen}
+                  mode="noGroup"
                   />
                 )}
               </div>
@@ -150,7 +141,7 @@ const NewGroup: React.FC = () => {
                 <div
                   className=""
                   onClick={() => setIsAddSingleGroupOpen(!isAddSingleGroupOpen)}
-                >
+                  >
                   <CreateGroupCaller />
                 </div>
               </div>
@@ -160,9 +151,9 @@ const NewGroup: React.FC = () => {
           {/* Right Bar */}
           <RightBar isOpen={isRightBarOpen} setIsOpen={setIsRightBarOpen} />
         </div>
-        <FormButtons fromDashboard={false} isFormValid={!!isFormValid} groups={groups}/>
+        <FormButtons fromDashboard={true} isFormValid={!!isFormValid} groups={groups}/>
       </section>
-    </HeaderLayout>
+    </Container>
   );
 };
 

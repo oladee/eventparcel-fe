@@ -27,6 +27,7 @@ interface DollarPayoutFormProps {
   selectedUSBank: USBank | null;
   setSelectedUSBank: (usBank: USBank) => void;
   setFormData: React.Dispatch<React.SetStateAction<any>>;
+  setErrors: React.Dispatch<React.SetStateAction<{ [key: string]: string }>>;
 }
 
 const DollarPayoutForm: React.FC<DollarPayoutFormProps> = ({
@@ -37,7 +38,9 @@ const DollarPayoutForm: React.FC<DollarPayoutFormProps> = ({
   selectedUSBank,
   setSelectedUSBank,
   setFormData,
+  setErrors
 }) => {
+
   // Function to validate routing number
   const validateRoutingNumber = (routingNumber: string): boolean => {
     if (!selectedUSBank) return false; 
@@ -45,20 +48,35 @@ const DollarPayoutForm: React.FC<DollarPayoutFormProps> = ({
   };
 
   // Handle routing number input change
-  const handleRoutingNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
-    handleChange(e); 
+ const handleRoutingNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const { value } = e.target;
+  handleChange(e);
 
-    // Validate routing number
-    if (selectedUSBank) {
-      const isValid = validateRoutingNumber(value);
-      if (!isValid) {
-        errors.routingNumber = "Invalid routing number for the selected bank.";
-      } else {
-        delete errors.routingNumber;
-      }
+  const newErrors = { ...errors };
+
+  if (selectedUSBank) {
+    if (!/^\d{9}$/.test(value)) {
+      newErrors.routingNumber = "Routing number must be exactly 9 digits.";
+    } else if (!validateRoutingNumber(value)) {
+      newErrors.routingNumber = "Invalid routing number for the selected bank.";
+    } else {
+      delete newErrors.routingNumber;
     }
-  };
+  }
+  
+
+  if (e.target.name === "dollarAccount.usAccountNumber") {
+    console.log(value)
+    if (!/^\d{8,12}$/.test(value)) {
+      newErrors.usAccountNumber = "Account number must be between 8 and 12 digits.";
+    } else {
+      delete newErrors.usAccountNumber;
+    }
+  }
+
+  setErrors(newErrors);
+};
+
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -78,7 +96,7 @@ const DollarPayoutForm: React.FC<DollarPayoutFormProps> = ({
           placeholder="Enter account number"
           value={formData.dollarAccount.usAccountNumber}
           maxLength={10}
-          onChange={handleChange}
+          onChange={handleRoutingNumberChange}
           onBlur={handleBlur}
           className="px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50"
           aria-describedby="accountNumberError"
@@ -86,7 +104,7 @@ const DollarPayoutForm: React.FC<DollarPayoutFormProps> = ({
           required
         />
         {errors.usAccountNumber && (
-          <p id="accountNumberError" className="text-red-500 text-sm mt-1" role="alert">
+          <p id="accountNumberError" className="text-red-500 text-[12px] mt-1 whitespace-nowrap" role="alert">
             {errors.usAccountNumber}
           </p>
         )}
@@ -108,19 +126,22 @@ const DollarPayoutForm: React.FC<DollarPayoutFormProps> = ({
           Routing Number
         </label>
         <input
-          type="number"
-          id="dollarAccount.routingNumber"
-          name="dollarAccount.routingNumber"
-          placeholder="Enter routing number"
-          value={formData.dollarAccount.routingNumber}
-          maxLength={10}
-          onChange={handleRoutingNumberChange} 
-          onBlur={handleBlur}
-          className="px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50"
-          aria-describedby="routingNumberError"
-          aria-invalid={!!errors.routingNumber}
-          required
-        />
+            type="number"
+            id="dollarAccount.routingNumber"
+            name="dollarAccount.routingNumber"
+            placeholder="Enter routing number"
+            value={formData.dollarAccount.routingNumber}
+            maxLength={10}
+            onChange={handleRoutingNumberChange}
+            onBlur={handleBlur}
+            className={`px-3 py-2 input-field outline-primary w-full rounded-[5px] ${
+              !selectedUSBank ? "bg-gray-100 cursor-not-allowed" : "bg-slate-50"
+            }`}
+            aria-describedby="routingNumberError"
+            aria-invalid={!!errors.routingNumber}
+            required
+            disabled={!selectedUSBank} 
+          />
         {errors.routingNumber && (
           <p id="routingNumberError" className="text-red-500 text-sm mt-1" role="alert">
             {errors.routingNumber}
