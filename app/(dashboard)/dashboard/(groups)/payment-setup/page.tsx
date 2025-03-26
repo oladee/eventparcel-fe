@@ -2,7 +2,7 @@
 
 import RightBar from "@/components/Rightbar";
 import dynamic from "next/dynamic";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import ReusuableSuccess from "@/components/modals/ReusuableSuccess";
 import { toast, ToastContainer } from "react-toastify";
 import { BiLoaderCircle } from "react-icons/bi";
@@ -441,4 +441,12 @@ const PaymentSetupContent = () => {
   );
 };
 
-export default PaymentSetupContent;
+// export default PaymentSetupContent;
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div className="text-center py-10">Loading...</div>}>
+      <PaymentSetupContent />
+    </Suspense>
+  );
+}

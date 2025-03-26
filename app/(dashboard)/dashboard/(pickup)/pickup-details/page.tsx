@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -12,8 +12,14 @@ import { BiLoaderCircle } from "react-icons/bi";
 import PhoneNumberInput from "@/components/PhoneNumberInput";
 import axiosInstance from "@/lib/axiosInstance";
 import { useCallback } from "react";
-import LocationPickerModal from "@/components/aboutEvent/LocationPickerModal";
+// import LocationPickerModal from "@/components/aboutEvent/LocationPickerModal";
 import Container from "@/components/dashboard/Container";
+import dynamic from "next/dynamic";
+
+const LocationPickerModal = dynamic(
+  () => import("@/components/aboutEvent/LocationPickerModal"),
+  { ssr: false }
+);
 
 const PickupDetails = () => {
   const router = useRouter();
@@ -48,7 +54,9 @@ const PickupDetails = () => {
   });
 
   useEffect(() => {
-    setIsClient(true); 
+    if (typeof window !== "undefined") {
+      setIsClient(true);
+    }
   }, []);
 
   const today = new Date();
@@ -358,9 +366,11 @@ const handleSubmit = async (e: React.FormEvent) => {
   );
 };
 
-export default PickupDetails;
-
-
-
-
+export default function Page() {
+  return (
+    <Suspense fallback={<div className="text-center py-10">Loading...</div>}>
+      <PickupDetails />
+    </Suspense>
+  );
+}
 
