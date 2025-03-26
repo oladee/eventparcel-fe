@@ -55,13 +55,13 @@ const generateAvatarColor = (id: number): string => {
 const getStatusClasses = (status: Contact["status"]) => {
   switch (status) {
     case "Pending":
-      return "bg-gray-200 text-gray-700";
+      return "text-[#667085]";
     case "Ordered":
-      return "bg-green-100 text-green-700";
+      return "text-[#0CAF60]";
     case "Viewed":
-      return "bg-orange-100 text-orange-700";
+      return "text-[#FBBC05]";
     default:
-      return "bg-gray-200 text-gray-700";
+      return "text-gray-700";
   }
 };
 
@@ -109,7 +109,7 @@ const Page: React.FC = () => {
               .map((contact) => (
                 <div
                   key={contact.id}
-                  className="w-full flex items-start sm:items-center justify-between bg-white p-4 border border-gray-100 rounded-md shadow-sm"
+                  className="w-full flex items-start sm:items-center justify-between bg-white p-4 border-b border-gray-100 rounded-md hover:bg-[#F4F8FB]"
                 >
                   {/* Left Side: Checkbox, Avatar, Name & Phone */}
                   <div className="flex items-center space-x-3 w-full sm:w-auto">
@@ -140,7 +140,7 @@ const Page: React.FC = () => {
 
                   {/* Right Side: Status */}
                   <div
-                    className={`mt-2 sm:mt-0 px-3 py-1 rounded-full text-sm font-medium ${getStatusClasses(
+                    className={`mt-2 sm:mt-0 rounded-full text-sm font-medium ${getStatusClasses(
                       contact.status
                     )}`}
                   >
