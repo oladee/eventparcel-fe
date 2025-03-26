@@ -3,7 +3,7 @@
 import { Suspense } from "react";
 import PaymentSetupContent from "./payment-setup/page";
 
-const Page = () => {
+const SuspensePaymentPage = () => {
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <PaymentSetupContent />
@@ -11,7 +11,7 @@ const Page = () => {
   );
 };
 
-export default Page;
+export default SuspensePaymentPage;
 
 
 
