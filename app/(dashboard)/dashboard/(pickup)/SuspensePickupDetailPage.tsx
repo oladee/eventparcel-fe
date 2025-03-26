@@ -1,10 +1,9 @@
 "use client";
 
-import { Suspense } from "react";
+import { lazy, Suspense } from "react";
 // import PickupDetailsContent from "./PickupDetailsContent";
-import dynamic from "next/dynamic";
 
-const PickupDetailsContent = dynamic(() => import("./pickup-details/page"), { ssr: false });
+const PickupDetailsContent = lazy(() => import("./pickup-details/page"));
 
 
 const PickupDetails = () => {
