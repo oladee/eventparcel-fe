@@ -20,6 +20,7 @@ const PickupDetails = () => {
   const searchParams = useSearchParams();
 
   const [loading, setLoading] = useState(false);
+  const [isClient, setIsClient] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [showMapPickerModal, setShowMapPickerModal] = useState(false);
@@ -45,6 +46,10 @@ const PickupDetails = () => {
     deliveryTime: new Date(),
     deliveryTimeZone: "WAT",
   });
+
+  useEffect(() => {
+    setIsClient(true); 
+  }, []);
 
   const today = new Date();
 
@@ -88,6 +93,8 @@ const validateForm = useCallback(() => {
 
 // Retrieve formData from query parameters
 useEffect(() => {
+  if(!isClient) return;
+
   const data = searchParams.get("data");
   if (data) {
     try {
@@ -107,7 +114,7 @@ useEffect(() => {
       console.error("Error parsing form data:", error);
     }
   }
-}, [searchParams]);
+}, [searchParams, isClient]);
 
 // Validate form whenever formData changes
 useEffect(() => {
@@ -159,7 +166,6 @@ const handleSubmit = async (e: React.FormEvent) => {
       paymentTime: formData.paymentTime instanceof Date ? formatTime12Hour(formData.paymentTime) : "", // Ensure 12-hour format
     };
 
-    console.log("formattedData", formattedData);
 
     await axiosInstance.post("/add-payment", formattedData);
     toast.success("Payment and Delivery details submitted successfully!");
@@ -175,6 +181,10 @@ const handleSubmit = async (e: React.FormEvent) => {
   const handleMapLocationSelect = () => {
     setShowMapPickerModal(true);
   };
+    
+  if (!isClient) {
+    return null; 
+  }
 
   return (
     <Container>
