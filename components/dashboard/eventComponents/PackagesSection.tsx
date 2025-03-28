@@ -66,6 +66,10 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
     router.push("/dashboard/invited-contacts");
   };
 
+  const handleViewOneGroup = (groupId: any) => {
+    router.push(`/dashboard/groups/${groupId}`);
+  };
+
   return (
     <>
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-11">
@@ -91,12 +95,14 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
             </div>
 
             {/* Group Title and Description */}
-            <h2 className="text-xl font-bold text-[#111827] mt-2 capitalize">
-              {group.groupName}
-            </h2>
-            <p className="text-[#718096] text-sm mt-1 truncate-text2">
-              {group.groupDescription}
-            </p>
+            <div onClick={() => handleViewOneGroup(group._id)}>
+                <h2 className="text-xl font-bold text-[#111827] mt-2 capitalize">
+                  {group.groupName}
+                </h2>
+                <p className="text-[#718096] text-sm mt-1 truncate-text2">
+                  {group.groupDescription}
+                </p>
+            </div>
 
             {/* Packages Section */}
             <div className="flex justify-between items-center mt-6">
@@ -201,6 +207,26 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
 };
 
 export default PackagesSection;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // "use client";
 

@@ -86,7 +86,7 @@ const EventDetailsSection2: React.FC<EventDetailsProps> = ({ eventData }) => {
               className="mt-4 cursor-pointer"
             >
               <h2 className="text-xl font-bold text-gray-900 capitalize">
-                {event.eventName}
+                {/* {event.eventName} */}
               </h2>
               <p className="text-gray-600 text-sm mt-1 w-full max-w-3xl truncate-text">
                 {event.eventDescription}
