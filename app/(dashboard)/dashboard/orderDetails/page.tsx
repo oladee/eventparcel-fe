@@ -9,9 +9,12 @@ import { MdOutlineCalendarToday } from "react-icons/md";
 import { Order } from '@/app/interface/Order';
 import useUpdateOrderStatus from '@/hooks/useUpdateOrderStatus';
 import toast from 'react-hot-toast';
+import { useRouter } from 'next/navigation';
 
 const Page = () => {
   const [orders, setOrders] = useState<Order | null>(null);
+    const router = useRouter();
+
 
     useEffect(() => {
       const storedOrder = localStorage.getItem("selectedOrder");
@@ -39,6 +42,10 @@ const Page = () => {
     }
     };
 
+    const handleViewOneEvent = (eventId: any) => {
+        router.push(`/dashboard/events/${eventId}`);
+      };
+
 
     const getInitials = (name: string) => {
         if (!name) return "E"; 
@@ -63,7 +70,7 @@ const Page = () => {
             <Container>
                 <div id="order-not-found-container" className="min-h-screen mt-2">
                     <h4 id="order-not-found-heading" className="text-2xl font-general font-bold text-[#111827] mb-6">
-                        Order not found
+                        Getting Orders...
                     </h4>
                 </div>
             </Container>
@@ -83,7 +90,9 @@ const Page = () => {
                         <div id="status-icon-container" className='bg-[#FFF0E6] p-2 rounded-[20px]'>
                             <Image id="status-icon" src={BoxTime} alt='box' width={16} height={16} />
                         </div>
-                        <span id="status-text" className='font-general font-medium text-base text-[#FE964A]'>
+                        <span id="status-text" 
+                            className='font-general font-medium text-base text-[#FE964A]'
+                        >
                             {orders?.orderStatus
                                 ? orders.orderStatus.charAt(0).toUpperCase() + orders.orderStatus.slice(1)
                                 : "Status"}
@@ -121,7 +130,7 @@ const Page = () => {
                                     id={`order-price-${orders._id}-${index}`} 
                                     className="text-[#718096] font-normal font-general text-sm"
                                 >
-                                    Price: {item.packageId?.packagePrice ?? "N/A"} {item.packageId?.packagePriceCurrency ?? ""}
+                                    {item.packageId?.packagePriceCurrency  === "NGN" ? "₦" : "$"}{item.packageId?.packagePrice.toLocaleString() ?? "N/A"} 
                                 </p>
                             </div>
 
@@ -194,7 +203,7 @@ const Page = () => {
                         <p id="shipping-title" className='font-general font-bold text-[14px] text-[#111827]'>Shipping Address</p>
                         <div id="shipping-address" className='flex items-center gap-2 mt-3'>
                             <MapPin id="shipping-icon" className='text-[#A0AEC0] h-[24px] w-[24px]' />
-                            <p id="shipping-text" className='text-[#718096] font-general font-medium text-[14px]'>wrw wr wr wrw r</p>
+                            <p id="shipping-text" className='text-[#718096] font-general font-medium text-[14px]'>No. 23, Olufemi Street, Ikeja, Lagos, Nigeria</p>
                         </div>
                     </div>
                     <div id="shipping-divider" className="border-t border-[#EEEFF2] my-3"></div>
@@ -203,7 +212,7 @@ const Page = () => {
                         <p id="billing-title" className='font-general font-bold text-[14px] text-[#111827]'>Billing Address</p>
                         <div id="billing-address" className='flex items-center gap-2 mt-3'>
                             <MapPin id="billing-icon" className='text-[#A0AEC0] h-[24px] w-[24px]' />
-                            <p id="billing-text" className='text-[#718096] font-general font-medium text-[14px]'>wrw wr wr wrw r</p>
+                            <p id="billing-text" className='text-[#718096] font-general font-medium text-[14px]'>45A Adeola Odeku Street Victoria Island, Lagos 101241, Nigeria</p>
                         </div>
                     </div>
                     <div id="billing-divider" className="border-t border-[#EEEFF2] my-3"></div>
@@ -219,23 +228,23 @@ const Page = () => {
                     <div id="payment-divider" className="border-t border-[#EEEFF2] my-3"></div>
                     
                     <div id="item-cost" className='flex items-center justify-between'>
-                        <span id="item-label" className='text-[#718096] font-general font-medium text-[14px]'>1 item</span>
-                        <span id="item-price" className='text-[#718096] font-general font-medium text-[14px]'>#50000</span>
+                        <span id="item-label" className='text-[#718096] font-general font-medium text-[14px]'>3 item</span>
+                        <span id="item-price" className='text-[#718096] font-general font-medium text-[14px]'>₦50000</span>
                     </div>
                     
                     <div id="delivery-cost" className='flex items-center justify-between'>
                         <span id="delivery-label" className='text-[#718096] font-general font-medium text-[14px]'>Home Delivery</span>
-                        <span id="delivery-price" className='text-[#718096] font-general font-medium text-[14px]'>#50000</span>
+                        <span id="delivery-price" className='text-[#718096] font-general font-medium text-[14px]'>₦5000</span>
                     </div>
                     
                     <div id="total-cost" className='flex items-center justify-between'>
                         <span id="total-label" className='font-general font-bold text-[14px] text-[#111827]'>Total</span>
-                        <span id="total-price" className='font-general font-bold text-[16px] text-[#111827]'>#50000</span>
+                        <span id="total-price" className='font-general font-bold text-[16px] text-[#111827]'>₦55000</span>
                     </div>
                     
                     <div id="payment-method" className='flex items-center justify-between'>
                         <span id="method-label" className='text-[#718096] font-general font-medium text-[14px]'>Paid by Guest</span>
-                        <span id="method-amount" className='font-general font-bold text-[16px] text-[#111827]'>#50000</span>
+                        <span id="method-amount" className='font-general font-bold text-[16px] text-[#111827]'>₦55000</span>
                     </div>
                 </div>
                 <div id="final-divider" className="border-t border-[#EEEFF2] my-3"></div>
@@ -255,7 +264,7 @@ const Page = () => {
                                     priority
                                 />
                             </div>
-                            <p id="event-title" className="text-gray-700 font-general font-bold text-[16px]">
+                            <p onClick={() => handleViewOneEvent(orders?.eventId?._id)} id="event-title" className="text-gray-700 font-general font-bold text-[16px]">
                             {orders?.eventId?.eventName
                                 ? orders.eventId.eventName
                                     .split(" ")

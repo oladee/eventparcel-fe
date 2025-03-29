@@ -297,8 +297,8 @@ const Page: React.FC = ({  }) => {
                         setSelectedOrder(order)
                       }}
                       className={
-                        order.status === "Pending" ? "bg-[#FFF0E6] text-[#FE964A] px-2 py-1 text-xs rounded flex items-center" :
-                        order.status === "Delivered" ? "bg-[#ecfdeb] text-[#33ca5e] px-2 py-1 text-xs rounded flex items-center" :
+                        order.orderStatus === "pending" ? "bg-[#FFF0E6] text-[#FE964A] px-2 py-1 text-xs rounded flex items-center" :
+                        order.orderStatus === "delivered" ? "bg-[#ecfdeb] text-[#33ca5e] px-2 py-1 text-xs rounded flex items-center" :
                         "bg-purple-100 text-purple-700 px-2 py-1 text-xs rounded flex items-center"
                       }
                     >
@@ -337,7 +337,9 @@ const Page: React.FC = ({  }) => {
                           id={`order-price-${order._id}-${index}`} 
                           className="text-[#718096] font-normal font-general text-sm"
                           >
-                          Price: {item.packageId?.packagePrice ?? "N/A"} {item.packageId?.packagePriceCurrency ?? ""}
+                          {order?.items[0].packageId.packagePriceCurrency === "NGN" ? "₦" : "$"}{item.packageId?.packagePrice
+                            ? item.packageId.packagePrice.toLocaleString()
+                            : "N/A"}
                         </p>
                       </div>
 
@@ -367,7 +369,7 @@ const Page: React.FC = ({  }) => {
                     <p className="font-bold text-gray-900">{order?.items[0].deliveryMethod}</p>
   
                     <p className="font-medium">Total Price</p>
-                    <p className="font-bold text-gray-900">{order?.items[0].packageId.packagePriceCurrency === "NGN" ? "₦" : "$"}{order.totalAmount}</p>
+                    <p className="font-bold text-gray-900">{order?.items[0].packageId.packagePriceCurrency === "NGN" ? "₦" : "$"}{order.totalAmount ? order.totalAmount.toLocaleString() : "N/A"}</p>
                   </div>
                 </div>
                 {isModalOpen && (
