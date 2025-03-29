@@ -4,18 +4,18 @@ import Image from "next/image";
 import { useState } from "react";
 import CreatePackageModal from "./CreatePackageModal";
 import { Group, Package } from "@/app/interface/Group";
-import axiosInstance from "@/lib/axiosInstance";
-import axios from "axios";
 import AddGroup from "./AddGroupCaller";
-import { toast, ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import DeleteConfirmationDialog from "./modals/DeleteConfirmationDialog";
 
 type generalGroupProps = {
   group: Group;
+  handleDuplicate: (groudId: string) => void;
+  handleDeleteGroup: (groupId: string) => void;
 };
 
-const GeneralModal: React.FC<generalGroupProps> = ({ group }) => {
+const GeneralModal: React.FC<generalGroupProps> = ({ group, handleDuplicate, handleDeleteGroup }) => {
   const [openModalPackage, setOpenModalPackage] = useState(false);
   const [modalMode, setModalMode] = useState<"create" | "update">("create");
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
@@ -23,64 +23,22 @@ const GeneralModal: React.FC<generalGroupProps> = ({ group }) => {
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>("");
-  const [deleteEndPoint, setDeletEndPoint] = useState<string | null>("");
-  const [packages, setPackages] = useState(group.packages);
+  const [, setDeletEndPoint] = useState<string | null>("");
+  const [packages] = useState(group.packages);
 
-  const handleDelete = async () => {
-    if (!deleteId) return;
 
-    try {
-      await axiosInstance.delete(`/${deleteEndPoint}/${deleteId}`);
-      if (deleteEndPoint === "delete-package") {
-        setPackages((prev) => prev.filter((pkg) => pkg._id !== deleteId));
-      }
-
-      toast.success(`Group deleted successfully `, {
-        position: "top-right",
-        autoClose: 3000,
-        hideProgressBar: false,
-        closeOnClick: true,
-        pauseOnHover: true,
-        draggable: true,
-        theme: "light"
-      });
-
-      setIsDialogOpen(false);
-      window.location.reload();
-    } catch (error) {
-      if (axios.isAxiosError(error)) {
-        const errorMessage =
-          error.response?.data?.message ||
-          error.message ||
-          "An unknown error occurred.";
-        // setError(errorMessage);
-
-        // Show toast notification
-        toast.error(errorMessage, {
-          position: "top-right",
-          autoClose: 5000,
-          hideProgressBar: false,
-          closeOnClick: true,
-          pauseOnHover: true,
-          draggable: true,
-          theme: "colored"
-        });
-      } else {
-        console.error("Unexpected Error:", error);
-      }
-    }
-  };
-
-  // const handleDeletePackage = async (id: any) => {
-  //   setDeleteId(id);
-  //   setDeletEndPoint("delete-package");
-  //   setIsDialogOpen(true);
-  // };
 
   const handleDeleteModal = () => {
     setDeleteId(group._id);
     setDeletEndPoint("delete-group");
     setIsDialogOpen(true);
+  };
+
+  const confirmDelete = () => {
+    if (deleteId) {
+      handleDeleteGroup(deleteId);
+      setIsDialogOpen(false);
+    }
   };
 
   const handleAddGroupClick = () => {
@@ -93,8 +51,9 @@ const GeneralModal: React.FC<generalGroupProps> = ({ group }) => {
       <DeleteConfirmationDialog
         isOpen={isDialogOpen}
         onClose={() => setIsDialogOpen(false)}
-        onDelete={handleDelete}
+        onDelete={confirmDelete}
       />
+
       <div className="w-[320px]">
         <div className="w-[320px] h-auto space-y-6 bg-[#FFFFFF] pt-4 p-8 rounded-3xl">
           <div className="flex items-center justify-between">
@@ -220,18 +179,6 @@ const GeneralModal: React.FC<generalGroupProps> = ({ group }) => {
                     </div>
                   </div>
                   <div className="flex flex-col justify-center items-center gap-5">
-                    {/* <Image
-                      src="/images/trash.png"
-                      alt="delete"
-                      id="deletePackage"
-                      width={12}
-                      height={12}
-                      onClick={() => {
-                        handleDeletePackage(item._id);
-                        setSelectedPackage(item);
-                      }}
-                      className="cursor-pointer"
-                    /> */}
                     <Image
                       src="/images/edit.png"
                       alt="edit"
@@ -276,8 +223,9 @@ const GeneralModal: React.FC<generalGroupProps> = ({ group }) => {
               <span
                 id="copy"
                 className="font-general font-medium text-sm text-[#718096]"
+                onClick={() => handleDuplicate(group._id)}
               >
-                Copy
+                Duplicate
               </span>
             </div>
           </div>
