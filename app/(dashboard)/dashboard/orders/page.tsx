@@ -14,6 +14,8 @@ import { useRouter } from 'next/navigation';
 import axiosInstance from '@/lib/axiosInstance';
 import useDebounce from '@/hooks/useDebounce';
 import { Order, OrderDashboardResponse,  } from '@/app/interface/Order';
+import useUpdateOrderStatus from '@/hooks/useUpdateOrderStatus';
+import { toast, ToastContainer } from 'react-toastify';
 
 const tabs = ["All Orders", "Pending", "Shipped", "Completed"];
 
@@ -22,7 +24,7 @@ const Page: React.FC = ({  }) => {
   const [activeTab, setActiveTab] = useState("All Orders");
   const [orders, setOrders] = useState<OrderDashboardResponse | null>(null);
   const [page, setPage] = useState(1);
-  const [limit, setLimit] = useState(10);
+  const [limit, setLimit] = useState(6);
   const [totalPages, setTotalPages] = useState("");
   const [searchQuery, setSearchQuery] = useState("");
   const [loading, setLoading] = useState(true);
@@ -30,8 +32,9 @@ const Page: React.FC = ({  }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
+  const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
-  console.log(limit)
+  console.log(orders)
 
   const [stats, setStats] = useState([
     { icon: Cart, title: "Total Orders", count: 0, change: "0%" },
@@ -85,12 +88,36 @@ const Page: React.FC = ({  }) => {
 
 
   const handleOrderClick = (order: Order) => {
-    router.push(`/dashboard/orderDetails?orderId=${order.orderId}`);
+    localStorage.setItem("selectedOrder", JSON.stringify(order));
+    router.push(`/dashboard/orderDetails`);
+  };
+  
+  const { updateOrderStatus } = useUpdateOrderStatus();
+
+  const handleStatusChange = async (status: string) => {
+    try {
+      if (!selectedOrder?.orderId) {
+        toast.error("Invalid order. Please try again.");
+        return;
+      }
+  
+      await updateOrderStatus(
+        selectedOrder?._id,
+        selectedOrder.paymentStatus ?? "Unknown", 
+        status
+      );
+      
+    } catch (error) {
+      console.log(error)
+    } finally {
+      setIsModalOpen(false)
+    }
   };
   
 
   return (
     <Container>
+      <ToastContainer />
       <div id="orders-page-container" className="min-h-screen mt-2">
         {loading ? (
             <div className="min-h-screen mt-2">
@@ -267,6 +294,7 @@ const Page: React.FC = ({  }) => {
                       onClick={(e) => {
                         e.stopPropagation();
                         setIsModalOpen(true);
+                        setSelectedOrder(order)
                       }}
                       className={
                         order.status === "Pending" ? "bg-[#FFF0E6] text-[#FE964A] px-2 py-1 text-xs rounded flex items-center" :
@@ -274,7 +302,9 @@ const Page: React.FC = ({  }) => {
                         "bg-purple-100 text-purple-700 px-2 py-1 text-xs rounded flex items-center"
                       }
                     >
-                      {order?.orderStatus} ▼
+                  {order?.orderStatus
+                    ? order.orderStatus.charAt(0).toUpperCase() + order.orderStatus.slice(1)
+                    : "Status"} ▼
                     </div>
                   </div>
                   {order.items.map((item, index) => (
@@ -297,7 +327,11 @@ const Page: React.FC = ({  }) => {
                       {/* Order Details */}
                       <div id={`order-details-${order._id}-${index}`} className="flex-1">
                         <p id={`order-title-${order._id}-${index}`} className="font-semibold text-sm text-[#111827]">
-                          {item.packageId?.packageTitle ?? "No Title"}
+                        {item.packageId?.packageTitle
+                          ? item.packageId.packageTitle
+                              .toLowerCase()
+                              .replace(/\b\w/g, (char) => char.toUpperCase())
+                          : "No Title"}
                         </p>
                         <p 
                           id={`order-price-${order._id}-${index}`} 
@@ -318,10 +352,16 @@ const Page: React.FC = ({  }) => {
                 <div id={`order-summary-${order._id}`} className="bg-white rounded-lg p-4 w-full max-w-md">
                   <div id={`order-summary-grid-${order._id}`} className="grid grid-cols-2 gap-y-3 text-sm text-gray-600">
                     <p className="font-medium">Order Number</p>
-                    <p className="font-bold text-gray-900 truncate">{order?._id}</p>
+                    <p className="font-bold text-gray-900 truncate">{order?.orderId}</p>
   
                     <p className="font-medium">Guest</p>
-                    <p className="font-bold text-gray-900">{order?.guestName}</p>
+                    <p className="font-bold text-gray-900">
+                      {order?.guestName
+                        ? order.guestName
+                            .toLowerCase()
+                            .replace(/\b\w/g, (char) => char.toUpperCase())
+                        : "Guest Name"}
+                    </p>
   
                     <p className="font-medium">Delivery</p>
                     <p className="font-bold text-gray-900">{order?.items[0].deliveryMethod}</p>
@@ -332,7 +372,7 @@ const Page: React.FC = ({  }) => {
                 </div>
                 {isModalOpen && (
                   <div id="status-modal" className="fixed inset-0 flex items-center justify-center">
-                    <div 
+                  <div 
                       id="status-modal-content"
                       ref={modalRef} 
                       className="bg-white p-4 rounded-[15px] shadow-md w-64"
@@ -340,18 +380,21 @@ const Page: React.FC = ({  }) => {
                       <ul id="status-options" className="mt-1 space-y-2">
                         <li 
                           id="status-option-pending"
+                          onClick={() => handleStatusChange("pending")}
                           className="p-2 hover:bg-gray-100 rounded-md cursor-pointer font-general font-medium text-xl text-gray-700"
                         >
                           Pending
                         </li>
                         <li 
                           id="status-option-shipped"
+                          onClick={() => handleStatusChange("shipped")}
                           className="p-2 hover:bg-gray-100 rounded-md cursor-pointer font-general font-medium text-xl text-gray-700"
                           >
                           Shipped
                         </li>
                         <li 
                           id="status-option-delivered"
+                          onClick={() => handleStatusChange("delivered")}
                           className="p-2 hover:bg-gray-100 rounded-md cursor-pointer font-general font-medium text-xl text-gray-700"
                           >
                           Delivered

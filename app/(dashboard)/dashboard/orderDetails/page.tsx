@@ -2,18 +2,63 @@
 
 import Container from '@/components/dashboard/Container';
 import Image from 'next/image';
-import React from 'react';
-import { useSearchParams } from 'next/navigation';
+import React, { useEffect, useState } from 'react';
 import BoxTime from "../../../../assets/orderIcons/box-time-orange.png";
 import { Mail, Phone, MapPin, CircleDollarSign } from "lucide-react";
 import { MdOutlineCalendarToday } from "react-icons/md";
+import { Order } from '@/app/interface/Order';
+import useUpdateOrderStatus from '@/hooks/useUpdateOrderStatus';
+import toast from 'react-hot-toast';
 
 const Page = () => {
-    const searchParams = useSearchParams();
-    const orderParam = searchParams.get('order');
-    const order = orderParam ? JSON.parse(orderParam) : null;
+  const [orders, setOrders] = useState<Order | null>(null);
 
-    if (!order) {
+    useEffect(() => {
+      const storedOrder = localStorage.getItem("selectedOrder");
+      if (storedOrder) {
+        setOrders(JSON.parse(storedOrder));
+      }
+    }, []);
+
+    const { updateOrderStatus } = useUpdateOrderStatus();
+    const handleStatusChange = async (status: string) => {
+    try {
+        if (!orders?.orderId) {
+        toast.error("Invalid order. Please try again.");
+        return;
+        }
+    
+        await updateOrderStatus(
+        status,
+        orders.paymentStatus ?? "Unknown", 
+        orders.orderId
+        );
+        
+    } catch (error) {
+        console.log(error)
+    }
+    };
+
+
+    const getInitials = (name: string) => {
+        if (!name) return "E"; 
+        const nameParts = name.split(" ");
+        return nameParts
+          .map(part => part[0])
+          .join("")
+          .toUpperCase();
+      };
+
+      const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        }).replace(",", "");
+      };
+          
+    if (!orders) {
         return (
             <Container>
                 <div id="order-not-found-container" className="min-h-screen mt-2">
@@ -33,37 +78,76 @@ const Page = () => {
                     Order details
                 </h4>
 
-                <div id="order-status-card" className='w-[343px] h-[267px] bg-[#FFFFFF] rounded-[16px] p-4 mb-5'>
+                <div id="order-status-card" className='w-[343px] h-auto bg-[#FFFFFF] rounded-[16px] p-4 mb-5'>
                     <div id="status-container" className='flex items-center gap-2'>
                         <div id="status-icon-container" className='bg-[#FFF0E6] p-2 rounded-[20px]'>
                             <Image id="status-icon" src={BoxTime} alt='box' width={16} height={16} />
                         </div>
-                        <span id="status-text" className='font-general font-medium text-base text-[#FE964A]'>Pending</span>
+                        <span id="status-text" className='font-general font-medium text-base text-[#FE964A]'>
+                            {orders?.orderStatus
+                                ? orders.orderStatus.charAt(0).toUpperCase() + orders.orderStatus.slice(1)
+                                : "Status"}
+                        </span>
                     </div>
                     <div id="status-divider" className="border-t border-[#EEEFF2] my-3"></div>
                     
-                    <div id="product-summary" className="w-[311px] h-[91px] flex items-center gap-3 bg-[#FAFAFA] rounded-[12px] space-x-4 px-2 py-2">
-                        <Image 
-                            id="product-image"
-                            src={order.image} 
-                            alt={order.title} 
-                            width={42} 
-                            height={42} 
-                            className="rounded-md mb-6 ml-1"
-                            objectFit="cover" 
-                        />
-                        <div id="product-info" className="flex-1">
-                            <p id="product-title" className="font-semibold text-sm mb-2 text-[#111827]">{order.title}</p>
-                            <p id="product-price" className="text-[#718096] font-medium font-general text-xs">{order.price}</p>
+                    {orders.items.map((item, index) => (
+                        <div 
+                            key={item._id} 
+                            id={`order-content-${orders._id}-${index}`} 
+                            className="flex items-center gap-3  mb-2 h-[91px] bg-[#FAFAFA] rounded-[12px] space-x-4 px-4 py-2"
+                        >
+                            {/* Order Image */}
+                            <Image 
+                                id={`order-image-${orders._id}-${index}`}
+                                src={item.packageId?.packageImgUrls?.[0] || "/fallback-image.png"}
+                                alt={item.packageId?.packageTitle || "Order Image"} 
+                                width={42} 
+                                height={42} 
+                                className="rounded-md h-[42px] w-[42px] object-contain"
+                            />
+        
+                            {/* Order Details */}
+                            <div id={`order-details-${orders._id}-${index}`} className="flex-1">
+                                <p id={`order-title-${orders._id}-${index}`} className="font-semibold text-sm text-[#111827]">
+                                {item.packageId?.packageTitle 
+                                    ? item.packageId.packageTitle
+                                        .split(" ")
+                                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                                        .join(" ")
+                                    : "No Title"}
+                                </p>
+                                <p 
+                                    id={`order-price-${orders._id}-${index}`} 
+                                    className="text-[#718096] font-normal font-general text-sm"
+                                >
+                                    Price: {item.packageId?.packagePrice ?? "N/A"} {item.packageId?.packagePriceCurrency ?? ""}
+                                </p>
+                            </div>
+
+                            {/* Order Quantity */}
+                            <div id={`order-quantity-${orders._id}-${index}`} className="flex items-center text-[#718096] text-xs">
+                                <span>Qty: {item.quantity}</span>
+                            </div>
                         </div>
-                        <div id="product-quantity" className="flex items-center text-[#718096] text-xs font-medium">
-                            <span>Qty: {order.quantity}</span>
-                        </div>
-                    </div>
+                    ))}
                     <div id="product-divider" className="border-t border-[#EEEFF2] my-3"></div>
+
                     
                     <div id="mark-shipped-button" className='border border-[#111827] w-[311px] h-[48px] flex justify-center items-center rounded-[12px] mt-6'>
-                        <p id="mark-shipped-text" className='font-manrope font-extrabold text-sm text-[#111827]'>Mark as Shipped</p>
+                    {orders?.orderStatus === "pending" ? (
+                        <p id="mark-shipped-text" onClick={() => handleStatusChange("Shipped")} className="font-manrope font-extrabold text-sm text-[#111827]">
+                            Mark as Shipped
+                        </p>
+                        ) : orders?.orderStatus === "shipped" ? (
+                        <p id="mark-shipped-text" onClick={() => handleStatusChange("Delivered")} className="font-manrope font-extrabold text-sm text-[#111827]">
+                            Mark as Delivered
+                        </p>
+                        ) : orders?.orderStatus === "delivered" ? (
+                        <p id="order-completed-text"  className="font-manrope font-extrabold text-sm text-gray-400 cursor-not-allowed">
+                            Order Completed
+                        </p>
+                        ) : null}
                     </div>
                 </div>
 
@@ -71,11 +155,24 @@ const Page = () => {
                     <span id="guest-section-title" className='font-general font-bold text-[18px] text-[#111827]'>Guest</span>
                     <div id="guest-profile" className='w-[190px] h-[50px] flex items-center gap-4 mt-4'>
                         <div id="guest-avatar-container">
-                            <p id="guest-avatar" className='bg-[#9BB3E366] rounded-[20px] p-2 flex items-center justify-center text-[#3C5C98] font-semibold text-base'>BG</p>
+                        <p
+                            id="guest-avatar"
+                            className="bg-[#9BB3E366] rounded-[20px] p-2 flex items-center justify-center text-[#3C5C98] font-semibold text-base"
+                            >
+                            {getInitials(orders.guestName)}
+                            </p>                        
                         </div>
                         <div id="guest-details" className='flex flex-col gap-1'>
-                            <span id="guest-name" className='font-general font-semibold text-base text-[#111827]'>Darcel Ballentine</span>
-                            <span id="guest-id" className='font-general font-medium text-sm text-[#718096]'>#342242</span>
+                            <span id="guest-name" className='font-general font-semibold text-base text-[#111827]'>
+                            <p className="font-bold text-gray-900">
+                                {orders?.guestName
+                                    ? orders.guestName
+                                        .toLowerCase()
+                                        .replace(/\b\w/g, (char) => char.toUpperCase())
+                                    : "Guest Name"}
+                                </p>
+                            </span>
+                            <span id="guest-id" className='font-general font-medium text-sm text-[#718096]'>{orders._id}</span>
                         </div>
                     </div>
                     <div id="guest-divider" className="border-t border-[#EEEFF2] my-4"></div>
@@ -84,11 +181,11 @@ const Page = () => {
                         <p id="contact-info-title" className='font-general font-bold text-[14px] text-[#111827]'>Contact Information</p>
                         <div id="email-info" className='flex items-center gap-2 mt-3'>
                             <Mail id="email-icon" className='text-[#A0AEC0] h-[24px] w-[24px]' />
-                            <p id="email-text" className='text-[#718096] font-general font-medium text-[14px]'>darcelballentine@mail.com</p>
+                            <p id="email-text" className='text-[#718096] font-general font-medium text-[14px]'>{orders.guestEmail}</p>
                         </div>
                         <div id="phone-info" className='flex items-center gap-2 mt-3'>
                             <Phone id="phone-icon" className='text-[#A0AEC0] h-[24px] w-[24px]' />
-                            <p id="phone-text" className='text-[#718096] font-general font-medium text-[14px]'>(671) 555-0110</p>
+                            <p id="phone-text" className='text-[#718096] font-general font-medium text-[14px]'>{orders.guestPhoneNumber}</p>
                         </div>
                     </div>
                     <div id="contact-divider" className="border-t border-[#EEEFF2] my-3"></div>
@@ -149,7 +246,7 @@ const Page = () => {
                             <div id="event-image-container" className="relative w-24 h-24 rounded-xl overflow-hidden flex-shrink-0">
                                 <Image
                                     id="event-image"
-                                    src="/images/placeholder_eventCover2.jpg"
+                                    src={orders?.eventId?.eventImgUrl}
                                     alt="Event Cover"
                                     className="object-contain w-full h-full rounded-[12px]"
                                     width={20} 
@@ -159,7 +256,12 @@ const Page = () => {
                                 />
                             </div>
                             <p id="event-title" className="text-gray-700 font-general font-bold text-[16px]">
-                                Get ready to party with us, Get ready 
+                            {orders?.eventId?.eventName
+                                ? orders.eventId.eventName
+                                    .split(" ")
+                                    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                                    .join(" ")
+                                : "No Event Name"}
                             </p>
                         </div>
 
@@ -168,11 +270,11 @@ const Page = () => {
                                 <div className="flex items-center gap-2 text-sm font-semibold">
                                     <MdOutlineCalendarToday id="calendar-icon" size={18} />
                                     <span id="date-text">
-                                        12 MAR, 2025 at 10:30AM WAT
+                                        {formatDate(orders.eventId.date)} at {orders.eventId.time} WAT
                                     </span>
                                 </div>
                                 <p id="event-location" className="text-sm mt-1 text-gray-500">
-                                    3, djdks fksjfljf sfjjfs
+                                    {orders.eventId.eventLocation}
                                 </p>
                             </div>
                         </div>

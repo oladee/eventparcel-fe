@@ -19,22 +19,21 @@ interface EventImage {
   url: string;
 }
 
-// interface Event extends BaseEntity {
-//   name: string;
-//   description: string;
-//   location: string;
-//   date: string;
-//   time: string;
-//   image: EventImage;
-//   host: EventHost;
-//   coHosts: string[]; // Array of User._id
-//   groups: string[];  // Array of EventGroup._id
-//   isDisabled: boolean;
-//   accountTypes: {
-//     naira: boolean;
-//     dollar: boolean;
-//   };
-// }
+export interface Event extends BaseEntity {
+  eventName: string;
+  description: string;
+  eventLocation: string;
+  date: string;
+  time: string;
+  eventImgUrl: string;
+  coHosts: string[]; // Array of User._id
+  groups: string[];  // Array of EventGroup._id
+  isDisabled: boolean;
+  accountTypes: {
+    naira: boolean;
+    dollar: boolean;
+  };
+}
 
 // Package System
 // interface PackageImage {
@@ -94,11 +93,14 @@ export interface Order extends BaseEntity {
   };
   guest: OrderGuest;
   guestName: string;
+  guestEmail: string;
+  guestPhoneNumber: string;
   orderStatus: string;
   items: OrderItem[];
   status: string;
   paymentStatus: string;
   totalAmount: number;
+  eventId: Event;
 }
 
 // Analytics System

@@ -15,6 +15,7 @@ import { useRouter } from 'next/navigation';
 import { IoIosSend } from 'react-icons/io';
 import GroupOptionsModal from '@/components/dashboard/eventComponents/GroupOptionsModal';
 import { Group } from '@/app/interface/Group';
+import { FiMoreHorizontal } from 'react-icons/fi';
 
 interface Order {
   id: number;
@@ -88,7 +89,12 @@ const Page = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-    const [selectedGroup] = useState<Group | null>(null);
+  const [selectedGroup] = useState<Group | null>(null);
+
+  // const openGroupOptions = (group: Group) => {
+  //   setSelectedGroup(group);
+  //   setIsModalOpen(true);
+  // };
   
 
   useEffect(() => {
@@ -142,12 +148,14 @@ const Page = () => {
                   {/* {group.groupPrivacy} */}
                   General
                 </span>
-                {/* <span onClick={() => openGroupOptions(group)}>
+                <span 
+                  // onClick={() => openGroupOptions(group)}
+                  >
                   <FiMoreHorizontal
                     size={24}
                     className="text-gray-500 cursor-pointer"
                   />
-                </span> */}
+                </span>
                 {/* <span onClick={() => openGroupOptions(group)}>...</span> */}
               </div>
   
@@ -174,7 +182,7 @@ const Page = () => {
               </div>
               <div className="h-6 w-px bg-gray-300"></div>
               <div className="flex flex-col items-start">
-                <span className="font-bold text-lg">42</span>
+                <span className="font-bold text-lg text-[#111827]">42</span>
                 <span className='text-green-600'>In stock</span>
               </div>
             </div>

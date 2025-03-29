@@ -1,5 +1,8 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import BankDropdown from "./BankDropdown";
+import axiosInstance from "@/lib/axiosInstance";
+import { CheckCircle, XCircle } from "lucide-react";
+
 
 interface Bank {
     name: string;
@@ -13,8 +16,10 @@ interface NairaPayoutFormProps {
       accountNumber: string;
       accountName: string;
       bankName: string;
+      bankCode: string;
     };
   };
+
   errors: { [key: string]: string };
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   handleBlur: (e: React.FocusEvent<HTMLInputElement>) => void;
@@ -34,6 +39,55 @@ const NairaPayoutForm: React.FC<NairaPayoutFormProps> = ({
   setFormData,
   setErrors
 }) => {
+
+  const [isValidating, setIsValidating] = useState(false);
+
+  useEffect(() => {
+    if (selectedBank) {
+      setFormData((prev: any) => ({
+        ...prev,
+        nairaAccount: {
+          ...prev.nairaAccount,
+          bankName: selectedBank.name,
+          bankCode: selectedBank.code, 
+        },
+      }));
+    }
+  }, [selectedBank]);
+
+  useEffect(() => {
+    const validateBankAccount = async () => {
+      const { accountNumber } = formData.nairaAccount;
+      if (!selectedBank || accountNumber.length !== 10) return;
+
+      setIsValidating(true);
+      try {
+        const response = await axiosInstance.post("/validate-bank-account", {
+          accountNumber,
+          bankCode: selectedBank.code,
+        });
+
+        if (response.data?.data?.account_name) {
+          setFormData((prev: any) => ({
+            ...prev,
+            nairaAccount: {
+              ...prev.nairaAccount,
+              accountName: response.data.data.account_name,
+            },
+          }));
+          setErrors((prev) => ({ ...prev, accountName: "" })); // Clear previous errors
+        } else {
+          setErrors((prev) => ({ ...prev, accountName: "Invalid account details" }));
+        }
+      } catch (error) {
+        setErrors((prev) => ({ ...prev, accountName: "Error validating account" }));
+      } finally {
+        setIsValidating(false);
+      }
+    };
+
+    validateBankAccount();
+  }, [formData.nairaAccount.accountNumber, selectedBank]);
 
    const handleValidation = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;
@@ -97,20 +151,32 @@ const NairaPayoutForm: React.FC<NairaPayoutFormProps> = ({
       </div>
 
       {/* Account Name Field */}
-      <div className="flex flex-col -mt-5">
+      <div className="flex flex-col -mt-5 relative">
         <label htmlFor="accountName" className="block mb-2 font-semibold text-[#111827]">
           Account Name
         </label>
-        <input
-          type="text"
-          id="nairaAccount.accountName"
-          placeholder="Account name"
-          value={formData.nairaAccount.accountName}
-          onChange={handleChange}
-          onBlur={handleBlur}
-          className="px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50"
-        />
-        {errors.accountName && <p className="text-red-500 text-sm mt-1">{errors.accountName}</p>}
+        <div className="relative w-full">
+          <input
+            type="text"
+            id="nairaAccount.accountName"
+            placeholder="Account name"
+            value={isValidating ? "Validating..." : formData.nairaAccount.accountName}
+            disabled
+            className={`px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50 pr-10
+              ${errors.accountName ? "border-red-500" : "border-green-500"}
+            `}
+          />
+          {/* Validation Icons */}
+          {!isValidating && formData.nairaAccount.accountName && (
+            <span className="absolute inset-y-0 right-3 flex items-center">
+              {errors.accountName ? (
+                <XCircle size={20} className="text-red-500" />
+              ) : (
+                <CheckCircle size={20} className="text-green-500" />
+              )}
+            </span>
+          )}
+        </div>
       </div>
     </div>
   );
