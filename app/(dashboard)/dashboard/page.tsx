@@ -1,114 +1,304 @@
 "use client";
 
-import React from "react";
+import React, { useState, useEffect } from "react";
 import Container from "@/components/dashboard/Container";
-import { FaArrowUp, FaCalendarAlt } from "react-icons/fa";
+import { FaCalendarAlt } from "react-icons/fa";
+import { GrLineChart } from "react-icons/gr";
+import axiosInstance from "@/lib/axiosInstance";
+import {
+  ComposedChart,
+  Bar,
+  Line,
+  XAxis,
+  YAxis,
+  Tooltip,
+  ResponsiveContainer,
+  TooltipProps,
+} from "recharts";
 
-const data = [
-  { month: "Jan", height: "h-[40px]" },
-  { month: "Feb", height: "h-[60px]" },
-  { month: "Mar", height: "h-[80px]" },
-  {
-    month: "Apr",
-    height: "h-[160px]", // This is the tallest bar
-    netSales: "₦852,657.00"
-  },
-  { month: "May", height: "h-[70px]" },
-  { month: "Jun", height: "h-[60px]" },
-  { month: "Jul", height: "h-[50px]" }
-];
+// Define interfaces for the expected data shapes
+interface MonthlySale {
+  month: string;
+  sales: number;
+  netSales?: string;
+}
+
+interface DailySale {
+  day: string;
+  sales: number;
+}
+
+interface OverallSales {
+  totalAmount: number;
+  growthRate: number;
+  monthlySales: MonthlySale[];
+  dailySales: DailySale[];
+}
+
+interface DashboardData {
+  overallSales: OverallSales;
+  // Other parts of the dashboard can be defined here as needed
+}
+
+interface SalesData {
+  month: string;
+  sales: number;
+  netSales?: string;
+}
+
+// Extend the Recharts tooltip props for our custom tooltip
+interface CustomTooltipProps extends TooltipProps<number, string> {}
+
+const CustomTooltip: React.FC<CustomTooltipProps> = ({
+  active,
+  payload,
+  label,
+}) => {
+  if (active && payload && payload.length) {
+    const { netSales, sales } = payload[0].payload as SalesData;
+    return (
+      <div className="bg-white p-2 border rounded shadow">
+        <p className="text-sm font-medium">{label}</p>
+        <p className="text-xs text-gray-500">
+          Sales: ₦{sales.toLocaleString()}
+        </p>
+        {netSales && (
+          <p className="text-xs text-gray-600">Net Sales: {netSales}</p>
+        )}
+      </div>
+    );
+  }
+  return null;
+};
+
+// Custom background bar shape props
+interface CustomBarProps {
+  x: number;
+  width: number;
+  index: number;
+  hoveredIndex: number;
+  onBarHover: (index: number) => void;
+  onBarLeave: () => void;
+  viewBox?: { x: number; y: number; width: number; height: number };
+}
+
+const CustomBackgroundBar: React.FC<CustomBarProps> = ({
+  x,
+  width,
+  index,
+  hoveredIndex,
+  onBarHover,
+  onBarLeave,
+  viewBox,
+}) => {
+  // Use the chart's viewBox for chart area dimensions.
+  const chartY = viewBox?.y ?? 0;
+  const chartHeight = viewBox?.height ?? 300;
+  // Top padding of 10px.
+  const topPadding = 10;
+  // When hovered, fill with a gradient; otherwise use a solid gray.
+  const fill =
+    hoveredIndex === index ? `url(#gradient-${index})` : "#F9FAFB";
+  // Dotted line color: gray by default, white on hover.
+  const lineStroke = hoveredIndex === index ? "#FFFFFF" : "#F1F2F4";
+
+  return (
+    <g
+      onMouseEnter={() => onBarHover(index)}
+      onMouseLeave={onBarLeave}
+      style={{ cursor: "pointer" }}
+    >
+      {hoveredIndex === index && (
+        <defs>
+          <linearGradient id={`gradient-${index}`} x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stopColor="#751423" />
+            <stop offset="100%" stopColor="#FFFFFF" />
+          </linearGradient>
+        </defs>
+      )}
+      {/* Full-height Bar with top padding and rounded top corners */}
+      <rect
+        x={x}
+        y={chartY + topPadding}
+        width={width}
+        height={chartHeight - topPadding}
+        fill={fill}
+        rx={8}
+        ry={8}
+      />
+      {/* Centered Dotted Line adjusted to start at the padded top */}
+      <line
+        x1={x + width / 2}
+        x2={x + width / 2}
+        y1={chartY + topPadding}
+        y2={chartY + chartHeight}
+        stroke={lineStroke}
+        strokeWidth={2}
+        strokeDasharray="4 4"
+      />
+    </g>
+  );
+};
+
+// Define type for the custom dot props for the Line component
+interface DotProps {
+  cx: number;
+  cy: number;
+  index: number;
+}
 
 const Page: React.FC = () => {
+  // State for dashboard data from API
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(
+    null
+  );
+  // Loading and error states (optional)
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
+
+  // Default view is "monthly"; can toggle to "daily"
+  const [viewType, setViewType] = useState("monthly");
+  // Track which bar (index) is currently hovered
+  const [hoveredIndex, setHoveredIndex] = useState(-1);
+
+  useEffect(() => {
+    axiosInstance
+      .get("/dashboard")
+      .then((response) => {
+        if (response.data.success) {
+          setDashboardData(response.data.data);
+        } else {
+          setError("Failed to fetch dashboard data");
+        }
+        setLoading(false);
+      })
+      .catch((err) => {
+        console.error(err);
+        setError("An error occurred while fetching data");
+        setLoading(false);
+      });
+  }, []);
+
+  if (loading) {
+    return (
+      <Container>
+        <div className="p-4">Loading...</div>
+      </Container>
+    );
+  }
+
+  if (error || !dashboardData) {
+    return (
+      <Container>
+        <div className="p-4 text-red-600">{error || "No data available"}</div>
+      </Container>
+    );
+  }
+
+  const { overallSales } = dashboardData;
+
+  const chartData: SalesData[] =
+    viewType === "monthly"
+      ? overallSales.monthlySales
+      : overallSales.dailySales.map((item) => ({
+          month: item.day,
+          sales: item.sales,
+        }));
+
+  const maxSales = Math.max(...chartData.map((item) => item.sales)) * 1.1;
+
+  const toggleView = () => {
+    setViewType((prev) => (prev === "monthly" ? "daily" : "monthly"));
+  };
+
+  // Custom dot for the line chart: always return a <circle> element with a unique key.
+  const renderCustomDot = (props: DotProps): React.ReactElement<SVGElement> => {
+    const { cx, cy, index } = props;
+    return (
+      <circle
+        key={`custom-dot-${index}`}
+        cx={cx}
+        cy={cy}
+        r={index === hoveredIndex ? 6 : 0}
+        fill="#9F1239"
+        stroke={index === hoveredIndex ? "#fff" : "none"}
+        strokeWidth={index === hoveredIndex ? 2 : 0}
+      />
+    ) as React.ReactElement<SVGElement>;
+  };
+
   return (
     <Container>
-      {/* Wrapper */}
-      <div className="w-full h-full p-4 flex flex-col gap-6">
+      <div className="bg-white rounded-[18px] w-full h-full p-4 flex flex-col gap-6">
         {/* Top Section */}
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between">
-          {/* Left - Overall Sales + Big Number */}
+        <div className="flex items-start sm:items-center justify-between">
           <div className="flex flex-col gap-2">
+            <h1 className="text-xs md:text-xl font-medium text-[#718096]">
+              Overall Sales
+            </h1>
             <div className="flex items-center gap-2">
-              <h1 className="text-xl font-semibold text-gray-800">
-                Overall sales
-              </h1>
-              <span className="flex items-center text-sm text-green-600 bg-green-100 px-2 py-1 rounded-full">
-                <FaArrowUp className="mr-1" />
-                23.5%
+              <p className="text-2xl md:text-3xl font-bold text-[#111827]">
+                ₦{(overallSales.totalAmount / 1e6).toFixed(2)}M
+              </p>
+              <span className="flex items-center text-[10px] md:text-xs font-medium text-white bg-primary px-2 py-2 rounded-full">
+                <GrLineChart className="mr-1" />
+                {Math.abs(overallSales.growthRate)}%
               </span>
             </div>
-            <div className="text-3xl font-bold text-gray-900">₦131.49M</div>
           </div>
-
-          {/* Right - Monthly Dropdown */}
           <div className="mt-4 sm:mt-0">
             <button
               type="button"
-              className="flex items-center gap-2 border border-gray-300 rounded-md px-4 py-2 text-gray-600 hover:bg-gray-50"
+              onClick={toggleView}
+              className="flex items-center gap-2 border border-[#F1F2F4] rounded-[8px] px-4 py-2 text-[#111827] hover:bg-gray-50 outline-none"
             >
-              Monthly
+              {viewType === "monthly" ? "Monthly" : "Daily"}
               <FaCalendarAlt />
             </button>
           </div>
         </div>
 
         {/* Chart Container */}
-        <div className="bg-white shadow-sm rounded-lg p-4">
-          {/* Y-Axis Labels (optional) */}
-          <div className="relative">
-            <div className="absolute -left-10 top-0 flex flex-col justify-between h-full text-gray-400 text-sm">
-              <span>400k</span>
-              <span>300k</span>
-              <span>200k</span>
-              <span>100k</span>
-              <span>0</span>
-            </div>
-            {/* Chart Grid */}
-            <div className="grid grid-cols-7 gap-4 mt-2">
-              {data.map((item, index) => (
-                <div
-                  key={index}
-                  className="flex flex-col items-center justify-end"
-                >
-                  {/* Bar Wrapper */}
-                  <div className="relative w-full bg-gray-100 h-[200px] flex items-end justify-center rounded-md overflow-hidden">
-                    <div
-                      className={`w-2/3 bg-red-500 rounded-t-md hover:bg-red-600 transition-all ${item.height} relative`}
-                    >
-                      {/* Tooltip for Apr */}
-                      {item.netSales && (
-                        <div className="absolute -top-12 left-1/2 -translate-x-1/2 w-max bg-white text-gray-700 text-sm p-2 rounded shadow-md">
-                          {item.netSales}
-                          <span className="block text-xs text-gray-400">
-                            Net sales
-                          </span>
-                          <div className="absolute bottom-[-6px] left-1/2 -translate-x-1/2 border-8 border-transparent border-t-white"></div>
-                        </div>
-                      )}
-                    </div>
-                  </div>
-                  {/* Month Label */}
-                  <span className="mt-2 text-sm text-gray-600">
-                    {item.month}
-                  </span>
-                </div>
-              ))}
-            </div>
-
-            {/* Optional - Subtle line chart overlay (static example) */}
-            <svg
-              viewBox="0 0 700 200"
-              preserveAspectRatio="none"
-              className="absolute top-0 left-0 w-full h-full pointer-events-none"
+        <div className="w-full relative">
+          <ResponsiveContainer width="100%" height={352}>
+            <ComposedChart
+              data={chartData}
+              margin={{ top: 20, right: 0, left: 0, bottom: 20 }}
+              onMouseLeave={() => setHoveredIndex(-1)}
             >
-              <path
-                d="M0,160 C100,150 150,140 200,120 C250,90 300,60 350,40 C400,20 500,80 550,60 C600,40 650,80 700,50"
-                stroke="#9F1239" /* Tailwind's red-900 or so */
-                strokeWidth="2"
-                fill="none"
-                strokeLinecap="round"
+              <XAxis dataKey="month" axisLine={false} tickLine={false} />
+              <YAxis
+                domain={[0, maxSales]}
+                tickFormatter={(value) =>
+                  value >= 1000 ? `${(value / 1000).toFixed(0)}k` : value
+                }
+                axisLine={false}
+                tickLine={false}
               />
-            </svg>
-          </div>
+              <Tooltip content={<CustomTooltip />} />
+              <Bar
+                dataKey="sales"
+                fill="transparent"
+                shape={(props: any) => (
+                  <CustomBackgroundBar
+                    {...props}
+                    index={props.index}
+                    hoveredIndex={hoveredIndex}
+                    onBarHover={(i) => setHoveredIndex(i)}
+                    onBarLeave={() => setHoveredIndex(-1)}
+                  />
+                )}
+              />
+              <Line
+                type="monotone"
+                dataKey="sales"
+                stroke="#9F1239"
+                strokeWidth={2}
+                dot={renderCustomDot}
+                activeDot={{ r: 6 }}
+              />
+            </ComposedChart>
+          </ResponsiveContainer>
         </div>
       </div>
     </Container>
@@ -116,19 +306,3 @@ const Page: React.FC = () => {
 };
 
 export default Page;
-
-// "use client";
-// import Container from "@/components/dashboard/Container";
-
-// const Page = () => {
-
-//   return (
-//     <Container>
-//       <div className="w-full h-full flex items-center justify-center">
-//         Dashboard is coming soon
-//       </div>
-//     </Container>
-//   );
-// };
-
-// export default Page;
