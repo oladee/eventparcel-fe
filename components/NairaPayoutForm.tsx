@@ -53,7 +53,7 @@ const NairaPayoutForm: React.FC<NairaPayoutFormProps> = ({
         },
       }));
     }
-  }, [selectedBank]);
+  }, [selectedBank, setFormData]);
 
   useEffect(() => {
     const validateBankAccount = async () => {
@@ -81,13 +81,14 @@ const NairaPayoutForm: React.FC<NairaPayoutFormProps> = ({
         }
       } catch (error) {
         setErrors((prev) => ({ ...prev, accountName: "Error validating account" }));
+        console.log(error)
       } finally {
         setIsValidating(false);
       }
     };
 
     validateBankAccount();
-  }, [formData.nairaAccount.accountNumber, selectedBank]);
+  }, [formData.nairaAccount.accountNumber, selectedBank, formData.nairaAccount, setErrors,setFormData]);
 
    const handleValidation = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;

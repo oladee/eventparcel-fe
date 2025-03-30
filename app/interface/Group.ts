@@ -13,7 +13,7 @@ export interface Package {
     _id: string;
     groupName: string;
     groupDescription: string;
-    groupPrivacy: "General" | "Private";
+    groupPrivacy: string;
     groupCurrency: string;
     packages: Package[];
     link?: string;

@@ -13,12 +13,13 @@ import OrderPagination from '@/components/OrderPagination';
 import { useRouter } from 'next/navigation';
 import axiosInstance from '@/lib/axiosInstance';
 import useDebounce from '@/hooks/useDebounce';
-import { Order, OrderDashboardResponse,  } from '@/app/interface/Order';
+import { Order, OrderDashboardResponse  } from '@/app/interface/Order';
 import useUpdateOrderStatus from '@/hooks/useUpdateOrderStatus';
 import { toast, ToastContainer } from 'react-toastify';
+import { motion } from 'framer-motion';
+
 
 const tabs = ["All Orders", "Pending", "Shipped", "Completed"];
-
 
 const Page: React.FC = ({  }) => {
   const [activeTab, setActiveTab] = useState("All Orders");
@@ -33,8 +34,6 @@ const Page: React.FC = ({  }) => {
   const router = useRouter();
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-
-  console.log(orders)
 
   const [stats, setStats] = useState([
     { icon: Cart, title: "Total Orders", count: 0, change: "0%" },
@@ -63,20 +62,64 @@ const Page: React.FC = ({  }) => {
   useEffect(() => {
 
     const fetchOrders = async () => {
+      setLoading(true);
       try {
-        const response = await axiosInstance.get(`view-orders/67dd1f5f48f2e5b414f3efb7`, {
-          params: { page, limit, query: debouncedSearchQuery, filter: activeTab === "All Orders" ? "" : activeTab }
-        });
 
-        setStats([
-          { icon: Cart, title: "Total Orders", count: response.data.data.summary.ordersSummary.totalOrders.overall, change: `${response.data.data.summary.ordersSummary.totalOrders.growthRate}%` },
-          { icon: Eye, title: "Total Invites", count:  response.data.data.summary.invitesSummary.totalInvites, change: `${response.data.data.summary.invitesSummary.viewedRate}%` },
-          { icon: Package, title: "Total Delivered", count: response.data.data.summary.ordersSummary.totalDelivered.overall, change: `${response.data.data.summary.ordersSummary.totalDelivered.growthRate}%` },
-          { icon: BoxTime, title: "Pending Orders", count: response.data.data.summary.ordersSummary.pendingOrders.overall, change: `${response.data.data.summary.ordersSummary.pendingOrders.growthRate}%` },
-        ]);
+        const params: Record<string, any> = { 
+          page, 
+          limit, 
+          query: debouncedSearchQuery 
+        };
 
-        setOrders(response.data.data as OrderDashboardResponse);
-        setTotalPages(response.data.data.totalPages)
+        if (activeTab && activeTab !== "All Orders") {
+          const normalizedStatus = activeTab.trim().toLowerCase();
+          params.orderStatus = normalizedStatus === "completed" ? "delivered" : normalizedStatus;
+        }
+
+        const response = await axiosInstance.post(
+            `view-orders/`,
+            { eventId: "67dd1f5f48f2e5b414f3efb7" },
+            { params }
+          );
+
+          setStats([
+            { 
+              icon: Cart, 
+              title: "Total Orders", 
+              count: response?.data?.data?.orderSummary?.ordersSummary?.totalOrders?.overall, 
+              change: `${parseFloat(response?.data?.data?.orderSummary?.ordersSummary?.totalOrders?.growthRate).toFixed(1)}%`
+            },
+            {
+              icon: Eye,
+              title: "Total Invites",
+              count: response?.data?.data?.orderSummary?.invitesSummary?.totalInvites,
+              change: `${parseFloat(response?.data?.data?.orderSummary?.invitesSummary?.viewedRate).toFixed(1)}%`
+            },          
+            { 
+              icon: Package, 
+              title: "Total Delivered", 
+              count: response?.data?.data?.orderSummary?.ordersSummary?.totalDelivered?.overall, 
+              change: `${parseFloat(response?.data?.data?.orderSummary?.ordersSummary?.totalDelivered?.growthRate).toFixed(1)}%`
+            },
+            { 
+              icon: BoxTime, 
+              title: "Pending Orders", 
+              count: response?.data?.data?.orderSummary?.ordersSummary?.pendingOrders?.overall, 
+              change: `${parseFloat(response?.data?.data?.orderSummary?.ordersSummary?.pendingOrders?.growthRate).toFixed(1)}%`
+            },
+          ]);
+          
+
+        // Ensure response data exists before setting state
+        if (response.data && response.data.data) {
+          console.log("res", response.data.data)
+          setOrders(response.data.data as OrderDashboardResponse);
+          setTotalPages(response.data.data.totalPages || 1); 
+        } else {
+          setOrders(response.data?.data || []);          
+          setTotalPages(String(1));       
+        }
+          
       } catch (error) {
         console.error("Error fetching orders:", error);
       } finally {
@@ -103,16 +146,55 @@ const Page: React.FC = ({  }) => {
   
       await updateOrderStatus(
         selectedOrder?._id,
-        selectedOrder.paymentStatus ?? "Unknown", 
+        selectedOrder.paymentStatus ?? "Unknown",
         status
       );
-      
+  
+      setOrders((prevOrders) => {
+        if (!prevOrders) return prevOrders; 
+  
+        return {
+          ...prevOrders,
+          orders: prevOrders.orders.map((order) =>
+            order.orderId === selectedOrder.orderId
+              ? { ...order, orderStatus: status } 
+              : order
+          ),
+        };
+      });
+  
     } catch (error) {
-      console.log(error)
+      console.error("Error updating order status:", error);
     } finally {
-      setIsModalOpen(false)
+      setIsModalOpen(false);
     }
   };
+
+  if (loading) {
+    return (
+      <Container>
+        <div className="flex flex-col justify-center items-center min-h-screen">
+          {/* Animated Spinner */}
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            className="w-12 h-12 border-4 border-t-[#751423] border-gray-300 rounded-full"
+          ></motion.div>
+
+          {/* Skeleton Effect for Loading Content */}
+          <div className="mt-6 w-[80%] max-w-md bg-white p-4 shadow-lg rounded-xl">
+            <div className="animate-pulse">
+              <div className="h-6 bg-gray-300 rounded w-3/4 mb-4"></div>
+              <div className="h-4 bg-gray-300 rounded w-full mb-2"></div>
+              <div className="h-4 bg-gray-300 rounded w-5/6"></div>
+            </div>
+          </div>
+        </div>
+      </Container>
+    );
+  }
+
+  
   
 
   return (
@@ -272,106 +354,100 @@ const Page: React.FC = ({  }) => {
   
           {/* Order List */}
           <div id="orders-list" className="mt-6 space-y-4">
-            {orders?.orders.map((order) => (
-              <React.Fragment key={order._id}>
-                <div id={`order-divider-${order._id}`} className="border-t border-[#EEEFF2] my-3"></div>
-                <div 
-                  id={`order-card-${order._id}`}
-                  onClick={() => handleOrderClick(order)} 
-                  className="rounded-lg font-general cursor-pointer"
-                >
-                  <div id={`order-header-${order._id}`} className="flex justify-between text-[#718096] font-medium text-sm mb-2 py-4">
-                  <p id={`order-date-${order._id}`}>
-                    {new Date(order?.createdAt).toLocaleDateString("en-US", {
-                      month: "short",
-                      day: "2-digit",
-                      year: "numeric",
-                    })}
-                  </p>
-
-                    <div 
-                      id={`order-status-${order._id}`}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setIsModalOpen(true);
-                        setSelectedOrder(order)
-                      }}
-                      className={
-                        order.orderStatus === "pending" ? "bg-[#FFF0E6] text-[#FE964A] px-2 py-1 text-xs rounded flex items-center" :
-                        order.orderStatus === "delivered" ? "bg-[#ecfdeb] text-[#33ca5e] px-2 py-1 text-xs rounded flex items-center" :
-                        "bg-purple-100 text-purple-700 px-2 py-1 text-xs rounded flex items-center"
-                      }
+            {orders?.orders?.length 
+              ? (
+                orders?.orders?.map((order) => (
+                  <React.Fragment key={order._id}>
+                    <div className="border-t border-[#EEEFF2] my-3"></div>
+                    <div
+                      onClick={() => handleOrderClick(order)}
+                      className="rounded-lg font-general cursor-pointer"
                     >
-                  {order?.orderStatus
-                    ? order.orderStatus.charAt(0).toUpperCase() + order.orderStatus.slice(1)
-                    : "Status"} ▼
-                    </div>
-                  </div>
-                  {order.items.map((item, index) => (
-                    <div 
-                      key={item._id} 
-                      id={`order-content-${order._id}-${index}`} 
-                      className="flex items-center gap-3 mb-2 h-[91px] bg-[#FAFAFA] rounded-[12px] space-x-4 px-2 py-2"
-                    >
-                      {/* Order Image */}
-                      <Image 
-                        id={`order-image-${order._id}-${index}`}
-                        src={item.packageId?.packageImgUrls?.[0] || "/fallback-image.png"}
-                        alt={item.packageId?.packageTitle || "Order Image"} 
-                        width={42} 
-                        height={42} 
-                        className="rounded-md h-[42px] w-[42px] object-contain"
-                        objectFit="cover" 
-                      />
+                      <div className="flex justify-between text-[#718096] font-medium text-sm mb-2 py-4">
+                        <p>
+                          {new Date(order?.createdAt).toLocaleDateString("en-US", {
+                            month: "short",
+                            day: "2-digit",
+                            year: "numeric",
+                          })}
+                        </p>
 
-                      {/* Order Details */}
-                      <div id={`order-details-${order._id}-${index}`} className="flex-1">
-                        <p id={`order-title-${order._id}-${index}`} className="font-semibold text-sm text-[#111827]">
-                        {item.packageId?.packageTitle
-                          ? item.packageId.packageTitle
-                              .toLowerCase()
-                              .replace(/\b\w/g, (char) => char.toUpperCase())
-                          : "No Title"}
-                        </p>
-                        <p 
-                          id={`order-price-${order._id}-${index}`} 
-                          className="text-[#718096] font-normal font-general text-sm"
-                          >
-                          {order?.items[0].packageId.packagePriceCurrency === "NGN" ? "₦" : "$"}{item.packageId?.packagePrice
-                            ? item.packageId.packagePrice.toLocaleString()
-                            : "N/A"}
-                        </p>
+                        <div
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setSelectedOrder(order);
+                            setIsModalOpen(true);
+                          }}
+                          className={
+                            order.orderStatus === "pending"
+                              ? "bg-[#FFF0E6] text-[#FE964A] px-2 py-1 text-xs rounded flex items-center"
+                              : order.orderStatus === "delivered"
+                              ? "bg-[#ecfdeb] text-[#33ca5e] px-2 py-1 text-xs rounded flex items-center"
+                              : "bg-purple-100 text-purple-700 px-2 py-1 text-xs rounded flex items-center"
+                          }
+                        >
+                          {order.orderStatus?.charAt(0).toUpperCase() + order.orderStatus?.slice(1)} ▼
+                        </div>
                       </div>
 
-                      {/* Order Quantity */}
-                      <div id={`order-quantity-${order._id}-${index}`} className="flex items-center text-[#718096] text-xs">
-                        <span>Qty: {item.quantity}</span>
+                      {order.items.map((item) => (
+                        <div
+                          key={item._id}
+                          className="flex items-center gap-3 mb-2 h-[91px] bg-[#FAFAFA] rounded-[12px] space-x-4 px-2 py-2"
+                        >
+                          <Image
+                            src={item.packageId?.packageImgUrls?.[0] || "/fallback-image.png"}
+                            alt={item.packageId?.packageTitle || "Order Image"}
+                            width={42}
+                            height={42}
+                            className="rounded-md h-[42px] w-[42px] object-contain"
+                          />
+
+                          <div className="flex-1">
+                            <p className="font-semibold text-sm text-[#111827]">
+                            {item.packageId?.packageTitle
+                              ? item.packageId.packageTitle.charAt(0).toUpperCase() + item.packageId.packageTitle.slice(1)
+                              : "No Title"}
+
+                            </p>
+                            <p className="text-[#718096] font-normal text-sm">
+                              {item.packageId?.packagePriceCurrency === "NGN" ? "₦" : "$"}
+                              {item.packageId?.packagePrice?.toLocaleString() || "N/A"}
+                            </p>
+                          </div>
+
+                          <div className="flex items-center text-[#718096] text-xs">
+                            <span>Qty: {item.quantity}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+
+                    <div className="bg-white rounded-lg p-4 w-full max-w-md">
+                      <div className="grid grid-cols-2 gap-y-3 text-sm text-gray-600">
+                        <p className="font-medium">Order Number</p>
+                        <p className="font-bold text-gray-900 truncate">{order?.orderId}</p>
+
+                        <p className="font-medium">Guest</p>
+                        <p className="font-bold text-gray-900">
+                        {order?.guestName 
+                          ? order.guestName.charAt(0).toUpperCase() + order.guestName.slice(1) 
+                          : "Guest Name"}
+                        </p>
+
+                        <p className="font-medium">Delivery</p>
+                        <p className="font-bold text-gray-900">
+                          {order?.items[0]?.deliveryMethod || "N/A"}
+                        </p>
+
+                        <p className="font-medium">Total Price</p>
+                        <p className="font-bold text-gray-900">
+                          {order?.items[0]?.packageId?.packagePriceCurrency === "NGN" ? "₦" : "$"}
+                          {order.totalAmount?.toLocaleString() || "N/A"}
+                        </p>
                       </div>
                     </div>
-                  ))}
 
-                </div>
-                <div id={`order-summary-${order._id}`} className="bg-white rounded-lg p-4 w-full max-w-md">
-                  <div id={`order-summary-grid-${order._id}`} className="grid grid-cols-2 gap-y-3 text-sm text-gray-600">
-                    <p className="font-medium">Order Number</p>
-                    <p className="font-bold text-gray-900 truncate">{order?.orderId}</p>
-  
-                    <p className="font-medium">Guest</p>
-                    <p className="font-bold text-gray-900">
-                      {order?.guestName
-                        ? order.guestName
-                            .toLowerCase()
-                            .replace(/\b\w/g, (char) => char.toUpperCase())
-                        : "Guest Name"}
-                    </p>
-  
-                    <p className="font-medium">Delivery</p>
-                    <p className="font-bold text-gray-900">{order?.items[0].deliveryMethod}</p>
-  
-                    <p className="font-medium">Total Price</p>
-                    <p className="font-bold text-gray-900">{order?.items[0].packageId.packagePriceCurrency === "NGN" ? "₦" : "$"}{order.totalAmount ? order.totalAmount.toLocaleString() : "N/A"}</p>
-                  </div>
-                </div>
                 {isModalOpen && (
                   <div id="status-modal" className="fixed inset-0 flex items-center justify-center">
                   <div 
@@ -405,8 +481,11 @@ const Page: React.FC = ({  }) => {
                     </div>
                   </div>
                 )}
-              </React.Fragment>
-            ))}
+                  </React.Fragment>
+                ))
+              ) : (
+                <p>No orders available</p>
+              )}
           </div>
   
           {/* Pagination */}

@@ -5,7 +5,6 @@ import Container from "@/components/dashboard/Container";
 import PackagesSection from "@/components/dashboard/eventComponents/PackagesSection";
 import EventDetailsSection from "@/components/dashboard/eventComponents/EventDetailsSection";
 import axiosInstance from "@/lib/axiosInstance";
-// import { useRouter } from "next-nprogress-bar";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useRouter } from 'next/navigation';

@@ -19,6 +19,19 @@ interface EventImage {
   url: string;
 }
 
+export interface EventGroup extends BaseEntity {
+  _id: string;
+  groupName: string;
+  groupDescription: string;
+  groupPrivacy: string; 
+  groupCurrency: string;
+  event: string;
+  isDisabled: boolean;
+  link: string;
+  contacts: any[]; // Define a more specific type if possible
+  packages: string[]; // Array of package IDs
+}
+
 export interface Event extends BaseEntity {
   eventName: string;
   description: string;
@@ -72,6 +85,7 @@ interface OrderItem {
     packagePriceCurrency: string;
   };
   packageImgUrls: string[]; 
+  packagePrice: number;
   packageTitle: string;
 }
 
@@ -101,6 +115,7 @@ export interface Order extends BaseEntity {
   paymentStatus: string;
   totalAmount: number;
   eventId: Event;
+  eventGroupId: Group;
 }
 
 // Analytics System

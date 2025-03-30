@@ -66,9 +66,16 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
     router.push("/dashboard/invited-contacts");
   };
 
-  const handleViewOneGroup = (groupId: any) => {
-    router.push(`/dashboard/groups/${groupId}`);
-  };
+"use client";
+
+
+const handleViewOneGroup = (group: Group) => {
+  const groupData = encodeURIComponent(JSON.stringify(group));
+
+  router.push(`/dashboard/groups/${group._id}?groupData=${groupData}`);
+};
+
+  
 
   return (
     <>
@@ -95,7 +102,7 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
             </div>
 
             {/* Group Title and Description */}
-            <div onClick={() => handleViewOneGroup(group._id)}>
+            <div onClick={() => handleViewOneGroup(group)}>
                 <h2 className="text-xl font-bold text-[#111827] mt-2 capitalize">
                   {group.groupName}
                 </h2>

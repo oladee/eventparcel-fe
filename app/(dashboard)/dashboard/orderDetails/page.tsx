@@ -12,9 +12,8 @@ import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 
 const Page = () => {
-  const [orders, setOrders] = useState<Order | null>(null);
+    const [orders, setOrders] = useState<Order | null>(null);
     const router = useRouter();
-
 
     useEffect(() => {
       const storedOrder = localStorage.getItem("selectedOrder");
@@ -25,22 +24,40 @@ const Page = () => {
 
     const { updateOrderStatus } = useUpdateOrderStatus();
     const handleStatusChange = async (status: string) => {
-    try {
-        if (!orders?.orderId) {
-        toast.error("Invalid order. Please try again.");
-        return;
-        }
+        try {
+            if (!orders?.orderId) {
+                toast.error("Invalid order. Please try again.");
+                return;
+            }
     
-        await updateOrderStatus(
-        status,
-        orders.paymentStatus ?? "Unknown", 
-        orders.orderId
-        );
-        
-    } catch (error) {
-        console.log(error)
-    }
+            // Ensure paymentStatus is always a string
+            const paymentStatus: string = orders.paymentStatus ?? "Unknown";
+    
+            await updateOrderStatus(orders?._id, paymentStatus, status);
+    
+            // Retrieve selectedOrder from localStorage
+            const storedOrder = JSON.parse(localStorage.getItem("selectedOrder") || "{}");
+
+            console.log("selected", storedOrder)
+    
+            if (!storedOrder || Object.keys(storedOrder).length === 0) {
+                console.warn("No selected order found in local storage.");
+                return;
+            }
+    
+            // Update orderStatus
+            storedOrder.orderStatus = status;
+    
+            // Save the updated object back to localStorage
+            localStorage.setItem("selectedOrder", JSON.stringify(storedOrder));
+            setOrders(storedOrder);
+    
+        } catch (error) {
+            console.error("Failed to update order status:", error);
+        }
     };
+    
+    
 
     const handleViewOneEvent = (eventId: any) => {
         router.push(`/dashboard/events/${eventId}`);
@@ -145,11 +162,11 @@ const Page = () => {
                     
                     <div id="mark-shipped-button" className='border border-[#111827] w-[311px] h-[48px] flex justify-center items-center rounded-[12px] mt-6'>
                     {orders?.orderStatus === "pending" ? (
-                        <p id="mark-shipped-text" onClick={() => handleStatusChange("Shipped")} className="font-manrope font-extrabold text-sm text-[#111827]">
+                        <p id="mark-shipped-text" onClick={() => handleStatusChange("shipped")} className="font-manrope font-extrabold text-sm text-[#111827]">
                             Mark as Shipped
                         </p>
                         ) : orders?.orderStatus === "shipped" ? (
-                        <p id="mark-shipped-text" onClick={() => handleStatusChange("Delivered")} className="font-manrope font-extrabold text-sm text-[#111827]">
+                        <p id="mark-shipped-text" onClick={() => handleStatusChange("delivered")} className="font-manrope font-extrabold text-sm text-[#111827]">
                             Mark as Delivered
                         </p>
                         ) : orders?.orderStatus === "delivered" ? (
@@ -228,23 +245,26 @@ const Page = () => {
                     <div id="payment-divider" className="border-t border-[#EEEFF2] my-3"></div>
                     
                     <div id="item-cost" className='flex items-center justify-between'>
-                        <span id="item-label" className='text-[#718096] font-general font-medium text-[14px]'>3 item</span>
-                        <span id="item-price" className='text-[#718096] font-general font-medium text-[14px]'>₦50000</span>
+                        <span id="item-label" className='text-[#718096] font-general font-medium text-[14px]'>
+                        {orders?.items ? orders.items.reduce((total, item) => total + item.quantity, 0) : 0} item
+                    </span>
+                        <span id="item-price" className='text-[#718096] font-general font-medium text-[14px]'>
+                            {orders.items[0]?.packageId?.packagePriceCurrency === "NGN" ? "₦" : "$"}{orders?.totalAmount.toLocaleString()}
+                        </span>
                     </div>
                     
                     <div id="delivery-cost" className='flex items-center justify-between'>
                         <span id="delivery-label" className='text-[#718096] font-general font-medium text-[14px]'>Home Delivery</span>
-                        <span id="delivery-price" className='text-[#718096] font-general font-medium text-[14px]'>₦5000</span>
+                        <span id="delivery-price" className='text-[#718096] font-general font-medium text-[14px]'>N/A</span>
                     </div>
-                    
                     <div id="total-cost" className='flex items-center justify-between'>
                         <span id="total-label" className='font-general font-bold text-[14px] text-[#111827]'>Total</span>
-                        <span id="total-price" className='font-general font-bold text-[16px] text-[#111827]'>₦55000</span>
+                        <span id="total-price" className='font-general font-bold text-[16px] text-[#111827]'>N/A</span>
                     </div>
                     
                     <div id="payment-method" className='flex items-center justify-between'>
                         <span id="method-label" className='text-[#718096] font-general font-medium text-[14px]'>Paid by Guest</span>
-                        <span id="method-amount" className='font-general font-bold text-[16px] text-[#111827]'>₦55000</span>
+                        <span id="method-amount" className='font-general font-bold text-[16px] text-[#111827]'>N/A</span>
                     </div>
                 </div>
                 <div id="final-divider" className="border-t border-[#EEEFF2] my-3"></div>
