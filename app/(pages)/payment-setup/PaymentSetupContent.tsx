@@ -85,6 +85,7 @@ const PaymentSetupContent = () => {
       accountNumber: "",
       accountName: "",
       bankName: "",
+      bankCode: "",
     },
     dollarAccount: {
       usAccountNumber: "",
