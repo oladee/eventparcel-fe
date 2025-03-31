@@ -190,7 +190,7 @@ const Page = () => {
     } catch (error) {
       console.error("Error updating order status:", error);
     } finally {
-      setIsModalOpen(false);
+      setIsStatusModal(false);
     }
   };
 

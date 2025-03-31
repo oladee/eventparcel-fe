@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import BankDropdown from "./BankDropdown";
 import axiosInstance from "@/lib/axiosInstance";
 import { CheckCircle, XCircle } from "lucide-react";
@@ -41,7 +41,12 @@ const NairaPayoutForm: React.FC<NairaPayoutFormProps> = ({
 }) => {
 
   const [isValidating, setIsValidating] = useState(false);
+  const prevValues = useRef({
+    accountNumber: "",
+    bankCode: ""
+  });
 
+  // Set bank details when selected
   useEffect(() => {
     if (selectedBank) {
       setFormData((prev: any) => ({
@@ -49,64 +54,76 @@ const NairaPayoutForm: React.FC<NairaPayoutFormProps> = ({
         nairaAccount: {
           ...prev.nairaAccount,
           bankName: selectedBank.name,
-          bankCode: selectedBank.code, 
+          bankCode: selectedBank.code,
         },
       }));
     }
   }, [selectedBank, setFormData]);
 
-  useEffect(() => {
-    const validateBankAccount = async () => {
-      const { accountNumber } = formData.nairaAccount;
-      if (!selectedBank || accountNumber.length !== 10) return;
+  // Memoized validation function
+  const validateBankAccount = useCallback(async (accountNumber: string, bankCode: string) => {
+    if (!bankCode || accountNumber.length !== 10) return;
+    if (accountNumber === prevValues.current.accountNumber && 
+        bankCode === prevValues.current.bankCode) {
+      return;
+    }
 
-      setIsValidating(true);
-      try {
-        const response = await axiosInstance.post("/validate-bank-account", {
-          accountNumber,
-          bankCode: selectedBank.code,
-        });
+    setIsValidating(true);
+    try {
+      const response = await axiosInstance.post("/validate-bank-account", {
+        accountNumber,
+        bankCode,
+      });
 
-        if (response.data?.data?.account_name) {
-          setFormData((prev: any) => ({
-            ...prev,
-            nairaAccount: {
-              ...prev.nairaAccount,
-              accountName: response.data.data.account_name,
-            },
-          }));
-          setErrors((prev) => ({ ...prev, accountName: "" })); // Clear previous errors
-        } else {
-          setErrors((prev) => ({ ...prev, accountName: "Invalid account details" }));
-        }
-      } catch (error) {
-        setErrors((prev) => ({ ...prev, accountName: "Error validating account" }));
-        console.log(error)
-      } finally {
-        setIsValidating(false);
+      if (response.data?.data?.account_name) {
+        setFormData((prev: any) => ({
+          ...prev,
+          nairaAccount: {
+            ...prev.nairaAccount,
+            accountName: response.data.data.account_name,
+          },
+        }));
+        setErrors((prev) => ({ ...prev, accountName: "" }));
+      } else {
+        setErrors((prev) => ({ ...prev, accountName: "Invalid account details" }));
       }
-    };
+    } catch (error) {
+      setErrors((prev) => ({ ...prev, accountName: "Error validating account" }));
+      console.error("Validation error:", error);
+    } finally {
+      setIsValidating(false);
+      prevValues.current = { accountNumber, bankCode };
+    }
+  }, [setErrors, setFormData]);
 
-    validateBankAccount();
-  }, [formData.nairaAccount.accountNumber, selectedBank,formData.nairaAccount,setErrors,setFormData]);
+  // Run validation when account number or bank changes
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      validateBankAccount(
+        formData.nairaAccount.accountNumber, 
+        selectedBank?.code || ""
+      );
+    }, 500); // Debounce to prevent rapid firing
 
-   const handleValidation = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { value } = e.target;
+    return () => clearTimeout(timer);
+  }, [formData.nairaAccount.accountNumber, selectedBank?.code, validateBankAccount]);
+
+  const handleValidation = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { value, name } = e.target;
     handleChange(e);
-  
+
     const newErrors = { ...errors };
-  
-    if (e.target.name === "nairaAccount.accountNumber") {
+
+    if (name === "nairaAccount.accountNumber") {
       if (!/^\d{10}$/.test(value)) {
         newErrors.accountNumber = "Account number must be 10 digits.";
       } else {
         delete newErrors.accountNumber;
       }
     }
-  
+
     setErrors(newErrors);
   };
-  
 
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
