@@ -88,7 +88,7 @@ const NairaPayoutForm: React.FC<NairaPayoutFormProps> = ({
     };
 
     validateBankAccount();
-  }, [formData.nairaAccount.accountNumber, selectedBank]);
+  }, [formData.nairaAccount.accountNumber, selectedBank,formData.nairaAccount,setErrors,setFormData]);
 
    const handleValidation = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { value } = e.target;

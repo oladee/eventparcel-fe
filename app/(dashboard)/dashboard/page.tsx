@@ -50,7 +50,30 @@ interface SalesData {
 // Extend the Recharts tooltip props for our custom tooltip
 interface CustomTooltipProps extends TooltipProps<number, string> {}
 
-const CustomTooltip: React.FC<CustomTooltipProps> = ({
+// const CustomTooltip: React.FC<CustomTooltipProps> = ({
+//   active,
+//   payload,
+//   label,
+// }) => {
+//   if (active && payload && payload.length) {
+//     const { netSales, sales } = payload[0].payload as SalesData;
+//     return (
+//       <div className="bg-white p-2 border rounded shadow">
+//         <p className="text-sm font-medium">{label}</p>
+//         <p className="text-xs text-gray-500">
+//           Sales: ₦{sales.toLocaleString()}
+//         </p>
+//         {netSales && (
+//           <p className="text-xs text-gray-600">Net Sales: {netSales}</p>
+//         )}
+//       </div>
+//     );
+//   }
+//   return null;
+// };
+
+
+const CustomTooltip: React.FC<TooltipProps<number, string>> = ({
   active,
   payload,
   label,

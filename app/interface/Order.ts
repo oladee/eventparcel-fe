@@ -1,3 +1,5 @@
+import { Group } from "./Group";
+
 // Core Entity Structure
 interface BaseEntity {
   _id: string;
