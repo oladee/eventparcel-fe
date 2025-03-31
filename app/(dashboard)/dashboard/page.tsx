@@ -47,8 +47,7 @@ interface SalesData {
   netSales?: string;
 }
 
-// Extend the Recharts tooltip props for our custom tooltip
-interface CustomTooltipProps extends TooltipProps<number, string> {}
+// interface CustomTooltipProps extends TooltipProps<number, string> {}
 
 // const CustomTooltip: React.FC<CustomTooltipProps> = ({
 //   active,
