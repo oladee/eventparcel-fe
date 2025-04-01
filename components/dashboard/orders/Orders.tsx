@@ -1,6 +1,5 @@
 "use client";
 
-import Container from '@/components/dashboard/Container';
 import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
 import Cart from "@/assets/orderIcons/cart.png";
