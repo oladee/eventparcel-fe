@@ -15,6 +15,7 @@ import HeaderLayout from "@/components/layout/HeaderLayout";
 import { useRouter, useSearchParams } from "next/navigation";
 import NairaPayoutForm from "@/components/NairaPayoutForm";
 import DollarPayoutForm from "@/components/DollarPayoutForm";
+import axiosInstance from "@/lib/axiosInstance";
 
 const LocationPickerModal = dynamic(
   () => import("@/components/aboutEvent/LocationPickerModal"),
@@ -69,8 +70,7 @@ const PaymentSetupContent = () => {
   const groupsString = searchParams.get("groups");
   const groups = groupsString ? JSON.parse(decodeURIComponent(groupsString)) : [];
   const firstEventId = groups.length > 0 && groups[0].event ? groups[0].event._id : "";
-
-  const [isRightBarOpen, setIsRightBarOpen] = useState(false);
+  // const [isRightBarOpen, setIsRightBarOpen] = useState(false);
   const [showMapPickerModal, setShowMapPickerModal] = useState(false);
   const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
   const [selectedUSBank, setSelectedUSBank] = useState<USBank | null>(null);
@@ -104,6 +104,19 @@ const PaymentSetupContent = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const [isFormValid, setIsFormValid] = useState(false);
+
+  //Are all packages self-managed
+  const isAllSelfManaged = (groupList: any[]) => {
+    if (groupList.length === 0) return false; 
+  
+    return groupList.every((group) =>
+      group.packages.every((pkg: any) =>
+        pkg.packageDelivery.every((delivery: string) => delivery.includes("selfManaged"))
+      )
+    );
+  };
+
+  const allSelfManaged = isAllSelfManaged(groups);
 
   useEffect(() => {
     const isAllFieldsFilled = Object.values(formData).every((value) => {
@@ -220,13 +233,18 @@ const PaymentSetupContent = () => {
     const queryString = new URLSearchParams({
       data: JSON.stringify(formattedData),
     }).toString();
-  
-    router.push(`/pickup-details?${queryString}`);
+
+    if(allSelfManaged) {
+      await axiosInstance.post("/add-payment", formattedData);
+    }else{
+      router.push(`/dashboard/pickup-details?${queryString}`);
+    }
   };
   const hasNGN = groups.some((group: { groupCurrency: string; }) => group.groupCurrency === "NGN");
   const hasUSD = groups.some((group: { groupCurrency: string; }) => group.groupCurrency === "USD");
 
   const today = new Date();
+
 
   return (
     <HeaderLayout>
@@ -257,12 +275,12 @@ const PaymentSetupContent = () => {
                   deadline
                 </span>
               </div>
-              <span
+              {/* <span
                 onClick={() => setIsRightBarOpen(true)}
                 className="px-2 mb-6 text-sm cursor-pointer rounded-[200px] bg-[#ECB795] text-white"
               >
                 !
-              </span>
+              </span> */}
             </div>
           </div>
 
@@ -428,7 +446,7 @@ const PaymentSetupContent = () => {
             </div>
           </form>
 
-          <RightBar isOpen={isRightBarOpen} setIsOpen={setIsRightBarOpen} />
+          {/* <RightBar isOpen={isRightBarOpen} setIsOpen={setIsRightBarOpen} /> */}
         </div>
       </section>
       {showModal && (

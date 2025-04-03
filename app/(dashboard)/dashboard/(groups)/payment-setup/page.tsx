@@ -15,6 +15,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import NairaPayoutForm from "@/components/NairaPayoutForm";
 import DollarPayoutForm from "@/components/DollarPayoutForm";
 import Container from "@/components/dashboard/Container";
+import axiosInstance from "@/lib/axiosInstance";
 
 const LocationPickerModal = dynamic(
   () => import("@/components/aboutEvent/LocationPickerModal"),
@@ -69,8 +70,7 @@ const PaymentSetupContent = () => {
   const groupsString = searchParams.get("groups");
   const groups = groupsString ? JSON.parse(decodeURIComponent(groupsString)) : [];
   const firstEventId = groups.length > 0 && groups[0].event ? groups[0].event._id : "";
-
-  const [isRightBarOpen, setIsRightBarOpen] = useState(false);
+  // const [isRightBarOpen, setIsRightBarOpen] = useState(false);
   const [showMapPickerModal, setShowMapPickerModal] = useState(false);
   const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
   const [selectedUSBank, setSelectedUSBank] = useState<USBank | null>(null);
@@ -104,6 +104,19 @@ const PaymentSetupContent = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
 
   const [isFormValid, setIsFormValid] = useState(false);
+
+  //Are all packages self-managed
+  const isAllSelfManaged = (groupList: any[]) => {
+    if (groupList.length === 0) return false; 
+  
+    return groupList.every((group) =>
+      group.packages.every((pkg: any) =>
+        pkg.packageDelivery.every((delivery: string) => delivery.includes("selfManaged"))
+      )
+    );
+  };
+
+  const allSelfManaged = isAllSelfManaged(groups);
 
   useEffect(() => {
     const isAllFieldsFilled = Object.values(formData).every((value) => {
@@ -220,8 +233,12 @@ const PaymentSetupContent = () => {
     const queryString = new URLSearchParams({
       data: JSON.stringify(formattedData),
     }).toString();
-  
-    router.push(`/dashboard/pickup-details?${queryString}`);
+
+    if(allSelfManaged) {
+      await axiosInstance.post("/add-payment", formattedData);
+    }else{
+      router.push(`/dashboard/pickup-details?${queryString}`);
+    }
   };
   const hasNGN = groups.some((group: { groupCurrency: string; }) => group.groupCurrency === "NGN");
   const hasUSD = groups.some((group: { groupCurrency: string; }) => group.groupCurrency === "USD");
@@ -244,25 +261,25 @@ const PaymentSetupContent = () => {
           <div className="md:mb-12  sm:p-0 space-y-3">
             <h2
               id="payment_deliveryHeader"
-              className="flex justify-start text-xl sm:text-2xl font-bold text-[#111827]"
+              className="flex justify-start text-xl sm:text-2xl font-bold text-[#111827] pl-1"
             >
               Payment Setup
             </h2>
             <div id="payment_deliveryDesc" className="flex justify-center items-center gap-3">
               <div className="flex flex-col">
-                <span className="flex justify-start w-[313px] pl-2 whitespace-nowrap h-6 font-general font-medium text-sm text-[#718096]">
+                <span className="flex justify-start w-[313px] whitespace-nowrap h-6 font-general font-medium text-sm text-[#718096]">
                   Let&apos;s setup your payout process and payment
                 </span>
-                <span className="flex justify-start w-[313px] pl-2 h-11 font-general font-medium text-sm text-[#718096]">
+                <span className="flex justify-start w-[313px] h-11 font-general font-medium text-sm text-[#718096]">
                   deadline
                 </span>
               </div>
-              <span
+              {/* <span
                 onClick={() => setIsRightBarOpen(true)}
                 className="px-2 mb-6 text-sm cursor-pointer rounded-[200px] bg-[#ECB795] text-white"
               >
                 !
-              </span>
+              </span> */}
             </div>
           </div>
 
@@ -427,7 +444,7 @@ const PaymentSetupContent = () => {
             </div>
           </form>
 
-          <RightBar isOpen={isRightBarOpen} setIsOpen={setIsRightBarOpen} />
+          {/* <RightBar isOpen={isRightBarOpen} setIsOpen={setIsRightBarOpen} /> */}
         </div>
       </section>
       {showModal && (

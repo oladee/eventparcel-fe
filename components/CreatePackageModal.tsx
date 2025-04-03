@@ -4,12 +4,14 @@ import { Package } from "@/app/interface/Group";
 import axiosInstance from "@/lib/axiosInstance";
 import axios from "axios";
 import Image from "next/image";
+import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 interface PackageFormData {
     groupId?: string | number;
+    eventId?: string | null;
     groupCurrency?: string;
     packageTitle?: string;
     packageDescription?: string;
@@ -35,8 +37,11 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
     const [loading, setLoading] = useState(false);
     const [, setError] = useState(false);
     const [openHomeDeliveryOption, setOpenHomeDeliveryOption] = useState(false);
+    const router = useRouter();
+    const [eventId, setEventId] = useState<string | null>(null);
     const [formData, setFormData] = useState<PackageFormData>({
         groupId: groudId,
+        eventId: eventId,
         packageTitle: packageData?.packageTitle || "",
         packageDescription: packageData?.packageDescription || "",
         packagePriceCurrency: groupCurrency,
@@ -49,7 +54,30 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
         ? packageData.packageImgUrls
         : packageData?.packageImgUrls ? [packageData.packageImgUrls] : []
     });
-
+    
+    useEffect(() => {
+        if (typeof window !== "undefined") {
+            const storedEventId = localStorage.getItem("eventId");
+            
+            if (!storedEventId) {
+                router.replace("/new-group");
+                return;
+            }
+    
+            setEventId(storedEventId);
+        }
+    }, []);
+    
+    useEffect(() => {
+        if (eventId) {
+            setFormData((prev) => ({
+                ...prev,
+                eventId: eventId,  
+            }));
+        }
+    }, [eventId]);
+    
+    
     const validateField = (field: keyof PackageFormData, value: string) => {
         if (field === "packageTitle") {
             if (!value.trim()) return "Title is required.";
@@ -189,6 +217,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
         if(mode === "create") {
             formDataToSend.append("groupId", formData.groupId?.toString() || "");
         }
+        formDataToSend.append("eventId", formData.eventId?.toString() || "");
         formDataToSend.append("packageTitle", formData.packageTitle || "");
         formDataToSend.append("packageDescription", formData.packageDescription || "");
         formDataToSend.append("packagePriceCurrency", formData.packagePriceCurrency || "");
