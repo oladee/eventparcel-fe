@@ -466,13 +466,13 @@ const Page: React.FC = ({  }) => {
                         <li 
                           id="status-option-shipped"
                           onClick={() => handleStatusChange("shipped")}
-                          className="p-2 hover:bg-[#F9FAFB] rounded-md cursor-pointer font-general font-medium text-base text-[#111827]"                          >
+                          className="p-2 hover:bg-[#F9FAFB] rounded-md cursor-pointer font-general font-medium text-base text-[#111827]">
                           Shipped
                         </li>
                         <li 
                           id="status-option-delivered"
                           onClick={() => handleStatusChange("delivered")}
-                          className="p-2 hover:bg-[#F9FAFB] rounded-md cursor-pointer font-general font-medium text-base text-[#111827]"                          >
+                          className="p-2 hover:bg-[#F9FAFB] rounded-md cursor-pointer font-general font-medium text-base text-[#111827]">
                           Delivered
                         </li>
                       </ul>
