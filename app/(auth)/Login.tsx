@@ -78,7 +78,7 @@ const Login: React.FC = () => {
       localStorage.setItem("loggedInUserEmail", response.data.email)
       toast.success(response?.data?.message);
 
-      router.push("/dashboard/event-creation");
+      router.push("/dashboard");
     } catch (error: any) {
       if (
         error.response?.data?.message ===
