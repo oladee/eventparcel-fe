@@ -66,7 +66,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
     
             setEventId(storedEventId);
         }
-    }, []);
+    }, [router]);
     
     useEffect(() => {
         if (eventId) {
