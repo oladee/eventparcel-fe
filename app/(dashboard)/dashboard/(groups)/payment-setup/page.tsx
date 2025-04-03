@@ -1,8 +1,7 @@
 "use client";
 
-// import RightBar from "@/components/Rightbar";
 import dynamic from "next/dynamic";
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, useEffect } from "react";
 import ReusuableSuccess from "@/components/modals/ReusuableSuccess";
 import { toast, ToastContainer } from "react-toastify";
 import { BiLoaderCircle } from "react-icons/bi";
@@ -11,10 +10,10 @@ import "react-datepicker/dist/react-datepicker.css";
 import { FormEvent } from "react";
 import { PiCalendarMinus } from "react-icons/pi";
 import { AiOutlineClockCircle } from "react-icons/ai";
+import HeaderLayout from "@/components/layout/HeaderLayout";
 import { useRouter, useSearchParams } from "next/navigation";
 import NairaPayoutForm from "@/components/NairaPayoutForm";
 import DollarPayoutForm from "@/components/DollarPayoutForm";
-import Container from "@/components/dashboard/Container";
 import axiosInstance from "@/lib/axiosInstance";
 
 const LocationPickerModal = dynamic(
@@ -216,7 +215,6 @@ const PaymentSetupContent = () => {
     return `${paddedHours}:${paddedMinutes} ${ampm}`;
   };
 
-
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
   
@@ -257,13 +255,15 @@ const PaymentSetupContent = () => {
     }
   };
 
+
   const hasNGN = groups.some((group: { groupCurrency: string; }) => group.groupCurrency === "NGN");
   const hasUSD = groups.some((group: { groupCurrency: string; }) => group.groupCurrency === "USD");
 
   const today = new Date();
 
+
   return (
-    <Container>
+    <HeaderLayout>
       <ToastContainer />
       {showMapPickerModal && (
         <LocationPickerModal
@@ -273,12 +273,12 @@ const PaymentSetupContent = () => {
           onCancel={() => setShowMapPickerModal(false)}
         />
       )}
-      <section className="!overflow-hidden relative pb-20">
-        <div className="lg:py-24 px-3 sm:px-4 mx-auto max-w-screen-md h-[98vh] overflow-y-auto no-scrollbar">
-          <div className="md:mb-12  sm:p-0 space-y-3">
+      <section className="bg-[#EEEFF2] !overflow-hidden relative">
+        <div className="py-20 lg:py-24 px-3 sm:px-4 mx-auto max-w-screen-md h-[98vh] overflow-y-auto no-scrollbar">
+          <div className="md:mb-12 text-center p-3 sm:p-0 space-y-3">
             <h2
               id="payment_deliveryHeader"
-              className="flex justify-start text-xl sm:text-2xl font-bold text-[#111827] pl-1"
+              className="flex justify-start text-xl sm:text-2xl font-bold text-[#111827]"
             >
               Payment Setup
             </h2>
@@ -323,7 +323,7 @@ const PaymentSetupContent = () => {
               {/* NAIRA PAYOUT */}
               <div className=" rounded-[10px]">
               {hasNGN && (
-                 <div className="border border-[#CBD5E0] mb-7 p-4 rounded-[10px]">
+                <div className="border border-[#CBD5E0] mb-7 p-4 rounded-[10px]">
                   <NairaPayoutForm
                     formData={formData}
                     errors={errors}
@@ -336,6 +336,7 @@ const PaymentSetupContent = () => {
                   />
                 </div>
               )}
+
 
                 {/* DOLLAR PAYOUT */}
                 {hasUSD && (
@@ -472,16 +473,8 @@ const PaymentSetupContent = () => {
           buttonText="continue"
         />
       )}
-    </Container>
+    </HeaderLayout>
   );
 };
 
-// export default PaymentSetupContent;
-
-export default function Page() {
-  return (
-    <Suspense fallback={<div className="text-center py-10">Loading...</div>}>
-      <PaymentSetupContent />
-    </Suspense>
-  );
-}
+export default PaymentSetupContent;

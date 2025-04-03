@@ -69,7 +69,6 @@ const PaymentSetupContent = () => {
   const groupsString = searchParams.get("groups");
   const groups = groupsString ? JSON.parse(decodeURIComponent(groupsString)) : [];
   const firstEventId = groups.length > 0 && groups[0].event ? groups[0].event._id : "";
-  // const [isRightBarOpen, setIsRightBarOpen] = useState(false);
   const [showMapPickerModal, setShowMapPickerModal] = useState(false);
   const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
   const [selectedUSBank, setSelectedUSBank] = useState<USBank | null>(null);
@@ -462,7 +461,6 @@ const PaymentSetupContent = () => {
             </div>
           </form>
 
-          {/* <RightBar isOpen={isRightBarOpen} setIsOpen={setIsRightBarOpen} /> */}
         </div>
       </section>
       {showModal && (
