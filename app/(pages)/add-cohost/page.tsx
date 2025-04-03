@@ -117,16 +117,16 @@ const Page = () => {
       <ToastContainer />
       <section className="bg-[#F9FAFB] !overflow-hidden relative">
         <div className="py-20 lg:py-24 px-3 sm:px-4 mx-auto max-w-screen-md h-screen overflow-y-auto no-scrollbar">
-          <div className="mb-4 md:mb-12 text-center p-3 sm:p-0 space-y-3">
+          <div className="mb-4 md:mb-12 md:text-center p-3 sm:p-0 space-y-3">
             <h1
               id="payment_deliveryHeader"
               className="text-2xl sm:text-3xl font-bold text-[#111827]"
             >
-              Add a Co-host
+              Invite a Co-host
             </h1>
-            <p id="payment_deliveryDesc" className="gap-3">
+            <p id="addCoHostDes" className="gap-3 text-[#718096]">
               <span className="mr-2">
-                Enter the name and email address of your co-host
+              A co-host will be able to manage your event and guest invite
               </span>
               {/* <span
                 onClick={() => setIsRightBarOpen(true)}
@@ -149,6 +149,8 @@ const Page = () => {
                 >
                   Co-host Details
                 </h2>
+                <p id="coHostDes" className="text-[#718096] mb-4">Enter the name and email address of your 
+                co-host</p>
               </div>
               <label
                 htmlFor="accountNumber"
@@ -204,7 +206,7 @@ const Page = () => {
                 <input
                   type="email"
                   id="email"
-                  placeholder="Email address"
+                  placeholder="Email"
                   value={formData.email}
                   onChange={handleChange}
                   onBlur={handleBlur}
@@ -230,7 +232,7 @@ const Page = () => {
               </button>
             </div>
 
-            <div className="bg-[#FFFF] py-4 flex justify-center absolute z-10 right-0 bottom-0 w-full">
+            <div className="bg-[#FFFF] pt-4 pb-11 flex justify-center absolute z-10 right-0 bottom-0 w-full">
               <div className="max-w-3xl flex gap-4 items-center justify-center sm:justify-end w-full">
                 <button className="p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827]">
                   Save for later
