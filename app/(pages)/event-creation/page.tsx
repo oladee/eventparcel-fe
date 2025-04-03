@@ -14,6 +14,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import Cookies from "js-cookie";
 import { useRouter, useSearchParams } from "next/navigation";
 import HeaderLayout from "@/components/layout/HeaderLayout";
+import { motion } from "framer-motion";
 
 // Dynamically import LocationPickerModal with SSR disabled.
 const LocationPickerModal = dynamic(
@@ -87,7 +88,6 @@ const PageContent: React.FC = () => {
     eventImage: ""
   });
 
-
   useEffect(() => {
     const redirect = Cookies.get("redirectAfterLogin");
     if (redirect === "co-host") {
@@ -102,9 +102,7 @@ const PageContent: React.FC = () => {
     }
   }, [router]);
 
-
   const [isAuthenticated, setIsAuthenticated] = useState(false);
-
 
   useEffect(() => {
     // Check for authToken in localStorage
@@ -159,10 +157,13 @@ const PageContent: React.FC = () => {
 
   const validateField = (id: string, value: any): string => {
     // Skip personal details validations if user is authenticated
-    if (isAuthenticated && (id === "firstName" || id === "lastName" || id === "email")) {
+    if (
+      isAuthenticated &&
+      (id === "firstName" || id === "lastName" || id === "email")
+    ) {
       return "";
     }
-  
+
     if (id === "eventDate" || id === "eventTime") {
       if (!(value instanceof Date) || isNaN(value.getTime())) {
         return "This field is required.";
@@ -182,41 +183,39 @@ const PageContent: React.FC = () => {
     ) {
       return "This field is required.";
     }
-    
-    if (id === "email" &&
-        !/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(value)
+
+    if (
+      id === "email" &&
+      !/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(value)
     ) {
       return "Enter a valid email address.";
     }
-    
+
     if (
       (id === "firstName" || id === "lastName") &&
       /[^a-zA-Z\s]/.test(value)
     ) {
       return "Name cannot include numbers or special characters.";
     }
-    
+
     if (id === "description" && value.trim() && value.length < 5) {
       return "Description must be at least 5 characters.";
     }
-    
+
     if (id === "description" && value.length > 300) {
       return "Description must have a maximum of 300 characters.";
     }
-    
+
     if (id === "eventName" && value.length < 5) {
       return "Event name must be at least 5 characters.";
     }
-    
+
     if (id === "eventName" && value.length > 60) {
       return "Event name must not exceed 60 characters.";
     }
-    
+
     return "";
   };
-  
-
-
 
   const handleBlur = (
     e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -499,11 +498,36 @@ const PageContent: React.FC = () => {
 
 export default function Page() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense
+      fallback={
+        <div>
+          <div className="flex flex-col justify-center items-center min-h-screen">
+            {/* Animated Spinner */}
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              className="w-12 h-12 border-4 border-t-[#751423] border-gray-300 rounded-full"
+            ></motion.div>
+
+            {/* Skeleton Effect for Loading Content */}
+            <div className="mt-6 w-[80%] max-w-md bg-white p-4 shadow-lg rounded-xl">
+              <div className="animate-pulse">
+                <div className="h-6 bg-gray-300 rounded w-3/4 mb-4"></div>
+                <div className="h-4 bg-gray-300 rounded w-full mb-2"></div>
+                <div className="h-4 bg-gray-300 rounded w-5/6"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      }
+    >
       <PageContent />
     </Suspense>
   );
 }
+
+
+
 
 
 
