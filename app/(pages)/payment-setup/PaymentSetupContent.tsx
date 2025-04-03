@@ -242,15 +242,20 @@ const PaymentSetupContent = () => {
       } else {
         router.push(`/dashboard/pickup-details?${queryString}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error submitting payment details:", error);
-      toast.error("Failed to submit payment details. Please try again.");
+  
+      if (error.response && error.response.data && error.response.data.message) {
+        toast.error(`Error: ${error.response.data.message}`);
+      } else {
+        toast.error("Failed to submit payment details. Please try again.");
+      }
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
-  
+
   const hasNGN = groups.some((group: { groupCurrency: string; }) => group.groupCurrency === "NGN");
   const hasUSD = groups.some((group: { groupCurrency: string; }) => group.groupCurrency === "USD");
 

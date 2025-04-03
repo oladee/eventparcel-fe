@@ -216,30 +216,6 @@ const PaymentSetupContent = () => {
     return `${paddedHours}:${paddedMinutes} ${ampm}`;
   };
 
-  // const handleSubmit = async (e: FormEvent) => {
-  //   e.preventDefault();
-  
-  //   if (!isFormValid) {
-  //     toast.error("Please fill out all required fields");
-  //     return;
-  //   }
-
-  
-  //   const formattedData = {
-  //     ...formData,
-  //     paymentTime: formatTime12Hour(formData.paymentTime), 
-  //   };
-    
-  //   const queryString = new URLSearchParams({
-  //     data: JSON.stringify(formattedData),
-  //   }).toString();
-
-  //   if(allSelfManaged) {
-  //     await axiosInstance.post("/add-payment", formattedData);
-  //   }else{
-  //     router.push(`/dashboard/pickup-details?${queryString}`);
-  //   }
-  // };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -249,7 +225,7 @@ const PaymentSetupContent = () => {
       return;
     }
   
-    setLoading(true); 
+    setLoading(true);
   
     try {
       const formattedData = {
@@ -268,11 +244,16 @@ const PaymentSetupContent = () => {
       } else {
         router.push(`/dashboard/pickup-details?${queryString}`);
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error("Error submitting payment details:", error);
-      toast.error("Failed to submit payment details. Please try again.");
+  
+      if (error.response && error.response.data && error.response.data.message) {
+        toast.error(`Error: ${error.response.data.message}`);
+      } else {
+        toast.error("Failed to submit payment details. Please try again.");
+      }
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
 
