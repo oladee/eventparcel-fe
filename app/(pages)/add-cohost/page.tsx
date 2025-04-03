@@ -128,12 +128,12 @@ const Page = () => {
               <span className="mr-2">
                 Enter the name and email address of your co-host
               </span>
-              <span
+              {/* <span
                 onClick={() => setIsRightBarOpen(true)}
                 className="px-2 text-sm cursor-pointer rounded-[200px] bg-[#ECB795] text-white"
               >
                 !
-              </span>
+              </span> */}
             </p>
           </div>
 
