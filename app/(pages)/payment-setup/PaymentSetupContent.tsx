@@ -74,7 +74,7 @@ const PaymentSetupContent = () => {
   const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
   const [selectedUSBank, setSelectedUSBank] = useState<USBank | null>(null);
   const [showModal] = useState<boolean>(false);
-  const [loading] = useState<boolean>(false);
+  const [loading, setLoading] = useState<boolean>(false);
 
   const router = useRouter();
 
@@ -222,23 +222,35 @@ const PaymentSetupContent = () => {
       toast.error("Please fill out all required fields");
       return;
     }
-
   
-    const formattedData = {
-      ...formData,
-      paymentTime: formatTime12Hour(formData.paymentTime), 
-    };
-    
-    const queryString = new URLSearchParams({
-      data: JSON.stringify(formattedData),
-    }).toString();
-
-    if(allSelfManaged) {
-      await axiosInstance.post("/add-payment", formattedData);
-    }else{
-      router.push(`/dashboard/pickup-details?${queryString}`);
+    setLoading(true);
+  
+    try {
+      const formattedData = {
+        ...formData,
+        paymentTime: formatTime12Hour(formData.paymentTime),
+      };
+  
+      const queryString = new URLSearchParams({
+        data: JSON.stringify(formattedData),
+      }).toString();
+  
+      if (allSelfManaged) {
+        await axiosInstance.post("/add-payment", formattedData);
+        toast.success("Payment details successfully submitted!");
+        router.push("/dashboard/events");
+      } else {
+        router.push(`/dashboard/pickup-details?${queryString}`);
+      }
+    } catch (error) {
+      console.error("Error submitting payment details:", error);
+      toast.error("Failed to submit payment details. Please try again.");
+    } finally {
+      setLoading(false); 
     }
   };
+
+  
   const hasNGN = groups.some((group: { groupCurrency: string; }) => group.groupCurrency === "NGN");
   const hasUSD = groups.some((group: { groupCurrency: string; }) => group.groupCurrency === "USD");
 
