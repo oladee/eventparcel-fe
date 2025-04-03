@@ -1,6 +1,5 @@
 "use client";
 
-import RightBar from "@/components/Rightbar";
 import dynamic from "next/dynamic";
 import React, { useState, useEffect } from "react";
 import ReusuableSuccess from "@/components/modals/ReusuableSuccess";
