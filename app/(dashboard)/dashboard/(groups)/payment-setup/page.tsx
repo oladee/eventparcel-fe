@@ -1,7 +1,7 @@
 "use client";
 
 import dynamic from "next/dynamic";
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import ReusuableSuccess from "@/components/modals/ReusuableSuccess";
 import { toast, ToastContainer } from "react-toastify";
 import { BiLoaderCircle } from "react-icons/bi";
@@ -15,6 +15,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import NairaPayoutForm from "@/components/NairaPayoutForm";
 import DollarPayoutForm from "@/components/DollarPayoutForm";
 import axiosInstance from "@/lib/axiosInstance";
+import exp from "constants";
 
 const LocationPickerModal = dynamic(
   () => import("@/components/aboutEvent/LocationPickerModal"),
@@ -37,7 +38,6 @@ interface USBank {
   currency: string;
   routingNumber: string[];
 }
-
 
 const validTimeZones = [
   "UTC",
@@ -67,8 +67,11 @@ const validTimeZones = [
 const PaymentSetupContent = () => {
   const searchParams = useSearchParams();
   const groupsString = searchParams.get("groups");
-  const groups = groupsString ? JSON.parse(decodeURIComponent(groupsString)) : [];
-  const firstEventId = groups.length > 0 && groups[0].event ? groups[0].event._id : "";
+  const groups = groupsString
+    ? JSON.parse(decodeURIComponent(groupsString))
+    : [];
+  const firstEventId =
+    groups.length > 0 && groups[0].event ? groups[0].event._id : "";
   // const [isRightBarOpen, setIsRightBarOpen] = useState(false);
   const [showMapPickerModal, setShowMapPickerModal] = useState(false);
   const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
@@ -84,20 +87,19 @@ const PaymentSetupContent = () => {
       accountNumber: "",
       accountName: "",
       bankName: "",
-      bankCode: "",
+      bankCode: ""
     },
     dollarAccount: {
       usAccountNumber: "",
       routingNumber: "",
       usBankName: "",
-      usAccountName: "",
+      usAccountName: ""
     },
 
     paymentDate: new Date(),
     paymentTime: new Date(),
-    paymentTimeZone: "WAT",
+    paymentTimeZone: "WAT"
   });
-
 
   // Initialize error messages as strings, not dates.
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
@@ -106,11 +108,13 @@ const PaymentSetupContent = () => {
 
   //Are all packages self-managed
   const isAllSelfManaged = (groupList: any[]) => {
-    if (groupList.length === 0) return false; 
-  
+    if (groupList.length === 0) return false;
+
     return groupList.every((group) =>
       group.packages.every((pkg: any) =>
-        pkg.packageDelivery.every((delivery: string) => delivery.includes("selfManaged"))
+        pkg.packageDelivery.every((delivery: string) =>
+          delivery.includes("selfManaged")
+        )
       )
     );
   };
@@ -134,10 +138,10 @@ const PaymentSetupContent = () => {
 
   const handleDateChange = (date: Date | null, field: string) => {
     if (date) {
-      setFormData((prev) => ({ ...prev, [field]: date })); 
+      setFormData((prev) => ({ ...prev, [field]: date }));
     }
   };
-  
+
   const validateField = (id: string, value: any) => {
     const fieldName = id.split(".").pop();
 
@@ -172,29 +176,30 @@ const PaymentSetupContent = () => {
   };
 
   const handleChange = (
-    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
   ) => {
     const { id, value } = e.target;
-  
+
     if (id.includes(".")) {
       const [parentKey, childKey] = id.split(".");
       setFormData((prev) => ({
         ...prev,
         [parentKey]: {
           ...(prev[parentKey as keyof typeof formData] as object),
-          [childKey]: value,
-        },
+          [childKey]: value
+        }
       }));
     } else {
       setFormData((prev) => ({ ...prev, [id]: value }));
     }
-  
+
     setErrors((prev) => ({
       ...prev,
-      [id]: validateField(id, value), 
+      [id]: validateField(id, value)
     }));
   };
-  
 
   const handleBlur = (
     e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -202,7 +207,6 @@ const PaymentSetupContent = () => {
     const { id, value } = e.target;
     setErrors((prev) => ({ ...prev, [id]: validateField(id, value) }));
   };
-
 
   // Helper function to format a Date object to a 12-hour time string.
   const formatTime12Hour = (date: Date): string => {
@@ -217,24 +221,24 @@ const PaymentSetupContent = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-  
+
     if (!isFormValid) {
       toast.error("Please fill out all required fields");
       return;
     }
-  
+
     setLoading(true);
-  
+
     try {
       const formattedData = {
         ...formData,
-        paymentTime: formatTime12Hour(formData.paymentTime),
+        paymentTime: formatTime12Hour(formData.paymentTime)
       };
-  
+
       const queryString = new URLSearchParams({
-        data: JSON.stringify(formattedData),
+        data: JSON.stringify(formattedData)
       }).toString();
-  
+
       if (allSelfManaged) {
         await axiosInstance.post("/add-payment", formattedData);
         toast.success("Payment details successfully submitted!");
@@ -244,8 +248,12 @@ const PaymentSetupContent = () => {
       }
     } catch (error: any) {
       console.error("Error submitting payment details:", error);
-  
-      if (error.response && error.response.data && error.response.data.message) {
+
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
         toast.error(`Error: ${error.response.data.message}`);
       } else {
         toast.error("Failed to submit payment details. Please try again.");
@@ -255,21 +263,23 @@ const PaymentSetupContent = () => {
     }
   };
 
-
-  const hasNGN = groups.some((group: { groupCurrency: string; }) => group.groupCurrency === "NGN");
-  const hasUSD = groups.some((group: { groupCurrency: string; }) => group.groupCurrency === "USD");
+  const hasNGN = groups.some(
+    (group: { groupCurrency: string }) => group.groupCurrency === "NGN"
+  );
+  const hasUSD = groups.some(
+    (group: { groupCurrency: string }) => group.groupCurrency === "USD"
+  );
 
   const today = new Date();
-
 
   return (
     <HeaderLayout>
       <ToastContainer />
       {showMapPickerModal && (
         <LocationPickerModal
-        onLocationSelect={() => {
-          setShowMapPickerModal(false);
-        }}
+          onLocationSelect={() => {
+            setShowMapPickerModal(false);
+          }}
           onCancel={() => setShowMapPickerModal(false)}
         />
       )}
@@ -282,7 +292,10 @@ const PaymentSetupContent = () => {
             >
               Payment Setup
             </h2>
-            <div id="payment_deliveryDesc" className="flex justify-center items-center gap-3">
+            <div
+              id="payment_deliveryDesc"
+              className="flex justify-center items-center gap-3"
+            >
               <div className="flex flex-col">
                 <span className="flex justify-start w-[313px] whitespace-nowrap h-6 font-general font-medium text-sm text-[#718096]">
                   Let&apos;s setup your payout process and payment
@@ -322,39 +335,38 @@ const PaymentSetupContent = () => {
 
               {/* NAIRA PAYOUT */}
               <div className=" rounded-[10px]">
-              {hasNGN && (
-                <div className="border border-[#CBD5E0] mb-7 p-4 rounded-[10px]">
-                  <NairaPayoutForm
-                    formData={formData}
-                    errors={errors}
-                    handleChange={handleChange}
-                    handleBlur={handleBlur}
-                    selectedBank={selectedBank}
-                    setSelectedBank={setSelectedBank}
-                    setFormData={setFormData}
-                    setErrors={setErrors}
-                  />
-                </div>
-              )}
-
+                {hasNGN && (
+                  <div className="border border-[#CBD5E0] mb-7 p-4 rounded-[10px]">
+                    <NairaPayoutForm
+                      formData={formData}
+                      errors={errors}
+                      handleChange={handleChange}
+                      handleBlur={handleBlur}
+                      selectedBank={selectedBank}
+                      setSelectedBank={setSelectedBank}
+                      setFormData={setFormData}
+                      setErrors={setErrors}
+                    />
+                  </div>
+                )}
 
                 {/* DOLLAR PAYOUT */}
                 {hasUSD && (
-                <div className="border border-[#CBD5E0] p-4 rounded-[10px]">
-                  <DollarPayoutForm
-                    formData={formData}
-                    errors={errors}
-                    handleChange={handleChange}
-                    handleBlur={handleBlur}
-                    selectedUSBank={selectedUSBank}
-                    setSelectedUSBank={setSelectedUSBank}
-                    setFormData={setFormData}
-                    setErrors={setErrors}
-                  />
-                </div> 
-                )}        
+                  <div className="border border-[#CBD5E0] p-4 rounded-[10px]">
+                    <DollarPayoutForm
+                      formData={formData}
+                      errors={errors}
+                      handleChange={handleChange}
+                      handleBlur={handleBlur}
+                      selectedUSBank={selectedUSBank}
+                      setSelectedUSBank={setSelectedUSBank}
+                      setFormData={setFormData}
+                      setErrors={setErrors}
+                    />
+                  </div>
+                )}
               </div>
-              </div>
+            </div>
             <div className="mt-8">
               <div className="mb-5">
                 <h2
@@ -381,14 +393,16 @@ const PaymentSetupContent = () => {
                   <div className="relative">
                     <PiCalendarMinus className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10 text-[#111827]" />
                     <div className="w-full bg-slate-50">
-                    <DatePicker
-                      selected={formData.paymentDate}
-                      minDate={today}
-                      id="paymentDate"
-                      onChange={(date) => handleDateChange(date, "paymentDate")}
-                      dateFormat="yyyy-MM-dd"
-                      className="pl-10 px-3 py-2 z-20 input-field outline-primary w-full rounded-[5px] bg-slate-50"
-                      popperClassName="custom-datepicker"
+                      <DatePicker
+                        selected={formData.paymentDate}
+                        minDate={today}
+                        id="paymentDate"
+                        onChange={(date) =>
+                          handleDateChange(date, "paymentDate")
+                        }
+                        dateFormat="yyyy-MM-dd"
+                        className="pl-10 px-3 py-2 z-20 input-field outline-primary w-full rounded-[5px] bg-slate-50"
+                        popperClassName="custom-datepicker"
                       />
                     </div>
                   </div>
@@ -410,9 +424,11 @@ const PaymentSetupContent = () => {
                     <div className="relative">
                       <AiOutlineClockCircle className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#111827] z-10" />
                       <DatePicker
-                        selected={formData.paymentTime} 
+                        selected={formData.paymentTime}
                         id="paymentTime"
-                        onChange={(date) => handleDateChange(date, "paymentTime")}
+                        onChange={(date) =>
+                          handleDateChange(date, "paymentTime")
+                        }
                         showTimeSelect
                         showTimeSelectOnly
                         timeIntervals={15}
@@ -477,4 +493,12 @@ const PaymentSetupContent = () => {
   );
 };
 
-export default PaymentSetupContent;
+// export default PaymentSetupContent;
+
+export default function Page() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PaymentSetupContent />
+    </Suspense>
+  );
+}
