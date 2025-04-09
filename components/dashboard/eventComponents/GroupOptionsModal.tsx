@@ -13,12 +13,6 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import DeleteConfirmationDialog from "@/components/modals/DeleteConfirmationDialog";
 
-// interface Group {
-//   _id: string;
-//   groupName: string;
-//   link?: string;
-// }
-
 interface GroupOptionsModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -33,6 +27,8 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
   const modalRef = useRef<HTMLDivElement>(null);
   const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
   const [isDeleteModal, setIsDeleteModal] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [loadingMessage, setLoadingMessage] = useState<string | null>("");
 
   // Focus on the modal when it opens and add Escape key support
   useEffect(() => {
@@ -74,22 +70,6 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
     }
   };
 
-  // const handleDeleteEvent = async () => {
-  //   if (!eventData?._id) return;
-
-  //   try {
-  //     await axiosInstance.delete(`/delete-event/${eventData._id}`);
-  //     console.log("Event deleted successfully");
-  //     setIsDeleteDialogOpen(false);
-  //     onClose();
-  //     // Optionally, refresh or update the event list:
-  //     router.refresh();
-  //   } catch (error) {
-  //     console.error("Error deleting event:", error);
-  //     alert("Failed to delete event. Please try again later.");
-  //   }
-  // };
-
   const handleDelete = async () => {
     if (!group?._id) return;
 
@@ -113,6 +93,42 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
       } else {
         console.error("Unexpected Error:", error);
       }
+    }
+  };
+
+  const handleDisableGroup = async () => {
+    if (!group?._id) return;
+  
+    try {
+      const isCurrentlyDisabled = group.isDisabled;
+      setLoading(true); 
+      setLoadingMessage(isCurrentlyDisabled ? "Enabling..." : "Disabling..."); // Set appropriate loading message
+  
+      const response = await axiosInstance.put(
+        `/disable-enable-group/${group._id}`,
+        {
+          isDisabled: !isCurrentlyDisabled, // Toggle the isDisabled state
+        }
+      );
+  
+      console.log("Group disabled/enabled successfully");
+      toast.success(response.data.message);
+      window.dispatchEvent(new Event("refreshEvents"));
+      onClose();
+    } catch (error: any) {
+      console.error("Error disabling/enabling group:", error);
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("Failed to update group status. Please try again.");
+      }
+    } finally {
+      setLoading(false); 
+      setLoadingMessage(""); 
     }
   };
 
@@ -181,13 +197,20 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
             </div>
             <div
               className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
-              onClick={() => console.log("Disable Group clicked")}
+              onClick={handleDisableGroup}
             >
               <div className="flex items-center">
-                <span className="p-2 bg-[#FFF7F2] rounded-full text-primary">
+                <span
+                  className={`p-2 bg-[#FFF7F2] rounded-full ${
+                    group?.isDisabled ? "text-[#319b29]" : "text-primary"
+                  }`}
+                >
                   <MdOutlinePowerSettingsNew size={20} />
                 </span>
-                <span className="ml-3 font-medium">Disable Group</span>
+                <span className="ml-3 font-medium">
+                  {/* {group?.isDisabled ? "Enable Group" : "Disable Group"} */}
+                  {loading ? loadingMessage : group?.isDisabled ? "Enable Group" : "Disable Group"}
+                </span>
               </div>
               <PiCaretRightBold />
             </div>
