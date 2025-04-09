@@ -7,10 +7,13 @@ import copy from "../../../../public/images/copyDiscount.png"
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import axiosInstance from '@/lib/axiosInstance';
+import SkeletonLoader from '@/components/dashboard/loadingStates/SkeletonLoader';
 
 const Page = () => {
   const [hostId, setHostId] = useState("");
   const [discountData, setDiscountData] = useState<any[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -28,24 +31,75 @@ const Page = () => {
 
   useEffect(() => {
     if (!hostId) return;
+    setLoading(true);
 
     const fetchDiscountData = async () => {
       try {
         const response = await axiosInstance.get(`/get-all-discounts/${hostId}`);
         if (response.data.success) {
-          console.log("discount", response.data)
           setDiscountData(response.data.data);
         }
       } catch (error: any) {
         console.error("Error fetching event:", error);
+      } finally{
+        setLoading(false);
       }
     };
 
     fetchDiscountData();
   }, [hostId]);
 
-  console.log("discount", discountData)
+  const handleCopy = (code: string,  id: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCodeId(id);
 
+    setTimeout(() => {
+      setCopiedCodeId(null);
+    }, 3000);
+  };
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center h-full min-h-[300px]"> 
+        <div className="w-[280px] animate-pulse"> {/* Compact width */}
+          <div className="bg-white rounded-lg shadow-sm border p-3 space-y-2">
+            {/* Top row */}
+            <div className="flex justify-between">
+              <div className="h-4 w-14 bg-gray-200 rounded-full"></div>
+              <div className="h-3 w-3 bg-gray-200 rounded"></div>
+            </div>
+  
+            {/* Middle content */}
+            <div className="space-y-1.5">
+              <div className="h-4 w-3/4 bg-gray-200 rounded"></div>
+              <div className="h-3 w-1/2 bg-gray-200 rounded"></div>
+            </div>
+  
+            {/* Stats */}
+            <div className="flex justify-between pt-2">
+              <div className="space-y-1">
+                <div className="h-5 w-8 bg-gray-200 rounded"></div>
+                <div className="h-3 w-10 bg-gray-200 rounded"></div>
+              </div>
+              <div className="space-y-1 text-right">
+                <div className="h-5 w-10 bg-gray-200 rounded"></div>
+                <div className="h-3 w-12 bg-gray-200 rounded"></div>
+              </div>
+            </div>
+  
+            {/* Bottom row */}
+            <div className="flex justify-between items-center pt-2">
+              <div className="h-3 w-20 bg-gray-200 rounded"></div>
+              <div className="flex items-center gap-1">
+                <div className="h-3 w-3 bg-gray-200 rounded"></div>
+                <div className="h-3 w-8 bg-gray-200 rounded"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    )
+  }
   return (
     <Container>
       <div className=" w-full space-y-6">
@@ -95,11 +149,13 @@ const Page = () => {
                   Code: <span className="text-base font-semibold text-[#111827]">{discount.discountCode}</span>
                 </span>
                 <div
-                  onClick={() => navigator.clipboard.writeText(discount.discountCode)}
-                  className="flex gap-1 items-center text-red-500 hover:underline text-xs font-medium cursor-pointer"
+                onClick={() => handleCopy(discount.discountCode, discount._id)}
+                className="flex gap-1 items-center text-red-500 hover:underline text-xs font-medium cursor-pointer"
                 >
                   <Image src={copy} alt="copy" width={16} height={16} />
-                  <span className="text-[14px] text-[#751423]">Copy Code</span>
+                  <span className="text-[14px] text-[#751423]">
+                  {copiedCodeId === discount._id ? "Copied!" : "Copy Code"}
+                  </span>
                 </div>
               </div>
             </div>
