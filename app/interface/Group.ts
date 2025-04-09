@@ -17,4 +17,5 @@ export interface Package {
     groupCurrency: string;
     packages: Package[];
     link?: string;
+    isDisabled:boolean;
   }

@@ -8,6 +8,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { useRouter } from 'next/navigation';
+import { AiOutlineArrowLeft } from "react-icons/ai";
 
 
 const Page: React.FC = () => {
@@ -81,7 +82,20 @@ const Page: React.FC = () => {
     return (
       <Container>
         <div className="flex flex-col items-center justify-center min-h-screen">
-          <p className="text-red-500 font-semibold text-lg">{error}</p>
+          {error === "Sorry, this event has been disabled!" ? (
+            <div className="text-center">
+              <p className="text-red-500 font-semibold text-lg mb-4">{error}</p>
+              <button
+                onClick={() => router.push("/dashboard/events")}
+                className="flex items-center text-primary hover:underline"
+              >
+                <AiOutlineArrowLeft className="mr-2" size={20} />
+                click here, to return to event list
+              </button>
+            </div>
+          ) : (
+            <p className="text-red-500 font-semibold text-lg">{error}</p>
+          )}
         </div>
       </Container>
     );

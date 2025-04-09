@@ -7,7 +7,6 @@ import copy from "../../../../public/images/copyDiscount.png"
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import axiosInstance from '@/lib/axiosInstance';
-import SkeletonLoader from '@/components/dashboard/loadingStates/SkeletonLoader';
 
 const Page = () => {
   const [hostId, setHostId] = useState("");
@@ -60,7 +59,7 @@ const Page = () => {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-full min-h-[300px]"> 
+      <div className="flex items-center justify-center h-screen min-h-[300px]"> 
         <div className="w-[280px] animate-pulse"> {/* Compact width */}
           <div className="bg-white rounded-lg shadow-sm border p-3 space-y-2">
             {/* Top row */}

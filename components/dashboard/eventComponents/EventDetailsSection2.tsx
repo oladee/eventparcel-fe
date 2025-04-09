@@ -7,6 +7,7 @@ import { MdOutlineCalendarToday } from "react-icons/md";
 import EventOptionsModal from "./EventOptionsModal";
 import { useRouter } from "next-nprogress-bar";
 
+
 interface EventDetailsProps {
   eventData: Array<{
     _id: string;

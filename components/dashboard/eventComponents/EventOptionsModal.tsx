@@ -9,6 +9,8 @@ import UpdateEventModal from "./UpdateEventModal";
 import DeleteConfirmationDialog from "@/components/modals/DeleteConfirmationDialog";
 import axiosInstance from "@/lib/axiosInstance";
 import { useRouter } from "next/navigation";
+import { ToastContainer, toast } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 
 interface EventOptionsModalProps {
   isOpen: boolean;
@@ -24,6 +26,8 @@ const EventOptionsModal: React.FC<EventOptionsModalProps> = ({
   const modalRef = useRef<HTMLDivElement>(null);
   const [showUpdateModal, setShowUpdateModal] = useState(false);
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
+  const [loading, setLoading] = useState<boolean>(false);
+  const [loadingMessage, setLoadingMessage] = useState<string | null>("");
   const router = useRouter();
 
   // Focus on the modal when it opens and add Escape key support
@@ -57,6 +61,42 @@ const EventOptionsModal: React.FC<EventOptionsModalProps> = ({
     } catch (error) {
       console.error("Error deleting event:", error);
       alert("Failed to delete event. Please try again later.");
+    }
+  };
+  const handleDisableEvent = async () => {
+    if (!eventData?._id) return;
+
+    try {
+      const isCurrentlyDisabled = eventData.isDisabled;
+      setLoading(true);
+      setLoadingMessage(isCurrentlyDisabled ? "Enabling..." : "Disabling...");
+
+      const response = await axiosInstance.put(
+        `/disable-enable/${eventData._id}`,
+        {
+          isDisabled: !isCurrentlyDisabled // Toggle the isDisabled state
+        }
+      );
+
+      console.log("Event disabled/enabled successfully");
+      window.dispatchEvent(new Event("refreshEvents"));
+      toast.success(response.data.message);
+      onClose();
+      // router.refresh();
+    } catch (error: any) {
+      console.error("Error disabling/enabling event:", error);
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        toast.error(error.response.data.message);
+      } else {
+        toast.error("Failed to update event status. Please try again.");
+      }
+    }finally{
+      setLoading(false); 
+      setLoadingMessage(""); 
     }
   };
 
@@ -130,13 +170,20 @@ const EventOptionsModal: React.FC<EventOptionsModalProps> = ({
             </div>
             <div
               className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
-              onClick={() => console.log("Disable Event clicked")}
+              onClick={handleDisableEvent}
             >
               <div className="flex items-center">
-                <span className="p-2 bg-[#FFF7F2] rounded-full text-primary">
+                <span
+                  className={`p-2 bg-[#FFF7F2] rounded-full ${
+                    eventData.isDisabled ? "text-[#5cba52]" : "text-primary"
+                  } `}
+                >
                   <MdOutlinePowerSettingsNew size={20} />
                 </span>
-                <span className="ml-3 font-medium">Disable Event</span>
+                <span className="ml-3 font-medium">
+                  {" "}
+                  {loading ? loadingMessage : eventData.isDisabled ? "Enable Event" : "Disable Event"}
+                </span>
               </div>
               <PiCaretRightBold />
             </div>
@@ -157,6 +204,7 @@ const EventOptionsModal: React.FC<EventOptionsModalProps> = ({
           </div>
         </div>
       </div>
+      <ToastContainer />
     </>
   );
 };
