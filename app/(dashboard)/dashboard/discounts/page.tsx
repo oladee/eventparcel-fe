@@ -1,12 +1,122 @@
-import Container from '@/components/dashboard/Container'
-import React from 'react'
+"use client"
+
+import Container from '@/components/dashboard/Container';
+import React, { useEffect, useState } from 'react';
+import { Plus } from 'lucide-react';
+import copy from "../../../../public/images/copyDiscount.png"
+import Image from 'next/image';
+import { useRouter } from 'next/navigation';
+import axiosInstance from '@/lib/axiosInstance';
 
 const Page = () => {
-  return (
-   <Container>
-    <div className="w-full h-full flex items-center justify-center">Discounts is coming soon</div>
-   </Container>
-  )
-}
+  const [hostId, setHostId] = useState("");
+  const [discountData, setDiscountData] = useState<any[]>([]);
+  const router = useRouter();
 
-export default Page
+  useEffect(() => {
+    const loggedInUserEmail = localStorage.getItem("loggedInUserEmail");
+    const loggedInUserString = localStorage.getItem("loggedInUser");
+    const loggedInUser = loggedInUserString ? JSON.parse(loggedInUserString) : null;
+
+    if (!loggedInUserEmail || !loggedInUser?._id) {
+      router.replace("/");
+      return;
+    }
+
+    setHostId(loggedInUser._id);
+  }, [router]);
+
+  useEffect(() => {
+    if (!hostId) return;
+
+    const fetchDiscountData = async () => {
+      try {
+        const response = await axiosInstance.get(`/get-all-discounts/${hostId}`);
+        if (response.data.success) {
+          console.log("discount", response.data)
+          setDiscountData(response.data.data);
+        }
+      } catch (error: any) {
+        console.error("Error fetching event:", error);
+      }
+    };
+
+    fetchDiscountData();
+  }, [hostId]);
+
+  console.log("discount", discountData)
+
+  return (
+    <Container>
+      <div className=" w-full space-y-6">
+        <div className='w-[343px] h-[82.62px] flex flex-col gap-2'>
+          <h2 className="font-general text-2xl font-bold text-[#111827]">Discounts</h2>
+          <p className="text-sm font-medium text-[#718096] w-[343px] h-[44px]">
+            Create a special discount for some of your guest, can be in percent or actual value
+          </p>
+        </div>
+        <div className="w-full grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+          {discountData.map((discount) => (
+            <div key={discount._id} id={discount._id} className="bg-[#FFFFFF] rounded-[20px] shadow-sm border p-4 space-y-2">
+              <div className="flex items-center justify-between">
+                <span className="px-3 py-1 text-xs font-medium bg-[#2B9EA01F] text-[#2B9EA0] rounded-full border border-[#2B9EA0]">
+                  {discount?.discountStatus === "active" ? 'Active' : 'Inactive'}
+                </span>
+                <button className="text-[#A0AEC0] text-2xl font-bold">⋯</button>
+              </div>
+
+              <div className="w-full flex flex-col gap-2">
+                <h3 className="text-xl font-semibold text-[#111827]">{discount.discountTitle}</h3>
+                <p className="text-sm font-medium text-[#718096]">
+                  Discount Value: <span className="font-bold text-base">{discount.discountValue} 
+                  {discount.discountValueType === 'percentage'
+                    ? '%'
+                    : discount.discountValueType === 'NGN'
+                    ? '₦'
+                    : discount.discountValueType === 'USD'
+                    ? '$'
+                    : ''}</span>
+                </p>
+              </div>
+
+              <div className="h-auto flex items-center justify-between text-xs text-gray-600">
+                <div className="flex-1 pr-4 border-r border-gray-200">
+                  <p className="font-semibold text-xl text-[#111827]">{discount.totalUsed || 0}</p>
+                  <p className="text-[#718096] font-medium text-xs">Total Used</p>
+                </div>
+                <div className="flex-1 flex flex-col items-end">
+                  <p className="font-semibold text-xl text-[#111827] pr-8">{discount.overallValue || '0.00'}</p>
+                  <p className="text-[#718096] font-medium text-xs">Overall Value</p>
+                </div>
+              </div>
+
+              <div className="h-[61px] flex items-center justify-between">
+                <span className="text-[#718096] text-[13px]">
+                  Code: <span className="text-base font-semibold text-[#111827]">{discount.discountCode}</span>
+                </span>
+                <div
+                  onClick={() => navigator.clipboard.writeText(discount.discountCode)}
+                  className="flex gap-1 items-center text-red-500 hover:underline text-xs font-medium cursor-pointer"
+                >
+                  <Image src={copy} alt="copy" width={16} height={16} />
+                  <span className="text-[14px] text-[#751423]">Copy Code</span>
+                </div>
+              </div>
+            </div>
+          ))}
+
+          {/* Create Discount Button */}
+          <button
+            onClick={() => router.push("/dashboard/createDiscount")}
+            className="flex flex-col items-center justify-center border border-dashed border-[#11182752] rounded-xl p-6 bg-[#FFFFFF66] transition"
+          >
+            <Plus className="text-[#751423] w-5 h-5 mb-2" />
+            <span className="text-[#751423] font-semibold text-sm">Create Discount</span>
+          </button>
+        </div>
+      </div>
+    </Container>
+  );
+};
+
+export default Page;
