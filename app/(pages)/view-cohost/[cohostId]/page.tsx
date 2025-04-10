@@ -28,7 +28,7 @@ interface ActivityLogEntry {
 }
 
 // Palette for random action color (red, green, yellow, etc.)
-const actionColors = ["#F04438", "#42BA96", "#FFC107"];
+const actionColors = ["#C22B2F", "#F7B500", "#0CAF60"];
 
 export default function Page() {
   const params = useParams();
@@ -115,7 +115,7 @@ export default function Page() {
     const lower = entityType.toLowerCase();
     if (lower.includes("event")) return "View Event";
     if (lower.includes("group")) return "View Group";
-    return "View";
+    return "View Group";
   };
 
   // Prepare grouped logs
@@ -156,7 +156,7 @@ export default function Page() {
         </div>
 
         {/* Title */}
-        <h2 className="text-xl font-semibold text-[#101828] mb-4">Activity Log</h2>
+        <h2 className="text-xl font-semibold text-[#111827] mb-4">Activity Log</h2>
 
         {loading ? (
           <div className="flex justify-center items-center mt-10">
@@ -209,7 +209,7 @@ export default function Page() {
                                 >
                                   {log.action}
                                 </div>
-                                <div className="text-base font-semibold text-[#101828] mb-1">
+                                <div className="text-base max-w-sm font-semibold text-[#101828] mb-1">
                                   {log.entity}
                                 </div>
                                 {log.entityType && (
@@ -225,7 +225,7 @@ export default function Page() {
                                       `Viewing ${getViewButtonText(log.entityType)} for “${log.entity}”.`
                                     )
                                   }
-                                  className="text-sm font-semibold text-[#344054] border border-[#D0D5DD] rounded-full px-4 py-1 hover:bg-gray-100"
+                                  className="text-xs font-medium bg-[#7514231F] text-[#751423] border border-[#979797] rounded-full px-4 py-1 hover:bg-gray-100"
                                 >
                                   {getViewButtonText(log.entityType)}
                                 </button>
