@@ -1,7 +1,7 @@
 "use client"
 
 import Container from '@/components/dashboard/Container';
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { ChevronDown } from 'lucide-react';
 import axiosInstance from '@/lib/axiosInstance';
 import { useRouter } from "next-nprogress-bar";
@@ -26,9 +26,10 @@ const Page = () => {
   const [searchEvent, setSearchEvent] = useState("");
   const [hostId, setHostId] = useState("");
   const [loading, setLoading] = useState(false);
+  const [fetchingEvents, setFetchingEvents] = useState(true);
   const [fetchingCode, setFetchingCode] = useState(false);
   const router = useRouter();
-  const symbolDropdownRef = React.useRef<HTMLDivElement>(null);
+  const symbolDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const loggedInUserEmail = localStorage.getItem("loggedInUserEmail");
@@ -44,14 +45,19 @@ const Page = () => {
 
     const fetchEventData = async () => {
       try {
+        setFetchingEvents(true);
         const response = await axiosInstance.post("/view-events", {
           email: loggedInUserEmail
         });
         if (response.data.success) {
-          setEventData(response.data.data);
+          setEventData(response.data.data || []);
         }
       } catch (error: any) {
         console.error("Error fetching event:", error);
+        toast.error("Failed to load events");
+        setEventData([]);
+      } finally {
+        setFetchingEvents(false);
       }
     };
 
@@ -73,24 +79,25 @@ const Page = () => {
 
   useEffect(() => {
     const fetchDiscountCode = async () => {
-      if (selectedEvent) {
-        setFetchingCode(true);
-        try {
-          const response = await axiosInstance.get("/discount-code");
-          if (response.data.success) {
-            setDiscountCode(response.data.data || '');
-          }else{
-            setDiscountCode('');
-          }
-        } catch (error) {
-          console.error("Error fetching discount code:", error);
-          toast.error("Failed to generate discount code");
-          setDiscountCode('');
-        } finally {
-          setFetchingCode(false);
-        }
-      }else {
+      if (!selectedEvent) {
         setDiscountCode('');
+        return;
+      }
+      
+      setFetchingCode(true);
+      try {
+        const response = await axiosInstance.get("/discount-code");
+        if (response.data.success) {
+          setDiscountCode(response.data.data || '');
+        } else {
+          setDiscountCode('');
+        }
+      } catch (error) {
+        console.error("Error fetching discount code:", error);
+        toast.error("Failed to generate discount code");
+        setDiscountCode('');
+      } finally {
+        setFetchingCode(false);
       }
     };
 
@@ -176,7 +183,12 @@ const Page = () => {
                     onChange={(e) => setSearchEvent(e.target.value)}
                     className="w-full px-3 py-2 border-b text-sm outline-none"
                   />
-                  {filteredEvents.length > 0 ? (
+                  {fetchingEvents ? (
+                    <div className="p-3 text-center text-sm flex items-center justify-center gap-2">
+                      <BiLoaderCircle className="animate-spin" size={16} />
+                      Loading events...
+                    </div>
+                  ) : filteredEvents.length > 0 ? (
                     filteredEvents.map((event) => (
                       <div
                         id={`event-option-${event._id}`}
@@ -185,13 +197,16 @@ const Page = () => {
                         onClick={() => {
                           setSelectedEvent(event);
                           setIsEventDropdownOpen(false);
+                          setSearchEvent("");
                         }}
                       >
                         {event.eventName}
                       </div>
                     ))
                   ) : (
-                    <div id="no-event-message" className="p-3 text-center text-sm">No event found</div>
+                    <div id="no-event-message" className="p-3 text-center text-sm">
+                      {eventData.length === 0 ? "No events found" : "No matching events found"}
+                    </div>
                   )}
                 </div>
               )}
@@ -281,8 +296,8 @@ const Page = () => {
           <button
             id="submit-discount-button"
             type="submit"
-            disabled={loading || fetchingCode}
-            className="w-[160px] h-[48px] mt-3 bg-[#751423] text-white text-sm font-medium rounded-[12px] px-4 py-3 hover:bg-[#631818] transition flex items-center justify-center"
+            disabled={loading || fetchingCode || !selectedEvent}
+            className="w-[160px] h-[48px] mt-3 bg-[#751423] text-white text-sm font-medium rounded-[12px] px-4 py-3 hover:bg-[#631818] transition flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
           >
             {loading ? (
               <BiLoaderCircle className="animate-spin mr-2" size={22} />

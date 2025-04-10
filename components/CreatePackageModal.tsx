@@ -127,34 +127,44 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
         setFormData((prev) => {
             const updatedSelections = new Set(prev.packageDelivery || []);
     
-            if (option === "pickUp") {
-                // If pickUp is selected, remove any home delivery options  
-                updatedSelections.clear();
-                updatedSelections.add("pickUp");
+            if (updatedSelections.has(option)) {
+                // If the option is already selected, deselect it
+                updatedSelections.delete(option);
             } else {
-                // If a home delivery option is selected, remove pickUp and other home delivery options
-                updatedSelections.delete("pickUp");
-                updatedSelections.delete("homeDelivery:platformDelivery");
-                updatedSelections.delete("homeDelivery:selfManaged");
+                // If it's a "PickUp", just add it without clearing home delivery options
+                if (option === "pickUp") {
+                    updatedSelections.add("pickUp");
+                } else {
+                    // If a home delivery option is selected, remove the other home delivery options
+                    updatedSelections.delete("homeDelivery:platformDelivery");
+                    updatedSelections.delete("homeDelivery:selfManaged");
     
-                updatedSelections.add(option);
+                    updatedSelections.add(option);
+                }
             }
     
             return { ...prev, packageDelivery: Array.from(updatedSelections) };
         });
     
-        // Update state for UI toggling
+        // Update UI state for toggling
         if (option === "pickUp") {
-            setSelectedOptions({ pickUp: true, homeDelivery: false });
+            setSelectedOptions({
+                pickUp: !selectedOptions.pickUp, // Toggle "PickUp" on click
+                homeDelivery: selectedOptions.homeDelivery
+            });
             setHomeDeliverySelectedOptions({ platformDelivery: false, selfManaged: false });
         } else {
-            setSelectedOptions({ pickUp: false, homeDelivery: true });
+            setSelectedOptions({
+                pickUp: selectedOptions.pickUp, // Keep "PickUp" as is
+                homeDelivery: !selectedOptions.homeDelivery // Toggle "Home Delivery" on click
+            });
             setHomeDeliverySelectedOptions({
                 platformDelivery: option === "homeDelivery:platformDelivery",
                 selfManaged: option === "homeDelivery:selfManaged",
             });
         }
     };
+    
     
     
     
