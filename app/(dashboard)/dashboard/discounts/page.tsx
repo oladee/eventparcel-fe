@@ -1,18 +1,32 @@
-"use client"
+"use client";
 
 import Container from '@/components/dashboard/Container';
-import React, { useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useState } from 'react';
 import { Plus } from 'lucide-react';
-import copy from "../../../../public/images/copyDiscount.png"
+import Vector from "../../../../public/icons/Vector.png";
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import axiosInstance from '@/lib/axiosInstance';
+import DiscountOptionsModal from '@/components/dashboard/eventComponents/DiscountOptionsModal';
+
+interface Discount {
+  _id: string;
+  discountCode: string;
+  discountTitle: string;
+  discountValue: number;
+  discountValueType: string;
+  discountStatus: string;
+  totalUsed: number;
+  overallValue: number;
+}
 
 const Page = () => {
   const [hostId, setHostId] = useState("");
-  const [discountData, setDiscountData] = useState<any[]>([]);
+  const [discountData, setDiscountData] = useState<Discount[]>([]);
   const [loading, setLoading] = useState(false);
-  const [copiedCodeId, setCopiedCodeId] = useState<string | null>(null);
+  const [isReady, setIsReady] = useState(false);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const [selectedDiscount, setSelectedDiscount] = useState<Discount | null>(null);
   const router = useRouter();
 
   useEffect(() => {
@@ -26,54 +40,85 @@ const Page = () => {
     }
 
     setHostId(loggedInUser._id);
+    setIsReady(true);
   }, [router]);
 
-  useEffect(() => {
+  const fetchDiscountData = useCallback(async () => {
     if (!hostId) return;
+
     setLoading(true);
 
-    const fetchDiscountData = async () => {
-      try {
-        const response = await axiosInstance.get(`/get-all-discounts/${hostId}`);
-        if (response.data.success) {
-          setDiscountData(response.data.data);
-        }
-      } catch (error: any) {
-        console.error("Error fetching event:", error);
-      } finally{
-        setLoading(false);
+    try {
+      const response = await axiosInstance.get(`/get-all-discounts/${hostId}`);
+      if (response.data.success) {
+        setDiscountData(response.data.data);
       }
-    };
+    } catch (error: any) {
+      console.error("Error fetching event:", error);
+    } finally {
+      setLoading(false);
+    }
+  }, [hostId]); 
 
+  useEffect(() => {
     fetchDiscountData();
-  }, [hostId]);
+  }, [hostId, fetchDiscountData]);
 
-  const handleCopy = (code: string,  id: string) => {
-    navigator.clipboard.writeText(code);
-    setCopiedCodeId(id);
+  useEffect(() => {
+    fetchDiscountData();
+  }, [hostId, fetchDiscountData]);
 
-    setTimeout(() => {
-      setCopiedCodeId(null);
-    }, 3000);
+  const handleShareDiscountCode = async (discount: Discount) => {
+  
+    const discountCode = discount.discountCode;
+  
+    if (!discountCode) {
+      console.log("No discount code found in selectedDiscount");
+      return;
+    }
+  
+    if (navigator.share) {
+      try {
+        await navigator.share({
+          title: "Special Discount Offer",
+          text: `Use this discount code: ${discountCode}`,
+        });
+      } catch (error) {
+        console.error("Error sharing:", error);
+      }
+    } else if (navigator.clipboard) {
+      // Fallback: copy the link to clipboard
+      navigator.clipboard.writeText(discountCode);
+      alert("Discount code copied to clipboard!");
+    } else {
+      alert("Sharing not supported on this browser.");
+    }
+  };
+
+  const handleModalClose = (dataUpdated: boolean) => {
+    setIsModalOpen(false);
+    if (dataUpdated) {
+      fetchDiscountData();
+    }
   };
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center h-screen min-h-[300px]"> 
-        <div className="w-[280px] animate-pulse"> {/* Compact width */}
+      <div className="flex items-center justify-center h-screen min-h-[300px]">
+        <div className="w-[280px] animate-pulse">
           <div className="bg-white rounded-lg shadow-sm border p-3 space-y-2">
             {/* Top row */}
             <div className="flex justify-between">
               <div className="h-4 w-14 bg-gray-200 rounded-full"></div>
               <div className="h-3 w-3 bg-gray-200 rounded"></div>
             </div>
-  
+
             {/* Middle content */}
             <div className="space-y-1.5">
               <div className="h-4 w-3/4 bg-gray-200 rounded"></div>
               <div className="h-3 w-1/2 bg-gray-200 rounded"></div>
             </div>
-  
+
             {/* Stats */}
             <div className="flex justify-between pt-2">
               <div className="space-y-1">
@@ -85,7 +130,7 @@ const Page = () => {
                 <div className="h-3 w-12 bg-gray-200 rounded"></div>
               </div>
             </div>
-  
+
             {/* Bottom row */}
             <div className="flex justify-between items-center pt-2">
               <div className="h-3 w-20 bg-gray-200 rounded"></div>
@@ -97,38 +142,54 @@ const Page = () => {
           </div>
         </div>
       </div>
-    )
+    );
   }
+
+  if (!isReady) return null;
+
   return (
     <Container>
-      <div className=" w-full space-y-6">
-        <div className='w-[343px] h-[82.62px] flex flex-col gap-2'>
+      <div className="w-full space-y-6">
+        <div className="w-[343px] h-[82.62px] flex flex-col gap-2">
           <h2 className="font-general text-2xl font-bold text-[#111827]">Discounts</h2>
           <p className="text-sm font-medium text-[#718096] w-[343px] h-[44px]">
-            Create a special discount for some of your guest, can be in percent or actual value
+            Treat your guests to something special! Set a custom discount by value or percentage
           </p>
         </div>
         <div className="w-full grid gap-6 sm:grid-cols-2 md:grid-cols-3">
           {discountData.map((discount) => (
             <div key={discount._id} id={discount._id} className="bg-[#FFFFFF] rounded-[20px] shadow-sm border p-4 space-y-2">
               <div className="flex items-center justify-between">
-                <span className="px-3 py-1 text-xs font-medium bg-[#2B9EA01F] text-[#2B9EA0] rounded-full border border-[#2B9EA0]">
+                <span
+                  className={`px-3 py-1 text-xs font-medium rounded-full border 
+                    ${discount?.discountStatus === "active" ? "bg-[#2B9EA01F] text-[#2B9EA0] border-[#2B9EA0]" : "bg-[#F2D1D1] text-[#D9534F] border-[#D9534F]"}`}
+                >
                   {discount?.discountStatus === "active" ? 'Active' : 'Inactive'}
                 </span>
-                <button className="text-[#A0AEC0] text-2xl font-bold">⋯</button>
+                <button
+                  onClick={() => {
+                    setSelectedDiscount(discount); 
+                    setIsModalOpen(true); 
+                  }}
+                  className="text-[#A0AEC0] text-2xl font-bold"
+                >
+                  ⋯
+                </button>
               </div>
 
               <div className="w-full flex flex-col gap-2">
                 <h3 className="text-xl font-semibold text-[#111827]">{discount.discountTitle}</h3>
                 <p className="text-sm font-medium text-[#718096]">
-                  Discount Value: <span className="font-bold text-base">{discount.discountValue} 
-                  {discount.discountValueType === 'percentage'
-                    ? '%'
-                    : discount.discountValueType === 'NGN'
-                    ? '₦'
-                    : discount.discountValueType === 'USD'
-                    ? '$'
-                    : ''}</span>
+                  Discount Value:{" "}
+                  <span className="font-bold text-base">
+                    {discount.discountValueType === 'percentage'
+                      ? `${discount.discountValue}%`
+                      : discount.discountValueType === 'NGN'
+                      ? `₦${discount.discountValue}`
+                      : discount.discountValueType === 'USD'
+                      ? `$${discount.discountValue}`
+                      : discount.discountValue}
+                  </span>
                 </p>
               </div>
 
@@ -148,13 +209,13 @@ const Page = () => {
                   Code: <span className="text-base font-semibold text-[#111827]">{discount.discountCode}</span>
                 </span>
                 <div
-                onClick={() => handleCopy(discount.discountCode, discount._id)}
-                className="flex gap-1 items-center text-red-500 hover:underline text-xs font-medium cursor-pointer"
+                  onClick={() => {
+                    handleShareDiscountCode(discount); 
+                  }}                  
+                  className="flex gap-1 items-center text-red-500 hover:underline text-xs font-medium cursor-pointer"
                 >
-                  <Image src={copy} alt="copy" width={16} height={16} />
-                  <span className="text-[14px] text-[#751423]">
-                  {copiedCodeId === discount._id ? "Copied!" : "Copy Code"}
-                  </span>
+                  <Image src={Vector} alt="copy" width={16} height={16} />
+                  <span className="text-[14px] text-[#751423]">Share Code</span>
                 </div>
               </div>
             </div>
@@ -169,6 +230,14 @@ const Page = () => {
             <span className="text-[#751423] font-semibold text-sm">Create Discount</span>
           </button>
         </div>
+
+        {isModalOpen && selectedDiscount && (
+          <DiscountOptionsModal
+            isOpen={isModalOpen}
+            onClose={handleModalClose}
+            discountData={selectedDiscount}
+          />
+        )}
       </div>
     </Container>
   );
