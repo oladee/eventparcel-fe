@@ -31,6 +31,8 @@ const Page = () => {
   const [selectedEventId, setSelectedEventId] = useState<string>(""); // Store selected event ID
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+        console.log(error);
+  
 
   useEffect(() => {
     if (typeof window !== "undefined") {

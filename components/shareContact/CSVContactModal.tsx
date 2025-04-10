@@ -29,7 +29,7 @@ const CSVContactModal: React.FC<CSVContactModalProps> = ({
   const [selectAll, setSelectAll] = useState(false);
   const [showErrorModal, setShowErrorModal] = useState(false);
   const [filteredContacts, setFilteredContacts] = useState<Contact[]>([]);
-  const [showModal, setShowModal] = useState<boolean>(false);
+  const [showModal] = useState<boolean>(false);
   const [optionModal, setOptionModal] = useState(false);
 
   // Update filteredContacts and set initials
