@@ -32,7 +32,8 @@ const SendContactModal: React.FC<EventOptionsModalProps> = ({
     try {
       const data = await sendInviteSMS(eventGroupId, phoneNumbers);
       toast.success(data.message || "Invitations sent via SMS");
-    } catch (error: any) {
+    } catch (error: any) {      
+      console.log(error);
       toast.error("Failed to send SMS invitations");
     } finally {
       setIsLoadingSMS(false);
@@ -45,6 +46,7 @@ const SendContactModal: React.FC<EventOptionsModalProps> = ({
       const data = await sendInviteWhatsApp(eventGroupId, phoneNumbers);
       toast.success(data.message || "Invitations sent via WhatsApp");
     } catch (error: any) {
+      console.log(error);
       toast.error("Failed to send WhatsApp invitations");
     } finally {
       setIsLoadingWA(false);
@@ -57,6 +59,7 @@ const SendContactModal: React.FC<EventOptionsModalProps> = ({
       const data = await sendInviteBoth(eventGroupId, phoneNumbers);
       toast.success(data.message || "Invitations sent via WhatsApp/SMS");
     } catch (error: any) {
+      console.log(error);
       toast.error("Failed to send invitations via both");
     } finally {
       setIsLoadingBoth(false);
