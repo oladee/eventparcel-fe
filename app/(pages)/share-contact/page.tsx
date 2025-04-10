@@ -3,8 +3,7 @@
 import { CSV, Doc, Done } from "@/components/icons/Icons";
 import CsvModal from "@/components/shareContact/CsvModal";
 import { useState, useEffect, useMemo, useCallback } from "react";
-// import axiosInstance from "@/lib/axiosInstance";
-import {  ToastContainer } from "react-toastify";
+import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import ReusuableSuccess from "@/components/modals/ReusuableSuccess";
 import HeaderLayout from "@/components/layout/HeaderLayout";
@@ -12,7 +11,6 @@ import ContactModal, { Contact } from "@/components/shareContact/ContactModal";
 import SendContactModal from "@/components/shareContact/SendContactModal";
 
 // Types
-// (If Contact type is defined elsewhere you can remove this duplicate definition)
 type ContactProperty = "name" | "email" | "tel";
 
 // Reusable OptionCard component
@@ -31,7 +29,7 @@ const OptionCard: React.FC<OptionCardProps> = ({
   onSelect,
   Icon,
   title,
-  description
+  description,
 }) => {
   return (
     <div
@@ -66,16 +64,12 @@ const Page: React.FC = () => {
   // State declarations
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
-  const [selectedOption, setSelectedOption] = useState<
-    "contact" | "csv" | null
-  >(null);
+  const [selectedOption, setSelectedOption] = useState<"contact" | "csv" | null>(null);
   const [contacts, setContacts] = useState<Contact[]>([]);
   const [selectedContacts, setSelectedContacts] = useState<Contact[]>([]);
   const [isContactsSupported, setIsContactsSupported] = useState(false);
   const [searchTerm, setSearchTerm] = useState("");
-  const [selectedTab, setSelectedTab] = useState<"All" | "Work" | "Family">(
-    "All"
-  );
+  const [selectedTab, setSelectedTab] = useState<"All" | "Work" | "Family">("All");
   const [contactError, setContactError] = useState("");
   const [isLoadingContacts, setIsLoadingContacts] = useState(false);
   const [isImportingContacts] = useState(false);
@@ -131,42 +125,31 @@ const Page: React.FC = () => {
     );
   }, []);
 
-  // const handleImportContacts = useCallback(async () => {
-  //   setIsImportingContacts(true);
-  //   try {
-  //     await axiosInstance.post("/save-contacts", {
-  //       contacts: selectedContacts.map((contact) => ({
-  //         guestName: contact.name.join(" "),
-  //         guestPhoneNumber: contact.tel?.join("").replace(/\D/g, "")
-  //       }))
-  //     });
-  //     setIsContactModalOpen(false);
-  //     setSelectedContacts([]);
-  //     setShowModal(true);
-  //   } catch (error: any) {
-  //     console.error("Error saving contacts:", error);
-  //     toast.error(
-  //       error.response?.data?.message || "Failed to import contacts."
-  //     );
-  //   } finally {
-  //     setIsImportingContacts(false);
-  //   }
-  // }, [selectedContacts]);
+
 
   const handleImportContacts = () => {
+    // Toggle the option modal which will show the SendContactModal.
     setOptionModal((prev) => !prev);
   };
+
+  // Extract phone numbers from selected contacts.
+  // For each contact, we pick the first telephone number (if any) and remove non-digit characters.
+  const extractedPhoneNumbers = useMemo(() => {
+    return selectedContacts
+      .map((contact) =>
+        contact.tel && contact.tel.length > 0
+          ? contact.tel[0].replace(/\D/g, "")
+          : ""
+      )
+      .filter((number) => number.length > 0);
+  }, [selectedContacts]);
 
   // Memoized computed values
   const filteredContacts = useMemo(() => {
     return contacts.filter((contact) => {
       const term = searchTerm.toLowerCase();
-      const nameMatch = contact.name?.some((n) =>
-        n.toLowerCase().includes(term)
-      );
-      const emailMatch = contact.email?.some((e) =>
-        e.toLowerCase().includes(term)
-      );
+      const nameMatch = contact.name?.some((n) => n.toLowerCase().includes(term));
+      const emailMatch = contact.email?.some((e) => e.toLowerCase().includes(term));
       const telMatch = contact.tel?.some((t) => t.toLowerCase().includes(term));
       return nameMatch || emailMatch || telMatch;
     });
@@ -182,7 +165,7 @@ const Page: React.FC = () => {
     <HeaderLayout>
       {showModal && (
         <ReusuableSuccess
-          title="Nicely done,you're almost there"
+          title="Nicely done, you're almost there"
           subtitle="Let's setup your payment process and delivery plans"
           route="/dashboard/events"
           buttonText="Continue"
@@ -196,8 +179,7 @@ const Page: React.FC = () => {
               Import Contacts
             </h2>
             <p className="text-gray-600 md:text-center mt-2">
-              Import contacts to send a unique invite to each of your imported
-              contacts
+              Import contacts to send a unique invite to each of your imported contacts
             </p>
           </div>
 
@@ -210,8 +192,7 @@ const Page: React.FC = () => {
               title="Import from contact list"
               description={
                 <>
-                  You can import directly from your <br /> device linked
-                  contacts
+                  You can import directly from your <br /> device linked contacts
                 </>
               }
             />
@@ -223,18 +204,15 @@ const Page: React.FC = () => {
               title="Upload CSV"
               description={
                 <>
-                  You can upload a csv file exported <br /> from your contact
-                  list
+                  You can upload a csv file exported <br /> from your contact list
                 </>
               }
             />
           </div>
           <div className="mt-8 w-full max-w-md bg-[#FFF7F2] p-4">
-            <span className="font-semibold text-black-100"> P.S</span>
+            <span className="font-semibold text-black-100">P.S</span>
             <span className="italic text-[#718096] text-sm font-semibold">
-              : Data retention policy will apply i.e we will nudge them after a
-              period asking if they want us to keep the data. If no consent is
-              given, we will expunge it.
+              : Data retention policy will apply – we will nudge them after a period asking if they want us to keep the data. If no consent is given, we will expunge it.
             </span>
           </div>
         </div>
@@ -277,13 +255,25 @@ const Page: React.FC = () => {
         handleImportContacts={handleImportContacts}
         isImportingContacts={isImportingContacts}
       />
+
       <ToastContainer />
-      <SendContactModal isOpen={optionModal} onClose={handleImportContacts} />
+
+      {/* SendContactModal now receives eventGroupId and extracted phone numbers */}
+      <SendContactModal
+        isOpen={optionModal}
+        onClose={handleImportContacts}
+        eventGroupId="67eeab0c65b211b0e9281b9b"
+        phoneNumbers={extractedPhoneNumbers}
+      />
     </HeaderLayout>
   );
 };
 
 export default Page;
+
+
+
+
 
 // "use client";
 

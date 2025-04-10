@@ -1,21 +1,29 @@
 "use client";
-
 import RightBar from "@/components/Rightbar";
 import axiosInstance from "@/lib/axiosInstance";
 import { toast, ToastContainer } from "react-toastify";
 import { BiLoaderCircle } from "react-icons/bi";
-
+import { FiMoreHorizontal } from "react-icons/fi";
 import "react-datepicker/dist/react-datepicker.css";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import HeaderLayout from "@/components/layout/HeaderLayout";
+import CohostActionsModal from "@/components/modals/CohostActionsModal";
 
 const Page = () => {
   const [isRightBarOpen, setIsRightBarOpen] = useState(false);
-  const [coHosts, setCoHosts] = useState([]);
+  const [coHosts, setCoHosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
+
+  // State to control the modal for a co-host
+  const [selectedCohost, setSelectedCohost] = useState<{
+    _id: string;
+    eventId: string;
+    status: boolean;
+  } | null>(null);
+  const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleAddNew = () => {
     router.push("/add-cohost");
@@ -25,35 +33,32 @@ const Page = () => {
     router.push("/new-group");
   };
 
-  
-
   useEffect(() => {
     if (typeof window !== "undefined") {
       const storedEventId = localStorage.getItem("eventId");
-      // const storedEventId = "67d4b39a98acd292aa0daa32";
       if (!storedEventId) {
         router.replace("/event-creation");
         return;
       }
       
-    const fetchCoHosts = async () => {
-      try {
-        const response = await axiosInstance.get(`/view-cohosts/${storedEventId}`);
-        if (response.data.success) {
-          setCoHosts(response.data.data);
-        } else {
-          toast.error(response.data.message);
+      const fetchCoHosts = async () => {
+        try {
+          const response = await axiosInstance.get(`/view-cohosts/${storedEventId}`);
+          if (response.data.success) {
+            setCoHosts(response.data.data);
+          } else {
+            toast.error(response.data.message);
+          }
+        } catch (error: any) {
+          console.error("Error fetching co-hosts:", error);
+          toast.error("Failed to fetch co-hosts.");
+        } finally {
+          setLoading(false);
         }
-      } catch (error: any) {
-        console.log(error);
-        toast.error("Failed to fetch co-hosts.");
-      } finally {
-        setLoading(false);
-      }
-    };
+      };
 
-    fetchCoHosts();
-  }
+      fetchCoHosts();
+    }
   }, [router]);
 
   return (
@@ -61,26 +66,6 @@ const Page = () => {
       <ToastContainer />
       <section className="bg-[#F9FAFB] !overflow-hidden relative">
         <div className="py-20 lg:py-24 px-3 sm:px-4 mx-auto max-w-screen-md h-screen overflow-y-auto no-scrollbar">
-          <div className="mb-4 md:mb-12 text-center p-3 sm:p-0 space-y-3">
-            <h1
-              id="payment_deliveryHeader"
-              className="text-2xl sm:text-3xl font-bold text-[#111827]"
-            >
-              Add a Co-host
-            </h1>
-            <p id="payment_deliveryDesc" className="gap-3">
-              <span className="mr-2">
-                Enter the name and email address of your co-host
-              </span>
-              <span
-                onClick={() => setIsRightBarOpen(true)}
-                className="px-2 text-sm cursor-pointer rounded-[200px] bg-[#ECB795] text-white"
-              >
-                !
-              </span>
-            </p>
-          </div>
-
           {loading ? (
             <div className="flex justify-center items-center">
               <BiLoaderCircle className="animate-spin" size={32} />
@@ -94,7 +79,7 @@ const Page = () => {
               {coHosts.map((coHost: any) => (
                 <div
                   key={coHost._id}
-                  className="flex items-center space-x-4 bg-white rounded-[12px] p-4"
+                  className="flex items-center justify-between space-x-4 bg-white rounded-[12px] p-4"
                 >
                   {/* Avatar */}
                   <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[#C4C4C466] text-gray-800 font-bold text-base">
@@ -108,6 +93,20 @@ const Page = () => {
                     </h2>
                     <p className="text-sm text-[#667085]">{coHost.email}</p>
                   </div>
+                  {/* More Options Button */}
+                  <button
+                    onClick={() => {
+                      setSelectedCohost({
+                        _id: coHost._id,
+                        eventId: coHost.eventId, // ensure your coHost object has eventId (or modify as needed)
+                        status: coHost.status,
+                      });
+                      setIsModalOpen(true);
+                    }}
+                    className="text-[#667085] h-10"
+                  >
+                    <FiMoreHorizontal size={30} />
+                  </button>
                 </div>
               ))}
             </div>
@@ -146,18 +145,22 @@ const Page = () => {
           <RightBar isOpen={isRightBarOpen} setIsOpen={setIsRightBarOpen} />
         </div>
       </section>
+      {/* Render the modal if a co-host is selected */}
+      {selectedCohost && (
+        <CohostActionsModal
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setSelectedCohost(null);
+          }}
+          cohost={selectedCohost}
+        />
+      )}
     </HeaderLayout>
   );
 };
 
 export default Page;
-
-
-
-
-
-
-
 
 
 
@@ -182,11 +185,12 @@ export default Page;
 // import axiosInstance from "@/lib/axiosInstance";
 // import { toast, ToastContainer } from "react-toastify";
 // import { BiLoaderCircle } from "react-icons/bi";
-
+// import { FiMoreHorizontal } from "react-icons/fi";
 // import "react-datepicker/dist/react-datepicker.css";
 // import Image from "next/image";
 // import { useState, useEffect } from "react";
 // import { useRouter } from "next/navigation";
+// import HeaderLayout from "@/components/layout/HeaderLayout";
 
 // const Page = () => {
 //   const [isRightBarOpen, setIsRightBarOpen] = useState(false);
@@ -195,23 +199,33 @@ export default Page;
 //   const router = useRouter();
 
 //   const handleAddNew = () => {
-//     router.push("/create-cohost");
+//     router.push("/add-cohost");
 //   };
 
 //   const handleContinue = () => {
-//     router.push("/payment-delivery");
+//     router.push("/new-group");
 //   };
 
+  
+
 //   useEffect(() => {
+//     if (typeof window !== "undefined") {
+//       const storedEventId = localStorage.getItem("eventId");
+//       // const storedEventId = "67d4b39a98acd292aa0daa32";
+//       if (!storedEventId) {
+//         router.replace("/event-creation");
+//         return;
+//       }
+      
 //     const fetchCoHosts = async () => {
 //       try {
-//         const response = await axiosInstance.get("/view-cohosts");
+//         const response = await axiosInstance.get(`/view-cohosts/${storedEventId}`);
 //         if (response.data.success) {
 //           setCoHosts(response.data.data);
 //         } else {
 //           toast.error(response.data.message);
 //         }
-//       } catch (error:any) {
+//       } catch (error: any) {
 //         console.log(error);
 //         toast.error("Failed to fetch co-hosts.");
 //       } finally {
@@ -220,14 +234,15 @@ export default Page;
 //     };
 
 //     fetchCoHosts();
-//   }, []);
+//   }
+//   }, [router]);
 
 //   return (
-//     <>
+//     <HeaderLayout>
 //       <ToastContainer />
 //       <section className="bg-[#F9FAFB] !overflow-hidden relative">
 //         <div className="py-20 lg:py-24 px-3 sm:px-4 mx-auto max-w-screen-md h-screen overflow-y-auto no-scrollbar">
-//           <div className="mb-4 md:mb-12 text-center p-3 sm:p-0 space-y-3">
+//           {/* <div className="mb-4 md:mb-12 text-center p-3 sm:p-0 space-y-3">
 //             <h1
 //               id="payment_deliveryHeader"
 //               className="text-2xl sm:text-3xl font-bold text-[#111827]"
@@ -245,18 +260,22 @@ export default Page;
 //                 !
 //               </span>
 //             </p>
-//           </div>
+//           </div> */}
 
 //           {loading ? (
 //             <div className="flex justify-center items-center">
 //               <BiLoaderCircle className="animate-spin" size={32} />
+//             </div>
+//           ) : coHosts.length === 0 ? (
+//             <div className="text-center text-gray-500">
+//               No co-hosts found. Please add a co-host.
 //             </div>
 //           ) : (
 //             <div className="grid md:grid-cols-2 gap-6">
 //               {coHosts.map((coHost: any) => (
 //                 <div
 //                   key={coHost._id}
-//                   className="flex items-center space-x-4 bg-white rounded-[12px] p-4"
+//                   className="flex items-center justify-between space-x-4 bg-white rounded-[12px] p-4"
 //                 >
 //                   {/* Avatar */}
 //                   <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[#C4C4C466] text-gray-800 font-bold text-base">
@@ -270,6 +289,7 @@ export default Page;
 //                     </h2>
 //                     <p className="text-sm text-[#667085]">{coHost.email}</p>
 //                   </div>
+//                   <button className="text-[#667085] h-10"><FiMoreHorizontal size={30} /></button>
 //                 </div>
 //               ))}
 //             </div>
@@ -308,7 +328,7 @@ export default Page;
 //           <RightBar isOpen={isRightBarOpen} setIsOpen={setIsRightBarOpen} />
 //         </div>
 //       </section>
-//     </>
+//     </HeaderLayout>
 //   );
 // };
 
