@@ -24,7 +24,7 @@ interface DiscountData {
   isDisabled?: boolean;
 }
 
-const Page = () => {
+const EditDiscountPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const symbolDropdownRef = useRef<HTMLDivElement>(null);
