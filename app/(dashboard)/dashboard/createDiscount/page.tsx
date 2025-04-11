@@ -5,7 +5,8 @@ import React, { useEffect, useState, useRef } from 'react';
 import { ChevronDown } from 'lucide-react';
 import axiosInstance from '@/lib/axiosInstance';
 import { useRouter } from "next-nprogress-bar";
-import { toast } from 'react-hot-toast'; 
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { BiLoaderCircle } from 'react-icons/bi';
 
 const currencyOptions = [
@@ -305,7 +306,9 @@ const Page = () => {
               "Create Discount"
             )}
           </button>
-        </form>
+        </form>     
+      {/* Toast Notifications */}
+      <ToastContainer aria-live="polite" />
       </div>
     </Container>
   );
