@@ -5,7 +5,7 @@ import { LuPencilLine } from "react-icons/lu";
 import { AiOutlineClose } from "react-icons/ai";
 import axiosInstance from "@/lib/axiosInstance";
 import { useRouter } from "next/navigation";
-import { ToastContainer, toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
 interface DiscountOptionsModalProps {
@@ -19,7 +19,6 @@ const DiscountOptionsModal = ({ isOpen, onClose, discountData }: DiscountOptions
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingMessage, setLoadingMessage] = useState<string>("");
   const router = useRouter();
-  console.log("disc", discountData);
 
   useEffect(() => {
     if (isOpen && modalRef.current) {
@@ -101,7 +100,7 @@ const DiscountOptionsModal = ({ isOpen, onClose, discountData }: DiscountOptions
     <>
       <div
         className={`fixed inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50`}
-        onClick={() => onClose(false)} // Send false when clicking outside modal
+        onClick={() => onClose(false)} 
         role="presentation"
       >
         <div
@@ -167,7 +166,7 @@ const DiscountOptionsModal = ({ isOpen, onClose, discountData }: DiscountOptions
         </div>
       </div>
 
-      <ToastContainer />
+      <ToastContainer aria-live="polite" />
     </>
   );
 };

@@ -3,7 +3,8 @@
 import Container from '@/components/dashboard/Container';
 import React, { useEffect, useState, useRef } from 'react';
 import { ChevronDown } from 'lucide-react';
-import { toast } from 'react-hot-toast';
+import { toast, ToastContainer } from "react-toastify";
+import "react-toastify/dist/ReactToastify.css";
 import { BiLoaderCircle } from 'react-icons/bi';
 import { useRouter, useSearchParams } from 'next/navigation';
 import axiosInstance from '@/lib/axiosInstance';
@@ -240,6 +241,9 @@ const Page = () => {
             {formLoading ? <BiLoaderCircle className="animate-spin mr-2" size={22} /> : 'Update Discount'}
           </button>
         </form>
+        
+          {/* Toast Notifications */}
+          <ToastContainer aria-live="polite" />
       </div>
     </Container>
   );
