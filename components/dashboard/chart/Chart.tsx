@@ -201,7 +201,7 @@ const Chart: React.FC = () => {
 
   // Extract the relevant data for the selected currency
   const currentSalesData = dashboardData.overallSales[currency];
-  const { totalAmount, growthRate } = currentSalesData;
+  // const { totalAmount, growthRate } = currentSalesData;
 
   // Prepare the chart data based on monthly or daily view
   const chartData: SalesData[] =
