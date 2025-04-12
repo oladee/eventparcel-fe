@@ -10,6 +10,9 @@ body {
 #checkbox {
   accent-color: #751423;
 }
+.checkbox {
+  accent-color: #751423;
+}
 
 @layer base {
   html {
