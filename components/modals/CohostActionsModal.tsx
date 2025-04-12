@@ -101,7 +101,7 @@ const CohostActionsModal: React.FC<CohostActionsModalProps> = ({
     <AnimatePresence>
       {isOpen && (
         <motion.div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50 backdrop-blur-sm p-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           exit={{ opacity: 0 }}
@@ -109,7 +109,7 @@ const CohostActionsModal: React.FC<CohostActionsModalProps> = ({
         >
           <FocusLock returnFocus>
             <motion.div
-              className="bg-white rounded-xl shadow-xl p-6 w-[90%] max-w-sm outline-none"
+              className="bg-white rounded-xl shadow-xl p-6 w-full max-w-sm outline-none"
               role="dialog"
               aria-modal="true"
               aria-labelledby="modal-title"
