@@ -41,9 +41,10 @@ const SendContactModal: React.FC<EventOptionsModalProps> = ({
       // Call the updated SMS API passing contacts object as required.
       const data = await sendInviteSMS(eventGroupId, contacts);
       toast.success(data.message || "Invitations sent via SMS");
+      console.log(data.message);
     } catch (error: any) {
-      console.error(error);
-      toast.error("Failed to send SMS invitations");
+      console.error(error.response.data.message);
+      toast.error(error.response.data.message);
     } finally {
       setIsLoadingSMS(false);
     }
@@ -54,9 +55,10 @@ const SendContactModal: React.FC<EventOptionsModalProps> = ({
     try {
       const data = await sendInviteWhatsApp(eventGroupId, phoneNumbers);
       toast.success(data.message || "Invitations sent via WhatsApp");
+      console.log(data.message);
     } catch (error: any) {
       console.error(error);
-      toast.error("Failed to send WhatsApp invitations");
+      toast.error(error.response.data.message);
     } finally {
       setIsLoadingWA(false);
     }
@@ -69,7 +71,7 @@ const SendContactModal: React.FC<EventOptionsModalProps> = ({
       toast.success(data.message || "Invitations sent via WhatsApp/SMS");
     } catch (error: any) {
       console.error(error);
-      toast.error("Failed to send invitations via both");
+      toast.error(error.response.data.message);
     } finally {
       setIsLoadingBoth(false);
     }
