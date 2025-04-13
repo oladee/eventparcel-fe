@@ -28,7 +28,7 @@ const EventOptionsModal: React.FC<EventOptionsModalProps> = ({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingMessage, setLoadingMessage] = useState<string | null>("");
-  const router = useRouter();
+  // const router = useRouter();
 
   // Focus on the modal when it opens and add Escape key support
   useEffect(() => {
