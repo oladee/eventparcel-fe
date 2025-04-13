@@ -57,12 +57,14 @@ const EventOptionsModal: React.FC<EventOptionsModalProps> = ({
       setIsDeleteDialogOpen(false);
       onClose();
       // Optionally, refresh or update the event list:
-      router.refresh();
+      // router.refresh();
+      window.dispatchEvent(new Event("refreshEvents"));
     } catch (error) {
       console.error("Error deleting event:", error);
       alert("Failed to delete event. Please try again later.");
     }
   };
+
   const handleDisableEvent = async () => {
     if (!eventData?._id) return;
 
