@@ -8,7 +8,7 @@ import { AiOutlineClose } from "react-icons/ai";
 import UpdateEventModal from "./UpdateEventModal";
 import DeleteConfirmationDialog from "@/components/modals/DeleteConfirmationDialog";
 import axiosInstance from "@/lib/axiosInstance";
-import { useRouter } from "next/navigation";
+// import { useRouter } from "next/navigation";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 
