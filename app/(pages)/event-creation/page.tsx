@@ -71,7 +71,7 @@ const PageContent: React.FC = () => {
     lastName: "",
     email: "",
     description: "",
-    numberOfGroups: "",
+    numberOfGroups: "0",
     eventImage: null
   });
 
@@ -155,6 +155,7 @@ const PageContent: React.FC = () => {
     setErrors({ ...errors, [e.target.id]: "" });
   };
 
+
   const validateField = (id: string, value: any): string => {
     // Skip personal details validations if user is authenticated
     if (
@@ -163,59 +164,67 @@ const PageContent: React.FC = () => {
     ) {
       return "";
     }
-
+  
     if (id === "eventDate" || id === "eventTime") {
       if (!(value instanceof Date) || isNaN(value.getTime())) {
         return "This field is required.";
       }
     } else if (id === "numberOfGroups") {
-      // Check that the input is a number and within 1 to 99
-      if (!value.trim() || isNaN(Number(value))) {
+      // Convert value to string (in case it's not) and trim extra spaces
+      const trimmed = value.toString().trim();
+      // Allow empty value (optional field)
+      if (trimmed === "") {
+        return "";
+      }
+      // Validate that input is composed solely of digits
+      if (!/^\d+$/.test(trimmed)) {
         return "Enter a valid number.";
       }
-      const numValue = Number(value);
-      if (numValue < 1 || numValue > 99) {
-        return "Number must be between 1 and 99.";
+      const numValue = Number(trimmed);
+      if (numValue < 0 || numValue > 99) {
+        return "Number must be between 0 and 99.";
       }
+      return "";
     } else if (
       id !== "description" &&
       (typeof value !== "string" || !value.trim())
     ) {
       return "This field is required.";
     }
-
+  
     if (
       id === "email" &&
       !/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(value)
     ) {
       return "Enter a valid email address.";
     }
-
+  
     if (
       (id === "firstName" || id === "lastName") &&
       /[^a-zA-Z\s]/.test(value)
     ) {
       return "Name cannot include numbers or special characters.";
     }
-
+  
     if (id === "description" && value.trim() && value.length < 5) {
       return "Description must be at least 5 characters.";
     }
-
+  
     if (id === "description" && value.length > 300) {
       return "Description must have a maximum of 300 characters.";
     }
-
+  
     if (id === "eventName" && value.length < 5) {
       return "Event name must be at least 5 characters.";
     }
-
+  
     if (id === "eventName" && value.length > 60) {
       return "Event name must not exceed 60 characters.";
     }
-
+  
     return "";
   };
+  
 
   const handleBlur = (
     e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -421,13 +430,12 @@ const PageContent: React.FC = () => {
   };
 
   const isFormValid =
-    (isAuthenticated ||
-      (formData.firstName && formData.lastName && formData.email)) &&
-    formData.location &&
-    formData.eventName &&
-    formData.numberOfGroups &&
-    formData.eventTime &&
-    Object.values(errors).every((err) => err === "");
+  (isAuthenticated ||
+    (formData.firstName && formData.lastName && formData.email)) &&
+  formData.location &&
+  formData.eventName &&
+  formData.eventTime &&
+  Object.values(errors).every((err) => err === "");
 
   return (
     <HeaderLayout>
@@ -559,7 +567,7 @@ export default function Page() {
 // import Cookies from "js-cookie";
 // import { useRouter, useSearchParams } from "next/navigation";
 // import HeaderLayout from "@/components/layout/HeaderLayout";
-// import Container from "@/components/dashboard/Container";
+// import { motion } from "framer-motion";
 
 // // Dynamically import LocationPickerModal with SSR disabled.
 // const LocationPickerModal = dynamic(
@@ -679,7 +687,6 @@ export default function Page() {
 //           });
 //           // Save the response to localStorage as the logged-in user
 //           localStorage.setItem("loggedInUser", JSON.stringify(response.data));
-//           localStorage.setItem("loggedInUserEmail", response.data.email)
 //           console.log("User profile fetched successfully:", response.data);
 //         } catch (error: any) {
 //           console.error("Error fetching user profile:", error);
@@ -971,12 +978,12 @@ export default function Page() {
 //       (formData.firstName && formData.lastName && formData.email)) &&
 //     formData.location &&
 //     formData.eventName &&
-//     formData.numberOfGroups &&
+//     // formData.numberOfGroups &&
 //     formData.eventTime &&
 //     Object.values(errors).every((err) => err === "");
 
 //   return (
-//     <Container>
+//     <HeaderLayout>
 //       {showImagePickerModal && (
 //         <ImagePickerModal
 //           onSelectGallery={handleSelectGallery}
@@ -995,7 +1002,7 @@ export default function Page() {
 //       )}
 //       <div>{showSuccess && <EventSuccess />}</div>
 //       <div>{showSuccess2 && <EventSaveSuccess />}</div>
-//       <section className="bg-[#F9FAFB]">
+//       <section className="bg-[#F9FAFB] mt-14 md:mt-10">
 //         <div className="py-8 lg:py-16 px-3 sm:px-4 mx-auto max-w-screen-md">
 //           <EventHeader />
 //           <form
@@ -1038,13 +1045,35 @@ export default function Page() {
 //         />
 //       </section>
 //       <ToastContainer />
-//     </Container>
+//     </HeaderLayout>
 //   );
 // };
 
 // export default function Page() {
 //   return (
-//     <Suspense fallback={<div>Loading...</div>}>
+//     <Suspense
+//       fallback={
+//         <div>
+//           <div className="flex flex-col justify-center items-center min-h-screen">
+//             {/* Animated Spinner */}
+//             <motion.div
+//               animate={{ rotate: 360 }}
+//               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+//               className="w-12 h-12 border-4 border-t-[#751423] border-gray-300 rounded-full"
+//             ></motion.div>
+
+//             {/* Skeleton Effect for Loading Content */}
+//             <div className="mt-6 w-[80%] max-w-md bg-white p-4 shadow-lg rounded-xl">
+//               <div className="animate-pulse">
+//                 <div className="h-6 bg-gray-300 rounded w-3/4 mb-4"></div>
+//                 <div className="h-4 bg-gray-300 rounded w-full mb-2"></div>
+//                 <div className="h-4 bg-gray-300 rounded w-5/6"></div>
+//               </div>
+//             </div>
+//           </div>
+//         </div>
+//       }
+//     >
 //       <PageContent />
 //     </Suspense>
 //   );

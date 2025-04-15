@@ -71,7 +71,7 @@ const PageContent: React.FC = () => {
     lastName: "",
     email: "",
     description: "",
-    numberOfGroups: "",
+    numberOfGroups: "0",
     eventImage: null
   });
 
@@ -175,8 +175,8 @@ const PageContent: React.FC = () => {
         return "Enter a valid number.";
       }
       const numValue = Number(value);
-      if (numValue < 1 || numValue > 99) {
-        return "Number must be between 1 and 99.";
+      if (numValue < 0 || numValue > 99) {
+        return "Number must be between 0 and 99.";
       }
     } else if (
       id !== "description" &&
@@ -426,7 +426,6 @@ const PageContent: React.FC = () => {
       (formData.firstName && formData.lastName && formData.email)) &&
     formData.location &&
     formData.eventName &&
-    formData.numberOfGroups &&
     formData.eventTime &&
     Object.values(errors).every((err) => err === "");
 
