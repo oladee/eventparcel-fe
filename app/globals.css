@@ -81,6 +81,10 @@ body {
   @apply flex items-center space-x-3 p-2 hover:bg-gray-100 rounded;
 }
 
+.input-style {
+  @apply w-full px-4 py-2 rounded-lg border border-[#E5E7EB] text-sm text-[#111827] bg-[#FAFAFA] focus:outline-none;
+}
+
 
 .custom-phone-input .flag {
   border-radius: 100% !important;

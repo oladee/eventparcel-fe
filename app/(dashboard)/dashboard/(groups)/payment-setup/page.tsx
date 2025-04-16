@@ -284,7 +284,7 @@ const PaymentSetupContent = () => {
         />
       )}
       <section className="bg-[#EEEFF2] !overflow-hidden relative">
-        <div className="py-20 lg:py-24 px-3 sm:px-4 mx-auto max-w-screen-md h-[98vh] overflow-y-auto no-scrollbar">
+        <div className="mt-4 pb-20 lg:py-24 px-3 sm:px-4 mx-auto max-w-screen-md h-[98vh] overflow-y-auto no-scrollbar">
           <div className="md:mb-12 text-center p-3 sm:p-0 space-y-3">
             <h2
               id="payment_deliveryHeader"
