@@ -3,13 +3,13 @@
 import HeaderLayout from "@/components/layout/HeaderLayout";
 import Image from "next/image";
 import { useRouter, useSearchParams } from "next/navigation";
-import { useEffect, useMemo, useState } from "react";
+import { Suspense, useEffect, useMemo, useState } from "react";
 import axiosInstance from "@/lib/axiosInstance";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { BiLoaderCircle } from "react-icons/bi";
 
-export default function PaymentDetailsCard() {
+function PaymentDetailsCard() {
   const searchParams = useSearchParams();
   const cartItems = searchParams.get('orderData');
   const parsedCartItems = useMemo(() => {
@@ -227,5 +227,14 @@ export default function PaymentDetailsCard() {
         </form>
       </div>
     </HeaderLayout>
+  );
+}
+
+
+export default function PaymentDetailsPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <PaymentDetailsCard />
+    </Suspense>
   );
 }
