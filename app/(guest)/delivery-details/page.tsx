@@ -1,7 +1,7 @@
 "use client";
 
 import HeaderLayout from "@/components/layout/HeaderLayout";
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef, useEffect, Suspense } from "react";
 import check from "../../../public/images/check.png";
 import uncheck from "../../../public/images/unchecked.png";
 import Image from "next/image";
@@ -12,7 +12,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import { toast, ToastContainer } from "react-toastify";
 import { BiLoaderCircle } from "react-icons/bi";
 
-export default function DeliveryDetailsForm() {
+function DeliveryDetailsForm() {
   const searchParams = useSearchParams();
   const cartItems = searchParams.get('cartItems');
   const eventData = searchParams.get('eventData')
@@ -564,6 +564,15 @@ export default function DeliveryDetailsForm() {
         </div>        
       </div>
     </HeaderLayout>
-                    </>
+    </>
+  );
+}
+
+
+export default function DeliveryDetailsPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <DeliveryDetailsForm />
+    </Suspense>
   );
 }
