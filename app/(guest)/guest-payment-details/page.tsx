@@ -2,9 +2,8 @@
 
 import HeaderLayout from "@/components/layout/HeaderLayout";
 import Image from "next/image";
-import { useSearchParams } from "next/navigation";
-import { debounce } from "lodash";
-import { useEffect, useState } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import { useEffect, useMemo, useState } from "react";
 import axiosInstance from "@/lib/axiosInstance";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -13,47 +12,55 @@ import { BiLoaderCircle } from "react-icons/bi";
 export default function PaymentDetailsCard() {
   const searchParams = useSearchParams();
   const cartItems = searchParams.get('orderData');
-  const parsedCartItems = cartItems ? JSON.parse(cartItems) : [];
-  console.log("ddd",parsedCartItems)
-
+  const parsedCartItems = useMemo(() => {
+    return cartItems ? JSON.parse(cartItems) : [];
+  }, [cartItems]);
   const [discountCode, setDiscountCode] = useState("");
   const [discountResponse, setDiscountResponse] = useState<any>(null);
   const [isLoadingDiscount, setIsLoadingDiscount] = useState(false);
   const [isSubmittingPayment, setIsSubmittingPayment] = useState(false);
+  const eventId = parsedCartItems?.data?.eventId;
+  const Router = useRouter();
 
   const handleDiscountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDiscountCode(e.target.value);
   };
 
-  const fetchDiscount = debounce(async (code: string) => {
-    if (!code) {
-      setDiscountResponse(null);
-      return;
-    }
+  // Debounced discount validation using useEffect and setTimeout
+  useEffect(() => {
+    const handler = setTimeout(() => {
+      if (!discountCode.trim()) {
+        setDiscountResponse(null);
+        return;
+      }
 
-    setIsLoadingDiscount(true);
-    try {
-      const response = await axiosInstance.post("/calculate-discounted-total", {
-        eventId: parsedCartItems?.data?.eventId,
-        discountCode: code,
+      setIsLoadingDiscount(true);
+      axiosInstance.post("/calculate-discounted-total", {
+        eventId: eventId,  
+        discountCode: discountCode,
         items: parsedCartItems?.data?.items?.map((item: any) => ({
           packageId: item.packageId,
           quantity: item.quantity,
           deliveryMethod: item.deliveryMethod,
         })),
+      })
+      .then(response => {
+        setDiscountResponse(response.data.data);
+        toast.success("Discount applied successfully!");
+      })
+      .catch(error => {
+        setDiscountResponse(null);
+        toast.error(error.response?.data?.message || "Invalid discount code");
+      })
+      .finally(() => {
+        setIsLoadingDiscount(false);
       });
+    }, 600);
 
-      setDiscountResponse(response.data.data);
-      console.log("dsic", response.data)
-      toast.success("Discount applied successfully!");
-    } catch (error: any) {
-      setDiscountResponse(null);
-      toast.error(error.response?.data?.message || "Invalid discount code");
-      console.error("Failed to calculate discount:", error);
-    } finally {
-      setIsLoadingDiscount(false);
-    }
-  }, 600);
+    return () => {
+      clearTimeout(handler);
+    };
+  }, [discountCode, eventId, parsedCartItems?.data?.items]);
 
   // Calculate totals
   const itemTotal = parsedCartItems?.data?.items?.map((item: any) => {
@@ -67,45 +74,30 @@ export default function PaymentDetailsCard() {
   const subtotal = itemTotal.reduce((acc: number, item: any) => acc + item.totalPrice, 0);
   const currencySymbol = parsedCartItems?.data?.items?.[0]?.packagePriceCurrency || "NGN";
   const tax = (7.5 / 100) * subtotal;
-  const deliveryFee = currencySymbol === "NGN" ? 3000 : 0;
+  const isHomeDelivery = parsedCartItems?.data?.deliveryType === "homeDelivery";
+  const deliveryFee = isHomeDelivery && currencySymbol === "NGN" ? 3000 : 1.87;
   let grandTotal = subtotal + tax + deliveryFee;
-
+  
   // Apply discount if valid
   if (discountResponse?.discountAmount) {
     grandTotal -= discountResponse.discountAmount;
   }
-
-  useEffect(() => {
-    fetchDiscount(discountCode);
-    return () => fetchDiscount.cancel();
-  }, [discountCode, fetchDiscount]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmittingPayment(true);
     
     try {
-      // const response = await axiosInstance.post("/process-payment", {
-      //   items: parsedCartItems?.data?.items?.map((item: any) => ({
-      //     packageId: item._id,
-      //     quantity: item.quantity,
-      //     deliveryMethod: item.deliveryMethod || "pickUp",
-      //   })),
-      //   discountCode: discountResponse ? discountCode : undefined,
-      //   eventId: parsedCartItems?.data?.eventId,
-      //   totalAmount: grandTotal,
-      // });
+      const payload: any = {};
+      if (discountCode) {
+        payload.discountCode = discountCode;
+      }
 
-      const response = await axiosInstance.post(`/checkout-contd/${parsedCartItems?.data?._id}`,{
-        discountCode: discountCode
-      });
-
+      await axiosInstance.post(`/checkout-contd/${parsedCartItems?.data?._id}`, payload);
       toast.success("Payment processed successfully!");
-      console.log("Payment response:", response.data);
-      // Redirect or handle successful payment here
+      Router.push("/orderSuccessful");
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Payment failed");
-      console.error("Payment error:", error);
     } finally {
       setIsSubmittingPayment(false);
     }
@@ -149,12 +141,14 @@ export default function PaymentDetailsCard() {
                 {currencySymbol === "NGN" ? "₦" : "$"}{subtotal.toLocaleString()}
               </span>
             </div>
-            <div className="flex justify-between">
+            {parsedCartItems?.data?.deliveryType === "homeDelivery" && (
+              <div className="flex justify-between">
               <span className="text-[#A0AEC0] font-medium text-sm font-general">Home Delivery</span>
               <span className="text-[#A0AEC0] font-medium text-sm font-general">
                 {currencySymbol === "NGN" ? "₦" : "$"}{deliveryFee.toLocaleString()}
               </span>
             </div>
+            )}
             <div className="flex justify-between">
               <span className="text-[#A0AEC0] font-medium text-sm font-general">Tax</span>
               <span className="text-[#A0AEC0] font-medium text-sm font-general">

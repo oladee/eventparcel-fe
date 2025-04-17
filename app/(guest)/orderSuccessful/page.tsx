@@ -1,9 +1,21 @@
+"use client"
+
 import Image from 'next/image'
 import success from "../../../assets/orderIcons/payment-success.png"
 import HeaderLayout from '@/components/layout/HeaderLayout'
 import logo from "../../../public/images/logo4.png"
+import { useRouter } from 'next/navigation';
+import { useCartStore } from '@/app/store/useCartStore'
+import { useEffect } from 'react'
 
 export default function ConfirmationCards() {
+  const Router = useRouter();
+  const clearCart = useCartStore((state) => state.clearCart);
+
+  useEffect(() => {
+    clearCart();
+  }, [clearCart]);
+
   return (
     <HeaderLayout>
       <div id="confirmation-container" className="rounded-xl bg-[#F9FAFB] p-4 space-y-4 mt-20">
@@ -46,6 +58,7 @@ export default function ConfirmationCards() {
             <button 
               id="create-event-button"
               className="w-full h-14 rounded-[12px] mt-4 px-4 py-2 border border-[#751423] text-[#751423] text-sm font-semibold hover:bg-red-50 transition"
+              onClick={() => Router.push("/event-creation")}
             >
               Create an Event
             </button>

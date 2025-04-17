@@ -41,8 +41,7 @@ export default function DeliveryDetailsForm() {
     dispatchType: "",
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
-  const [error, setError] = useState("");
-
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const stateInputRef = useRef<HTMLInputElement | null>(null);
   const cityInputRef = useRef<HTMLInputElement | null>(null);
   const dispatchInputRef = useRef<HTMLInputElement | null>(null);
@@ -71,11 +70,56 @@ export default function DeliveryDetailsForm() {
     }));
     setDispatchDropdownOpen(false);
   };
+
+  //validate form
+  const validateForm = () => {
+    const errors: Record<string, string> = {};
+    
+    // Common validations for both delivery types
+    if (!formData.guestFirstName) errors.guestFirstName = "First name is required";
+    if (!formData.guestLastName) errors.guestLastName = "Last name is required";
+    
+    if (!formData.guestEmail) {
+      errors.guestEmail = "Email is required";
+    } else if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(formData.guestEmail)) {
+      errors.guestEmail = "Invalid email format";
+    }
+    
+    if (!formData.guestPhoneNumber) {
+      errors.guestPhoneNumber = "Phone number is required";
+    } else if (!/^[0-9]{11}$/.test(formData.guestPhoneNumber)) {
+      errors.guestPhoneNumber = "Invalid phone number (11 digits required)";
+    }
+  
+    // Home delivery specific validations
+    if (deliveryType === "home") {
+      if (!formData.shippingAddress) errors.shippingAddress = "Address is required";
+      if (!formData.state) errors.state = "State is required";
+      if (!formData.city) errors.city = "City is required";
+      if (!formData.dispatchType) errors.dispatchType = "Dispatch type is required";
+      
+      // Validate city belongs to state
+      // if (formData.state && formData.city) {
+      //   const stateCities = nigeriancities.filter(c => c.state === formData.state);
+      //   if (!stateCities.some(c => c.value === formData.city)) {
+      //     errors.city = "Selected city doesn't belong to selected state";
+      //   }
+      // }
+    }
+  
+    return errors;
+  };
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setError("");
+    
+    const validationErrors = validateForm();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      setIsSubmitting(false);
+      return;
+    }
   
     try {
       const { deliveryType } = formData;
@@ -180,7 +224,6 @@ export default function DeliveryDetailsForm() {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
-  console.log(error)
 
   return (
     <>
@@ -247,8 +290,11 @@ export default function DeliveryDetailsForm() {
                     value={formData.guestFirstName}
                     onChange={handleInputChange}
                     placeholder="Enter your first name"
-                    className="w-full h-14 px-4 py-2 rounded-[12px] border border-[#E5E7EB] bg-[#FAFAFA] focus:outline-none focus:border-[#8B1E3F]"
-                  />
+                    className={`w-full h-14 px-4 py-2 rounded-[12px] border ${errors.guestFirstName ? 'border-red-500' : 'border-[#E5E7EB]'} bg-[#FAFAFA] focus:outline-none focus:border-[#8B1E3F]`}
+                    />
+                    {errors.guestFirstName && (
+                      <p className="text-red-500 text-sm mt-1">{errors.guestFirstName}</p>
+                    )}
                 </div>
                 <div>
                   <label htmlFor="home-last-name" className="font-general font-medium text-base block mb-1 text-[#718096]">
@@ -260,8 +306,11 @@ export default function DeliveryDetailsForm() {
                     value={formData.guestLastName}
                     onChange={handleInputChange}
                     placeholder="Enter your last name"
-                    className="w-full h-14 px-4 py-2 rounded-[12px] border border-[#E5E7EB] bg-[#FAFAFA] focus:outline-none focus:border-[#8B1E3F]"
-                  />
+                    className={`w-full h-14 px-4 py-2 rounded-[12px] border ${errors.guestLastName ? 'border-red-500' : 'border-[#E5E7EB]'} bg-[#FAFAFA] focus:outline-none focus:border-[#8B1E3F]`}
+                    />
+                    {errors.guestLastName && (
+                      <p className="text-red-500 text-sm mt-1">{errors.guestLastName}</p>
+                    )}
                 </div>
                 <div>
                   <label htmlFor="home-email" className="font-general font-medium text-base block mb-1 text-[#718096]">
@@ -274,8 +323,11 @@ export default function DeliveryDetailsForm() {
                     value={formData.guestEmail}
                     onChange={handleInputChange}
                     placeholder="Enter your email address"
-                    className="w-full h-14 px-4 py-2 rounded-[12px] border border-[#E5E7EB] bg-[#FAFAFA] focus:outline-none focus:border-[#8B1E3F]"
-                  />
+                    className={`w-full h-14 px-4 py-2 rounded-[12px] border ${errors.guestEmail ? 'border-red-500' : 'border-[#E5E7EB]'} bg-[#FAFAFA] focus:outline-none focus:border-[#8B1E3F]`}
+                    />
+                    {errors.guestEmail && (
+                      <p className="text-red-500 text-sm mt-1">{errors.guestEmail}</p>
+                    )}
                 </div>
                 <div>
                   <label htmlFor="home-phone" className="font-general font-medium text-base block mb-1 text-[#718096]">
@@ -288,8 +340,11 @@ export default function DeliveryDetailsForm() {
                     onChange={handleInputChange}
                     type="tel"
                     placeholder="Enter your phone number"
-                    className="w-full h-14 px-4 py-2 rounded-[12px] border border-[#E5E7EB] bg-[#FAFAFA] focus:outline-none focus:border-[#8B1E3F]"
-                  />
+                    className={`w-full h-14 px-4 py-2 rounded-[12px] border ${errors.guestPhoneNumber ? 'border-red-500' : 'border-[#E5E7EB]'} bg-[#FAFAFA] focus:outline-none focus:border-[#8B1E3F]`}
+                    />
+                    {errors.guestPhoneNumber && (
+                      <p className="text-red-500 text-sm mt-1">{errors.guestPhoneNumber}</p>
+                    )}
                 </div>
                 <div>
                   <label htmlFor="home-address" className="font-general font-medium text-base block mb-1 text-[#718096]">
@@ -301,8 +356,11 @@ export default function DeliveryDetailsForm() {
                     value={formData.shippingAddress}
                     onChange={handleInputChange}
                     placeholder="Enter your address"
-                    className="w-full h-14 px-4 py-2 rounded-[12px] border border-[#E5E7EB] bg-[#FAFAFA] focus:outline-none focus:border-[#8B1E3F]"
+                    className={`w-full h-14 px-4 py-2 rounded-[12px] border ${errors.shippingAddress ? 'border-red-500' : 'border-[#E5E7EB]'} bg-[#FAFAFA] focus:outline-none focus:border-[#8B1E3F]`}
                     />
+                    {errors.shippingAddress && (
+                      <p className="text-red-500 text-sm mt-1">{errors.shippingAddress}</p>
+                    )}
                 </div>
                 {/* State and City Dropdowns */}
                 <div className="grid grid-cols-2 gap-4 relative">
@@ -431,8 +489,11 @@ export default function DeliveryDetailsForm() {
                     value={formData.guestFirstName}
                     onChange={handleInputChange}
                     placeholder="Enter your first name"
-                    className="w-full h-14 px-4 py-2 rounded-[12px] border border-[#E5E7EB] bg-[#FAFAFA] focus:outline-none focus:border-[#8B1E3F]"
+                    className={`w-full h-14 px-4 py-2 rounded-[12px] border ${errors.guestFirstName ? 'border-red-500' : 'border-[#E5E7EB]'} bg-[#FAFAFA] focus:outline-none focus:border-[#8B1E3F]`}
                     />
+                    {errors.guestFirstName && (
+                      <p className="text-red-500 text-sm mt-1">{errors.guestFirstName}</p>
+                    )}
                 </div>
                 <div>
                   <label htmlFor="pickup-last-name" className="font-general font-medium text-base block mb-1 text-[#718096]">
@@ -444,8 +505,11 @@ export default function DeliveryDetailsForm() {
                     value={formData.guestLastName}
                     onChange={handleInputChange}
                     placeholder="Enter your last name"
-                    className="w-full h-14 px-4 py-2 rounded-[12px] border border-[#E5E7EB] bg-[#FAFAFA] focus:outline-none focus:border-[#8B1E3F]"
+                    className={`w-full h-14 px-4 py-2 rounded-[12px] border ${errors.guestLastName ? 'border-red-500' : 'border-[#E5E7EB]'} bg-[#FAFAFA] focus:outline-none focus:border-[#8B1E3F]`}
                     />
+                    {errors.guestLastName && (
+                      <p className="text-red-500 text-sm mt-1">{errors.guestLastName}</p>
+                    )}
                 </div>
                 <div>
                   <label htmlFor="pickup-email" className="font-general font-medium text-base block mb-1 text-[#718096]">
@@ -458,8 +522,11 @@ export default function DeliveryDetailsForm() {
                     value={formData.guestEmail}
                     onChange={handleInputChange}
                     placeholder="Enter your email address"
-                    className="w-full h-14 px-4 py-2 rounded-[12px] border border-[#E5E7EB] bg-[#FAFAFA] focus:outline-none focus:border-[#8B1E3F]"
-                  />
+                    className={`w-full h-14 px-4 py-2 rounded-[12px] border ${errors.guestEmail ? 'border-red-500' : 'border-[#E5E7EB]'} bg-[#FAFAFA] focus:outline-none focus:border-[#8B1E3F]`}
+                    />
+                    {errors.guestEmail && (
+                      <p className="text-red-500 text-sm mt-1">{errors.guestEmail}</p>
+                    )}
                 </div>
                 <div>
                   <label htmlFor="pickup-phone" className="font-general font-medium text-base block mb-1 text-[#718096]">
@@ -472,8 +539,11 @@ export default function DeliveryDetailsForm() {
                     onChange={handleInputChange}
                     type="tel"
                     placeholder="Enter your phone number"
-                    className="w-full h-14 px-4 py-2 rounded-[12px] border border-[#E5E7EB] bg-[#FAFAFA] focus:outline-none focus:border-[#8B1E3F]"
+                    className={`w-full h-14 px-4 py-2 rounded-[12px] border ${errors.guestPhoneNumber ? 'border-red-500' : 'border-[#E5E7EB]'} bg-[#FAFAFA] focus:outline-none focus:border-[#8B1E3F]`}
                     />
+                    {errors.guestPhoneNumber && (
+                      <p className="text-red-500 text-sm mt-1">{errors.guestPhoneNumber}</p>
+                    )}
                 </div>
               </div>
             )}

@@ -218,7 +218,7 @@ const ViewEvent = () => {
                   <div  
                    key={pkg._id}               
                    id="general-package-item" 
-                   className="flex gap-3 p-3 border rounded-xl"
+                   className="flex gap-3 mb-3 p-3 border rounded-xl"
                   >
                   <div id="package-item-image-container" className="w-16 h-16 relative rounded-lg overflow-hidden">
                     <Image
@@ -458,6 +458,7 @@ const ViewEvent = () => {
                     onClick={handleCheckout}
                     className={`h-[56px] bg-[#7D0021] text-[#FFFFFF] ${items.length === 1 ? "mt-10" : "mt-10"} w-full rounded-[8px] py-3 font-bold text-base`}
                   >
+                    {}
                     Checkout
                   </button>
               </>
