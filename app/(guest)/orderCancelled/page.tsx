@@ -1,8 +1,5 @@
 "use client"
-
-import Image from 'next/image'
 import HeaderLayout from '@/components/layout/HeaderLayout'
-import logo from "../../../public/images/logo4.png"
 import { useRouter } from 'next/navigation';
 
 export default function FailurePage() {
