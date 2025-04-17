@@ -1,4 +1,3 @@
-// components/PersonalDetails.tsx
 import React from "react";
 
 interface PersonalDetailsProps {
@@ -36,7 +35,7 @@ const PersonalDetails: React.FC<PersonalDetailsProps> = ({
           onBlur={handleBlur}
           className="input-field outline-primary w-full p-2 rounded-[5px] bg-slate-50"
           placeholder="First name"
-          required={!isAuthenticated} // Only required if user is NOT authenticated
+          required={!isAuthenticated} 
         />
         {errors.firstName && (
           <p className="text-red-500 text-sm mt-1">{errors.firstName}</p>
