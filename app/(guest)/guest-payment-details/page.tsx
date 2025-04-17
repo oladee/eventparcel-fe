@@ -93,9 +93,9 @@ export default function PaymentDetailsCard() {
         payload.discountCode = discountCode;
       }
 
-      await axiosInstance.post(`/checkout-contd/${parsedCartItems?.data?._id}`, payload);
+      const res = await axiosInstance.post(`/checkout-contd/${parsedCartItems?.data?._id}`, payload);
       toast.success("Payment processed successfully!");
-      Router.push("/orderSuccessful");
+      Router.push(res.data.data.paymentUrl);
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Payment failed");
     } finally {
