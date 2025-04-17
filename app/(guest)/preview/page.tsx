@@ -393,7 +393,7 @@ const ViewEvent = () => {
 
             {/* Item Info */}
             {items.length === 0 ? (
-              <div className="flex flex-col items-center justify-center py-10">
+              <div className="flex flex-col items-center justify-center">
                 <Image
                   src={cart}
                   alt="Empty cart"
@@ -414,12 +414,15 @@ const ViewEvent = () => {
               </div>
             ) : (
               <>
+              <div
+                className="h-[145px] overflow-y-auto scrollbar-hide flex flex-col gap-3"
+                >
                 {items.map((item) => (
                   <div
                     key={item._id}
-                    className="flex justify-between gap-1  border-b pb-4"
-                  >
-                    <div className="flex flex-col gap-3">
+                    className="flex justify-between  h-[72px]"
+                    >
+                    <div className="flex flex-col gap-1">
                       <p className="text-base text-[#111827] font-medium w-[180px]">
                         {item.packageTitle
                           ?.split(" ")
@@ -437,7 +440,7 @@ const ViewEvent = () => {
                       <button
                         onClick={() => decreaseQuantity(item._id)}
                         className="w-10 h-10 rounded bg-gray-100 flex items-center justify-center"
-                      >
+                        >
                         <Minus size={14} />
                       </button>
 
@@ -448,20 +451,20 @@ const ViewEvent = () => {
                       <button
                         onClick={() => increaseQuantity(item._id)}
                         className="w-10 h-10 rounded bg-[#7D0021] text-white flex items-center justify-center"
-                      >
+                        >
                         <Plus size={14} />
                       </button>
                     </div>
                   </div>
                 ))}
-                  <button
-                    onClick={handleCheckout}
-                    className={`h-[56px] bg-[#7D0021] text-[#FFFFFF] ${items.length === 1 ? "mt-10" : "mt-10"} w-full rounded-[8px] py-3 font-bold text-base`}
-                  >
-                    {}
-                    Checkout
-                  </button>
-              </>
+              </div>
+              <button
+                onClick={handleCheckout}
+                className={`h-[56px] bg-[#7D0021] text-[#FFFFFF] ${items.length === 1 ? "mt-2" : "mt-5"} w-full rounded-[8px] py-3 font-bold text-base`}
+                >
+                Checkout
+              </button>
+            </>
             )}
           </motion.div>
         )}

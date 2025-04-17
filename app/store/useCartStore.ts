@@ -111,7 +111,7 @@ export const useCartStore = create<CartState>()(
         ),
     }),
     {
-      name: 'cart-storage', // stored in localStorage
+      name: 'cart-storage', 
     }
   )
 )

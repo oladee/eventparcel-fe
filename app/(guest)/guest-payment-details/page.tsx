@@ -75,8 +75,17 @@ function PaymentDetailsCard() {
   const currencySymbol = parsedCartItems?.data?.items?.[0]?.packagePriceCurrency || "NGN";
   const tax = (7.5 / 100) * subtotal;
   const isHomeDelivery = parsedCartItems?.data?.deliveryType === "homeDelivery";
-  const deliveryFee = isHomeDelivery && currencySymbol === "NGN" ? 3000 : 1.87;
-  let grandTotal = subtotal + tax + deliveryFee;
+  const deliveryFee = isHomeDelivery
+  ? (currencySymbol === "NGN" ? 3000 : 1.87)
+  : 0;
+  let grandTotal;
+  if(!isHomeDelivery) {
+    grandTotal = subtotal + tax;
+  }else {
+    grandTotal = subtotal + tax + deliveryFee;
+  }
+
+  console.log("check", isHomeDelivery)
   
   // Apply discount if valid
   if (discountResponse?.discountAmount) {
@@ -94,7 +103,6 @@ function PaymentDetailsCard() {
       }
 
       const res = await axiosInstance.post(`/checkout-contd/${parsedCartItems?.data?._id}`, payload);
-      toast.success("Payment processed successfully!");
       Router.push(res.data.data.paymentUrl);
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Payment failed");

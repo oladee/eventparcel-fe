@@ -5,8 +5,7 @@ import { useState, useRef, useEffect, Suspense } from "react";
 import check from "../../../public/images/check.png";
 import uncheck from "../../../public/images/unchecked.png";
 import Image from "next/image";
-import { nigerianstates } from "@/utils/data";
-import { nigeriancities } from "@/utils/data";
+import { nigerianStates } from "@/utils/data";
 import { useRouter, useSearchParams } from 'next/navigation';
 import axiosInstance from "@/lib/axiosInstance";
 import { toast, ToastContainer } from "react-toastify";
@@ -46,13 +45,17 @@ function DeliveryDetailsForm() {
   const cityInputRef = useRef<HTMLInputElement | null>(null);
   const dispatchInputRef = useRef<HTMLInputElement | null>(null);
 
-  const filteredStates = nigerianstates.filter((state) =>
+  const filteredStates = nigerianStates.filter((state) =>
     state.value.toLowerCase().includes(stateSearch.toLowerCase())
   );
 
-  const filteredCities = nigeriancities.filter((city) =>
-    city.value.toLowerCase().includes(citySearch.toLowerCase())
-  );
+  const selectedState = nigerianStates.find(state => state.value === formData.state);
+  const filteredCities = selectedState
+    ? selectedState.cities.filter(city =>
+        city.toLowerCase().includes(citySearch.toLowerCase())
+      )
+    : [];
+
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -420,16 +423,16 @@ function DeliveryDetailsForm() {
                     {cityDropdownOpen && (
                       <div className="absolute left-0 right-0 max-h-60 overflow-y-auto bg-white border border-[#E5E7EB] shadow-lg z-10 mt-1 rounded-[12px]">
                         {filteredCities.map((city) => (
-                           <div
-                           key={city.value}
-                           className="px-3 py-3 cursor-pointer hover:bg-gray-100 text-sm"
-                           onClick={() => {
-                             setCitySearch(city.value);
-                             setFormData(prev => ({ ...prev, city: city.value }));
-                             setCityDropdownOpen(false);
-                           }}
-                         >
-                            {city.value}
+                          <div
+                            key={city}
+                            className="px-3 py-3 cursor-pointer hover:bg-gray-100 text-sm"
+                            onClick={() => {
+                              setCitySearch(city);
+                              setFormData(prev => ({ ...prev, city }));
+                              setCityDropdownOpen(false);
+                            }}
+                          >
+                            {city}
                           </div>
                         ))}
                       </div>
