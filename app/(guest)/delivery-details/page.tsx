@@ -168,9 +168,7 @@ function DeliveryDetailsForm() {
         `/guest-checkout/${parsedEventData?.eventId}/${parsedEventData?.eventGroupId}`,
         submissionData
       );
-  
-      toast("Your order has been placed successfully");
-  
+    
       const query = new URLSearchParams({
         orderData: JSON.stringify(res.data),
       }).toString();
