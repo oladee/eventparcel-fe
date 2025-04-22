@@ -85,7 +85,7 @@ function PaymentDetailsCard() {
     grandTotal = subtotal + tax + deliveryFee;
   }
 
-  console.log("check", isHomeDelivery)
+  console.log("check", discountResponse)
   
   // Apply discount if valid
   if (discountResponse?.discountAmount) {
@@ -198,9 +198,11 @@ function PaymentDetailsCard() {
                 <span className={`font-general font-medium text-sm ${
                   discountResponse.discountAmount ? "text-[#A0AEC0]" : "text-[#DE4222]"
                 }`}>
-                  {discountResponse.discountAmount 
-                    ? `${discountResponse.discountObject?.discountValue}% Discount` 
-                    : "Invalid discount code"}
+                {discountResponse.discountObject?.discountValueType === "percentage" && (
+                    discountResponse.discountAmount
+                      ? `${discountResponse.discountObject?.discountValue}% Discount`
+                      : "Invalid discount code"
+                  )}
                 </span>
                 {discountResponse.discountAmount && (
                   <span className="font-general font-medium text-sm text-[#DE4222]">
