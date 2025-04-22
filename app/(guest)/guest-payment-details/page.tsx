@@ -46,7 +46,6 @@ function PaymentDetailsCard() {
       })
       .then(response => {
         setDiscountResponse(response.data.data);
-        toast.success("Discount applied successfully!");
       })
       .catch(error => {
         setDiscountResponse(null);
@@ -85,7 +84,7 @@ function PaymentDetailsCard() {
     grandTotal = subtotal + tax + deliveryFee;
   }
 
-  console.log("check", isHomeDelivery)
+  console.log("check", discountResponse)
   
   // Apply discount if valid
   if (discountResponse?.discountAmount) {
@@ -129,7 +128,11 @@ function PaymentDetailsCard() {
               />
               <div className="w-[80%] h-full flex flex-col justify-between">
                 <p className="flex text-sm font-semibold text-[#111827] mb-2.5">
-                  {item.packageTitle}
+                {item.packageTitle
+                  .split(' ')
+                  .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+                  .join(' ')
+                }
                 </p>
                 <p className="text-xs text-[#718096] font-medium">
                   {currencySymbol === "NGN" ? "₦" : "$"}
@@ -198,9 +201,11 @@ function PaymentDetailsCard() {
                 <span className={`font-general font-medium text-sm ${
                   discountResponse.discountAmount ? "text-[#A0AEC0]" : "text-[#DE4222]"
                 }`}>
-                  {discountResponse.discountAmount 
-                    ? `${discountResponse.discountObject?.discountValue}% Discount` 
-                    : "Invalid discount code"}
+                {discountResponse.discountObject?.discountValueType === "percentage" && (
+                    discountResponse.discountAmount
+                      ? `${discountResponse.discountObject?.discountValue}% Discount`
+                      : "Invalid discount code"
+                  )}
                 </span>
                 {discountResponse.discountAmount && (
                   <span className="font-general font-medium text-sm text-[#DE4222]">
