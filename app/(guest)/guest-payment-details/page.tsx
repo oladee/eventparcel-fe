@@ -46,7 +46,6 @@ function PaymentDetailsCard() {
       })
       .then(response => {
         setDiscountResponse(response.data.data);
-        toast.success("Discount applied successfully!");
       })
       .catch(error => {
         setDiscountResponse(null);
@@ -129,7 +128,11 @@ function PaymentDetailsCard() {
               />
               <div className="w-[80%] h-full flex flex-col justify-between">
                 <p className="flex text-sm font-semibold text-[#111827] mb-2.5">
-                  {item.packageTitle}
+                {item.packageTitle
+                  .split(' ')
+                  .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+                  .join(' ')
+                }
                 </p>
                 <p className="text-xs text-[#718096] font-medium">
                   {currencySymbol === "NGN" ? "₦" : "$"}
