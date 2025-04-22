@@ -199,7 +199,7 @@ const Page = () => {
                   <p className="text-[#718096] font-medium text-xs">Total Used</p>
                 </div>
                 <div className="flex-1 flex flex-col items-end">
-                  <p className="font-semibold text-xl text-[#111827] pr-8">{discount.overallValue || '0.00'}</p>
+                  <p className="font-semibold text-xl text-[#111827] pr-8">{discount.overallValue.toLocaleString() || '0.00'}</p>
                   <p className="text-[#718096] font-medium text-xs">Overall Value</p>
                 </div>
               </div>
