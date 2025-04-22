@@ -326,7 +326,8 @@ const CSVContactModal: React.FC<CSVContactModalProps> = ({
       <SendContactModal
         isOpen={optionModal}
         onClose={handleImport}
-        eventGroupId="67eeab0c65b211b0e9281b9b"
+        // eventGroupId="67eeab0c65b211b0e9281b9b"
+        eventGroupId={localStorage.getItem("sendGroupId") || ""}
         contacts={extractedContacts}
         phoneNumbers={extractedPhoneNumbers}
       />

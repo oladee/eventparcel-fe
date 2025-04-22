@@ -47,9 +47,13 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
     router.push(`/dashboard/invited-contacts/${groupId}`);
   };
 
-  const handleSendInviteClick = () => {
-    // You may also pass the group id here if needed; currently, this navigates to a general share-contact page.
-    router.push("/dashboard/share-contact");
+  // const handleSendInviteClick = () => {
+  //   // You may also pass the group id here if needed; currently, this navigates to a general share-contact page.
+  //   router.push("/dashboard/share-contact");
+  // };
+
+  const handleSendInviteClick = (groupId: string) => {
+    router.push(`/dashboard/share-contact?groupId=${groupId}`);
   };
 
   const handleViewOneGroup = (group: Group) => {
@@ -170,7 +174,8 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
                 Contacts: <span className="text-gray-900 font-bold">0</span>
               </button> */}
               <button
-                onClick={handleSendInviteClick}
+                // onClick={handleSendInviteClick}
+                onClick={() => handleSendInviteClick(group._id)}
                 className="text-primary flex items-center gap-1 font-medium outline-none"
               >
                 <IoIosSend size={18} /> Send Invite
@@ -202,6 +207,10 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
 };
 
 export default PackagesSection;
+
+
+
+
 
 // "use client";
 
