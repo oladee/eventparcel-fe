@@ -288,6 +288,7 @@ function DeliveryDetailsForm() {
                   <input
                     id="home-first-name"
                     name="guestFirstName"
+                    required
                     value={formData.guestFirstName}
                     onChange={handleInputChange}
                     placeholder="Enter your first name"
@@ -304,6 +305,7 @@ function DeliveryDetailsForm() {
                   <input
                     id="home-last-name"
                     name="guestLastName"
+                    required
                     value={formData.guestLastName}
                     onChange={handleInputChange}
                     placeholder="Enter your last name"
@@ -321,6 +323,7 @@ function DeliveryDetailsForm() {
                     id="home-email"
                     name="guestEmail"
                     type="email"
+                    required
                     value={formData.guestEmail}
                     onChange={handleInputChange}
                     placeholder="Enter your email address"
@@ -337,9 +340,10 @@ function DeliveryDetailsForm() {
                   <input
                     id="home-phone"
                     name="guestPhoneNumber"
+                    required
                     value={formData.guestPhoneNumber}
                     onChange={handleInputChange}
-                    type="tel"
+                    type="number"
                     placeholder="Enter your phone number"
                     className={`w-full h-14 px-4 py-2 rounded-[12px] border ${errors.guestPhoneNumber ? 'border-red-500' : 'border-[#E5E7EB]'} bg-[#FAFAFA] focus:outline-none focus:border-[#8B1E3F]`}
                     />
@@ -356,6 +360,7 @@ function DeliveryDetailsForm() {
                     name="shippingAddress"
                     value={formData.shippingAddress}
                     onChange={handleInputChange}
+                    required
                     placeholder="Enter your address"
                     className={`w-full h-14 px-4 py-2 rounded-[12px] border ${errors.shippingAddress ? 'border-red-500' : 'border-[#E5E7EB]'} bg-[#FAFAFA] focus:outline-none focus:border-[#8B1E3F]`}
                     />
@@ -373,9 +378,13 @@ function DeliveryDetailsForm() {
                       ref={stateInputRef}
                       name="state"
                       type="text"
+                      autoComplete="new-state"
                       placeholder="Search states..."
+                      spellCheck="false"
+                      autoCorrect="off"
                       className="w-full px-3 h-14 py-2 rounded-[12px] border border-[#E5E7EB] bg-[#FAFAFA] outline-none"
                       value={stateSearch}
+                      required
                       onChange={(e) => {
                         setStateSearch(e.target.value);
                         setStateDropdownOpen(true);
@@ -409,7 +418,11 @@ function DeliveryDetailsForm() {
                       ref={cityInputRef}
                       name="city"
                       type="text"
+                      autoComplete="new-city"
                       placeholder="Search cities..."
+                      spellCheck="false"
+                      autoCorrect="off"
+                      required
                       className="w-full h-14 rounded-[12px] px-3 py-2 border border-[#E5E7EB] bg-[#FAFAFA] text-sm outline-none"
                       value={citySearch}
                       onChange={(e) => {
@@ -448,10 +461,11 @@ function DeliveryDetailsForm() {
                       name="dispatchType"
                       ref={dispatchInputRef}
                       type="text"
+                      required
                       placeholder="Select dispatch type"
                       className="w-full h-14 px-4 py-2 rounded-[12px] border border-[#E5E7EB] bg-[#FAFAFA] focus:outline-none focus:border-[#8B1E3F]"
-                      value={formData.dispatchType}  // Changed from dispatchType to formData.dispatchType
-                      readOnly
+                      value={formData.dispatchType}
+                      onChange={() => {}}
                       onClick={() => setDispatchDropdownOpen(!dispatchDropdownOpen)}
                       />
                   {dispatchDropdownOpen && (

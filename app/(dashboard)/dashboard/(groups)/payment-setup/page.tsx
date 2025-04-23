@@ -221,24 +221,29 @@ const PaymentSetupContent = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-
+  
     if (!isFormValid) {
       toast.error("Please fill out all required fields");
       return;
     }
-
+  
     setLoading(true);
-
+  
     try {
+      const { nairaAccount, dollarAccount, ...rest } = formData;
+  
+      // Check if nairaAccount or dollarAccount has values before including them in the payload
       const formattedData = {
-        ...formData,
-        paymentTime: formatTime12Hour(formData.paymentTime)
+        ...rest,
+        ...(isFilled(nairaAccount) ? { nairaAccount } : {}),
+        ...(isFilled(dollarAccount) ? { dollarAccount } : {}),
+        paymentTime: formatTime12Hour(formData.paymentTime),
       };
-
+  
       const queryString = new URLSearchParams({
-        data: JSON.stringify(formattedData)
+        data: JSON.stringify(formattedData),
       }).toString();
-
+  
       if (allSelfManaged) {
         await axiosInstance.post("/add-payment", formattedData);
         toast.success("Payment details successfully submitted!");
@@ -248,7 +253,7 @@ const PaymentSetupContent = () => {
       }
     } catch (error: any) {
       console.error("Error submitting payment details:", error);
-
+  
       if (
         error.response &&
         error.response.data &&
@@ -259,9 +264,14 @@ const PaymentSetupContent = () => {
         toast.error("Failed to submit payment details. Please try again.");
       }
     } finally {
-      setLoading(false);
+      setLoading(true); 
     }
   };
+  
+  // Helper function to check if account details are filled
+  const isFilled = (obj: { [key: string]: string }) =>
+    Object.values(obj).some((val) => val && typeof val === "string" && val.trim() !== "");
+  
 
   const hasNGN = groups.some(
     (group: { groupCurrency: string }) => group.groupCurrency === "NGN"
@@ -464,7 +474,7 @@ const PaymentSetupContent = () => {
                 <button
                   type="submit"
                   disabled={!isFormValid}
-                  className={`bg-primary text-white py-3 px-8 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center font-extrabold font-manrope ${
+                  className={`bg-primary w-[142.24px] text-white py-3 px-8 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center font-extrabold font-manrope ${
                     !isFormValid ? "opacity-50 cursor-not-allowed" : ""
                   }`}
                 >

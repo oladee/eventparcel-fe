@@ -11,7 +11,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
 import Container from "@/components/dashboard/Container";
-import { toast } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
 
 const AddGroup = dynamic(() => import("@/components/AddGroupCaller"), {
@@ -28,6 +28,7 @@ const NewGroup: React.FC = () => {
   console.log(loading, error);
   const router = useRouter();
   const [, setIsDialogOpen] = useState(false);
+  const [loadingGroup, setLoadingGroup] = useState(false);
   
 
   useEffect(() => {
@@ -67,6 +68,7 @@ const NewGroup: React.FC = () => {
 
    
   const handleDuplicate = async (groupId: string) => {
+    setLoadingGroup(true)
     try {
       const response = await axiosInstance.get(`/clone-group/${groupId}`);
   
@@ -76,7 +78,9 @@ const NewGroup: React.FC = () => {
       // setGroups((prevGroups) => [...prevGroups, data]);
       window.location.reload()
     } catch (error: any) {
-      console.error("Error:", error.message);
+      toast.error("Error duplicating group");
+    } finally {
+      setLoadingGroup(false)
     }
   };
 
@@ -123,6 +127,8 @@ const NewGroup: React.FC = () => {
  
 
   return (
+    <>
+    <ToastContainer />
     <Container>
       <section className="w-auto h-full">
         <div className="py-6 lg:py-12">
@@ -159,16 +165,16 @@ const NewGroup: React.FC = () => {
           </div>
           ) : groups.length === 0 ? (
             <div
-              onClick={handleAddGroupClick}
-              className="w-full flex justify-center xl:justify-start xl:pl-[380px]"
-              >
+            onClick={handleAddGroupClick}
+            className="w-full flex justify-center xl:justify-start xl:pl-[380px]"
+            >
               <AddGroup mode="noGroup" setIsAddGroupOpen={setIsAddGroupOpen} />
             </div>
           ) : groups.length === 1 ? (
             <div className="flex flex-col md:flex-row gap-7 justify-center px-5">
               {groups.map((group) => (
-                  <GeneralModal key={group._id} group={group} handleDuplicate={handleDuplicate}  handleDeleteGroup={handleDeleteGroup} />
-                ))}
+                <GeneralModal key={group._id} group={group} handleDuplicate={handleDuplicate}  handleDeleteGroup={handleDeleteGroup} loadingGroup={loadingGroup}  />
+              ))}
 
               {isAddSingleGroupOpen && (
                 <AddGroup
@@ -180,7 +186,7 @@ const NewGroup: React.FC = () => {
               <div
                 className=""
                 onClick={() => setIsAddSingleGroupOpen(!isAddSingleGroupOpen)}
-              >
+                >
                 <CreateGroupCaller />
               </div>
             </div>
@@ -189,7 +195,7 @@ const NewGroup: React.FC = () => {
             <div className="flex flex-col sm:flex-row lg:justify-center">
               <div className=" flex flex-wrap w-full max-w-3xl space-x-2 space-y-4 pl-3 md:pl-2 xl:pl-24 -mr-6">
                 {groups.map((group) => (
-                  <GeneralModal key={group._id} group={group} handleDuplicate={handleDuplicate}  handleDeleteGroup={handleDeleteGroup} />
+                  <GeneralModal key={group._id} group={group} handleDuplicate={handleDuplicate}  handleDeleteGroup={handleDeleteGroup} loadingGroup={loadingGroup} />
                 ))}
 
                 {isAddSingleGroupOpen && (
@@ -218,6 +224,7 @@ const NewGroup: React.FC = () => {
         <FormButtons fromDashboard={true} isFormValid={!!isFormValid} groups={groups}/>
       </section>
     </Container>
+    </>
   );
 };
 

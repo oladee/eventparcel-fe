@@ -14,6 +14,7 @@ import PhoneNumberInput from "@/components/PhoneNumberInput";
 import axiosInstance from "@/lib/axiosInstance";
 import { useCallback } from "react";
 import LocationPickerModal from "@/components/aboutEvent/LocationPickerModal";
+import axios from "axios";
 
 const PickupDetails = () => {
   const router = useRouter();
@@ -72,50 +73,6 @@ const PickupDetails = () => {
     "ACST",
     "AWST",
   ];
-
-  
-  // Retrieve formData from query parameters
-  // useEffect(() => {
-  //   const data = searchParams.get("data");
-  //   if (data) {
-  //     try {
-  //       const parsedData = JSON.parse(data);
-
-  //       setFormData((prev) => ({
-  //         ...prev,
-  //         ...parsedData,
-  //         nairaAccount: { ...prev.nairaAccount, ...parsedData.nairaAccount },
-  //         dollarAccount: { ...prev.dollarAccount, ...parsedData.dollarAccount },
-  //         paymentDate: formData.paymentDate.toISOString().split("T")[0],
-  //         paymentTime: parsedData.paymentTime,
-  //         deliveryDate: parsedData.deliveryDate,
-  //         deliveryTime: parsedData.deliveryTime,
-  //       }));
-  //     } catch (error) {
-  //       console.error("Error parsing form data:", error);
-  //     }
-  //   }
-  // }, [searchParams]);
-
-
-  // // Validate form whenever formData changes
-  // useEffect(() => {
-  //   validateForm();
-  // }, [formData]);
-
-  // const validateForm = () => {
-  //   const { contactName, contactPhoneNumber, pickupLocation, deliveryDate, deliveryTime } = formData;
-  //   const isValid =
-  //     contactName.trim() !== "" &&
-  //     contactPhoneNumber.trim() !== "" &&
-  //     pickupLocation.trim() !== "" &&
-  //     deliveryDate instanceof Date &&
-  //     deliveryTime instanceof Date;
-  //   setIsFormValid(isValid);
-  // };
-
-
-
   
 // Refactor validateForm to use useCallback
 const validateForm = useCallback(() => {
@@ -189,31 +146,58 @@ useEffect(() => {
       return `${paddedHours}:${paddedMinutes} ${ampm}`;
     };
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  if (!isFormValid) return;
-
-  setLoading(true);
-  try {
-    const formattedData = {
-      ...formData,
-      deliveryDate: formData.deliveryDate instanceof Date ? formData.deliveryDate.toISOString().split("T")[0] : "",
-      deliveryTime: formData.deliveryTime instanceof Date ? formatTime12Hour(formData.deliveryTime) : "",
-      paymentTime: formData.paymentTime instanceof Date ? formatTime12Hour(formData.paymentTime) : "", // Ensure 12-hour format
+    const handleSubmit = async (e: React.FormEvent) => {
+      e.preventDefault();
+      if (!isFormValid) return;
+    
+      setLoading(true);
+    
+      const cleanObject = (obj: Record<string, any>) =>
+        Object.fromEntries(
+          Object.entries(obj).filter(
+            ([_, v]) => v !== null && v !== undefined && v !== ""
+          )
+        );
+    
+      const isFilled = (obj: Record<string, any>) =>
+        Object.values(obj).some((val) => val && val.toString().trim() !== "");
+    
+      try {
+        const { nairaAccount, dollarAccount, ...rest } = formData;
+    
+        const formattedData = {
+          ...rest,
+          ...(isFilled(nairaAccount) ? { nairaAccount } : {}),
+          ...(isFilled(dollarAccount) ? { dollarAccount } : {}),
+          deliveryDate:
+            formData.deliveryDate instanceof Date
+              ? formData.deliveryDate.toISOString().split("T")[0]
+              : "",
+          deliveryTime:
+            formData.deliveryTime instanceof Date
+              ? formatTime12Hour(formData.deliveryTime)
+              : "",
+          paymentTime:
+            formData.paymentTime instanceof Date
+              ? formatTime12Hour(formData.paymentTime)
+              : "",
+        };
+    
+        const cleanedData = cleanObject(formattedData);
+    
+        await axiosInstance.post("/add-payment", cleanedData);
+        toast.success("Payment and Delivery details submitted successfully!");
+        router.push("/dashboard/events");
+      } catch (error: any) {
+        if (axios.isAxiosError(error)) {
+          const errorMessage = error.response?.data?.message || "An error occurred. Please try again.";
+          toast.error(errorMessage);
+        }
+      } finally {
+        setLoading(false); 
+      }
     };
-
-    console.log("formattedData", formattedData);
-
-    await axiosInstance.post("/add-payment", formattedData);
-    toast.success("Payment and Delivery details submitted successfully!");
-    router.push("/dashboard/events");
-  } catch (error) {
-    toast.error("Error submitting Payment and delivery details");
-    console.error("Submission Error:", error);
-  } finally {
-    setLoading(false);
-  }
-};
+    
 
   const handleMapLocationSelect = () => {
     setShowMapPickerModal(true);

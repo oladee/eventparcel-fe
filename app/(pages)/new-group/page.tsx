@@ -28,6 +28,7 @@ const NewGroup: React.FC = () => {
   console.log(loading, error);
   const router = useRouter();
   const [, setIsDialogOpen] = useState(false);
+  const [loadingGroup, setLoadingGroup] = useState(false);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -66,19 +67,21 @@ const NewGroup: React.FC = () => {
 
   
   const handleDuplicate = async (groupId: string) => {
+    setLoadingGroup(true)
     try {
       const response = await axiosInstance.get(`/clone-group/${groupId}`);
   
       if (!response) throw new Error("Failed to duplicate group");
-      
+  
       await response.data.data;
       // setGroups((prevGroups) => [...prevGroups, data]);
       window.location.reload()
     } catch (error: any) {
-      console.error("Error:", error.message);
+      toast.error("Error duplicating group");
+    } finally {
+      setLoadingGroup(false)
     }
   };
-
 
   const handleDeleteGroup = async (groupId: string) => {
 
@@ -170,7 +173,7 @@ const NewGroup: React.FC = () => {
             // Render content when it's just a single group
             <div className="flex flex-col md:flex-row gap-7 justify-center px-8">
               {groups.map((group) => (
-                  <GeneralModal key={group._id} group={group} handleDuplicate={handleDuplicate}  handleDeleteGroup={handleDeleteGroup} />
+                  <GeneralModal key={group._id} group={group} handleDuplicate={handleDuplicate}  handleDeleteGroup={handleDeleteGroup} loadingGroup={loadingGroup} />
                 ))}
 
               {isAddSingleGroupOpen && (
@@ -193,7 +196,7 @@ const NewGroup: React.FC = () => {
             <div className="flex flex-col sm:flex-row lg:justify-center">
               <div className=" flex flex-wrap w-full max-w-3xl space-x-2 space-y-4 pl-6 md:pl-2 xl:pl-24 -mr-6">
                 {groups.map((group) => (
-                  <GeneralModal key={group._id} group={group} handleDuplicate={handleDuplicate}  handleDeleteGroup={handleDeleteGroup} />
+                  <GeneralModal key={group._id} group={group} handleDuplicate={handleDuplicate}  handleDeleteGroup={handleDeleteGroup} loadingGroup={loadingGroup}  />
                 ))}
 
                 {isAddSingleGroupOpen && (

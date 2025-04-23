@@ -13,9 +13,10 @@ type generalGroupProps = {
   group: Group;
   handleDuplicate: (groudId: string) => void;
   handleDeleteGroup: (groupId: string) => void;
+  loadingGroup: boolean;
 };
 
-const GeneralModal: React.FC<generalGroupProps> = ({ group, handleDuplicate, handleDeleteGroup }) => {
+const GeneralModal: React.FC<generalGroupProps> = ({ group, handleDuplicate, handleDeleteGroup, loadingGroup }) => {
   const [openModalPackage, setOpenModalPackage] = useState(false);
   const [modalMode, setModalMode] = useState<"create" | "update">("create");
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
@@ -25,8 +26,6 @@ const GeneralModal: React.FC<generalGroupProps> = ({ group, handleDuplicate, han
   const [deleteId, setDeleteId] = useState<string | null>("");
   const [, setDeletEndPoint] = useState<string | null>("");
   const [packages] = useState(group.packages);
-
-
 
   const handleDeleteModal = () => {
     setDeleteId(group._id);
@@ -155,7 +154,7 @@ const GeneralModal: React.FC<generalGroupProps> = ({ group, handleDuplicate, han
                       alt="cloth"
                       width={60}
                       height={60}
-                      className="rounded-[5.29px] object-contain h-[60px] w-[60px]"
+                      style={{width: "60px", height:"60px", borderRadius: "5.29px"}}
                     />
                     <div className="flex flex-col">
                       <span
@@ -212,20 +211,45 @@ const GeneralModal: React.FC<generalGroupProps> = ({ group, handleDuplicate, han
               <span className="font-general font-medium text-sm text-[#DE4222]">
                 Delete
               </span>
-            </div>
+            </div> 
             <div className="flex items-center gap-1">
+            {loadingGroup ? (
+               <svg
+               className="animate-spin h-4 w-4 text-gray-400"
+               xmlns="http://www.w3.org/2000/svg"
+               fill="none"
+               viewBox="0 0 24 24"
+             >
+               <circle
+                 className="opacity-25"
+                 cx="12"
+                 cy="12"
+                 r="10"
+                 stroke="currentColor"
+                 strokeWidth="4"
+               ></circle>
+               <path
+                 className="opacity-75"
+                 fill="currentColor"
+                 d="M4 12a8 8 0 018-8v4l3-3-3-3v4a10 10 0 00-10 10h4z"
+               ></path>
+             </svg>
+            ) : (
               <Image
-                src="/images/copy.png"
-                alt="delete_package"
-                height={16}
-                width={16}
-              />
+              src="/images/copy.png"
+              alt="delete_package"
+              height={16}
+              width={16}
+            />
+            )}
               <span
                 id="copy"
                 className="font-general font-medium text-sm text-[#718096]"
                 onClick={() => handleDuplicate(group._id)}
               >
-                Duplicate
+                {
+                  loadingGroup ? "Duplicating" : "Duplicate"
+                }
               </span>
             </div>
           </div>
