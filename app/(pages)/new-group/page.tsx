@@ -78,6 +78,7 @@ const NewGroup: React.FC = () => {
       window.location.reload()
     } catch (error: any) {
       toast.error("Error duplicating group");
+      console.error(error.response?.data?.message || error.message || "An unknown error occurred.");
     } finally {
       setLoadingGroup(false)
     }

@@ -10,7 +10,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import { FormEvent } from "react";
 import { PiCalendarMinus } from "react-icons/pi";
 import { AiOutlineClockCircle } from "react-icons/ai";
-import HeaderLayout from "@/components/layout/HeaderLayout";
+// import HeaderLayout from "@/components/layout/HeaderLayout";
 import { useRouter, useSearchParams } from "next/navigation";
 import NairaPayoutForm from "@/components/NairaPayoutForm";
 import DollarPayoutForm from "@/components/DollarPayoutForm";

@@ -306,10 +306,10 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
     
         try {
             setLoading(true);
-            let response;
+            // let response;
             
             if (mode === "create") {
-                response = await axiosInstance.post("/add-package", formDataToSend, {
+                 await axiosInstance.post("/add-package", formDataToSend, {
                     headers: { "Content-Type": "multipart/form-data" },
                 });
                 
@@ -323,7 +323,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
                     theme: "light",
                 });
             } else if (mode === "update" && packageData?._id) {
-                response = await axiosInstance.put(`/update-package/${packageData._id}`, formDataToSend, {
+                 await axiosInstance.put(`/update-package/${packageData._id}`, formDataToSend, {
                     headers: { "Content-Type": "multipart/form-data" },
                 });
     
