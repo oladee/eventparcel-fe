@@ -296,8 +296,8 @@ const PaymentSetupContent = () => {
               Payment Setup
             </h2>
             <div id="payment_deliveryDesc" className="flex justify-center items-center gap-3">
-              <div className="flex flex-col">
-                <span className="flex justify-start w-[313px] whitespace-nowrap h-6 font-general font-medium text-sm text-[#718096]">
+              <div className="flex flex-col w-full">
+                <span className="flex justify-start w-full whitespace-nowrap h-6 font-general font-medium text-sm text-[#718096]">
                   Let&apos;s setup your payout process and payment
                 </span>
                 <span className="flex justify-start w-[313px] h-11 font-general font-medium text-sm text-[#718096]">

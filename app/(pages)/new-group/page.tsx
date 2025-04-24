@@ -138,7 +138,7 @@ const NewGroup: React.FC = () => {
             >
               Event Groups & Packages
             </h3>
-            <div className="flex items-center justify-center gap-2 text-sm sm:text-base text-gray-600">
+            <div className="w-[313px] flex items-center justify-center gap-2 text-sm sm:text-base text-gray-600">
               <span id="desc">
                 Create groups and packages for different types of guests
               </span>
@@ -148,7 +148,7 @@ const NewGroup: React.FC = () => {
                 width={20}
                 height={20}
                 alt="information"
-                className="cursor-pointer"
+                className="cursor-pointer absolute right-8"
                 id="infoButton"
               />
             </div>
