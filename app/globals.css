@@ -14,6 +14,33 @@ body {
   accent-color: #751423;
 }
 
+.rounded-checkbox {
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  border: 2px solid #ccc;
+  cursor: pointer;
+  position: relative;
+}
+
+.rounded-checkbox:checked {
+  background-color: #751423;
+  border-color: #751423;
+}
+
+.rounded-checkbox:checked::after {
+  content: "\2713"; /* Checkmark symbol */
+  font-size: 14px;
+  color: #fff; /* White checkmark */
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+
+
 @layer base {
   html {
     font-family: var(--font-open-sans), sans-serif;
