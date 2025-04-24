@@ -177,7 +177,7 @@ const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode, selectedGr
           groupPrivacy={formData.groupPrivacy as "Private" | "General"}
           onPrivacyChange={handlePrivacyChange}
         />
-        <FormButton isFormValid={isFormValid} onSubmit={() => handleSubmit} loading={loading} />
+        <FormButton isFormValid={isFormValid} onSubmit={() => handleSubmit} loading={loading} mode={mode} />
       </form>
     </>
   );

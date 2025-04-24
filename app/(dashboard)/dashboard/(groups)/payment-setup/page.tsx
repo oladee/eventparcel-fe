@@ -15,6 +15,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import NairaPayoutForm from "@/components/NairaPayoutForm";
 import DollarPayoutForm from "@/components/DollarPayoutForm";
 import axiosInstance from "@/lib/axiosInstance";
+import Container from "@/components/dashboard/Container";
 
 
 const LocationPickerModal = dynamic(
@@ -221,24 +222,29 @@ const PaymentSetupContent = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-
+  
     if (!isFormValid) {
       toast.error("Please fill out all required fields");
       return;
     }
-
+  
     setLoading(true);
-
+  
     try {
+      const { nairaAccount, dollarAccount, ...rest } = formData;
+  
+      // Check if nairaAccount or dollarAccount has values before including them in the payload
       const formattedData = {
-        ...formData,
-        paymentTime: formatTime12Hour(formData.paymentTime)
+        ...rest,
+        ...(isFilled(nairaAccount) ? { nairaAccount } : {}),
+        ...(isFilled(dollarAccount) ? { dollarAccount } : {}),
+        paymentTime: formatTime12Hour(formData.paymentTime),
       };
-
+  
       const queryString = new URLSearchParams({
-        data: JSON.stringify(formattedData)
+        data: JSON.stringify(formattedData),
       }).toString();
-
+  
       if (allSelfManaged) {
         await axiosInstance.post("/add-payment", formattedData);
         toast.success("Payment details successfully submitted!");
@@ -248,7 +254,7 @@ const PaymentSetupContent = () => {
       }
     } catch (error: any) {
       console.error("Error submitting payment details:", error);
-
+  
       if (
         error.response &&
         error.response.data &&
@@ -259,9 +265,14 @@ const PaymentSetupContent = () => {
         toast.error("Failed to submit payment details. Please try again.");
       }
     } finally {
-      setLoading(false);
+      setLoading(true); 
     }
   };
+  
+  // Helper function to check if account details are filled
+  const isFilled = (obj: { [key: string]: string }) =>
+    Object.values(obj).some((val) => val && typeof val === "string" && val.trim() !== "");
+  
 
   const hasNGN = groups.some(
     (group: { groupCurrency: string }) => group.groupCurrency === "NGN"
@@ -273,7 +284,7 @@ const PaymentSetupContent = () => {
   const today = new Date();
 
   return (
-    <HeaderLayout>
+    <Container>
       <ToastContainer />
       {showMapPickerModal && (
         <LocationPickerModal
@@ -283,7 +294,7 @@ const PaymentSetupContent = () => {
           onCancel={() => setShowMapPickerModal(false)}
         />
       )}
-      <section className="bg-[#EEEFF2] !overflow-hidden relative">
+      <section className="!overflow-hidden relative">
         <div className="mt-4 pb-20 lg:py-24 px-3 sm:px-4 mx-auto max-w-screen-md h-[98vh] overflow-y-auto no-scrollbar">
           <div className="md:mb-12 text-center p-3 sm:p-0 space-y-3">
             <h2
@@ -296,8 +307,8 @@ const PaymentSetupContent = () => {
               id="payment_deliveryDesc"
               className="flex justify-center items-center gap-3"
             >
-              <div className="flex flex-col">
-                <span className="flex justify-start w-[313px] whitespace-nowrap h-6 font-general font-medium text-sm text-[#718096]">
+              <div className="flex flex-col w-full">
+              <span className="flex justify-start w-[313px] whitespace-nowrap h-6 font-general font-medium text-sm text-[#718096]">
                   Let&apos;s setup your payout process and payment
                 </span>
                 <span className="flex justify-start w-[313px] h-11 font-general font-medium text-sm text-[#718096]">
@@ -464,7 +475,7 @@ const PaymentSetupContent = () => {
                 <button
                   type="submit"
                   disabled={!isFormValid}
-                  className={`bg-primary text-white py-3 px-8 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center font-extrabold font-manrope ${
+                  className={`bg-primary w-[142.24px] text-white py-3 px-8 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center font-extrabold font-manrope ${
                     !isFormValid ? "opacity-50 cursor-not-allowed" : ""
                   }`}
                 >
@@ -489,7 +500,7 @@ const PaymentSetupContent = () => {
           buttonText="continue"
         />
       )}
-    </HeaderLayout>
+    </Container>
   );
 };
 

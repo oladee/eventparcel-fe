@@ -225,8 +225,13 @@ const PaymentSetupContent = () => {
     setLoading(true);
   
     try {
+      const { nairaAccount, dollarAccount, ...rest } = formData;
+  
+      // Check if nairaAccount or dollarAccount has values before including them in the payload
       const formattedData = {
-        ...formData,
+        ...rest,
+        ...(isFilled(nairaAccount) ? { nairaAccount } : {}),
+        ...(isFilled(dollarAccount) ? { dollarAccount } : {}),
         paymentTime: formatTime12Hour(formData.paymentTime),
       };
   
@@ -244,15 +249,24 @@ const PaymentSetupContent = () => {
     } catch (error: any) {
       console.error("Error submitting payment details:", error);
   
-      if (error.response && error.response.data && error.response.data.message) {
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
         toast.error(`Error: ${error.response.data.message}`);
       } else {
         toast.error("Failed to submit payment details. Please try again.");
       }
     } finally {
-      setLoading(false);
+      setLoading(true); 
     }
   };
+  
+  // Helper function to check if account details are filled
+  const isFilled = (obj: { [key: string]: string }) =>
+    Object.values(obj).some((val) => val && typeof val === "string" && val.trim() !== "");
+  
 
 
   const hasNGN = groups.some((group: { groupCurrency: string; }) => group.groupCurrency === "NGN");
@@ -282,8 +296,8 @@ const PaymentSetupContent = () => {
               Payment Setup
             </h2>
             <div id="payment_deliveryDesc" className="flex justify-center items-center gap-3">
-              <div className="flex flex-col">
-                <span className="flex justify-start w-[313px] whitespace-nowrap h-6 font-general font-medium text-sm text-[#718096]">
+              <div className="flex flex-col w-full">
+                <span className="flex justify-start w-full whitespace-nowrap h-6 font-general font-medium text-sm text-[#718096]">
                   Let&apos;s setup your payout process and payment
                 </span>
                 <span className="flex justify-start w-[313px] h-11 font-general font-medium text-sm text-[#718096]">
@@ -447,7 +461,7 @@ const PaymentSetupContent = () => {
                 <button
                   type="submit"
                   disabled={!isFormValid}
-                  className={`bg-primary text-white py-3 px-8 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center font-extrabold font-manrope ${
+                  className={`bg-primary w-[142.24px] text-white py-3 px-8 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center font-extrabold font-manrope ${
                     !isFormValid ? "opacity-50 cursor-not-allowed" : ""
                   }`}
                 >

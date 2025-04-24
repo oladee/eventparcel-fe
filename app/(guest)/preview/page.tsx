@@ -12,6 +12,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import { useCartStore } from '../../store/useCartStore';
 import { toast, ToastContainer } from "react-toastify";
 import cart from "../../../assets/orderIcons/shopping-cart.png"
+import { BiLoaderCircle } from "react-icons/bi";
 
 const ViewEvent = () => {
   const searchParams = useSearchParams();
@@ -25,6 +26,7 @@ const ViewEvent = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [selectedPackage, setSelectedPackage] = useState<any>(null);
+  const [loadDeliveryDetails, setLoadDeliveryDetails] = useState(false);
 
   // Cart store functions
   const items = useCartStore((state) => state.items);
@@ -100,25 +102,32 @@ const ViewEvent = () => {
   const availableTabs = groupPrivacy === "private" ? ["General", "Private"] : ["General"];
 
   const handleCheckout = () => {
+    setLoadDeliveryDetails(true);
     if (cartItems.length === 0) {
       toast.error('Your cart is empty!');
       return;
     }
 
-    const minimalEventData = {
-      eventId: eventData?._id,
-      eventGroupId: eventGroupData?._id
-    };
-
-    // Create query string with cartItems serialized as a JSON string
-    const query = new URLSearchParams({ 
-      cartItems: JSON.stringify(cartItems),
-      eventData: JSON.stringify(minimalEventData)
-    }).toString();
-    
-
-    // Navigate to the delivery-details page with the query
-    router.push(`/delivery-details?${query}`);
+    try {
+      const minimalEventData = {
+        eventId: eventData?._id,
+        eventGroupId: eventGroupData?._id
+      };
+      
+      // Create query string with cartItems serialized as a JSON string
+      const query = new URLSearchParams({ 
+        cartItems: JSON.stringify(cartItems),
+        eventData: JSON.stringify(minimalEventData)
+      }).toString();
+      
+      
+      // Navigate to the delivery-details page with the query
+      router.push(`/delivery-details?${query}`);
+    }catch (error) {
+      console.error(error)
+    } finally {
+      setLoadDeliveryDetails(false);
+    }
   };
 
   return (
@@ -458,11 +467,20 @@ const ViewEvent = () => {
                   </div>
                 ))}
               </div>
+                {loading ? (
+                    <BiLoaderCircle className="animate-spin mr-2" size={22} />
+                  ) : (
+                    "Continue"
+                  )}
               <button
                 onClick={handleCheckout}
                 className={`h-[56px] bg-[#7D0021] text-[#FFFFFF] ${items.length === 1 ? "mt-2" : "mt-5"} w-full rounded-[8px] py-3 font-bold text-base`}
                 >
-                Checkout
+                   {loadDeliveryDetails ? (
+                    <BiLoaderCircle className="animate-spin mr-2" size={22} />
+                  ) : (
+                    "Checkout"
+                  )}
               </button>
             </>
             )}
