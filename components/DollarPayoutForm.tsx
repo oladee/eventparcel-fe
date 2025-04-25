@@ -67,8 +67,8 @@ const DollarPayoutForm: React.FC<DollarPayoutFormProps> = ({
 
   if (e.target.name === "dollarAccount.usAccountNumber") {
     console.log(value)
-    if (!/^\d{8,12}$/.test(value)) {
-      newErrors.usAccountNumber = "Account number must be between 8 and 12 digits.";
+    if (!/^\d{7,17}$/.test(value)) {
+      newErrors.usAccountNumber = "Account number must be between 7 and 17 digits.";
     } else {
       delete newErrors.usAccountNumber;
     }

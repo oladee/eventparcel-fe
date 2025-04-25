@@ -467,11 +467,11 @@ const ViewEvent = () => {
                   </div>
                 ))}
               </div>
-                {loading ? (
+                {/* {loading ? (
                     <BiLoaderCircle className="animate-spin mr-2" size={22} />
                   ) : (
                     "Continue"
-                  )}
+                  )} */}
               <button
                 onClick={handleCheckout}
                 className={`h-[56px] bg-[#7D0021] text-[#FFFFFF] ${items.length === 1 ? "mt-2" : "mt-5"} w-full rounded-[8px] py-3 font-bold text-base`}

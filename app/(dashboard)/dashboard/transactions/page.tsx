@@ -1,10 +1,276 @@
+"use client"
+
 import Container from '@/components/dashboard/Container'
-import React from 'react'
+import React, { useEffect, useState } from 'react'
+import BoxTime from "../../../../assets/orderIcons/box-time.png";
+import Cart from "../../../../assets/orderIcons/cart.png";
+import Image from 'next/image';
+import { Search, Settings2, ChevronUp, ChevronDown } from "lucide-react";
+import { Order } from '@/app/interface/Order';
+import { useRouter } from 'next/navigation';
+import useDebounce from '@/hooks/useDebounce';
+import axiosInstance from '@/lib/axiosInstance';
+import OrderPagination from '@/components/OrderPagination';
+import { motion } from 'framer-motion';
+
 
 const Page = () => {
+  const [orders, setOrders] = useState<any>(null);
+  const [page, setPage] = useState(1);
+  const [limit, setLimit] = useState(6);
+  const [totalPages, setTotalPages] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const debouncedSearchQuery = useDebounce(searchQuery, 500);
+  const [showBreakdown, setShowBreakdown] = useState(false);
+  const [stats, setStats] = useState([
+    { icon: Cart, title: "Overall Sales", count: 0, change: "0%" },
+    { icon: BoxTime, title: "Net Sales", count: 0, change: "0%" },
+  ]);
+
+
+    useEffect(() => {
+      const loggedInUserString = localStorage.getItem("loggedInUser");
+      const loggedInUser = loggedInUserString ? JSON.parse(loggedInUserString) : null;
+  
+      if (!loggedInUser?._id) {
+        router.replace("/");
+        return;
+      }
+
+      const fetchOrders = async () => {
+        setLoading(true);
+        try {
+  
+          // const params: Record<string, any> = { 
+          //   page, 
+          //   limit, 
+          //   query: debouncedSearchQuery 
+          // };
+  
+          const response = await axiosInstance.get(
+              `payment-history/${loggedInUser._id}`);
+
+              setStats([         
+              { 
+                icon: Cart, 
+                title: "Overall Sales", 
+                count: response?.data?.data?.summary?.summaryByCurrency?.NGN?.overallSales, 
+                change: response?.data?.data?.summary?.summaryByCurrency?.USD?.overallSales, 
+              },
+              { 
+                icon: BoxTime, 
+                title: "Net Sales", 
+                count: response?.data?.data?.summary?.summaryByCurrency?.NGN?.netSales, 
+                change: response?.data?.data?.summary?.summaryByCurrency?.USD?.netSales, 
+              },
+            ]);
+            
+          // Ensure response data exists before setting state
+          if (response.data && response.data.data) {
+            setOrders(response?.data?.data?.payments);
+            setTotalPages(response.data.data.totalPages || 1); 
+          } else {
+            setOrders(response.data?.data || []);          
+            setTotalPages(String(1));       
+          }
+            
+        } catch (error) {
+          console.error("Error fetching orders:", error);
+        } finally {
+          setLoading(false)
+        }
+      };
+      fetchOrders();
+    }, [page, limit, debouncedSearchQuery]);
+
+    const formatCurrency = (value: number) => {
+      if (value >= 1_000_000) {
+        return `₦${(value / 1_000_000).toFixed(2)}M`;
+      } else if (value >= 1_000) {
+        return `₦${(value / 1_000).toFixed(2)}K`;
+      }
+      return `₦${value}`;
+    };
+
+    const formatDollarCurrency = (value: number) => {
+      if (value >= 1_000_000) {
+        return `$${(value / 1_000_000).toFixed(2)}M`;
+      } else if (value >= 1_000) {
+        return `$${(value / 1_000).toFixed(2)}K`;
+      }
+      return `$${value}`;
+    };
+    
+      const handleOrderClick = (order: Order) => {
+        localStorage.setItem("selectedOrder", JSON.stringify(order));
+        router.push(`/dashboard/orderDetails`);
+      };
+    
+
+    if (loading) {
+      return (
+        <div>
+          <div className="flex flex-col justify-center items-center min-h-screen">
+            {/* Animated Spinner */}
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              className="w-12 h-12 border-4 border-t-[#751423] border-gray-300 rounded-full"
+            ></motion.div>
+  
+            {/* Skeleton Effect for Loading Content */}
+            <div className="mt-6 w-[80%] max-w-md bg-white p-4 shadow-lg rounded-xl">
+              <div className="animate-pulse">
+                <div className="h-6 bg-gray-300 rounded w-3/4 mb-4"></div>
+                <div className="h-4 bg-gray-300 rounded w-full mb-2"></div>
+                <div className="h-4 bg-gray-300 rounded w-5/6"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      );
+    }  
+
   return (
    <Container>
-    <div className="w-full h-full flex items-center justify-center">Transactions is coming soon</div>
+    <div className="w-[343px] h-full flex flex-col gap-5 items-center justify-center">
+      <div id="discount-header" className="w-full flex justify-start">
+        <h2 id="discount-title" className="font-general text-2xl font-bold text-[#111827]">Transactions</h2>
+      </div>
+       {/* Stats Grid */}
+        <div id="stats-grid" className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-[16px]">
+          {stats.map((stat, index) => (
+            <div 
+            id={`stat-card-${index}`}
+            key={index} 
+              className="w-[163px] h-[121px] bg-[#FFFFFF] shadow-sm p-3 rounded-[12px]"
+            >
+              <div id={`stat-header-${index}`} className='flex items-center gap-2'>
+                <Image 
+                  id={`stat-icon-${index}`}
+                  src={stat.icon} 
+                  alt={stat.title} 
+                  height={16} 
+                  width={16} 
+                />
+                <p id={`stat-title-${index}`} className="font-general font-semibold text-xs text-[#111827]">
+                  {stat.title}
+                </p>
+              </div>
+              <div id={`stat-divider-${index}`} className="border-t border-[#EEEFF2] my-3"></div>
+              <p id={`stat-count-${index}`} className="text-2xl font-bold text-[#111827]">
+              {formatCurrency(stat.count)}
+              </p>
+              <p 
+                id={`stat-change-${index}`}
+                className={`text-xs font-general font-normal mt-1 ${String(stat.change).startsWith('-') ? 'text-red-600' : 'text-green-600'}`}
+                >
+                {formatDollarCurrency(Number(stat.change))} <span className='text-[#718096]'>In Dollars</span>
+              </p>
+            </div>
+          ))}
+        </div>
+
+        <div id="orders-content-container" className='bg-[#FFFFFF] p-5 mt-6 rounded-[12px]'>
+        {/* Search and Filter */}
+        <div id="search-filter-container" className="flex items-center gap-3 rounded-md mt-3">
+          <div id="search-container" className="flex items-center bg-[#FAFAFA] px-4 py-2 rounded-[12px] w-[80%] h-[56px]">
+            <Search id="search-icon" className="h-6 w-6 text-gray-400" /> 
+            <input
+            type="text"
+            placeholder="Search..."
+            className="ml-3 w-full h-full outline-none text-base bg-[#FAFAFA] placeholder:text-gray-400"
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <div id="filter-button-container" className='bg-[#FAFAFA] h-14 w-14 flex justify-center items-center'>
+            <button id="filter-button" className="p-2 rounded-[12x]">
+              <Settings2 id="filter-icon" className='text-[#A0AEC0]' />
+            </button>
+          </div>
+        </div>
+
+        {/* Orders details page */}
+        <div id="orders-list" className="mt-6 space-y-4">
+        {orders?.map((order: any) => (
+          <div key={order?.orderNumber} className="rounded-xl py-2 w-full max-w-xs space-y-4 text-sm">
+            <div className="flex items-center justify-between font-medium text-[#718096] text-sm border-t pt-4">
+              <span>Apr 24, 2025</span>
+              <button onClick={() => handleOrderClick(order?.orderId)} className="w-[87px] h-[20px] text-xs text-[#751423] bg-[#7514231F] px-2 py-0.5 rounded-full font-medium">
+                View Order
+              </button>
+            </div>
+
+            {/* Transaction Info */}
+            <div className="space-y-4 text-gray-700">
+              <div className="flex justify-between">
+                <span className='font-medium text-[#718096] text-sm'>Order Number</span>
+                <span className="text-[#111827] text-sm font-semibold">{order?.orderNumber}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className='font-medium text-[#718096] text-sm'>Guest Payment</span>
+                <span className="text-[#111827] text-sm font-semibold">{order?.guestPaymentCurrency === "NGN" ? "₦" : "$"}{order?.guestPayment.toLocaleString()}</span>
+              </div>
+              <div className="flex justify-between">
+                <span className='font-medium text-[#718096] text-sm'>Amount Received</span>
+                <span className="text-[#0CAF60] text-sm font-semibold">{order?.amountReceivedCurrency === "NGN" ? "₦" : "$"}{order?.amountReceived.toLocaleString()}</span>
+              </div>
+
+              <div className="h-px bg-gray-100 my-2" />
+              {showBreakdown && (
+                <>
+              <div className="flex justify-between">
+                <span className='font-medium text-[#acb9ca] text-sm'>{order?.items} Item (s)</span>
+                <span>{order?.amountReceivedCurrency === "NGN" ? "₦" : "$"}{order?.amountReceived.toLocaleString()}</span>
+              </div>
+              {order?.homeDeliveryFee && (
+
+                <div className="flex justify-between">
+                  <span className='font-medium text-[#acb9ca] text-sm'>Home Delivery</span>
+                  <span>{order?.guestPaymentCurrency === "NGN" ? "₦" : "$"}{order?.homeDeliveryFee.toLocaleString()}</span>
+                </div>
+              )}
+              <div className="flex justify-between">
+                <span className='font-medium text-[#acb9ca] text-sm'>Tax</span>
+                <span>{order?.totalAmountCurrency === "NGN" ? "₦" : "$"}{order?.tax.toLocaleString()}</span>
+              </div>
+
+              <div className="h-px bg-gray-100 my-2" />
+
+              <div className="flex justify-between font-semibold text-black">
+                <span className="text-[#111827] text-sm font-semibold">Total</span>
+                <span className="text-[#111827] text-sm font-semibold">{order?.totalAmountCurrency === "NGN" ? "₦" : "$"}{order?.totalAmount.toLocaleString()}</span>
+              </div>
+            </>)}
+          </div>
+
+          {/* Collapse Button */}
+          <button onClick={() => setShowBreakdown(!showBreakdown)} className="w-full h-[32px] flex items-center justify-center text-[#751423] border border-[#751423] py-1.5 rounded-[8px] font-medium">
+          {showBreakdown ? 'See Less' : 'See Breakdown'}
+            {showBreakdown ? (
+              <ChevronUp size={16} className="ml-1 text-[#A0AEC0]" />
+            ) : (
+              <ChevronDown size={16} className="ml-1 text-[#A0AEC0]" />
+            )}
+          </button>
+        </div>
+        ))}
+
+        {/* Pagination */}
+        <div id="orders-pagination">
+          <OrderPagination
+            totalPages={totalPages} 
+            currentPage={page} 
+            setCurrentPage={setPage} 
+            setLimit={setLimit}
+          />
+        </div>
+      </div>
+        </div>
+    </div>
    </Container>
   )
 }

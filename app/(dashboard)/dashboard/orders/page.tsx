@@ -5,8 +5,8 @@ import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
 import Cart from "../../../../assets/orderIcons/cart.png";
 import BoxTime from "../../../../assets/orderIcons/box-time.png";
-import Eye from "../../../../assets/orderIcons/eye.png";
 import Package from "../../../../assets/orderIcons/package.png";
+import Eye from "../../../../assets/orderIcons/eye.png";
 import { Search, Settings2  } from "lucide-react";
 import { cn } from '@/utils/cn';
 import OrderPagination from '@/components/OrderPagination';
@@ -62,6 +62,13 @@ const Page: React.FC = ({  }) => {
   useEffect(() => {
 
     const fetchOrders = async () => {
+      const loggedInUserString = localStorage.getItem("loggedInUser");
+      const loggedInUser = loggedInUserString ? JSON.parse(loggedInUserString) : null;
+  
+      if (!loggedInUser?._id) {
+        router.replace("/");
+        return;
+      }
       setLoading(true);
       try {
 
@@ -77,10 +84,10 @@ const Page: React.FC = ({  }) => {
         }
 
         const response = await axiosInstance.post(
-            `view-orders/`,
-            { eventId: "67dd1f5f48f2e5b414f3efb7" },
-            { params }
-          );
+          `view-orders/`,
+          { hostId: loggedInUser._id },
+          { params }
+        );
 
           setStats([
             { 
@@ -112,7 +119,6 @@ const Page: React.FC = ({  }) => {
 
         // Ensure response data exists before setting state
         if (response.data && response.data.data) {
-          console.log("res", response.data.data)
           setOrders(response.data.data as OrderDashboardResponse);
           setTotalPages(response.data.data.totalPages || 1); 
         } else {
