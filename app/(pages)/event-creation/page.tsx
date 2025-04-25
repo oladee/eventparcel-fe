@@ -71,7 +71,7 @@ const PageContent: React.FC = () => {
     lastName: "",
     email: "",
     description: "",
-    numberOfGroups: "0",
+    numberOfGroups: "",
     eventImage: null
   });
 
@@ -151,8 +151,14 @@ const PageContent: React.FC = () => {
   const handleChange = (
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
-    setFormData({ ...formData, [e.target.id]: e.target.value });
-    setErrors({ ...errors, [e.target.id]: "" });
+    const { id, value } = e.target;
+  
+    if (id === "numberOfGroups" && value.startsWith("-")) {
+      return; // Prevent negative values
+    }
+  
+    setFormData({ ...formData, [id]: value });
+    setErrors({ ...errors, [id]: "" });
   };
 
 
@@ -170,22 +176,24 @@ const PageContent: React.FC = () => {
         return "This field is required.";
       }
     } else if (id === "numberOfGroups") {
-      // Convert value to string (in case it's not) and trim extra spaces
       const trimmed = value.toString().trim();
-      // Allow empty value (optional field)
-      if (trimmed === "") {
+    
+      // If user hasn't entered anything, don't treat it as an error
+      if (!trimmed) {
         return "";
       }
-      // Validate that input is composed solely of digits
+      // Must be digits only
       if (!/^\d+$/.test(trimmed)) {
         return "Enter a valid number.";
       }
       const numValue = Number(trimmed);
-      if (numValue < 0 || numValue > 99) {
-        return "Number must be between 0 and 99.";
+      // Enforce range 1–99
+      if (numValue < 1 || numValue > 99) {
+        return "Number must be between 1 and 99.";
       }
       return "";
-    } else if (
+    }
+     else if (
       id !== "description" &&
       (typeof value !== "string" || !value.trim())
     ) {
@@ -547,10 +555,6 @@ export default function Page() {
 
 
 
-
-
-
-
 // "use client";
 // import { Suspense, useState, useRef, useEffect } from "react";
 // import EventSuccess from "@/components/EventSuccess";
@@ -624,7 +628,7 @@ export default function Page() {
 //     lastName: "",
 //     email: "",
 //     description: "",
-//     numberOfGroups: "",
+//     numberOfGroups: "0",
 //     eventImage: null
 //   });
 
@@ -708,6 +712,7 @@ export default function Page() {
 //     setErrors({ ...errors, [e.target.id]: "" });
 //   };
 
+
 //   const validateField = (id: string, value: any): string => {
 //     // Skip personal details validations if user is authenticated
 //     if (
@@ -716,59 +721,67 @@ export default function Page() {
 //     ) {
 //       return "";
 //     }
-
+  
 //     if (id === "eventDate" || id === "eventTime") {
 //       if (!(value instanceof Date) || isNaN(value.getTime())) {
 //         return "This field is required.";
 //       }
 //     } else if (id === "numberOfGroups") {
-//       // Check that the input is a number and within 1 to 99
-//       if (!value.trim() || isNaN(Number(value))) {
+//       // Convert value to string (in case it's not) and trim extra spaces
+//       const trimmed = value.toString().trim();
+//       // Allow empty value (optional field)
+//       if (trimmed === "") {
+//         return "";
+//       }
+//       // Validate that input is composed solely of digits
+//       if (!/^\d+$/.test(trimmed)) {
 //         return "Enter a valid number.";
 //       }
-//       const numValue = Number(value);
-//       if (numValue < 1 || numValue > 99) {
-//         return "Number must be between 1 and 99.";
+//       const numValue = Number(trimmed);
+//       if (numValue < 0 || numValue > 99) {
+//         return "Number must be between 0 and 99.";
 //       }
+//       return "";
 //     } else if (
 //       id !== "description" &&
 //       (typeof value !== "string" || !value.trim())
 //     ) {
 //       return "This field is required.";
 //     }
-
+  
 //     if (
 //       id === "email" &&
 //       !/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(value)
 //     ) {
 //       return "Enter a valid email address.";
 //     }
-
+  
 //     if (
 //       (id === "firstName" || id === "lastName") &&
 //       /[^a-zA-Z\s]/.test(value)
 //     ) {
 //       return "Name cannot include numbers or special characters.";
 //     }
-
+  
 //     if (id === "description" && value.trim() && value.length < 5) {
 //       return "Description must be at least 5 characters.";
 //     }
-
+  
 //     if (id === "description" && value.length > 300) {
 //       return "Description must have a maximum of 300 characters.";
 //     }
-
+  
 //     if (id === "eventName" && value.length < 5) {
 //       return "Event name must be at least 5 characters.";
 //     }
-
+  
 //     if (id === "eventName" && value.length > 60) {
 //       return "Event name must not exceed 60 characters.";
 //     }
-
+  
 //     return "";
 //   };
+  
 
 //   const handleBlur = (
 //     e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -974,13 +987,12 @@ export default function Page() {
 //   };
 
 //   const isFormValid =
-//     (isAuthenticated ||
-//       (formData.firstName && formData.lastName && formData.email)) &&
-//     formData.location &&
-//     formData.eventName &&
-//     // formData.numberOfGroups &&
-//     formData.eventTime &&
-//     Object.values(errors).every((err) => err === "");
+//   (isAuthenticated ||
+//     (formData.firstName && formData.lastName && formData.email)) &&
+//   formData.location &&
+//   formData.eventName &&
+//   formData.eventTime &&
+//   Object.values(errors).every((err) => err === "");
 
 //   return (
 //     <HeaderLayout>
@@ -1078,3 +1090,4 @@ export default function Page() {
 //     </Suspense>
 //   );
 // }
+

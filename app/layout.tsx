@@ -29,6 +29,8 @@ export default function RootLayout({
         <Script
           src={`https://maps.googleapis.com/maps/api/js?key=AIzaSyDSJLDP8ehodqfX8FEFjhfOyp7NNniFUa4&libraries=places`}
           strategy="beforeInteractive"
+          async
+          defer
         />
       </head>
       <body className="w-full max-w-full">
