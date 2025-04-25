@@ -177,18 +177,23 @@ const PageContent: React.FC = () => {
       }
     } else if (id === "numberOfGroups") {
       const trimmed = value.toString().trim();
+    
+      // If user hasn't entered anything, don't treat it as an error
       if (!trimmed) {
-        return "This field is required.";
+        return "";
       }
+      // Must be digits only
       if (!/^\d+$/.test(trimmed)) {
         return "Enter a valid number.";
       }
       const numValue = Number(trimmed);
+      // Enforce range 1–99
       if (numValue < 1 || numValue > 99) {
         return "Number must be between 1 and 99.";
       }
       return "";
-    } else if (
+    }
+     else if (
       id !== "description" &&
       (typeof value !== "string" || !value.trim())
     ) {
