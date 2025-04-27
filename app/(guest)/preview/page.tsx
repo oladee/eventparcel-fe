@@ -24,7 +24,7 @@ const ViewEvent = () => {
   const [cartOpen, setCartOpen] = useState(false);
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error] = useState<string | null>(null);
   const [selectedPackage, setSelectedPackage] = useState<any>(null);
   const [loadDeliveryDetails, setLoadDeliveryDetails] = useState(false);
 
@@ -44,10 +44,10 @@ const ViewEvent = () => {
     const fetchData = async () => {
       try {
         const res = await axiosInstance.get(`/invite-details?code=${code}`);
-        setData(res.data);
-      } catch (err: any) {
-        setError("Something went wrong fetching invite details.");
-        console.log(err)
+        console.log("preview", res.data.data)
+        setData(res.data.data);
+      } catch (error: any) {
+          toast.error(error.response?.data?.message);
       } finally {
         setLoading(false);
       }
@@ -79,8 +79,8 @@ const ViewEvent = () => {
   }
 
   // Format data only after we're sure it exists
-  const eventData = data.data?.event;
-  const eventGroupData = data.data?.eventGroup;
+  const eventData = data?.event;
+  const eventGroupData = data?.eventGroup;
 
   const fullText = eventData?.eventDescription || "";
   const formattedText = fullText.charAt(0).toUpperCase() + fullText.slice(1);
@@ -148,7 +148,7 @@ const ViewEvent = () => {
 
           <div id="event-details" className="pt-5 ">
             <h3 id="event-title" className="text-xl font-general font-bold text-[#111827]">
-            {data?.data?.event?.eventName
+            {data?.event?.eventName
               ?.split(" ")
               .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
               .join(" ")}
@@ -169,11 +169,11 @@ const ViewEvent = () => {
 
             <div id="event-date" className="flex items-center gap-2 text-sm text-gray-600 mt-4 py ">
               <LuCalendarDays id="calendar-icon" className="w-4 h-4" />
-              <span id="date-text" className="font-medium text-sm text-[#111827]">{formattedDate} at {data?.data?.event?.time} WAT</span>
+              <span id="date-text" className="font-medium text-sm text-[#111827]">{formattedDate} at {data?.event?.time} WAT</span>
             </div>
 
             <p id="event-location" className="text-sm text-[#78858F] font-normal mt-1">
-            {data?.data?.event?.eventLocation
+            {data?.event?.eventLocation
               ?.split(" ")
               .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
               .join(" ")}
@@ -207,7 +207,7 @@ const ViewEvent = () => {
 
           {/* Package Content */}
           {activeTab === "General" && (
-            data?.data?.event?.eventGroups?.map((group: any) => (
+            data?.event?.eventGroups?.map((group: any) => (
               group.groupPrivacy === "general" && (
                 <div
                  key={group._id} 
@@ -219,7 +219,10 @@ const ViewEvent = () => {
                   .join(" ")}
                 </h3>
                 <p id="general-package-description" className="text-sm text-[#718096] mb-4 font-medium">
-                  {group.groupDescription.charAt(0).toUpperCase() + group.groupDescription.slice(1)}
+                {group?.groupDescription
+                  ?.split(' ')
+                  .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+                  .join(' ')}
                 </p>
 
 
@@ -249,14 +252,20 @@ const ViewEvent = () => {
                       }}                      
                      id="package-item-info">
                       <h4 id="package-item-name" className="text-sm font-semibold font-general">
-                      {pkg?.packageTitle?.length > 25 
-                        ? pkg.packageTitle.slice(0, 25) + '...' 
-                        : pkg?.packageTitle}
+                      {pkg?.packageTitle
+                          ?.split(' ')
+                          .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                          .join(' ')
+                          .slice(0, 25)}
+                        {pkg?.packageTitle?.length > 25 ? '...' : ''}
                       </h4>
                       <p id="package-item-short-description" className="text-xs text-gray-500 line-clamp-1">
-                      {pkg?.packageDescription.length > 70
-                        ? pkg.packageDescription.slice(0, 70) + '...' 
-                        : pkg?.packageDescription}
+                      {pkg?.packageDescription
+                          ?.split(' ')
+                          .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                          .join(' ')
+                          .slice(0, 70)}
+                        {pkg?.packageDescription?.length > 70 ? '...' : ''}
                       </p>
                       <p id="package-item-price" className="text-sm text-[#751423] font-bold mt-1">
                       {pkg?.packagePriceCurrency === "NGN" ? "₦" : "$"}
@@ -286,18 +295,18 @@ const ViewEvent = () => {
           {activeTab === "Private" && (
             <>
               <h3 id="private-package-title" className="text-xl font-bold text-[#111827]">
-                  {data?.data?.eventGroup?.groupName
+                  {data?.eventGroup?.groupName
                   ?.split(" ")
                   .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
                   .join(" ")}
               </h3>
               <p id="private-package-description" className="text-sm text-[#718096] mb-4 font-medium">
-              {data?.data?.eventGroup?.groupDescription
-                ? data.data.eventGroup.groupDescription.charAt(0).toUpperCase() + data.data.eventGroup.groupDescription.slice(1)
-                : ""}
+              {data?.eventGroup?.groupDescription
+              ?.split(' ')
+              .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+              .join(' ')}
               </p>
-
-              {data?.data?.eventGroup?.packages.map((pkg: any) => (
+              {data?.eventGroup?.packages.map((pkg: any) => (
                 <div key={pkg._id} id="private-package-item" className="flex gap-3 p-3 border rounded-xl">
                     <div id="private-package-image-container" className="w-16 h-16 relative rounded-lg overflow-hidden">
                     <Image
@@ -319,14 +328,20 @@ const ViewEvent = () => {
                            id="private-package-info"
                           >
                             <h4 id="private-package-name" className="text-sm font-semibold font-general">
-                            {pkg?.packageTitle?.length > 25 
-                              ? pkg.packageTitle.slice(0, 25) + '...' 
-                              : pkg?.packageTitle}
+                            {pkg?.packageTitle
+                              ?.split(' ')
+                              .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                              .join(' ')
+                              .slice(0, 25)}
+                            {pkg?.packageTitle?.length > 25 ? '...' : ''}
                             </h4>
                             <p id="private-package-short-description" className="text-xs text-gray-500 line-clamp-1">
-                            {pkg?.packageDescription.length > 70
-                              ? pkg.packageTitle.slice(0, 25) + '...' 
-                              : pkg?.packageTitle}
+                                {pkg?.packageDescription
+                                  ?.split(' ')
+                                  .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                                  .join(' ')
+                                  .slice(0, 70)}
+                                {pkg?.packageDescription?.length > 70 ? '...' : ''}
                             </p>
                             <p id="private-package-price" className="text-sm text-[#751423] font-bold mt-1">
                               {pkg?.packagePriceCurrency === "NGN" ? "₦" : "$"}

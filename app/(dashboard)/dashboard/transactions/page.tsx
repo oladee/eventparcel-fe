@@ -25,8 +25,8 @@ const Page = () => {
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const [showBreakdown, setShowBreakdown] = useState(false);
   const [stats, setStats] = useState([
-    { icon: Cart, title: "Overall Sales", count: 0, change: "0%" },
-    { icon: BoxTime, title: "Net Sales", count: 0, change: "0%" },
+    { icon: Cart, title: "Overall Sales", count: 0, change: "0.00%" },
+    { icon: BoxTime, title: "Net Sales", count: 0, change: "0.00%" },
   ]);
 
 
@@ -43,31 +43,34 @@ const Page = () => {
         setLoading(true);
         try {
   
-          // const params: Record<string, any> = { 
-          //   page, 
-          //   limit, 
-          //   query: debouncedSearchQuery 
-          // };
-  
           const response = await axiosInstance.get(
               `payment-history/${loggedInUser._id}`);
 
-              setStats([         
-              { 
-                icon: Cart, 
-                title: "Overall Sales", 
-                count: response?.data?.data?.summary?.summaryByCurrency?.NGN?.overallSales, 
-                change: response?.data?.data?.summary?.summaryByCurrency?.USD?.overallSales, 
-              },
-              { 
-                icon: BoxTime, 
-                title: "Net Sales", 
-                count: response?.data?.data?.summary?.summaryByCurrency?.NGN?.netSales, 
-                change: response?.data?.data?.summary?.summaryByCurrency?.USD?.netSales, 
-              },
-            ]);
+              const safeCount = (value?: number) => {
+                return typeof value === 'number' && !isNaN(value) ? value : 0;
+              };
+        
+              const safeChange = (value?: string | number) => {
+                if (value === undefined || value === null) return "0.00%";
+                const num = Number(value);
+                return isNaN(num) ? "0.00%" : `${num.toFixed(2)}%`;
+              };      
+
+              setStats([
+                { 
+                  icon: Cart, 
+                  title: "Overall Sales", 
+                  count: safeCount(response?.data?.data?.summary?.summaryByCurrency?.NGN?.overallSales),
+                  change: safeChange(response?.data?.data?.summary?.summaryByCurrency?.USD?.overallSalesChange),
+                },
+                { 
+                  icon: BoxTime, 
+                  title: "Net Sales", 
+                  count: safeCount(response?.data?.data?.summary?.summaryByCurrency?.NGN?.netSales),
+                  change: safeChange(response?.data?.data?.summary?.summaryByCurrency?.USD?.netSalesChange),
+                },
+              ]);
             
-          // Ensure response data exists before setting state
           if (response.data && response.data.data) {
             setOrders(response?.data?.data?.payments);
             setTotalPages(response.data.data.totalPages || 1); 
@@ -91,7 +94,7 @@ const Page = () => {
       } else if (value >= 1_000) {
         return `₦${(value / 1_000).toFixed(2)}K`;
       }
-      return `₦${value}`;
+      return `₦${value.toFixed(2)}`;
     };
 
     const formatDollarCurrency = (value: number) => {
@@ -100,7 +103,7 @@ const Page = () => {
       } else if (value >= 1_000) {
         return `$${(value / 1_000).toFixed(2)}K`;
       }
-      return `$${value}`;
+      return `$${value.toFixed(2)}`;
     };
     
       const handleOrderClick = (order: Order) => {
@@ -113,14 +116,12 @@ const Page = () => {
       return (
         <div>
           <div className="flex flex-col justify-center items-center min-h-screen">
-            {/* Animated Spinner */}
             <motion.div
               animate={{ rotate: 360 }}
               transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
               className="w-12 h-12 border-4 border-t-[#751423] border-gray-300 rounded-full"
             ></motion.div>
   
-            {/* Skeleton Effect for Loading Content */}
             <div className="mt-6 w-[80%] max-w-md bg-white p-4 shadow-lg rounded-xl">
               <div className="animate-pulse">
                 <div className="h-6 bg-gray-300 rounded w-3/4 mb-4"></div>
@@ -167,7 +168,7 @@ const Page = () => {
                 id={`stat-change-${index}`}
                 className={`text-xs font-general font-normal mt-1 ${String(stat.change).startsWith('-') ? 'text-red-600' : 'text-green-600'}`}
                 >
-                {formatDollarCurrency(Number(stat.change))} <span className='text-[#718096]'>In Dollars</span>
+                {stat.change} <span className='text-[#718096]'>Change</span>
               </p>
             </div>
           ))}
@@ -195,8 +196,13 @@ const Page = () => {
 
         {/* Orders details page */}
         <div id="orders-list" className="mt-6 space-y-4">
-        {orders?.map((order: any) => (
-          <div key={order?.orderNumber} className="rounded-xl py-2 w-full max-w-xs space-y-4 text-sm">
+        {!orders ||  orders?.length === 0 ? (
+          <div className="flex justify-center items-center h-32">
+            <span className="text-gray-500">No transactions found</span>
+          </div>
+        ) : (
+          orders?.map((order: any) => (
+            <div key={order?.orderNumber} className="rounded-xl py-2 w-full max-w-xs space-y-4 text-sm">
             <div className="flex items-center justify-between font-medium text-[#718096] text-sm border-t pt-4">
               <span>Apr 24, 2025</span>
               <button onClick={() => handleOrderClick(order?.orderId)} className="w-[87px] h-[20px] text-xs text-[#751423] bg-[#7514231F] px-2 py-0.5 rounded-full font-medium">
@@ -212,11 +218,19 @@ const Page = () => {
               </div>
               <div className="flex justify-between">
                 <span className='font-medium text-[#718096] text-sm'>Guest Payment</span>
-                <span className="text-[#111827] text-sm font-semibold">{order?.guestPaymentCurrency === "NGN" ? "₦" : "$"}{order?.guestPayment.toLocaleString()}</span>
+                <span className="text-[#111827] text-sm font-semibold">
+                  {order?.guestPaymentCurrency === "NGN" 
+                    ? formatCurrency(order?.guestPayment)
+                    : formatDollarCurrency(order?.guestPayment)}
+                </span>
               </div>
               <div className="flex justify-between">
                 <span className='font-medium text-[#718096] text-sm'>Amount Received</span>
-                <span className="text-[#0CAF60] text-sm font-semibold">{order?.amountReceivedCurrency === "NGN" ? "₦" : "$"}{order?.amountReceived.toLocaleString()}</span>
+                <span className="text-[#0CAF60] text-sm font-semibold">
+                  {order?.amountReceivedCurrency === "NGN" 
+                    ? formatCurrency(order?.amountReceived)
+                    : formatDollarCurrency(order?.amountReceived)}
+                </span>
               </div>
 
               <div className="h-px bg-gray-100 my-2" />
@@ -224,25 +238,40 @@ const Page = () => {
                 <>
               <div className="flex justify-between">
                 <span className='font-medium text-[#acb9ca] text-sm'>{order?.items} Item (s)</span>
-                <span>{order?.amountReceivedCurrency === "NGN" ? "₦" : "$"}{order?.amountReceived.toLocaleString()}</span>
+                <span>
+                  {order?.amountReceivedCurrency === "NGN" 
+                    ? formatCurrency(order?.amountReceived)
+                    : formatDollarCurrency(order?.amountReceived)}
+                </span>
               </div>
               {order?.homeDeliveryFee && (
-
                 <div className="flex justify-between">
                   <span className='font-medium text-[#acb9ca] text-sm'>Home Delivery</span>
-                  <span>{order?.guestPaymentCurrency === "NGN" ? "₦" : "$"}{order?.homeDeliveryFee.toLocaleString()}</span>
+                  <span>
+                    {order?.guestPaymentCurrency === "NGN" 
+                      ? formatCurrency(order?.homeDeliveryFee)
+                      : formatDollarCurrency(order?.homeDeliveryFee)}
+                  </span>
                 </div>
               )}
               <div className="flex justify-between">
                 <span className='font-medium text-[#acb9ca] text-sm'>Tax</span>
-                <span>{order?.totalAmountCurrency === "NGN" ? "₦" : "$"}{order?.tax.toLocaleString()}</span>
+                <span>
+                  {order?.totalAmountCurrency === "NGN" 
+                    ? formatCurrency(order?.tax)
+                    : formatDollarCurrency(order?.tax)}
+                </span>
               </div>
 
               <div className="h-px bg-gray-100 my-2" />
 
               <div className="flex justify-between font-semibold text-black">
                 <span className="text-[#111827] text-sm font-semibold">Total</span>
-                <span className="text-[#111827] text-sm font-semibold">{order?.totalAmountCurrency === "NGN" ? "₦" : "$"}{order?.totalAmount.toLocaleString()}</span>
+                <span className="text-[#111827] text-sm font-semibold">
+                  {order?.totalAmountCurrency === "NGN" 
+                    ? formatCurrency(order?.totalAmount)
+                    : formatDollarCurrency(order?.totalAmount)}
+                </span>
               </div>
             </>)}
           </div>
@@ -257,7 +286,8 @@ const Page = () => {
             )}
           </button>
         </div>
-        ))}
+        ))
+      )}
 
         {/* Pagination */}
         <div id="orders-pagination">

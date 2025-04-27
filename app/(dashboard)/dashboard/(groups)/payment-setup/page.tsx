@@ -296,7 +296,7 @@ const PaymentSetupContent = () => {
       )}
       <section className="!overflow-hidden relative">
         <div className="mt-4 pb-20 lg:py-24 px-3 sm:px-4 mx-auto max-w-screen-md h-[98vh] overflow-y-auto no-scrollbar">
-          <div className="md:mb-12 text-center p-3 sm:p-0 space-y-3">
+          <div className="md:mb-12 text-center p-3 sm:p-0 space-y-3 lg:flex lg:justify-center lg:flex-col">
             <h2
               id="payment_deliveryHeader"
               className="flex justify-start text-xl sm:text-2xl font-bold text-[#111827]"
@@ -307,20 +307,14 @@ const PaymentSetupContent = () => {
               id="payment_deliveryDesc"
               className="flex justify-center items-center gap-3"
             >
-              <div className="flex flex-col w-full">
-              <span className="flex justify-start w-[313px] whitespace-nowrap h-6 font-general font-medium text-sm text-[#718096]">
+              <div className="flex flex-col lg:flex-row w-full">
+              <span className="flex justify-start w-[313px] lg:w-[288px] whitespace-nowrap h-6 font-general font-medium text-sm text-[#718096]">
                   Let&apos;s setup your payout process and payment
                 </span>
                 <span className="flex justify-start w-[313px] h-11 font-general font-medium text-sm text-[#718096]">
                   deadline
                 </span>
               </div>
-              {/* <span
-                onClick={() => setIsRightBarOpen(true)}
-                className="px-2 mb-6 text-sm cursor-pointer rounded-[200px] bg-[#ECB795] text-white"
-              >
-                !
-              </span> */}
             </div>
           </div>
 

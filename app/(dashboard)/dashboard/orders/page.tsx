@@ -89,32 +89,37 @@ const Page: React.FC = ({  }) => {
           { params }
         );
 
-          setStats([
-            { 
-              icon: Cart, 
-              title: "Total Orders", 
-              count: response?.data?.data?.orderSummary?.ordersSummary?.totalOrders?.overall, 
-              change: `${parseFloat(response?.data?.data?.orderSummary?.ordersSummary?.totalOrders?.growthRate).toFixed(1)}%`
-            },
-            {
-              icon: Eye,
-              title: "Total Invites",
-              count: response?.data?.data?.orderSummary?.invitesSummary?.totalInvites,
-              change: `${parseFloat(response?.data?.data?.orderSummary?.invitesSummary?.viewedRate).toFixed(1)}%`
-            },          
-            { 
-              icon: Package, 
-              title: "Total Delivered", 
-              count: response?.data?.data?.orderSummary?.ordersSummary?.totalDelivered?.overall, 
-              change: `${parseFloat(response?.data?.data?.orderSummary?.ordersSummary?.totalDelivered?.growthRate).toFixed(1)}%`
-            },
-            { 
-              icon: BoxTime, 
-              title: "Pending Orders", 
-              count: response?.data?.data?.orderSummary?.ordersSummary?.pendingOrders?.overall, 
-              change: `${parseFloat(response?.data?.data?.orderSummary?.ordersSummary?.pendingOrders?.growthRate).toFixed(1)}%`
-            },
-          ]);
+        const safeParse = (value?: string | number) => {
+          const num = Number(value);
+          return isNaN(num) ? "0.00%" : `${num.toFixed(1)}%`;
+        };
+
+        setStats([
+          { 
+            icon: Cart, 
+            title: "Total Orders", 
+            count: response?.data?.data?.orderSummary?.ordersSummary?.totalOrders?.overall, 
+            change: safeParse(response?.data?.data?.orderSummary?.ordersSummary?.totalOrders?.growthRate)
+          },
+          {
+            icon: Eye,
+            title: "Total Invites",
+            count: response?.data?.data?.orderSummary?.invitesSummary?.totalInvites,
+            change: safeParse(response?.data?.data?.orderSummary?.invitesSummary?.viewedRate)
+          },          
+          { 
+            icon: Package, 
+            title: "Total Delivered", 
+            count: response?.data?.data?.orderSummary?.ordersSummary?.totalDelivered?.overall, 
+            change: safeParse(response?.data?.data?.orderSummary?.ordersSummary?.totalDelivered?.growthRate)
+          },
+          { 
+            icon: BoxTime, 
+            title: "Pending Orders", 
+            count: response?.data?.data?.orderSummary?.ordersSummary?.pendingOrders?.overall, 
+            change: safeParse(response?.data?.data?.orderSummary?.ordersSummary?.pendingOrders?.growthRate)
+          },
+        ]);
           
 
         // Ensure response data exists before setting state
@@ -200,6 +205,7 @@ const Page: React.FC = ({  }) => {
     );
   }
 
+  console.log(orders)
   
   
 
@@ -433,14 +439,14 @@ const Page: React.FC = ({  }) => {
                       <div className="grid grid-cols-2 gap-y-3 text-sm text-gray-600">
                         <p className="font-medium">Order Number</p>
                         <p className="font-bold text-gray-900 truncate">{order?.orderId}</p>
-
                         <p className="font-medium">Guest</p>
                         <p className="font-bold text-gray-900">
-                        {order?.guestName 
-                          ? order.guestName.charAt(0).toUpperCase() + order.guestName.slice(1) 
-                          : "Guest Name"}
+                        {order?.guestFirstName 
+                          ? order.guestFirstName.charAt(0).toUpperCase() + order.guestFirstName.slice(1) 
+                          : "No"} {order?.guestLastName 
+                            ? order.guestLastName.charAt(0).toUpperCase() + order.guestLastName.slice(1) 
+                            : "Name"}
                         </p>
-
                         <p className="font-medium">Delivery</p>
                         <p className="font-bold text-gray-900">
                           {order?.items[0]?.deliveryMethod || "N/A"}

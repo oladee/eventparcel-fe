@@ -202,7 +202,7 @@ useEffect(() => {
         const cleanedData = cleanObject(formattedData);
     
         await axiosInstance.post("/add-payment", cleanedData);
-        toast.success("Payment and Delivery details submitted successfully!");
+        toast.success("Details submitted successfully!");
         router.push("/dashboard/events");
       } catch (error: any) {
         if (axios.isAxiosError(error)) {

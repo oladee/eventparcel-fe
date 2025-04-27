@@ -10,6 +10,7 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import axiosInstance from "@/lib/axiosInstance";
 import { toast, ToastContainer } from "react-toastify";
 import { BiLoaderCircle } from "react-icons/bi";
+import PhoneNumberInput from "@/components/PhoneNumberInput";
 
 function DeliveryDetailsForm() {
   const searchParams = useSearchParams();
@@ -88,30 +89,22 @@ function DeliveryDetailsForm() {
       errors.guestEmail = "Invalid email format";
     }
     
-    if (!formData.guestPhoneNumber) {
-      errors.guestPhoneNumber = "Phone number is required";
-    } else if (!/^[0-9]{11}$/.test(formData.guestPhoneNumber)) {
-      errors.guestPhoneNumber = "Invalid phone number (11 digits required)";
-    }
-  
     // Home delivery specific validations
     if (deliveryType === "home") {
       if (!formData.shippingAddress) errors.shippingAddress = "Address is required";
       if (!formData.state) errors.state = "State is required";
       if (!formData.city) errors.city = "City is required";
       if (!formData.dispatchType) errors.dispatchType = "Dispatch type is required";
-      
-      // Validate city belongs to state
-      // if (formData.state && formData.city) {
-      //   const stateCities = nigeriancities.filter(c => c.state === formData.state);
-      //   if (!stateCities.some(c => c.value === formData.city)) {
-      //     errors.city = "Selected city doesn't belong to selected state";
-      //   }
-      // }
     }
   
     return errors;
   };
+
+    // Handle input change
+    const handleChange = (name: string, value: string) => {
+      setFormData((prev) => ({ ...prev, [name]: value }));
+      validateForm();
+    };
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -337,7 +330,7 @@ function DeliveryDetailsForm() {
                   <label htmlFor="home-phone" className="font-general font-medium text-base block mb-1 text-[#718096]">
                     Phone Number
                   </label>
-                  <input
+                  {/* <input
                     id="home-phone"
                     name="guestPhoneNumber"
                     required
@@ -346,7 +339,12 @@ function DeliveryDetailsForm() {
                     type="number"
                     placeholder="Enter your phone number"
                     className={`w-full h-14 px-4 py-2 rounded-[12px] border ${errors.guestPhoneNumber ? 'border-red-500' : 'border-[#E5E7EB]'} bg-[#FAFAFA] focus:outline-none focus:border-[#8B1E3F]`}
-                    />
+                    /> */}
+                     <PhoneNumberInput
+                        onPhoneChange={(value: string) =>
+                          handleChange("guestPhoneNumber", value)
+                        }
+                      />
                     {errors.guestPhoneNumber && (
                       <p className="text-red-500 text-sm mt-1">{errors.guestPhoneNumber}</p>
                     )}
@@ -547,7 +545,7 @@ function DeliveryDetailsForm() {
                   <label htmlFor="pickup-phone" className="font-general font-medium text-base block mb-1 text-[#718096]">
                     Phone Number
                   </label>
-                  <input
+                  {/* <input
                     id="pickup-phone"
                     name="guestPhoneNumber"
                     value={formData.guestPhoneNumber}
@@ -555,7 +553,12 @@ function DeliveryDetailsForm() {
                     type="tel"
                     placeholder="Enter your phone number"
                     className={`w-full h-14 px-4 py-2 rounded-[12px] border ${errors.guestPhoneNumber ? 'border-red-500' : 'border-[#E5E7EB]'} bg-[#FAFAFA] focus:outline-none focus:border-[#8B1E3F]`}
-                    />
+                    /> */}
+                       <PhoneNumberInput
+                        onPhoneChange={(value: string) =>
+                          handleChange("guestPhoneNumber", value)
+                        }
+                      />
                     {errors.guestPhoneNumber && (
                       <p className="text-red-500 text-sm mt-1">{errors.guestPhoneNumber}</p>
                     )}

@@ -101,8 +101,6 @@ const Page = () => {
         );
     }
 
-    console.log("orders", orders)
-
     return (
         <Container>
             <div id="order-details-container" className="min-h-screen mt-2">
@@ -145,12 +143,10 @@ const Page = () => {
                             {/* Order Details */}
                             <div id={`order-details-${orders._id}-${index}`} className="flex-1">
                                 <p id={`order-title-${orders._id}-${index}`} className="font-semibold text-sm text-[#111827]">
-                                {item.packageId?.packageTitle 
-                                    ? item.packageId.packageTitle
-                                        .split(" ")
-                                        .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
-                                        .join(" ")
-                                    : item?.packageTitle}
+                                {String(item?.packageTitle || item?.packageId?.packageTitle || "")
+                                    .split(" ")
+                                    .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+                                    .join(" ")}
                                 </p>
                                 <p 
                                     id={`order-price-${orders._id}-${index}`} 
@@ -295,11 +291,11 @@ const Page = () => {
                             <div id="event-image-container" className="relative w-24 h-24 rounded-xl overflow-hidden flex-shrink-0">
                                 <Image
                                     id="event-image"
-                                    src={orders?.eventId?.eventImgUrl}
+                                    src={orders?.eventId?.eventImgUrl || "/images/placeholder_eventCover3.jpg"}
                                     alt="Event Cover"
-                                    className="object-cover w-full h-full rounded-[12px]"
-                                    width={20} 
-                                    height={25} 
+                                    className="w-full h-full rounded-[12px]"
+                                    width={100} 
+                                    height={100} 
                                     quality={100}
                                     priority
                                     style={{width: "80px", height: "80px"}}

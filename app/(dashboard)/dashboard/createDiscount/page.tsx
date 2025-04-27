@@ -220,11 +220,14 @@ const Page = () => {
             <input
                 id="discount-title-input"
                 type="text"
+                required
+                minLength={3}
+                maxLength={25}
                 value={discountTitle}
                 onChange={(e) => setDiscountTitle(e.target.value)}
                 placeholder="Enter discount title"
                 className="w-full h-[56px] bg-[#FAFAFA] text-sm font-medium text-gray-700 rounded-[12px] px-4 py-3 focus:outline-none"
-                />
+            />
           </div>
 
           {/* Discount Value */}
@@ -266,6 +269,7 @@ const Page = () => {
               <input
                 id="discount-value-input"
                 type="number"
+                required
                 value={discountValue}
                 onChange={(e) => setDiscountValue(e.target.value === '' ? '' : Number(e.target.value))}
                 placeholder="Add discount value"

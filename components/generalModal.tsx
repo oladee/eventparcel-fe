@@ -157,17 +157,16 @@ const GeneralModal: React.FC<generalGroupProps> = ({ group, handleDuplicate, han
                       style={{width: "60px", height:"60px", borderRadius: "5.29px"}}
                     />
                     <div className="flex flex-col">
-                      <span
+                    <span
                         id="packageHeader"
                         className="text-sm font-general font-semibold leading-tight text-[#111827]"
                       >
                         {item.packageTitle
                           .split(" ")
-                          .map(
-                            (word) =>
-                              word.charAt(0).toUpperCase() + word.slice(1)
-                          )
-                          .join(" ")}
+                          .map((word) => word.charAt(0).toUpperCase() + word.slice(1))
+                          .join(" ")
+                          .slice(0, 41)}
+                        {item.packageTitle.length > 41 && "..."}
                       </span>
                       <p
                         id="packagePrice"
