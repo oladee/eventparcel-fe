@@ -14,12 +14,20 @@ const FiHelpCircle = dynamic(
   () => import("react-icons/fi").then((mod) => mod.FiHelpCircle),
   { ssr: false }
 );
+const CgProfile = dynamic(
+  () => import("react-icons/cg").then((mod) => mod.CgProfile),
+  { ssr: false }
+);
 const FiSettings = dynamic(
   () => import("react-icons/fi").then((mod) => mod.FiSettings),
   { ssr: false }
 );
-const FiCreditCard = dynamic(
-  () => import("react-icons/fi").then((mod) => mod.FiCreditCard),
+const VscSettings = dynamic(
+  () => import("react-icons/vsc").then((mod) => mod.VscSettings),
+  { ssr: false }
+);
+const MdOutlineDashboardCustomize = dynamic(
+  () => import("react-icons/md").then((mod) => mod.MdOutlineDashboardCustomize),
   { ssr: false }
 );
 const RiHome5Line = dynamic(
@@ -34,10 +42,7 @@ const PiShoppingCartLight = dynamic(
   () => import("react-icons/pi").then((mod) => mod.PiShoppingCartLight),
   { ssr: false }
 );
-// const FaRegUser = dynamic(
-//   () => import("react-icons/fa").then((mod) => mod.FaRegUser),
-//   { ssr: false }
-// );
+
 const BsBoxSeam = dynamic(
   () => import("react-icons/bs").then((mod) => mod.BsBoxSeam),
   { ssr: false }
@@ -157,39 +162,33 @@ export const AdminSidebar: React.FC = () => {
   const mainMenu = useMemo(
     () => [
       {
-        label: "Dashboard",
-        path: "/dashboard",
+        label: "Admin",
+        path: "/admin",
         icon: RiHome5Line,
         exact: true
       },
       {
         label: "Events",
-        path: "/dashboard/events",
+        path: "/admin/admin-events",
         icon: BsFillCalendarEventFill,
         exact: true
       },
       {
         label: "Orders",
-        path: "/dashboard/orders",
+        path: "/admin/admin-orders",
         icon: PiShoppingCartLight,
         badge: "8",
         exact: true
       },
-      // {
-      //   label: "Contacts",
-      //   path: "/dashboard/contacts",
-      //   icon: FaRegUser,
-      //   exact: true
-      // },
       {
         label: "Delivery",
-        path: "/dashboard/delivery",
+        path: "/admin/admin-delivery",
         icon: BsBoxSeam,
         exact: true
       },
       {
         label: "Transactions",
-        path: "/dashboard/transactions",
+        path: "/admin/admin-transactions",
         icon: RiExchange2Line,
         exact: true
       }
@@ -200,19 +199,33 @@ export const AdminSidebar: React.FC = () => {
   const adminMenu = useMemo(
     () => [
       {
-        label: "Co-Host",
-        path: "/dashboard/co-host",
+        label: "Support",
+        path: "/admin/admin-support",
         // Using FiHelpCircle as a placeholder icon
         icon: FiHelpCircle,
         exact: true
       },
       {
-        label: "Discounts",
-        path: "/dashboard/discounts",
+        label: "Integrations",
+        path: "/admin/admin-integrations",
         // Using FiCreditCard as a placeholder icon
-        icon: FiCreditCard,
+        icon: MdOutlineDashboardCustomize,
         exact: true
-      }
+      },
+      {
+        label: "Fee Settings",
+        path: "/admin/admin-feeSettings",
+        // Using FiCreditCard as a placeholder icon
+        icon: VscSettings,
+        exact: true
+      },
+      {
+        label: "Admin Users",
+        path: "/admin/adminUsers",
+        // Using FiCreditCard as a placeholder icon
+        icon: CgProfile,
+        exact: true
+      },
     ],
     []
   );
@@ -221,14 +234,8 @@ export const AdminSidebar: React.FC = () => {
     () => [
       {
         label: "Settings",
-        path: "/dashboard/settings",
+        path: "/admin/admin-settings",
         icon: FiSettings,
-        exact: true
-      },
-      {
-        label: "Get Help",
-        path: "/dashboard/help",
-        icon: FiHelpCircle,
         exact: true
       }
     ],
@@ -313,8 +320,8 @@ export const AdminSidebar: React.FC = () => {
 
             {/* ADMIN Section */}
             <div className="pt-4 border-t mb-4">
-              <p className="px-2 text-sm font-medium text-gray-500 uppercase mb-2">
-                Admin
+              <p className="px-2 text-xs font-medium text-[#A0AEC0] uppercase mb-2">
+                Admin  CHANNEL
               </p>
               <nav className="space-y-2">
                 {adminMenu.map((item, index) => (

@@ -10,19 +10,16 @@ function AdminContainer({ children }: { children: React.ReactNode }) {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
 
   useEffect(() => {
-    // Parse URL search parameters for the authToken
     const searchParams = new URLSearchParams(window.location.search);
     const tokenFromUrl = searchParams.get("token");
 
     if (tokenFromUrl) {
       localStorage.setItem("authToken", tokenFromUrl);
 
-      // Optionally, remove the token from the URL after saving it
       const cleanUrl = window.location.pathname;
       router.replace(cleanUrl);
     }
 
-    // Check for authToken in localStorage
     const authToken = localStorage.getItem("authToken");
     if (!authToken) {
       router.push("/");
@@ -31,13 +28,11 @@ function AdminContainer({ children }: { children: React.ReactNode }) {
 
     setIsAuthenticated(true);
 
-    // Consume the profile endpoint to fetch the user details
     const fetchUserProfile = async () => {
       try {
         const response = await axiosInstance.post("/profile-details", {
           token: authToken,
         });
-        // Save the user profile in localStorage
         localStorage.setItem("loggedInUser", JSON.stringify(response.data));
         localStorage.setItem("loggedInUserEmail", response.data.email)
         console.log("User profile fetched successfully:", response.data);

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import { FiMenu, FiBell, FiSearch } from "react-icons/fi";
+import { HiOutlineEnvelope } from "react-icons/hi2";
 
 interface HeaderProps {
   toggleSidebar: () => void;
@@ -105,10 +106,10 @@ const AdminHeaderDashboard: React.FC<HeaderProps> = ({ toggleSidebar }) => {
           <FiMenu size={24} />
         </button>
         <div className="hidden md:block">
-          <h1 className="text-xl font-bold">Hi, {user.firstName}!</h1>
-          <p className="text-sm text-gray-500">
+          <h1 className="text-xl font-bold">Dashboard</h1>
+          {/* <p className="text-sm text-gray-500">
             Let&apos;s check your store today
-          </p>
+          </p> */}
         </div>
       </div>
 
@@ -123,6 +124,12 @@ const AdminHeaderDashboard: React.FC<HeaderProps> = ({ toggleSidebar }) => {
             className="bg-transparent focus:outline-none ml-2 text-sm"
           />
         </div>
+
+        {/* Messages */}
+        <button className="relative outline-none">
+          <HiOutlineEnvelope size={20} />
+          <span className="absolute top-0 right-0 inline-block w-2 h-2 bg-red-500 rounded-full"></span>
+        </button>
 
         {/* Notification */}
         <button className="relative outline-none">
