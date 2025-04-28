@@ -60,11 +60,10 @@ const Orders: React.FC = ({  }) => {
 
   useEffect(() => {
 
-    const loggedInUserString = localStorage.getItem("loggedInUser");
-    const loggedInUser = loggedInUserString ? JSON.parse(loggedInUserString) : null;
+    const loggedInUserid = localStorage.getItem("loggedInUserId");
 
-    if (!loggedInUser?._id) {
-      // router.replace("/");
+    if (!loggedInUserid) {
+      router.replace("/");
       console.log("User ID not found in localStorage. Redirecting to login page.");
       return;
     }
@@ -86,7 +85,7 @@ const Orders: React.FC = ({  }) => {
 
         const response = await axiosInstance.post(
             `view-orders/`,
-            { hostId: loggedInUser._id },
+            { hostId: loggedInUserid },
             { params }
           );
 

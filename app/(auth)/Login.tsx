@@ -76,6 +76,9 @@ const Login: React.FC = () => {
       // Save the response to localStorage as the logged-in user
       localStorage.setItem("loggedInUser", JSON.stringify(response.data));
       localStorage.setItem("loggedInUserEmail", response.data.email)
+      localStorage.setItem("loggedInUserId", response.data.data._id)
+      console.log("User profile fetched successfully:", response.data.data._id);
+      
       toast.success(response?.data?.message);
 
       router.push("/dashboard");

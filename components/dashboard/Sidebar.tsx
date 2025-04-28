@@ -108,7 +108,7 @@ export const Sidebar: React.FC = () => {
     console.log(authToken);
     
     if (!authToken) {
-      // router.push("/");
+      router.push("/");
       console.log("This is from the container", "No auth token found.");
       
     }

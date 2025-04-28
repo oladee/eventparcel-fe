@@ -27,8 +27,7 @@ function Container({ children }: { children: React.ReactNode }) {
     console.log("Auth Token:", authToken); // Debugging line
     
     if (!authToken) {
-      // router.push("/");
-    console.log("Auth Token:", "There are no authToken"); // Debugging line
+      router.push("/");
       return;
     }
 
