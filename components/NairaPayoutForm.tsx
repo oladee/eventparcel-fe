@@ -103,6 +103,7 @@ const NairaPayoutForm: React.FC<NairaPayoutFormProps> = ({
       const errorMessage = 'Invalid account details';
       setErrors((prev) => ({ ...prev, accountName: errorMessage }));
       setValidationState({ status: 'error', message: errorMessage });
+      console.error(error)
     } finally {
       prevValues.current = { accountNumber, bankCode };
     }

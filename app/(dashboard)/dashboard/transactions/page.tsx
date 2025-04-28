@@ -86,7 +86,7 @@ const Page = () => {
         }
       };
       fetchOrders();
-    }, [page, limit, debouncedSearchQuery]);
+    }, [page, limit, debouncedSearchQuery, router]);
 
     const formatCurrency = (value: number) => {
       if (value >= 1_000_000) {
