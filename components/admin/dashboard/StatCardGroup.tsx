@@ -29,7 +29,6 @@ const stats = [
     delta: "+ 3.9%"
   }
 ];
-
 const StatCardGroup: React.FC = () => (
   <>
     <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:col-span-2">
