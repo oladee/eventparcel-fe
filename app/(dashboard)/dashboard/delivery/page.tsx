@@ -114,7 +114,7 @@ const Page = () => {
         }
       };
       fetchOrders();
-    }, [page, limit, debouncedSearchQuery, activeTab]);
+    }, [page, limit, debouncedSearchQuery, activeTab, router]);
 
      useEffect(() => {
         function handleClickOutside(event: MouseEvent) {

@@ -138,7 +138,7 @@ const Page: React.FC = ({  }) => {
       }
     };
     fetchOrders();
-  }, [page, limit, debouncedSearchQuery, activeTab]);
+  }, [page, limit, debouncedSearchQuery, activeTab, router]);
 
 
   const handleOrderClick = (order: Order) => {

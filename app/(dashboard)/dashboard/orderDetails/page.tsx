@@ -6,7 +6,7 @@ import React, { useEffect, useState } from 'react';
 import BoxTime from "../../../../assets/orderIcons/box-time-orange.png";
 import { Mail, Phone, MapPin, CircleDollarSign } from "lucide-react";
 import { MdOutlineCalendarToday } from "react-icons/md";
-import { Order } from '@/app/interface/Order';
+// import { Order } from '@/app/interface/Order';
 import useUpdateOrderStatus from '@/hooks/useUpdateOrderStatus';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
@@ -87,7 +87,7 @@ const Page = () => {
       };
 
       const itemTotalAmount = (orders?.totalAmount || 0) - (orders?.tax || 0) - (orders?.homeDeliveryFee || 0);
-      const paidByGuest = (orders?.totalAmount || 0) + (orders?.tax || 0) + (orders?.homeDeliveryFee || 0);
+    //   const paidByGuest = (orders?.totalAmount || 0) + (orders?.tax || 0) + (orders?.homeDeliveryFee || 0);
           
     if (!orders) {
         return (
