@@ -68,6 +68,7 @@ export const useCartStore = create<CartState>()(
 
       clearCart: () => {
         set({ items: [] })
+        console.log("cart cleared")
       },
 
       updateQuantity: (id, quantity) => {

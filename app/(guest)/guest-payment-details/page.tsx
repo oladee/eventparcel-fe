@@ -28,6 +28,13 @@ function PaymentDetailsCard() {
 
   // Debounced discount validation using useEffect and setTimeout
   useEffect(() => {
+    
+    // Only proceed if discountCode length is exactly 8
+    if (discountCode.length !== 8) {
+      setDiscountResponse(null); // Clear any previous response
+      return;
+    }
+
     const handler = setTimeout(() => {
       if (!discountCode.trim()) {
         setDiscountResponse(null);
@@ -84,7 +91,6 @@ function PaymentDetailsCard() {
     grandTotal = subtotal + tax + deliveryFee;
   }
 
-  console.log("check", discountResponse)
   
   // Apply discount if valid
   if (discountResponse?.discountAmount) {

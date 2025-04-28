@@ -5,8 +5,8 @@ import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
 import Cart from "../../../../assets/orderIcons/cart.png";
 import BoxTime from "../../../../assets/orderIcons/box-time.png";
-import Eye from "../../../../assets/orderIcons/eye.png";
 import Package from "../../../../assets/orderIcons/package.png";
+import Eye from "../../../../assets/orderIcons/eye.png";
 import { Search, Settings2  } from "lucide-react";
 import { cn } from '@/utils/cn';
 import OrderPagination from '@/components/OrderPagination';
@@ -62,6 +62,13 @@ const Page: React.FC = ({  }) => {
   useEffect(() => {
 
     const fetchOrders = async () => {
+      const loggedInUserString = localStorage.getItem("loggedInUser");
+      const loggedInUser = loggedInUserString ? JSON.parse(loggedInUserString) : null;
+  
+      if (!loggedInUser?._id) {
+        router.replace("/");
+        return;
+      }
       setLoading(true);
       try {
 
@@ -77,42 +84,46 @@ const Page: React.FC = ({  }) => {
         }
 
         const response = await axiosInstance.post(
-            `view-orders/`,
-            { eventId: "67dd1f5f48f2e5b414f3efb7" },
-            { params }
-          );
+          `view-orders/`,
+          { hostId: loggedInUser._id },
+          { params }
+        );
 
-          setStats([
-            { 
-              icon: Cart, 
-              title: "Total Orders", 
-              count: response?.data?.data?.orderSummary?.ordersSummary?.totalOrders?.overall, 
-              change: `${parseFloat(response?.data?.data?.orderSummary?.ordersSummary?.totalOrders?.growthRate).toFixed(1)}%`
-            },
-            {
-              icon: Eye,
-              title: "Total Invites",
-              count: response?.data?.data?.orderSummary?.invitesSummary?.totalInvites,
-              change: `${parseFloat(response?.data?.data?.orderSummary?.invitesSummary?.viewedRate).toFixed(1)}%`
-            },          
-            { 
-              icon: Package, 
-              title: "Total Delivered", 
-              count: response?.data?.data?.orderSummary?.ordersSummary?.totalDelivered?.overall, 
-              change: `${parseFloat(response?.data?.data?.orderSummary?.ordersSummary?.totalDelivered?.growthRate).toFixed(1)}%`
-            },
-            { 
-              icon: BoxTime, 
-              title: "Pending Orders", 
-              count: response?.data?.data?.orderSummary?.ordersSummary?.pendingOrders?.overall, 
-              change: `${parseFloat(response?.data?.data?.orderSummary?.ordersSummary?.pendingOrders?.growthRate).toFixed(1)}%`
-            },
-          ]);
+        const safeParse = (value?: string | number) => {
+          const num = Number(value);
+          return isNaN(num) ? "0.00%" : `${num.toFixed(1)}%`;
+        };
+
+        setStats([
+          { 
+            icon: Cart, 
+            title: "Total Orders", 
+            count: response?.data?.data?.orderSummary?.ordersSummary?.totalOrders?.overall, 
+            change: safeParse(response?.data?.data?.orderSummary?.ordersSummary?.totalOrders?.growthRate)
+          },
+          {
+            icon: Eye,
+            title: "Total Invites",
+            count: response?.data?.data?.orderSummary?.invitesSummary?.totalInvites,
+            change: safeParse(response?.data?.data?.orderSummary?.invitesSummary?.viewedRate)
+          },          
+          { 
+            icon: Package, 
+            title: "Total Delivered", 
+            count: response?.data?.data?.orderSummary?.ordersSummary?.totalDelivered?.overall, 
+            change: safeParse(response?.data?.data?.orderSummary?.ordersSummary?.totalDelivered?.growthRate)
+          },
+          { 
+            icon: BoxTime, 
+            title: "Pending Orders", 
+            count: response?.data?.data?.orderSummary?.ordersSummary?.pendingOrders?.overall, 
+            change: safeParse(response?.data?.data?.orderSummary?.ordersSummary?.pendingOrders?.growthRate)
+          },
+        ]);
           
 
         // Ensure response data exists before setting state
         if (response.data && response.data.data) {
-          console.log("res", response.data.data)
           setOrders(response.data.data as OrderDashboardResponse);
           setTotalPages(response.data.data.totalPages || 1); 
         } else {
@@ -194,6 +205,7 @@ const Page: React.FC = ({  }) => {
     );
   }
 
+  console.log(orders)
   
   
 
@@ -427,14 +439,14 @@ const Page: React.FC = ({  }) => {
                       <div className="grid grid-cols-2 gap-y-3 text-sm text-gray-600">
                         <p className="font-medium">Order Number</p>
                         <p className="font-bold text-gray-900 truncate">{order?.orderId}</p>
-
                         <p className="font-medium">Guest</p>
                         <p className="font-bold text-gray-900">
-                        {order?.guestName 
-                          ? order.guestName.charAt(0).toUpperCase() + order.guestName.slice(1) 
-                          : "Guest Name"}
+                        {order?.guestFirstName 
+                          ? order.guestFirstName.charAt(0).toUpperCase() + order.guestFirstName.slice(1) 
+                          : "No"} {order?.guestLastName 
+                            ? order.guestLastName.charAt(0).toUpperCase() + order.guestLastName.slice(1) 
+                            : "Name"}
                         </p>
-
                         <p className="font-medium">Delivery</p>
                         <p className="font-bold text-gray-900">
                           {order?.items[0]?.deliveryMethod || "N/A"}

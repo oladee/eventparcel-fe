@@ -1,3 +1,4 @@
+import { ReactNode } from "react";
 import { Group } from "./Group";
 
 // Core Entity Structure
@@ -74,6 +75,7 @@ export interface Event extends BaseEntity {
 
 // Order System
 interface OrderItem {
+  packagePriceCurrency: string;
   _id: string;
   quantity: number;
   deliveryMethod: string;
@@ -99,6 +101,9 @@ interface OrderGuest {
 }
 
 export interface Order extends BaseEntity {
+  totalAmountCurrency: string;
+  homeDeliveryFee: any;
+  shippingAddress: ReactNode;
   orderId: string;
   event: string; // Event._id
   eventSnapshot?: { // Optional cached data
@@ -109,7 +114,10 @@ export interface Order extends BaseEntity {
   };
   guest: OrderGuest;
   guestName: string;
+  guestFirstName: string;
+  guestLastName: string;
   guestEmail: string;
+  tax: number;
   guestPhoneNumber: string;
   orderStatus: string;
   items: OrderItem[];

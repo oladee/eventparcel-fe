@@ -12,7 +12,7 @@ import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 
 const Page = () => {
-    const [orders, setOrders] = useState<Order | null>(null);
+    const [orders, setOrders] = useState<any>(null);
     const router = useRouter();
 
     useEffect(() => {
@@ -30,32 +30,36 @@ const Page = () => {
                 return;
             }
     
-            // Ensure paymentStatus is always a string
             const paymentStatus: string = orders.paymentStatus ?? "Unknown";
     
+            // Update the order status through your API
             await updateOrderStatus(orders?._id, paymentStatus, status);
     
-            // Retrieve selectedOrder from localStorage
+            // Retrieve and update the selected order in localStorage
             const storedOrder = JSON.parse(localStorage.getItem("selectedOrder") || "{}");
-
-            console.log("selected", storedOrder)
     
             if (!storedOrder || Object.keys(storedOrder).length === 0) {
                 console.warn("No selected order found in local storage.");
                 return;
             }
     
-            // Update orderStatus
+            // Update orderStatus in the localStorage object
             storedOrder.orderStatus = status;
     
             // Save the updated object back to localStorage
             localStorage.setItem("selectedOrder", JSON.stringify(storedOrder));
-            setOrders(storedOrder);
     
+            // Update the state to trigger a re-render
+            setOrders((prevOrders: any) => ({
+                ...prevOrders,
+                orderStatus: status
+            }));
+            
         } catch (error) {
             console.error("Failed to update order status:", error);
         }
     };
+    
     
     
 
@@ -81,6 +85,9 @@ const Page = () => {
           year: "numeric",
         }).replace(",", "");
       };
+
+      const itemTotalAmount = (orders?.totalAmount || 0) - (orders?.tax || 0) - (orders?.homeDeliveryFee || 0);
+      const paidByGuest = (orders?.totalAmount || 0) + (orders?.tax || 0) + (orders?.homeDeliveryFee || 0);
           
     if (!orders) {
         return (
@@ -117,7 +124,7 @@ const Page = () => {
                     </div>
                     <div id="status-divider" className="border-t border-[#EEEFF2] my-3"></div>
                     
-                    {orders.items.map((item, index) => (
+                    {orders.items.map((item: { _id: React.Key | null | undefined; packageId: { packageImgUrls: any[]; packageTitle: string; }; packageImgUrls: any[]; packageTitle: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; packagePriceCurrency: string; packagePrice: { toLocaleString: () => any; }; quantity: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; }, index: any) => (
                         <div 
                             key={item._id} 
                             id={`order-content-${orders._id}-${index}`} 
@@ -126,7 +133,7 @@ const Page = () => {
                             {/* Order Image */}
                             <Image 
                                 id={`order-image-${orders._id}-${index}`}
-                                src={item.packageId?.packageImgUrls?.[0] || "/fallback-image.png"}
+                                src={item.packageId?.packageImgUrls?.[0] || item?.packageImgUrls?.[0]}
                                 alt={item.packageId?.packageTitle || "Order Image"} 
                                 width={42} 
                                 height={42} 
@@ -136,18 +143,16 @@ const Page = () => {
                             {/* Order Details */}
                             <div id={`order-details-${orders._id}-${index}`} className="flex-1">
                                 <p id={`order-title-${orders._id}-${index}`} className="font-semibold text-sm text-[#111827]">
-                                {item.packageId?.packageTitle 
-                                    ? item.packageId.packageTitle
-                                        .split(" ")
-                                        .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                                        .join(" ")
-                                    : "No Title"}
+                                {String(item?.packageTitle || item?.packageId?.packageTitle || "")
+                                    .split(" ")
+                                    .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
+                                    .join(" ")}
                                 </p>
                                 <p 
                                     id={`order-price-${orders._id}-${index}`} 
                                     className="text-[#718096] font-normal font-general text-sm"
                                 >
-                                    {item.packageId?.packagePriceCurrency  === "NGN" ? "₦" : "$"}{item.packageId?.packagePrice.toLocaleString() ?? "N/A"} 
+                                    {item?.packagePriceCurrency  === "NGN" ? "₦" : "$"}{item.packagePrice.toLocaleString() ?? "N/A"} 
                                 </p>
                             </div>
 
@@ -191,12 +196,15 @@ const Page = () => {
                         <div id="guest-details" className='flex flex-col gap-1'>
                             <span id="guest-name" className='font-general font-semibold text-base text-[#111827]'>
                             <p className="font-bold text-gray-900">
-                                {orders?.guestName
-                                    ? orders.guestName
-                                        .toLowerCase()
-                                        .replace(/\b\w/g, (char) => char.toUpperCase())
-                                    : "Guest Name"}
-                                </p>
+                            {orders?.guestName
+                                ? orders.guestName.toLowerCase().replace(/\b\w/g, (char: string) => char.toUpperCase())
+                                : orders?.guestFirstName || orders?.guestLastName
+                                ? `${orders?.guestFirstName ?? ''} ${orders?.guestLastName ?? ''}`
+                                    .toLowerCase()
+                                    .replace(/\b\w/g, (char) => char.toUpperCase())
+                                    .trim()
+                                : "Guest Name"}
+                            </p>
                             </span>
                             <span id="guest-id" className='font-general font-medium text-sm text-[#718096]'>{orders._id}</span>
                         </div>
@@ -220,19 +228,19 @@ const Page = () => {
                         <p id="shipping-title" className='font-general font-bold text-[14px] text-[#111827]'>Shipping Address</p>
                         <div id="shipping-address" className='flex items-center gap-2 mt-3'>
                             <MapPin id="shipping-icon" className='text-[#A0AEC0] h-[24px] w-[24px]' />
-                            <p id="shipping-text" className='text-[#718096] font-general font-medium text-[14px]'>No. 23, Olufemi Street, Ikeja, Lagos, Nigeria</p>
+                            <p id="shipping-text" className='text-[#718096] font-general font-medium text-[14px]'>{orders.shippingAddress}</p>
                         </div>
                     </div>
-                    <div id="shipping-divider" className="border-t border-[#EEEFF2] my-3"></div>
+                    {/* <div id="shipping-divider" className="border-t border-[#EEEFF2] my-3"></div> */}
 
-                    <div id="billing-address-section">
+                    {/* <div id="billing-address-section">
                         <p id="billing-title" className='font-general font-bold text-[14px] text-[#111827]'>Billing Address</p>
                         <div id="billing-address" className='flex items-center gap-2 mt-3'>
                             <MapPin id="billing-icon" className='text-[#A0AEC0] h-[24px] w-[24px]' />
                             <p id="billing-text" className='text-[#718096] font-general font-medium text-[14px]'>45A Adeola Odeku Street Victoria Island, Lagos 101241, Nigeria</p>
                         </div>
-                    </div>
-                    <div id="billing-divider" className="border-t border-[#EEEFF2] my-3"></div>
+                    </div> */}
+                    {/* <div id="billing-divider" className="border-t border-[#EEEFF2] my-3"></div> */}
                 </div>
 
                 <div id="payment-info-card" className='bg-[#FFFFFF] rounded-[16px] p-5 mt-5 flex flex-col gap-5'>
@@ -246,25 +254,33 @@ const Page = () => {
                     
                     <div id="item-cost" className='flex items-center justify-between'>
                         <span id="item-label" className='text-[#718096] font-general font-medium text-[14px]'>
-                        {orders?.items ? orders.items.reduce((total, item) => total + item.quantity, 0) : 0} item
-                    </span>
+                            {orders?.items ? orders.items.reduce((total: any, item: { quantity: any; }) => total + item.quantity, 0) : 0} item
+                        </span>
                         <span id="item-price" className='text-[#718096] font-general font-medium text-[14px]'>
-                            {orders.items[0]?.packageId?.packagePriceCurrency === "NGN" ? "₦" : "$"}{orders?.totalAmount.toLocaleString()}
+                            {orders?.totalAmountCurrency === "NGN" ? "₦" : "$"}{itemTotalAmount.toLocaleString()}
                         </span>
                     </div>
                     
+                    {orders?.homeDeliveryFee && (
+                        <div id="delivery-cost" className='flex items-center justify-between'>
+                            <span id="delivery-label" className='text-[#718096] font-general font-medium text-[14px]'>Home Delivery</span>
+                            <span id="delivery-price" className='text-[#718096] font-general font-medium text-[14px]'>{orders.totalAmountCurrency === "NGN" ? "₦" : "$"}{orders?.homeDeliveryFee}</span>
+                        </div>
+                    )}
                     <div id="delivery-cost" className='flex items-center justify-between'>
-                        <span id="delivery-label" className='text-[#718096] font-general font-medium text-[14px]'>Home Delivery</span>
-                        <span id="delivery-price" className='text-[#718096] font-general font-medium text-[14px]'>N/A</span>
+                        <span id="tax-label" className='text-[#718096] font-general font-medium text-[14px]'>Tax</span>
+                        <span id="tax-price" className='text-[#718096] font-general font-medium text-[14px]'>{orders.totalAmountCurrency === "NGN" ? "₦" : "$"}{orders?.tax}</span>
                     </div>
                     <div id="total-cost" className='flex items-center justify-between'>
                         <span id="total-label" className='font-general font-bold text-[14px] text-[#111827]'>Total</span>
-                        <span id="total-price" className='font-general font-bold text-[16px] text-[#111827]'>N/A</span>
+                        <span id="total-price" className='font-general font-bold text-[16px] text-[#111827]'>{orders.totalAmountCurrency === "NGN" ? "₦" : "$"}{orders?.totalAmount.toLocaleString()}</span>
                     </div>
                     
                     <div id="payment-method" className='flex items-center justify-between'>
                         <span id="method-label" className='text-[#718096] font-general font-medium text-[14px]'>Paid by Guest</span>
-                        <span id="method-amount" className='font-general font-bold text-[16px] text-[#111827]'>N/A</span>
+                        <span id="method-amount" className='font-general font-bold text-[16px] text-[#111827]'>
+                            {orders?.totalAmountCurrency === "NGN" ? "₦" : "$"}{orders?.totalAmount?.toLocaleString()}
+                        </span>
                     </div>
                 </div>
                 <div id="final-divider" className="border-t border-[#EEEFF2] my-3"></div>
@@ -275,20 +291,21 @@ const Page = () => {
                             <div id="event-image-container" className="relative w-24 h-24 rounded-xl overflow-hidden flex-shrink-0">
                                 <Image
                                     id="event-image"
-                                    src={orders?.eventId?.eventImgUrl}
+                                    src={orders?.eventId?.eventImgUrl || "/images/placeholder_eventCover3.jpg"}
                                     alt="Event Cover"
-                                    className="object-contain w-full h-full rounded-[12px]"
-                                    width={20} 
-                                    height={25} 
+                                    className="w-full h-full rounded-[12px]"
+                                    width={100} 
+                                    height={100} 
                                     quality={100}
                                     priority
+                                    style={{width: "80px", height: "80px"}}
                                 />
                             </div>
                             <p onClick={() => handleViewOneEvent(orders?.eventId?._id)} id="event-title" className="text-gray-700 font-general font-bold text-[16px]">
                             {orders?.eventId?.eventName
                                 ? orders.eventId.eventName
                                     .split(" ")
-                                    .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                                    .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
                                     .join(" ")
                                 : "No Event Name"}
                             </p>

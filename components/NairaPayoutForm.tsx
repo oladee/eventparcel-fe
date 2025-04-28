@@ -1,14 +1,15 @@
+"use client"
+
 import React, { useCallback, useEffect, useRef, useState } from "react";
 import BankDropdown from "./BankDropdown";
 import axiosInstance from "@/lib/axiosInstance";
-import { CheckCircle, XCircle } from "lucide-react";
-
+import { CheckCircle, XCircle, Loader2 } from "lucide-react";
 
 interface Bank {
-    name: string;
-    code: string;
-    url: string;
-  }
+  name: string;
+  code: string;
+  url: string;
+}
 
 interface NairaPayoutFormProps {
   formData: {
@@ -19,7 +20,6 @@ interface NairaPayoutFormProps {
       bankCode: string;
     };
   };
-
   errors: { [key: string]: string };
   handleChange: (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => void;
   handleBlur: (e: React.FocusEvent<HTMLInputElement>) => void;
@@ -39,8 +39,11 @@ const NairaPayoutForm: React.FC<NairaPayoutFormProps> = ({
   setFormData,
   setErrors
 }) => {
+  const [validationState, setValidationState] = useState<{
+    status: 'idle' | 'validating' | 'success' | 'error';
+    message: string;
+  }>({ status: 'idle', message: '' });
 
-  const [isValidating, setIsValidating] = useState(false);
   const prevValues = useRef({
     accountNumber: "",
     bankCode: ""
@@ -57,18 +60,25 @@ const NairaPayoutForm: React.FC<NairaPayoutFormProps> = ({
           bankCode: selectedBank.code,
         },
       }));
+      // Reset validation when bank changes
+      setValidationState({ status: 'idle', message: '' });
     }
   }, [selectedBank, setFormData]);
 
   // Memoized validation function
   const validateBankAccount = useCallback(async (accountNumber: string, bankCode: string) => {
-    if (!bankCode || accountNumber.length !== 10) return;
+    if (!bankCode || accountNumber.length !== 10) {
+      setValidationState({ status: 'idle', message: '' });
+      return;
+    }
+
     if (accountNumber === prevValues.current.accountNumber && 
         bankCode === prevValues.current.bankCode) {
       return;
     }
 
-    setIsValidating(true);
+    setValidationState({ status: 'validating', message: 'Validating account...' });
+
     try {
       const response = await axiosInstance.post("/validate-bank-account", {
         accountNumber,
@@ -83,15 +93,17 @@ const NairaPayoutForm: React.FC<NairaPayoutFormProps> = ({
             accountName: response.data.data.account_name,
           },
         }));
-        setErrors((prev) => ({ ...prev, accountName: "" }));
+        setErrors((prev) => ({ ...prev, accountName: '' }));
+        setValidationState({ status: 'success', message: 'Account validated successfully' });
       } else {
-        setErrors((prev) => ({ ...prev, accountName: "Invalid account details" }));
+        setErrors((prev) => ({ ...prev, accountName: 'Invalid account details' }));
+        setValidationState({ status: 'error', message: 'Invalid account details' });
       }
     } catch (error) {
-      setErrors((prev) => ({ ...prev, accountName: "Error validating account" }));
-      console.error("Validation error:", error);
+      const errorMessage = 'Invalid account details';
+      setErrors((prev) => ({ ...prev, accountName: errorMessage }));
+      setValidationState({ status: 'error', message: errorMessage });
     } finally {
-      setIsValidating(false);
       prevValues.current = { accountNumber, bankCode };
     }
   }, [setErrors, setFormData]);
@@ -120,6 +132,8 @@ const NairaPayoutForm: React.FC<NairaPayoutFormProps> = ({
       } else {
         delete newErrors.accountNumber;
       }
+      // Reset validation state when account number changes
+      setValidationState({ status: 'idle', message: '' });
     }
 
     setErrors(newErrors);
@@ -128,8 +142,10 @@ const NairaPayoutForm: React.FC<NairaPayoutFormProps> = ({
   return (
     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
       {/* Account Number Field */}
-      <div className="flex flex-col">
-        <p className="font-general font-semibold text-[#111827] text-xl mb-5">Naira Payout</p>
+      <div className="flex flex-col w-full">
+        <div className="w-full">
+          <p className="font-general font-semibold text-[#111827] text-xl mb-5">Naira Payout</p>
+        </div>
         <label
           htmlFor="accountNumber"
           className="block mb-2 font-semibold text-[#111827]"
@@ -152,14 +168,14 @@ const NairaPayoutForm: React.FC<NairaPayoutFormProps> = ({
           required
         />
         {errors.accountNumber && (
-          <p id="accountNumberError" className="text-red-500 text-sm mt-1" role="alert">
+          <p id="accountNumberError" className="text-red-500 text-xs mt-1 w-full" role="alert">
             {errors.accountNumber}
           </p>
         )}
       </div>
 
       {/* Bank Name Dropdown */}
-      <div>
+      <div className="lg:mt-12">
         <label className="block mb-2 font-semibold text-[#111827]">Bank Name</label>
         <BankDropdown
           selectedBank={selectedBank}
@@ -178,23 +194,42 @@ const NairaPayoutForm: React.FC<NairaPayoutFormProps> = ({
             type="text"
             id="nairaAccount.accountName"
             placeholder="Account name"
-            value={isValidating ? "Validating..." : formData.nairaAccount.accountName}
+            value={
+              validationState.status === 'validating'
+                ? ''
+                : formData.nairaAccount.accountName
+            }
             disabled
             className={`px-3 py-2 input-field outline-primary w-full rounded-[5px] bg-slate-50 pr-10
-              ${errors.accountName ? "border-red-500" : "border-green-500"}
+              ${validationState.status === 'error' ? 'border-red-500' : ''}
+              ${validationState.status === 'success' ? 'border-green-500' : ''}
             `}
           />
-          {/* Validation Icons */}
-          {!isValidating && formData.nairaAccount.accountName && (
-            <span className="absolute inset-y-0 right-3 flex items-center">
-              {errors.accountName ? (
-                <XCircle size={20} className="text-red-500" />
-              ) : (
-                <CheckCircle size={20} className="text-green-500" />
-              )}
-            </span>
-          )}
+          
+          {/* Validation Status Indicators */}
+          <span className="absolute inset-y-0 right-3 flex items-center">
+            {validationState.status === 'validating' && (
+              <Loader2 size={20} className="animate-spin text-gray-500" />
+            )}
+            {validationState.status === 'success' && (
+              <CheckCircle size={20} className="text-green-500" />
+            )}
+            {validationState.status === 'error' && (
+              <XCircle size={20} className="text-red-500" />
+            )}
+          </span>
         </div>
+        
+        {/* Validation Status Message */}
+        {validationState.message && (
+          <p className={`text-sm mt-1 ${
+            validationState.status === 'error' ? 'text-red-500' : 
+            validationState.status === 'success' ? 'text-green-500' : 
+            'text-gray-500'
+          }`}>
+            {validationState.message}
+          </p>
+        )}
       </div>
     </div>
   );

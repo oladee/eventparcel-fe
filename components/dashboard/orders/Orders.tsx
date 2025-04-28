@@ -60,6 +60,14 @@ const Orders: React.FC = ({  }) => {
 
   useEffect(() => {
 
+    const loggedInUserString = localStorage.getItem("loggedInUser");
+    const loggedInUser = loggedInUserString ? JSON.parse(loggedInUserString) : null;
+
+    if (!loggedInUser?._id) {
+      router.replace("/");
+      return;
+    }
+
     const fetchOrders = async () => {
       setLoading(true);
       try {
@@ -77,41 +85,45 @@ const Orders: React.FC = ({  }) => {
 
         const response = await axiosInstance.post(
             `view-orders/`,
-            { eventId: "67dd1f5f48f2e5b414f3efb7" },
+            { hostId: loggedInUser._id },
             { params }
           );
+
+          const safeParse = (value?: string | number) => {
+            const num = Number(value);
+            return isNaN(num) ? "0.00%" : `${num.toFixed(1)}%`;
+          };
 
           setStats([
             { 
               icon: Cart, 
               title: "Total Orders", 
               count: response?.data?.data?.orderSummary?.ordersSummary?.totalOrders?.overall, 
-              change: `${parseFloat(response?.data?.data?.orderSummary?.ordersSummary?.totalOrders?.growthRate).toFixed(1)}%`
+              change: safeParse(response?.data?.data?.orderSummary?.ordersSummary?.totalOrders?.growthRate)
             },
             {
               icon: Eye,
               title: "Total Invites",
               count: response?.data?.data?.orderSummary?.invitesSummary?.totalInvites,
-              change: `${parseFloat(response?.data?.data?.orderSummary?.invitesSummary?.viewedRate).toFixed(1)}%`
+              change: safeParse(response?.data?.data?.orderSummary?.invitesSummary?.viewedRate)
             },          
             { 
               icon: Package, 
               title: "Total Delivered", 
               count: response?.data?.data?.orderSummary?.ordersSummary?.totalDelivered?.overall, 
-              change: `${parseFloat(response?.data?.data?.orderSummary?.ordersSummary?.totalDelivered?.growthRate).toFixed(1)}%`
+              change: safeParse(response?.data?.data?.orderSummary?.ordersSummary?.totalDelivered?.growthRate)
             },
             { 
               icon: BoxTime, 
               title: "Pending Orders", 
               count: response?.data?.data?.orderSummary?.ordersSummary?.pendingOrders?.overall, 
-              change: `${parseFloat(response?.data?.data?.orderSummary?.ordersSummary?.pendingOrders?.growthRate).toFixed(1)}%`
+              change: safeParse(response?.data?.data?.orderSummary?.ordersSummary?.pendingOrders?.growthRate)
             },
           ]);
           
 
         // Ensure response data exists before setting state
         if (response.data && response.data.data) {
-          console.log("res", response.data.data)
           setOrders(response.data.data as OrderDashboardResponse);
           setTotalPages(response.data.data.totalPages || 1); 
         } else {
