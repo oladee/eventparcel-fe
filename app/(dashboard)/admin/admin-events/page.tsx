@@ -17,7 +17,7 @@ type Event = {
 const events: Event[] = [
   {
     id: 1,
-    image: '/images/event1.png',
+    image: '/images/placeholder_eventCover2.jpg',
     title: 'James & Jane Wedding Anniversary 2025',
     date: '12 MAR, 2025 AT 10:30AM WAT',
     location: 'Jaja Hall, 18 Olumo Street, Onike, Yaba, Lagos.',
@@ -26,7 +26,7 @@ const events: Event[] = [
   },
   {
     id: 2,
-    image: '/images/event2.png',
+    image: '/images/placeholder_eventCover2.jpg',
     title: 'Lorem & Ipsum Wedding Ceremony',
     date: '17 JUL, 2021 AT 02:00PM WAT',
     location: 'Riverside Venue, Banana Island, Lagos.',
@@ -35,7 +35,16 @@ const events: Event[] = [
   },
   {
     id: 3,
-    image: '/images/event1.png',
+    image: '/images/placeholder_eventCover2.jpg',
+    title: 'James & Jane Wedding Anniversary 2025',
+    date: '12 MAR, 2025 AT 10:30AM WAT',
+    location: 'Jaja Hall, 18 Olumo Street, Onike, Yaba, Lagos.',
+    sales: '₦13.49M',
+    packagesSold: 164,
+  },
+  {
+    id: 4,
+    image: '/images/placeholder_eventCover2.jpg',
     title: 'James & Jane Wedding Anniversary 2025',
     date: '12 MAR, 2025 AT 10:30AM WAT',
     location: 'Jaja Hall, 18 Olumo Street, Onike, Yaba, Lagos.',

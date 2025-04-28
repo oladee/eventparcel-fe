@@ -79,6 +79,7 @@ const Login: React.FC = () => {
       toast.success(response?.data?.message);
 
       router.push("/dashboard");
+      // router.push("/event-creation");
     } catch (error: any) {
       if (
         error.response?.data?.message ===

@@ -111,7 +111,9 @@ export const AdminSidebar: React.FC = () => {
   useEffect(() => {
     const authToken = localStorage.getItem("authToken");
     if (!authToken) {
-      router.push("/");
+      // router.push("/");
+      console.log("Auth Token:", "There are no authToken"); // Debugging line
+      
     }
   }, [router]);
 

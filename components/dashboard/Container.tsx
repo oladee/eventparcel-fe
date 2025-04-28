@@ -24,8 +24,11 @@ function Container({ children }: { children: React.ReactNode }) {
 
     // Check for authToken in localStorage
     const authToken = localStorage.getItem("authToken");
+    console.log("Auth Token:", authToken); // Debugging line
+    
     if (!authToken) {
-      router.push("/");
+      // router.push("/");
+    console.log("Auth Token:", "There are no authToken"); // Debugging line
       return;
     }
 
