@@ -196,14 +196,14 @@ const Page = () => {
 
   return (
    <Container>
-    <div className="w-[343px] h-full flex flex-col gap-5 items-center justify-center">
+    <div className="w-[343px] lg:w-[700px] h-full flex flex-col gap-5 items-center justify-center">
       <div id="discount-header" className="w-full flex justify-start">
         <h2 id="discount-title" className="font-general text-2xl font-bold text-[#111827]">Delivery</h2>
       </div>
 
        {/* Stats Grid */}
 
-      <div id="stats-grid" className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-[16px]">
+      <div id="stats-grid" className="w-full grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-[16px]">
         {stats.map((stat, index) => (
           <div 
             id={`stat-card-${index}`}
@@ -239,7 +239,7 @@ const Page = () => {
         ))}
       </div>
 
-        <div id="orders-content-container" className='bg-[#FFFFFF] p-5 mt-6 rounded-[12px]'>
+        <div id="orders-content-container" className='bg-[#FFFFFF] w-full p-5 mt-6 rounded-[12px]'>
 
          <div id="orders-tabs" className="flex items-center justify-between px-2 border-b space-x-6 mt-6 mb-6">
             {tabs.map((tab) => (
