@@ -12,6 +12,7 @@ import useDebounce from '@/hooks/useDebounce';
 import axiosInstance from '@/lib/axiosInstance';
 import OrderPagination from '@/components/OrderPagination';
 import { motion } from 'framer-motion';
+import { number } from 'zod';
 
 
 const Page = () => {
@@ -24,6 +25,7 @@ const Page = () => {
   const router = useRouter();
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
   const [showBreakdown, setShowBreakdown] = useState(false);
+  const [openBreakdownOrderId, setOpenBreakdownOrderId] = useState<string | null>(null);
   const [stats, setStats] = useState([
     { icon: Cart, title: "Overall Sales", count: 0, change: "0.00%" },
     { icon: BoxTime, title: "Net Sales", count: 0, change: "0.00%" },
@@ -51,23 +53,24 @@ const Page = () => {
               };
         
               const safeChange = (value?: string | number) => {
-                if (value === undefined || value === null) return "0.00%";
+                if (value === undefined || value === null) return "0.00";
                 const num = Number(value);
-                return isNaN(num) ? "0.00%" : `${num.toFixed(2)}%`;
+                return isNaN(num) ? "0.00" : `${num.toFixed(2)}`;
               };      
+              console.log("res", response.data.data)
 
               setStats([
                 { 
                   icon: Cart, 
                   title: "Overall Sales", 
                   count: safeCount(response?.data?.data?.summary?.summaryByCurrency?.NGN?.overallSales),
-                  change: safeChange(response?.data?.data?.summary?.summaryByCurrency?.USD?.overallSalesChange),
+                  change: safeChange(response?.data?.data?.summary?.summaryByCurrency?.USD?.overallSales),
                 },
                 { 
                   icon: BoxTime, 
                   title: "Net Sales", 
                   count: safeCount(response?.data?.data?.summary?.summaryByCurrency?.NGN?.netSales),
-                  change: safeChange(response?.data?.data?.summary?.summaryByCurrency?.USD?.netSalesChange),
+                  change: safeChange(response?.data?.data?.summary?.summaryByCurrency?.USD?.netSales),
                 },
               ]);
             
@@ -168,7 +171,7 @@ const Page = () => {
                 id={`stat-change-${index}`}
                 className={`text-xs font-general font-normal mt-1 ${String(stat.change).startsWith('-') ? 'text-red-600' : 'text-green-600'}`}
                 >
-                {stat.change} <span className='text-[#718096]'>Change</span>
+                {formatDollarCurrency(Number(stat.change))} <span className='text-[#718096]'>in Dollar</span>
               </p>
             </div>
           ))}
@@ -234,8 +237,7 @@ const Page = () => {
               </div>
 
               <div className="h-px bg-gray-100 my-2" />
-              {showBreakdown && (
-                <>
+              {openBreakdownOrderId === order.orderId && (                <>
               <div className="flex justify-between">
                 <span className='font-medium text-[#acb9ca] text-sm'>{order?.items} Item (s)</span>
                 <span>
@@ -277,9 +279,12 @@ const Page = () => {
           </div>
 
           {/* Collapse Button */}
-          <button onClick={() => setShowBreakdown(!showBreakdown)} className="w-full h-[32px] flex items-center justify-center text-[#751423] border border-[#751423] py-1.5 rounded-[8px] font-medium">
-          {showBreakdown ? 'See Less' : 'See Breakdown'}
-            {showBreakdown ? (
+          <button
+            onClick={() => setOpenBreakdownOrderId(prev => prev === order.orderId ? null : order.orderId)}
+            className="w-full h-[32px] flex items-center justify-center text-[#751423] border border-[#751423] py-1.5 rounded-[8px] font-medium"
+          >
+            {openBreakdownOrderId === order.orderId ? 'See Less' : 'See Breakdown'}
+            {openBreakdownOrderId === order.orderId ? (
               <ChevronUp size={16} className="ml-1 text-[#A0AEC0]" />
             ) : (
               <ChevronDown size={16} className="ml-1 text-[#A0AEC0]" />
