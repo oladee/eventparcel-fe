@@ -12,8 +12,6 @@ import useDebounce from '@/hooks/useDebounce';
 import axiosInstance from '@/lib/axiosInstance';
 import OrderPagination from '@/components/OrderPagination';
 import { motion } from 'framer-motion';
-import { number } from 'zod';
-
 
 const Page = () => {
   const [orders, setOrders] = useState<any>(null);
@@ -24,7 +22,6 @@ const Page = () => {
   const [loading, setLoading] = useState(true);
   const router = useRouter();
   const debouncedSearchQuery = useDebounce(searchQuery, 500);
-  const [showBreakdown, setShowBreakdown] = useState(false);
   const [openBreakdownOrderId, setOpenBreakdownOrderId] = useState<string | null>(null);
   const [stats, setStats] = useState([
     { icon: Cart, title: "Overall Sales", count: 0, change: "0.00%" },
@@ -113,7 +110,16 @@ const Page = () => {
         localStorage.setItem("selectedOrder", JSON.stringify(order));
         router.push(`/dashboard/orderDetails`);
       };
-    
+
+      const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        return date.toLocaleDateString("en-US", {
+          month: "short",
+          day: "2-digit",
+          year: "numeric",
+        });
+      };
+          
 
     if (loading) {
       return (
@@ -139,17 +145,17 @@ const Page = () => {
 
   return (
    <Container>
-    <div className="w-[343px] h-full flex flex-col gap-5 items-center justify-center">
+    <div className="w-[343px] lg:w-full h-full flex flex-col gap-5 items-center justify-center">
       <div id="discount-header" className="w-full flex justify-start">
         <h2 id="discount-title" className="font-general text-2xl font-bold text-[#111827]">Transactions</h2>
       </div>
        {/* Stats Grid */}
-        <div id="stats-grid" className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-[16px]">
+        <div id="stats-grid" className="w-full grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-[16px]">
           {stats.map((stat, index) => (
             <div 
             id={`stat-card-${index}`}
             key={index} 
-              className="w-[163px] h-[121px] bg-[#FFFFFF] shadow-sm p-3 rounded-[12px]"
+              className="w-[163px] lg:w-[226px] h-[121px] bg-[#FFFFFF] shadow-sm p-3 rounded-[12px]"
             >
               <div id={`stat-header-${index}`} className='flex items-center gap-2'>
                 <Image 
@@ -177,7 +183,7 @@ const Page = () => {
           ))}
         </div>
 
-        <div id="orders-content-container" className='bg-[#FFFFFF] p-5 mt-6 rounded-[12px]'>
+        <div id="orders-content-container" className='bg-[#FFFFFF] w-full p-5 mt-6 rounded-[12px]'>
         {/* Search and Filter */}
         <div id="search-filter-container" className="flex items-center gap-3 rounded-md mt-3">
           <div id="search-container" className="flex items-center bg-[#FAFAFA] px-4 py-2 rounded-[12px] w-[80%] h-[56px]">
@@ -204,94 +210,202 @@ const Page = () => {
             <span className="text-gray-500">No transactions found</span>
           </div>
         ) : (
-          orders?.map((order: any) => (
-            <div key={order?.orderNumber} className="rounded-xl py-2 w-full max-w-xs space-y-4 text-sm">
-            <div className="flex items-center justify-between font-medium text-[#718096] text-sm border-t pt-4">
-              <span>Apr 24, 2025</span>
-              <button onClick={() => handleOrderClick(order?.orderId)} className="w-[87px] h-[20px] text-xs text-[#751423] bg-[#7514231F] px-2 py-0.5 rounded-full font-medium">
-                View Order
-              </button>
-            </div>
+        //   orders?.map((order: any) => (
+        //     <div key={order?.orderNumber} className="rounded-xl py-2 w-full max-w-xs space-y-4 text-sm">
+        //     <div className="flex items-center justify-between font-medium text-[#718096] text-sm border-t pt-4">
+        //       <span>{formatDate(order?.orderId?.createdAt)}</span>
+        //       <button onClick={() => handleOrderClick(order?.orderId)} className="w-[87px] h-[20px] text-xs text-[#751423] bg-[#7514231F] px-2 py-0.5 rounded-full font-medium">
+        //         View Order
+        //       </button>
+        //     </div>
 
-            {/* Transaction Info */}
-            <div className="space-y-4 text-gray-700">
-              <div className="flex justify-between">
-                <span className='font-medium text-[#718096] text-sm'>Order Number</span>
-                <span className="text-[#111827] text-sm font-semibold">{order?.orderNumber}</span>
-              </div>
-              <div className="flex justify-between">
-                <span className='font-medium text-[#718096] text-sm'>Guest Payment</span>
-                <span className="text-[#111827] text-sm font-semibold">
-                  {order?.guestPaymentCurrency === "NGN" 
-                    ? formatCurrency(order?.guestPayment)
-                    : formatDollarCurrency(order?.guestPayment)}
-                </span>
-              </div>
-              <div className="flex justify-between">
-                <span className='font-medium text-[#718096] text-sm'>Amount Received</span>
-                <span className="text-[#0CAF60] text-sm font-semibold">
-                  {order?.amountReceivedCurrency === "NGN" 
-                    ? formatCurrency(order?.amountReceived)
-                    : formatDollarCurrency(order?.amountReceived)}
-                </span>
+        //     {/* Transaction Info */}
+        //     <div className="space-y-4 text-gray-700">
+        //       <div className="flex justify-between">
+        //         <span className='font-medium text-[#718096] text-sm'>Order Number</span>
+        //         <span className="text-[#111827] text-sm font-semibold">{order?.orderNumber}</span>
+        //       </div>
+        //       <div className="flex justify-between">
+        //         <span className='font-medium text-[#718096] text-sm'>Guest Payment</span>
+        //         <span className="text-[#111827] text-sm font-semibold">
+        //           {order?.guestPaymentCurrency === "NGN" 
+        //             ? formatCurrency(order?.guestPayment)
+        //             : formatDollarCurrency(order?.guestPayment)}
+        //         </span>
+        //       </div>
+        //       <div className="flex justify-between">
+        //         <span className='font-medium text-[#718096] text-sm'>Amount Received</span>
+        //         <span className="text-[#0CAF60] text-sm font-semibold">
+        //           {order?.amountReceivedCurrency === "NGN" 
+        //             ? formatCurrency(order?.amountReceived)
+        //             : formatDollarCurrency(order?.amountReceived)}
+        //         </span>
+        //       </div>
+
+        //       <div className="h-px bg-gray-100 my-2" />
+        //       {openBreakdownOrderId === order.orderId && (                <>
+        //       <div className="flex justify-between">
+        //         <span className='font-medium text-[#acb9ca] text-sm'>{order?.items} Item (s)</span>
+        //         <span>
+        //           {order?.amountReceivedCurrency === "NGN" 
+        //             ? formatCurrency(order?.amountReceived)
+        //             : formatDollarCurrency(order?.amountReceived)}
+        //         </span>
+        //       </div>
+        //       {order?.homeDeliveryFee && (
+        //         <div className="flex justify-between">
+        //           <span className='font-medium text-[#acb9ca] text-sm'>Home Delivery</span>
+        //           <span>
+        //             {order?.guestPaymentCurrency === "NGN" 
+        //               ? formatCurrency(order?.homeDeliveryFee)
+        //               : formatDollarCurrency(order?.homeDeliveryFee)}
+        //           </span>
+        //         </div>
+        //       )}
+        //       <div className="flex justify-between">
+        //         <span className='font-medium text-[#acb9ca] text-sm'>Tax</span>
+        //         <span>
+        //           {order?.totalAmountCurrency === "NGN" 
+        //             ? formatCurrency(order?.tax)
+        //             : formatDollarCurrency(order?.tax)}
+        //         </span>
+        //       </div>
+
+        //       <div className="h-px bg-gray-100 my-2" />
+
+        //       <div className="flex justify-between font-semibold text-black">
+        //         <span className="text-[#111827] text-sm font-semibold">Total</span>
+        //         <span className="text-[#111827] text-sm font-semibold">
+        //           {order?.totalAmountCurrency === "NGN" 
+        //             ? formatCurrency(order?.totalAmount)
+        //             : formatDollarCurrency(order?.totalAmount)}
+        //         </span>
+        //       </div>
+        //     </>)}
+        //   </div>
+
+        //   {/* Collapse Button */}
+        //   <button
+        //     onClick={() => setOpenBreakdownOrderId(prev => prev === order.orderId ? null : order.orderId)}
+        //     className="w-full h-[32px] flex items-center justify-center text-[#751423] border border-[#751423] py-1.5 rounded-[8px] font-medium"
+        //   >
+        //     {openBreakdownOrderId === order.orderId ? 'See Less' : 'See Breakdown'}
+        //     {openBreakdownOrderId === order.orderId ? (
+        //       <ChevronUp size={16} className="ml-1 text-[#A0AEC0]" />
+        //     ) : (
+        //       <ChevronDown size={16} className="ml-1 text-[#A0AEC0]" />
+        //     )}
+        //   </button>
+        // </div>
+        // ))
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
+          {orders?.map((order: any) => (
+            <div
+              key={order?.orderNumber}
+              className="rounded-xl p-4 w-full bg-white max-w-full space-y-4 text-sm"
+            >
+              {/* Header: Date & View Order */}
+              <div className="flex items-center justify-between font-medium text-[#718096] border-t pt-4 text-sm">
+                <span>{formatDate(order?.orderId?.createdAt)}</span>
+                <button
+                  onClick={() => handleOrderClick(order?.orderId)}
+                  className="text-xs text-[#751423] bg-[#7514231F] px-3 py-1 rounded-full font-medium"
+                >
+                  View Order
+                </button>
               </div>
 
-              <div className="h-px bg-gray-100 my-2" />
-              {openBreakdownOrderId === order.orderId && (                <>
-              <div className="flex justify-between">
-                <span className='font-medium text-[#acb9ca] text-sm'>{order?.items} Item (s)</span>
-                <span>
-                  {order?.amountReceivedCurrency === "NGN" 
-                    ? formatCurrency(order?.amountReceived)
-                    : formatDollarCurrency(order?.amountReceived)}
-                </span>
-              </div>
-              {order?.homeDeliveryFee && (
+              {/* Transaction Info */}
+              <div className="space-y-4 text-gray-700">
                 <div className="flex justify-between">
-                  <span className='font-medium text-[#acb9ca] text-sm'>Home Delivery</span>
-                  <span>
-                    {order?.guestPaymentCurrency === "NGN" 
-                      ? formatCurrency(order?.homeDeliveryFee)
-                      : formatDollarCurrency(order?.homeDeliveryFee)}
+                  <span className="font-medium text-[#718096] text-sm">Order Number</span>
+                  <span className="text-[#111827] text-sm font-semibold">{order?.orderNumber}</span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="font-medium text-[#718096] text-sm">Guest Payment</span>
+                  <span className="text-[#111827] text-sm font-semibold">
+                    {order?.guestPaymentCurrency === "NGN"
+                      ? formatCurrency(order?.guestPayment)
+                      : formatDollarCurrency(order?.guestPayment)}
                   </span>
                 </div>
-              )}
-              <div className="flex justify-between">
-                <span className='font-medium text-[#acb9ca] text-sm'>Tax</span>
-                <span>
-                  {order?.totalAmountCurrency === "NGN" 
-                    ? formatCurrency(order?.tax)
-                    : formatDollarCurrency(order?.tax)}
-                </span>
+                <div className="flex justify-between">
+                  <span className="font-medium text-[#718096] text-sm">Amount Received</span>
+                  <span className="text-[#0CAF60] text-sm font-semibold">
+                    {order?.amountReceivedCurrency === "NGN"
+                      ? formatCurrency(order?.amountReceived)
+                      : formatDollarCurrency(order?.amountReceived)}
+                  </span>
+                </div>
+
+                <div className="h-px bg-gray-100 my-2" />
+
+                {openBreakdownOrderId === order.orderId && (
+                  <>
+                    <div className="flex justify-between">
+                      <span className="font-medium text-[#acb9ca] text-sm">
+                        {order?.items} Item(s)
+                      </span>
+                      <span>
+                        {order?.amountReceivedCurrency === "NGN"
+                          ? formatCurrency(order?.amountReceived)
+                          : formatDollarCurrency(order?.amountReceived)}
+                      </span>
+                    </div>
+
+                    {order?.homeDeliveryFee && (
+                      <div className="flex justify-between">
+                        <span className="font-medium text-[#acb9ca] text-sm">Home Delivery</span>
+                        <span>
+                          {order?.guestPaymentCurrency === "NGN"
+                            ? formatCurrency(order?.homeDeliveryFee)
+                            : formatDollarCurrency(order?.homeDeliveryFee)}
+                        </span>
+                      </div>
+                    )}
+
+                    <div className="flex justify-between">
+                      <span className="font-medium text-[#acb9ca] text-sm">Tax</span>
+                      <span>
+                        {order?.totalAmountCurrency === "NGN"
+                          ? formatCurrency(order?.tax)
+                          : formatDollarCurrency(order?.tax)}
+                      </span>
+                    </div>
+
+                    <div className="h-px bg-gray-100 my-2" />
+
+                    <div className="flex justify-between font-semibold text-black">
+                      <span className="text-[#111827] text-sm font-semibold">Total</span>
+                      <span className="text-[#111827] text-sm font-semibold">
+                        {order?.totalAmountCurrency === "NGN"
+                          ? formatCurrency(order?.totalAmount)
+                          : formatDollarCurrency(order?.totalAmount)}
+                      </span>
+                    </div>
+                  </>
+                )}
               </div>
 
-              <div className="h-px bg-gray-100 my-2" />
-
-              <div className="flex justify-between font-semibold text-black">
-                <span className="text-[#111827] text-sm font-semibold">Total</span>
-                <span className="text-[#111827] text-sm font-semibold">
-                  {order?.totalAmountCurrency === "NGN" 
-                    ? formatCurrency(order?.totalAmount)
-                    : formatDollarCurrency(order?.totalAmount)}
-                </span>
-              </div>
-            </>)}
-          </div>
-
-          {/* Collapse Button */}
-          <button
-            onClick={() => setOpenBreakdownOrderId(prev => prev === order.orderId ? null : order.orderId)}
-            className="w-full h-[32px] flex items-center justify-center text-[#751423] border border-[#751423] py-1.5 rounded-[8px] font-medium"
-          >
-            {openBreakdownOrderId === order.orderId ? 'See Less' : 'See Breakdown'}
-            {openBreakdownOrderId === order.orderId ? (
-              <ChevronUp size={16} className="ml-1 text-[#A0AEC0]" />
-            ) : (
-              <ChevronDown size={16} className="ml-1 text-[#A0AEC0]" />
-            )}
-          </button>
+              {/* Collapse Button */}
+              <button
+                onClick={() =>
+                  setOpenBreakdownOrderId((prev) =>
+                    prev === order.orderId ? null : order.orderId
+                  )
+                }
+                className="w-full h-[32px] flex items-center justify-center text-[#751423] border border-[#751423] py-1.5 rounded-[8px] font-medium"
+              >
+                {openBreakdownOrderId === order.orderId ? "See Less" : "See Breakdown"}
+                {openBreakdownOrderId === order.orderId ? (
+                  <ChevronUp size={16} className="ml-1 text-[#A0AEC0]" />
+                ) : (
+                  <ChevronDown size={16} className="ml-1 text-[#A0AEC0]" />
+                )}
+              </button>
+            </div>
+          ))}
         </div>
-        ))
       )}
 
         {/* Pagination */}

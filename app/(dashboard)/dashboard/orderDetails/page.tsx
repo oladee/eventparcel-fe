@@ -6,7 +6,6 @@ import React, { useEffect, useState } from 'react';
 import BoxTime from "../../../../assets/orderIcons/box-time-orange.png";
 import { Mail, Phone, MapPin, CircleDollarSign } from "lucide-react";
 import { MdOutlineCalendarToday } from "react-icons/md";
-// import { Order } from '@/app/interface/Order';
 import useUpdateOrderStatus from '@/hooks/useUpdateOrderStatus';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
@@ -59,14 +58,10 @@ const Page = () => {
             console.error("Failed to update order status:", error);
         }
     };
-    
-    
-    
 
     const handleViewOneEvent = (eventId: any) => {
         router.push(`/dashboard/events/${eventId}`);
       };
-
 
     const getInitials = (name: string) => {
         if (!name) return "E"; 
@@ -87,7 +82,6 @@ const Page = () => {
       };
 
       const itemTotalAmount = (orders?.totalAmount || 0) - (orders?.tax || 0) - (orders?.homeDeliveryFee || 0);
-    //   const paidByGuest = (orders?.totalAmount || 0) + (orders?.tax || 0) + (orders?.homeDeliveryFee || 0);
           
     if (!orders) {
         return (
@@ -231,16 +225,7 @@ const Page = () => {
                             <p id="shipping-text" className='text-[#718096] font-general font-medium text-[14px]'>{orders.shippingAddress}</p>
                         </div>
                     </div>
-                    {/* <div id="shipping-divider" className="border-t border-[#EEEFF2] my-3"></div> */}
-
-                    {/* <div id="billing-address-section">
-                        <p id="billing-title" className='font-general font-bold text-[14px] text-[#111827]'>Billing Address</p>
-                        <div id="billing-address" className='flex items-center gap-2 mt-3'>
-                            <MapPin id="billing-icon" className='text-[#A0AEC0] h-[24px] w-[24px]' />
-                            <p id="billing-text" className='text-[#718096] font-general font-medium text-[14px]'>45A Adeola Odeku Street Victoria Island, Lagos 101241, Nigeria</p>
-                        </div>
-                    </div> */}
-                    {/* <div id="billing-divider" className="border-t border-[#EEEFF2] my-3"></div> */}
+                   
                 </div>
 
                 <div id="payment-info-card" className='bg-[#FFFFFF] rounded-[16px] p-5 mt-5 flex flex-col gap-5'>

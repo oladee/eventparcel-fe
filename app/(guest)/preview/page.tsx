@@ -139,7 +139,7 @@ const ViewEvent = () => {
         <div id="event-card" className="rounded-[20px] bg-[#FFF7F2] p-4">
           <Image
             id="event-image"
-            src={data?.data?.event?.eventImgUrl || "/images/placeholder_eventCover2.jpg"}
+            src={data?.event?.eventImgUrl || "/images/placeholder_eventCover2.jpg"}
             width={311}
             height={311}
             alt="Wedding Invite"
