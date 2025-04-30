@@ -65,7 +65,7 @@ const OrdersTab: React.FC = () => {
   const pageData = filtered.slice((page - 1) * pageSize, page * pageSize);
 
   return (
-    <div className="space-y-4 bg-white rounded-2xl py-4 overflow-x-scroll">
+    <div className="space-y-4 bg-white rounded-2xl py-4 overflow-x-auto">
       {/* Status Tabs */}
       <div className="border-b">
         <nav className="flex space-x-8 px-2">
