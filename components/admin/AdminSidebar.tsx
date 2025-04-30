@@ -14,6 +14,10 @@ const FiHelpCircle = dynamic(
   () => import("react-icons/fi").then((mod) => mod.FiHelpCircle),
   { ssr: false }
 );
+const FiUser = dynamic(
+  () => import("react-icons/fi").then((mod) => mod.FiUser),
+  { ssr: false }
+);
 const CgProfile = dynamic(
   () => import("react-icons/cg").then((mod) => mod.CgProfile),
   { ssr: false }
@@ -173,6 +177,12 @@ export const AdminSidebar: React.FC = () => {
         label: "Events",
         path: "/admin/admin-events",
         icon: BsFillCalendarEventFill,
+        exact: true
+      },
+      {
+        label: "Hosts",
+        path: "/admin/admin-hosts",
+        icon: FiUser,
         exact: true
       },
       {
