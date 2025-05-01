@@ -125,7 +125,7 @@ const page = () => {
 
   return (
     <AdminContainer>
-      <div className="w-full h-full flex flex-col gap-2 items-center justify-center">
+      <div id="orders-page" className="w-full h-full flex flex-col gap-2 items-center justify-center">
         {/* Top section: stat cards*/}
         <div className="w-full">
             <OrdersStatCardGroup orderSummary={orderSummary} />

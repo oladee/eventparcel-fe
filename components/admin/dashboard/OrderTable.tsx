@@ -95,21 +95,61 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
         localStorage.setItem("selectedOrder", JSON.stringify(order));
         Router.push("/admin/orderDetails");
       };
+
+      
+  //EXPORT CSV FILE
+  const exportToCSV = (data: any[], filename = 'referrals.csv') => {
+    if (!data || data.length === 0) return;
+  
+    const csvRows = [];
+  
+    // 1. Headers
+    const headers = Object.keys(data[0]);
+    csvRows.push(headers.join(','));
+  
+    // 2. Rows
+    for (const row of data) {
+      const values = headers.map(header => {
+        let value = row[header];
+  
+        // Convert 'createdAt' and 'acceptedAt' to locale string
+        if (header === 'createdAt' || header === 'acceptedAt' || header === 'updatedAt') {
+          value = new Date(value).toLocaleString();  // Convert to locale string
+        }
+  
+        const escaped = ('' + value).replace(/"/g, '""');
+        return `"${escaped}"`;
+      });
+      csvRows.push(values.join(','));
+    }
+  
+    // 3. Download
+    const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+    const url = window.URL.createObjectURL(blob);
+  
+    const a = document.createElement('a');
+    a.setAttribute('hidden', '');
+    a.setAttribute('href', url);
+    a.setAttribute('download', filename);
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+  };
       
   return (
-    <div className="w-full gap-4 pt-3 rounded-xl">
-      <div className="flex flex-col md:flex-row md:flex-wrap justify-between items-center gap-4 md:gap-0">
+    <div id="order-table" className="w-full gap-4 pt-3 rounded-xl">
+      <div id="table-top" className="flex flex-col md:flex-row md:flex-wrap justify-between items-center gap-4 md:gap-0">
       {/* Left: Filter + Search */}
-      <div className="flex flex-col md:flex-row items-center gap-4 md:flex-wrap w-full md:w-auto">
+      <div id="table-filter&search" className="flex flex-col md:flex-row items-center gap-4 md:flex-wrap w-full md:w-auto">
         {/* Show Dropdown */}
-        <div className="w-full md:w-[189px] h-[56px] flex justify-center items-center gap-2 bg-[#FFFFFF] rounded-[12px] px-3 py-1.5 text-sm text-[#718096] font-medium">
+        <div id="table-showDropDown" className="w-full md:w-[189px] h-[56px] flex justify-center items-center gap-2 bg-[#FFFFFF] rounded-[12px] px-3 py-1.5 text-sm text-[#718096] font-medium">
           <span>Show:</span>
           <span className="font-bold text-[#111827] text-base">All Orders</span> 
           <MdOutlineKeyboardArrowDown className="w-4 h-4 text-[#111827]"/>
         </div>
 
         {/* Search Input */}
-        <div className="w-full md:w-[339px] h-[56px] flex items-center bg-[#FFFFFF] rounded-[12px] px-3 py-1.5">
+        <div id="table-searchField" className="w-full md:w-[339px] h-[56px] flex items-center bg-[#FFFFFF] rounded-[12px] px-3 py-1.5">
           <FiSearch className="text-[#111827] mr-2 w-6 h-6" />
           <input
             type="text"
@@ -119,15 +159,17 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
         </div>
 
         {/* Filters Button */}
-        <button className="w-full md:w-[112px] h-[56px] flex justify-center items-center gap-1 bg-[#FFFFFF] rounded-[12px] px-3 py-1.5 text-sm text-[#718096] font-medium">
+        <button id="table-filterField" className="w-full md:w-[112px] h-[56px] flex justify-center items-center gap-1 bg-[#FFFFFF] rounded-[12px] px-3 py-1.5 text-sm text-[#718096] font-medium">
           <SlidersHorizontal size={16} />
           Filters
         </button>
       </div>
 
       {/* Right: Export */}
-      <div className="w-full md:w-auto">
-        <button className="w-full md:w-[153px] h-[56px] flex items-center justify-center gap-2 bg-[#FFFFFF] rounded-[12px] px-3 py-1.5 text-sm text-[#718096] font-medium shadow-sm">
+      <div id="table-export" className="w-full md:w-auto">
+        <button
+        onClick={() => exportToCSV(orders)}
+        className="w-full md:w-[153px] h-[56px] flex items-center justify-center gap-2 bg-[#FFFFFF] rounded-[12px] px-3 py-1.5 text-sm text-[#718096] font-medium shadow-sm">
           <HiOutlineDocumentDownload size={16} />
           Export 
           <MdOutlineKeyboardArrowDown className="w-6 h-6 text-[#718096]"/>
@@ -135,34 +177,34 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
       </div>
     </div>
 
-    <div className="mt-6 bg-white rounded-2xl shadow p-4 overflow-x-auto">
-  {/* Table Head */}
-  <div className="flex py-3 text-[#718096] font-semibold text-sm border-b min-w-[800px]"> {/* Reduced min width */}
-    <div className="w-[60px] flex items-center justify-center shrink-0">
-      <FaRegCircle className="w-5 h-5"/>
-    </div>
-    <div className="flex-1 min-w-[140px] flex items-center gap-1 text-base font-medium text-[#718096]">
-      Orders <PiArrowsDownUpFill />
-    </div>
-    <div className="flex-1 min-w-[240px] flex items-center gap-1 text-base font-medium text-[#718096]"> {/* Increased width */}
-      Guest <PiArrowsDownUpFill />
-    </div>
-    <div className="flex-1 min-w-[220px] flex items-center gap-1 text-base font-medium text-[#718096]"> {/* Reduced width */}
-      Event <PiArrowsDownUpFill />
-    </div>  
-    <div className="flex-1 min-w-[140px] flex items-center gap-1 text-base font-medium text-[#718096]">
-      Price <PiArrowsDownUpFill />
-    </div>
-    <div className="flex-1 min-w-[120px] flex items-center gap-1 text-base font-medium text-[#718096]">
-      Delivery <GoArrowUp className="text-[#0CAF60]" />
-    </div>
-    <div className="flex-1 min-w-[130px] flex items-center gap-1 text-base font-medium text-[#718096]">
-      Status <PiArrowsDownUpFill />
-    </div>
-    <div className="w-[60px] flex items-center justify-center shrink-0">
-      <BsThreeDots className="w-5 h-5 text-[#A0AEC0]"/>
-    </div>
-  </div>
+  <div id="main-table" className="mt-6 bg-white rounded-2xl shadow p-4 overflow-x-auto">
+      {/* Table Head */}
+      <div id="table-head" className="flex py-3 text-[#718096] font-semibold text-sm border-b min-w-[800px]"> {/* Reduced min width */}
+        <div className="w-[60px] flex items-center justify-center shrink-0">
+          <FaRegCircle className="w-5 h-5"/>
+        </div>
+        <div className="flex-1 min-w-[140px] flex items-center gap-1 text-base font-medium text-[#718096]">
+          Orders <PiArrowsDownUpFill />
+        </div>
+        <div className="flex-1 min-w-[240px] flex items-center gap-1 text-base font-medium text-[#718096]"> {/* Increased width */}
+          Guest <PiArrowsDownUpFill />
+        </div>
+        <div className="flex-1 min-w-[220px] flex items-center gap-1 text-base font-medium text-[#718096]"> {/* Reduced width */}
+          Event <PiArrowsDownUpFill />
+        </div>  
+        <div className="flex-1 min-w-[140px] flex items-center gap-1 text-base font-medium text-[#718096]">
+          Price <PiArrowsDownUpFill />
+        </div>
+        <div className="flex-1 min-w-[120px] flex items-center gap-1 text-base font-medium text-[#718096]">
+          Delivery <GoArrowUp className="text-[#0CAF60]" />
+        </div>
+        <div className="flex-1 min-w-[130px] flex items-center gap-1 text-base font-medium text-[#718096]">
+          Status <PiArrowsDownUpFill />
+        </div>
+        <div className="w-[60px] flex items-center justify-center shrink-0">
+          <BsThreeDots className="w-5 h-5 text-[#A0AEC0]"/>
+        </div>
+      </div>
 
     {/* Table Body */}
     {orders.map((order, i) => (
@@ -170,6 +212,7 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
         key={i}
         className="flex items-center border-b last:border-b-0 text-sm min-w-[900px] cursor-pointer"
         onClick={() => handleSelectedOrder(order)}
+        id="table-body"
         >
         <div className="w-[60px] flex justify-center shrink-0">
             <FaRegCircle className="w-5 h-5 text-[#718096]"/>
@@ -210,13 +253,14 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
     ))}
 
     {/* Pagination */}
-    <div className="flex flex-col sm:flex-row justify-between sm:mr-4 items-center mt-6 gap-2 sm:gap-0">
+    <div id="pagination" className="flex flex-col sm:flex-row justify-between sm:mr-4 items-center mt-6 gap-2 sm:gap-0">
         <div className="text-sm text-[#718096] whitespace-nowrap">
           <div className="flex items-center">
             <span className="text-gray-600 text-sm mr-2 whitespace-nowrap">
               Show result:
             </span>
             <select
+                id="table-limit"
                 value={limit}
                 onChange={(e) => {
                   const newLimit = Number(e.target.value);
@@ -235,9 +279,12 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
           </div>
         </div>
         <div className="flex items-center gap-1 text-sm overflow-x-auto py-2 sm:py-0 w-full justify-center sm:w-auto">
-          <button className="text-[#A0AEC0] whitespace-nowrap">&lt;</button>
+          <button
+          onClick={() => currentPage > 1 && setCurrentPage(currentPage - 1)}
+          className="text-[#A0AEC0] whitespace-nowrap">&lt;</button>
           {Array.from({ length: totalPages || 1 }, (_, i) => i + 1).map((pageNum) => (
             <button
+              id="tableNum"
               key={pageNum}
               onClick={() => setCurrentPage(pageNum)}
               className={`w-8 h-8 rounded-[12px] p-[8px] whitespace-nowrap ${
@@ -249,7 +296,9 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
               {pageNum}
             </button>
           ))}
-          <button className="text-[#A0AEC0] whitespace-nowrap">&gt;</button>
+          <button
+            onClick={() => currentPage < (totalPages || 1) && setCurrentPage(currentPage + 1)}
+            className="text-[#A0AEC0] whitespace-nowrap">&gt;</button>
         </div>
       </div>
     </div>

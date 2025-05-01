@@ -127,7 +127,7 @@ const dummyPayment = {
                         </span>
                     </div>
                     <span id="item-price" className='text-[#718096] font-general font-medium text-[14px]'>
-                    {dummyPayment.totalAmountCurrency === "NGN" ? "₦" : "$"} {itemTotalAmount.toLocaleString()}
+                    {order?.totalAmountCurrency === "NGN" ? "₦" : "$"} {itemTotalAmount.toLocaleString()}
                     </span>
                 </div>
                 
@@ -141,7 +141,12 @@ const dummyPayment = {
                         </span>
                     </div>
                     <span id="delivery-price" className='text-[#718096] font-general font-medium text-[14px]'>
-                        {dummyPayment.totalAmountCurrency === "NGN" ? "₦" : "$"}{order?.homeDeliveryFee.toLocaleString()}
+                      {order?.deliveryType === "homeDelivery" ? (
+                        <>
+                          {order?.totalAmountCurrency === "NGN" ? "₦" : "$"}
+                          {order?.homeDeliveryFee?.toLocaleString()}
+                        </>
+                      ) : "No Fee"}
                     </span>
                 </div>
                 
@@ -173,7 +178,7 @@ const dummyPayment = {
                 <div id="total-cost" className='flex items-center justify-between'>
                     <span id="total-label" className='font-general font-bold text-[14px] text-[#111827]'>Total</span>
                     <span id="total-price" className='font-general font-bold text-[16px] text-[#111827]'>
-                    {dummyPayment.totalAmountCurrency === "NGN" ? "₦" : "$"}{order?.totalAmount.toLocaleString()}
+                    {order?.totalAmountCurrency === "NGN" ? "₦" : "$"}{order?.totalAmount.toLocaleString()}
                     </span>
                 </div>
 
@@ -182,120 +187,118 @@ const dummyPayment = {
                 <div id="payment-method" className='flex items-center justify-between'>
                     <span id="method-label" className='text-[#718096] font-general font-medium text-[14px]'>Paid by Guest</span>
                     <span id="method-amount" className='font-general font-bold text-[16px] text-[#111827]'>
-                    {dummyPayment.totalAmountCurrency === "NGN" ? "₦" : "$"}{order?.totalAmount.toLocaleString()}
+                    {order?.totalAmountCurrency === "NGN" ? "₦" : "$"}{order?.totalAmount.toLocaleString()}
                     </span>
                 </div>
                 </div>
             </div>
           </div>
 
-       <div className="flex-[1]">
-            <div className="max-w-md mx-auto rounded-xl overflow-hidden flex flex-col gap-6 bg-white shadow-sm p-6 mb-6">
-                {/* Guest Header */}
-                <div>
+          <div id="guest-details-container" className="flex-[1]">
+            <div id="guest-card" className="max-w-md mx-auto rounded-xl overflow-hidden flex flex-col gap-6 bg-white shadow-sm p-6 mb-6">
+              {/* Guest Header */}
+              <div id="guest-header">
                 <h1 className="text-xl font-bold text-gray-800 mb-4">Guest Details</h1>
                 <div className="flex items-center gap-4">
-                    <div className="bg-purple-100 text-purple-800 rounded-full w-12 h-12 flex items-center justify-center font-bold text-lg">
-                      {order?.guestFirstName.charAt(0).toUpperCase()}{order?.guestLastName.charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                    <h2 className="font-semibold text-gray-900">
-                       {`${order?.guestFirstName.charAt(0).toUpperCase()}${order?.guestFirstName.slice(1)} ${order?.guestLastName.charAt(0).toUpperCase()}${order?.guestLastName.slice(1)}`}
+                  <div id="guest-avatar" className="bg-purple-100 text-purple-800 rounded-full w-12 h-12 flex items-center justify-center font-bold text-lg">
+                    {order?.guestFirstName.charAt(0).toUpperCase()}{order?.guestLastName.charAt(0).toUpperCase()}
+                  </div>
+                  <div id="guest-name-container">
+                    <h2 id="guest-fullname" className="font-semibold text-gray-900">
+                      {`${order?.guestFirstName.charAt(0).toUpperCase()}${order?.guestFirstName.slice(1)} ${order?.guestLastName.charAt(0).toUpperCase()}${order?.guestLastName.slice(1)}`}
                     </h2>
-                    <p className="text-gray-500 text-sm">
+                    <p id="order-id" className="text-gray-500 text-sm">
                       {order?.orderId}
                     </p>
-                    </div>
+                  </div>
                 </div>
-                </div>
+              </div>
 
-                <div className="border-t border-gray-200"></div>
+              <div className="border-t border-gray-200"></div>
 
-                {/* Contact Information */}
-                <div>
+              {/* Contact Information */}
+              <div id="contact-info-section">
                 <h2 className="font-bold text-[#111827] text-[16px] mb-3">Contact Information</h2>
                 <div className="space-y-3">
-                    <div className="flex items-center gap-3">
+                  <div id="email-info" className="flex items-center gap-3">
                     <Mail className="text-gray-400 h-5 w-5" />
                     <span className="text-gray-600">
                       {order?.guestEmail}
                     </span>
-                    </div>
-                    <div className="flex items-center gap-3">
+                  </div>
+                  <div id="phone-info" className="flex items-center gap-3">
                     <Phone className="text-gray-400 h-5 w-5" />
                     <span className="text-gray-600">
-                        {order?.guestPhoneNumber}
+                      {order?.guestPhoneNumber}
                     </span>
-                    </div>
+                  </div>
                 </div>
-                </div>
+              </div>
 
-                <div className="border-t border-gray-200"></div>
+              <div className="border-t border-gray-200"></div>
 
-                {/* Shipping Address */}
-                <div>
+              {/* Shipping Address */}
+              <div id="shipping-address-section">
                 <h2 className="font-bold text-[#111827] text-[16px] mb-3">Shipping Address</h2>
                 <div className="flex items-start gap-3">
-                    <MapPin className="text-gray-400 h-5 w-5 mt-1" />
-                    <span className="text-gray-600 w-[255px]">
+                  <MapPin className="text-gray-400 h-5 w-5 mt-1" />
+                  <span id="address-text" className="text-gray-600 w-[255px]">
                     {order?.shippingAddress
-                      .split(" ")
+                      ?.split(" ")
                       .map((word: any) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
                       .join(" ")}
-                    </span>
+                  </span>
                 </div>
-                </div>
+              </div>
             </div>
 
-                {/* Event */}
-                <div className="max-w-md mx-auto rounded-xl overflow-hidden flex flex-col gap-6 bg-white shadow-sm p-6">
-
-                <div className="">
+            {/* Event */}
+            <div id="event-card" className="max-w-md mx-auto rounded-xl overflow-hidden flex flex-col gap-6 bg-white shadow-sm p-6">
+              <div id="event-section">
                 <h2 className="font-bold text-[#111827] text-[18px] mb-3">Event</h2>
-                <div className="flex items-center gap-3 mb-3">
-                   <Image
-                      id="event-image"
-                      src={order?.eventId?.eventImgUrl || "/images/placeholder_eventCover3.jpg"}
-                      alt="Event Cover"
-                      className="w-full h-full rounded-[12px]"
-                      width={100} 
-                      height={100} 
-                      quality={100}
-                      priority
-                      style={{width: "80px", height: "80px"}}
+                <div id="event-header" className="flex items-center gap-3 mb-3">
+                  <Image
+                    id="event-image"
+                    src={order?.eventId?.eventImgUrl || "/images/placeholder_eventCover3.jpg"}
+                    alt="Event Cover"
+                    className="w-full h-full rounded-[12px]"
+                    width={100} 
+                    height={100} 
+                    quality={100}
+                    priority
+                    style={{width: "80px", height: "80px"}}
                   />
-                    <div className="w-[195px]">
-                        {/* <Calendar className="text-gray-400 h-5 w-5" /> */}
-                        <span className="text-[#111827] font-bold text-base">
-                          {order?.eventId?.eventName
-                            .split(" ")
-                            .map((word: any) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-                            .join(" ")}
-                        </span>
-                    </div>
+                  <div id="event-name-container" className="w-[195px]">
+                    <span id="event-name" className="text-[#111827] font-bold text-base">
+                      {order?.eventId?.eventName
+                        .split(" ")
+                        .map((word: any) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                        .join(" ")}
+                    </span>
+                  </div>
                 </div>
 
                 <div id="payment-divider" className="border-t border-[#EEEFF2]"></div>
 
                 {/* Event Details */}
-                <div className="p-4 rounded-lg">
-                    <div className="flex items-center gap-2 font-medium text mb-2">
+                <div id="event-details" className="p-4 rounded-lg">
+                  <div id="event-date-time" className="flex items-center gap-2 font-medium text mb-2">
                     <Calendar className="h-4 w-4" />
                     <span className="font-medium text-sm text-[#111827]">
                       {formatDate(order?.eventId.date)} at {order?.eventId.time} WAT
                     </span>
-                    </div>
-                    <p className="font-medium text-sm text-[#78858F]">
+                  </div>
+                  <p id="event-location" className="font-medium text-sm text-[#78858F]">
                     {order?.eventId?.eventLocation
-                        .split(" ")
-                        .map((word: any) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-                        .join(" ")}
-                    </p>
+                      .split(" ")
+                      .map((word: any) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                      .join(" ")}
+                  </p>
                 </div>
-                </div>
+              </div>
             </div>
-            </div>
-        </div>
+          </div>
+          </div>
       </div>
     </AdminContainer>
   );
