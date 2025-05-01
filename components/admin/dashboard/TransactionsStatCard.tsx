@@ -1,7 +1,7 @@
 import React from 'react'
 
-interface Props { icon: React.ReactNode; label: string; value: string; delta: string, subtext:string }
-const StatCard: React.FC<Props> = ({ icon, label, value, delta, subtext }) => (
+interface Props { icon: React.ReactNode; label: string; naira: string; dollar: string, subtext:string }
+const StatCard: React.FC<Props> = ({ icon, label, naira, dollar, subtext }) => (
   
 
    <div id="stats-grid" className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
@@ -15,12 +15,12 @@ const StatCard: React.FC<Props> = ({ icon, label, value, delta, subtext }) => (
             </p>
           </div>
           <div id={`stat-divider`} className="border-t border-[#EEEFF2] my-3 mb-1 lg:mb-10"></div>
-          <p id={`stat-count`} className="text-2xl font-bold text-[#111827]">{value}</p>
+          <p id={`stat-count`} className="text-2xl font-bold text-[#111827]">{naira}</p>
           <div 
             id={`stat-change`}
             className={`text-xs font-general font-normal mt-1`}
             >
-         <p className="mt-auto text-green-500 font-medium text-sm">{delta} <span className='text-[#718096]'>{subtext}</span></p> 
+         <p className="mt-auto text-green-500 font-medium text-sm">{dollar} <span className='text-[#718096]'>{subtext}</span></p> 
         </div>
         </div>
     </div>
