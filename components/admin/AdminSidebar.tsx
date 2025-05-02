@@ -189,7 +189,7 @@ export const AdminSidebar: React.FC = () => {
         label: "Orders",
         path: "/admin/admin-orders",
         icon: PiShoppingCartLight,
-        badge: "8",
+        badge: "",
         exact: true
       },
       {

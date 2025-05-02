@@ -7,7 +7,7 @@ const FiltersBar: React.FC = () => (
     <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 justify-between w-full max-w-2xl ">
       <div className="flex items-center bg-white rounded-[12px] px-4 py-2">
         <span className="text-[#A0AEC0]">Show:</span>
-        <select className="ml-2 text-black font-bold border-none focus:ring-0">
+        <select className="ml-2 text-black font-bold border-none focus:ring-0 outline-none">
           <option>All Events</option>
         </select>
         {/* <FiChevronDown className="ml-1 text-gray-500" /> */}
@@ -18,7 +18,7 @@ const FiltersBar: React.FC = () => (
         <input
           type="text"
           placeholder="Search by name, email, or others..."
-          className="ml-2 w-full border-none focus:ring-0"
+          className="ml-2 w-full border-none focus:ring-0 outline-none"
         />
       </div>
 
@@ -28,7 +28,7 @@ const FiltersBar: React.FC = () => (
       </button>
     </div>
 
-    <button className="flex items-center bg-white rounded-[12px]  px-4 py-2 text-[#718096]">
+    <button className="flex items-center bg-white rounded-[12px]  px-4 py-2 text-[#718096] outline-none">
       <FiDownload className="mr-2 text-[#A0AEC0]" />
       Export
       <FiChevronDown className="ml-1 text-[#718096]" />

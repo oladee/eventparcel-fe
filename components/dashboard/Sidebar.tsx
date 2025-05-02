@@ -176,7 +176,7 @@ export const Sidebar: React.FC = () => {
         label: "Orders",
         path: "/dashboard/orders",
         icon: PiShoppingCartLight,
-        badge: "8",
+        badge: "",
         exact: true
       },
       // {
