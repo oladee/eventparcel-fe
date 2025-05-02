@@ -57,7 +57,7 @@ const RiExchange2Line = dynamic(
 );
 
 // Static import for Logo
-import { Logo2 } from "../icons/Icons";
+// import { Logo2 } from "../icons/Icons";
 import Image from "next/image";
 
 interface MenuItemProps {
