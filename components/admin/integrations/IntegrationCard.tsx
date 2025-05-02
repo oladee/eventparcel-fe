@@ -19,7 +19,7 @@ const IntegrationCard: React.FC<Props> = ({
   rating,
   connected
 }) => (
-  <div className="bg-white rounded-2xl shadow p-6 flex flex-col justify-between">
+  <div className="bg-white rounded-2xl p-6 flex flex-col justify-between">
     <div className="flex justify-between items-start">
       <div className="flex items-center space-x-3">
         <Image
@@ -31,8 +31,14 @@ const IntegrationCard: React.FC<Props> = ({
         />
         <div>
           <h4 className="text-lg font-semibold text-gray-900">{name}</h4>
-          <p className="text-sm text-gray-500">
-            {connected ? "Connected" : "Not connected"}
+          <p className="text-sm text-[#718096]">
+            {connected ? (
+              <div className="flex items-center">
+                <div className="w-2 h-2 rounded-full bg-[#0CAF60] mr-1"></div> Connected
+              </div>
+            ) : (
+              "Not connected"
+            )}
           </p>
         </div>
       </div>

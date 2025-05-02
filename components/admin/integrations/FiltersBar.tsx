@@ -17,7 +17,7 @@ const FiltersBar: React.FC<Props> = ({
   onWorkWithChange
 }) => (
   <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4">
-    <div className="flex items-center bg-white rounded-xl shadow px-4 py-2 relative">
+    <div className="flex items-center bg-white rounded-xl px-4 py-2 relative">
       <select
         value={show}
         onChange={(e) => onShowChange(e.target.value as ShowTab)}
@@ -31,7 +31,7 @@ const FiltersBar: React.FC<Props> = ({
       <FiChevronDown className="ml-2 text-gray-500" />
       </div>
     </div>
-    <div className="flex items-center bg-white rounded-2xl shadow px-4 py-2 relative">
+    <div className="flex items-center bg-white rounded-xl px-4 py-2 relative">
       <select
         value={workWith}
         onChange={(e) => onWorkWithChange(e.target.value as WorkWithTab)}
@@ -49,6 +49,8 @@ const FiltersBar: React.FC<Props> = ({
   </div>
 );
 export default FiltersBar;
+
+
 
 // import React from 'react'
 // import { FiChevronDown, FiSearch, FiFilter } from 'react-icons/fi'
