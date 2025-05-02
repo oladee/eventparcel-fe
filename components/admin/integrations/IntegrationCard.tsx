@@ -1,6 +1,7 @@
 import React from "react";
 import { Switch } from "@headlessui/react";
 import { FiMoreVertical, FiStar } from "react-icons/fi";
+import Image from "next/image";
 
 interface Props {
   // id: number;
@@ -21,10 +22,12 @@ const IntegrationCard: React.FC<Props> = ({
   <div className="bg-white rounded-2xl shadow p-6 flex flex-col justify-between">
     <div className="flex justify-between items-start">
       <div className="flex items-center space-x-3">
-        <img
+        <Image
           src={logo}
           alt={name}
           className="w-10 h-10 rounded-lg object-cover"
+          width={40}
+          height={40}
         />
         <div>
           <h4 className="text-lg font-semibold text-gray-900">{name}</h4>

@@ -1,5 +1,5 @@
 import React from "react";
-import { FiEye } from "react-icons/fi";
+// import { FiEye } from "react-icons/fi";
 import { PiPackageBold } from "react-icons/pi";
 import BoxTime from "../../../assets/orderIcons/box-time.png"; 
 import Finance from "../../../assets/orderIcons/finance.png"; 

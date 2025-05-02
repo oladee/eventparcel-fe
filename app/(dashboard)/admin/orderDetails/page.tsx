@@ -6,24 +6,24 @@ import Image from "next/image";
 import BoxTime from "../../../../assets/orderIcons/box-time-orange.png";
 import { Mail, Phone, MapPin, CircleDollarSign, Calendar } from "lucide-react";
 
-const page = () => {
+const Page = () => {
 
-  // Add these to your existing order object
-const dummyPayment = {
-    // ... existing properties ...
-    guestName: "John Doe",
-    guestEmail: "john.doe@example.com",
-    guestPhoneNumber: "+2348012345678",
-    shippingAddress: "123 Main Street, Lagos, Nigeria",
-    totalAmountCurrency: "NGN",
-    totalAmount: 65000, // 25000*2 + 15000 = 65000
-    tax: 3250, // 5% of total
-    homeDeliveryFee: 2000,
-    // Add helper function for initials
-    getInitials: (name: string) => {
-      return name.split(' ').map(n => n[0]).join('').toUpperCase();
-    }
-  };
+//   // Add these to your existing order object
+// const dummyPayment = {
+//     // ... existing properties ...
+//     guestName: "John Doe",
+//     guestEmail: "john.doe@example.com",
+//     guestPhoneNumber: "+2348012345678",
+//     shippingAddress: "123 Main Street, Lagos, Nigeria",
+//     totalAmountCurrency: "NGN",
+//     totalAmount: 65000, // 25000*2 + 15000 = 65000
+//     tax: 3250, // 5% of total
+//     homeDeliveryFee: 2000,
+//     // Add helper function for initials
+//     getInitials: (name: string) => {
+//       return name.split(' ').map(n => n[0]).join('').toUpperCase();
+//     }
+//   };
 
     const [order, setOrder] = useState<any>(null);
 
@@ -304,4 +304,4 @@ const dummyPayment = {
   );
 };
 
-export default page;
+export default Page;

@@ -54,7 +54,7 @@ interface Order {
   _id: string;
 }
 
-const page = () => {
+const Page = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string>("");
   const [page, setPage] = useState(1);
@@ -146,4 +146,4 @@ const page = () => {
   );
 };
 
-export default page;
+export default Page;
