@@ -74,12 +74,14 @@ const Page = () => {
 
       const formatDate = (dateString: string) => {
         const date = new Date(dateString);
-        return date.toLocaleDateString("en-GB", {
-          day: "2-digit",
-          month: "short",
-          year: "numeric",
-        }).replace(",", "");
+        
+        const day = date.toLocaleString("en-GB", { day: "2-digit" });
+        const month = date.toLocaleString("en-GB", { month: "short" });
+        const year = date.getFullYear();
+      
+        return `${day} ${month}, ${year}`;
       };
+      
 
       const itemTotalAmount = (orders?.totalAmount || 0) - (orders?.tax || 0) - (orders?.homeDeliveryFee || 0);
           
@@ -222,7 +224,12 @@ const Page = () => {
                         <p id="shipping-title" className='font-general font-bold text-[14px] text-[#111827]'>Shipping Address</p>
                         <div id="shipping-address" className='flex items-center gap-2 mt-3'>
                             <MapPin id="shipping-icon" className='text-[#A0AEC0] h-[24px] w-[24px]' />
-                            <p id="shipping-text" className='text-[#718096] font-general font-medium text-[14px]'>{orders.shippingAddress}</p>
+                            <p id="shipping-text" className='text-[#718096] font-general font-medium text-[14px]'>
+                            {orders.shippingAddress
+                                .split(" ")
+                                .map((word: any) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                                .join(" ")}
+                            </p>
                         </div>
                     </div>
                    

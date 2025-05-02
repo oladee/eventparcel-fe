@@ -113,11 +113,12 @@ const Page = () => {
 
       const formatDate = (dateString: string) => {
         const date = new Date(dateString);
-        return date.toLocaleDateString("en-US", {
-          month: "short",
-          day: "2-digit",
-          year: "numeric",
-        });
+        
+        const day = date.toLocaleString("en-GB", { day: "2-digit" });
+        const month = date.toLocaleString("en-GB", { month: "short" });
+        const year = date.getFullYear();
+      
+        return `${day} ${month}, ${year}`;
       };
           
 
