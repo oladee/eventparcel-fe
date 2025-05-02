@@ -8,7 +8,7 @@ interface Props {
   subtext?: string;
 }
 const StatCard: React.FC<Props> = ({ icon, label, value, delta, subtext }) => (
-  <div className="bg-white rounded-2xl pt-3 pb-4 px-3 flex flex-col justify-between  ">
+  <div className="bg-white rounded-2xl pt-3 pb-4 px-3 flex flex-col justify-between ">
     <div className="flex items-center text-primary border-b border-[#EEEFF2] p-2">
       {icon}
       <span className="ml-2 font-semibold text-[#111827]">{label}</span>

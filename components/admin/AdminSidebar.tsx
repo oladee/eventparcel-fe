@@ -10,10 +10,10 @@ import { useMyContext } from "@/context";
 const FiX = dynamic(() => import("react-icons/fi").then((mod) => mod.FiX), {
   ssr: false
 });
-const FiHelpCircle = dynamic(
-  () => import("react-icons/fi").then((mod) => mod.FiHelpCircle),
-  { ssr: false }
-);
+// const FiHelpCircle = dynamic(
+//   () => import("react-icons/fi").then((mod) => mod.FiHelpCircle),
+//   { ssr: false }
+// );
 const FiUser = dynamic(
   () => import("react-icons/fi").then((mod) => mod.FiUser),
   { ssr: false }
@@ -210,13 +210,13 @@ export const AdminSidebar: React.FC = () => {
 
   const adminMenu = useMemo(
     () => [
-      {
-        label: "Support",
-        path: "/admin/admin-support",
-        // Using FiHelpCircle as a placeholder icon
-        icon: FiHelpCircle,
-        exact: true
-      },
+      // {
+      //   label: "Support",
+      //   path: "/admin/admin-support",
+      //   // Using FiHelpCircle as a placeholder icon
+      //   icon: FiHelpCircle,
+      //   exact: true
+      // },
       {
         label: "Integrations",
         path: "/admin/admin-integrations",
