@@ -294,19 +294,13 @@ export const AdminSidebar: React.FC = () => {
         >
           <div className="p-6 h-max flex flex-col">
             {/* Logo / Title */}
-            <div className="hidden md:flex items-center space-x-3 mb-6">
-              <Logo2 width={40} height={40} />
-              <h1 className="text-base md:text-2xl font-bold">
-                Event <br className="md:hidden" /> Parcel
-              </h1>
-            </div>
-            <div className="flex items-center space-x-3 mb-6 md:hidden">
+            <div className="flex items-center space-x-3 mb-6 py-2">
               <Image
                 src="/images/logo4.png"
                 alt="logo"
                 width={100}
                 height={100}
-                style={{ width: "auto", height: "auto" }} // Maintain aspect ratio
+                style={{ width: "auto", height: "auto" }} 
               />
             </div>
 

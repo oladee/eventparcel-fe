@@ -1,7 +1,10 @@
+"use client"
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import { FiMenu, FiBell, FiSearch } from "react-icons/fi";
 import { HiOutlineEnvelope } from "react-icons/hi2";
+import { usePathname } from "next/navigation";
+
 
 interface HeaderProps {
   toggleSidebar: () => void;
@@ -17,6 +20,31 @@ const AdminHeaderDashboard: React.FC<HeaderProps> = ({ toggleSidebar }) => {
 
   // Use a ref to store the current user state
   const userRef = useRef(user);
+
+  // Get the current pathname
+  // This will be used to determine the current page title
+  const pathname = usePathname();
+
+  const pageTitles: { [key: string]: string } = {
+    "/admin": "Dashboard",
+    "/admin/admin-hosts": "Hosts",
+    "/admin/admin-events": "Events",
+    "/admin/admin-orders": "Orders",
+    "/admin/admin-delivery": "Delivery",
+    "/admin/admin-transactions": "Transactions",
+    "/admin/admin-integrations": "Integration",
+    "/admin/admin-feeSettings": "Fee Setting",
+    "/admin/adminUsers": "Admin Users",
+    "/admin/admin-settings": "Settings"
+  };
+
+  // Handle dynamic routes like /admin/admin-hosts/:id
+  const getCurrentPageTitle = () => {
+    if (pathname?.startsWith("/admin/admin-hosts/")) {
+      return "Hosts";
+    }
+    return pageTitles[pathname] || "Dashboard";
+  };
 
   const loadUserData = () => {
     const loggedInUser = localStorage.getItem("loggedInUser");
@@ -106,10 +134,9 @@ const AdminHeaderDashboard: React.FC<HeaderProps> = ({ toggleSidebar }) => {
           <FiMenu size={24} />
         </button>
         <div className="hidden md:block">
-          <h1 className="text-xl font-bold">Dashboard</h1>
-          {/* <p className="text-sm text-gray-500">
-            Let&apos;s check your store today
-          </p> */}
+          {/* Current page */}
+          {/* <h1 className="text-xl font-bold">Dashboard</h1> */}
+          <h1 className="text-xl font-bold">{getCurrentPageTitle()}</h1>
         </div>
       </div>
 
