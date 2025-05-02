@@ -1,8 +1,8 @@
 "use client";
 import React, { useState, useMemo } from "react";
 import AdminContainer from "@/components/admin/AdminContainer";
-import { FiSearch, FiDownload, FiChevronDown } from "react-icons/fi";
-import { VscSettings } from "react-icons/vsc";
+import { FiSearch } from "react-icons/fi";
+// import { VscSettings } from "react-icons/vsc";
 import AdminUsersTable, { AdminInterface } from "@/components/admin/adminUsers/AdminUsersTable";
 import AddNewUser from "@/components/admin/AddNewUser";
 

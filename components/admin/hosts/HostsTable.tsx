@@ -55,7 +55,7 @@ const HostsTable: React.FC<{ hosts: Host[] }> = ({ hosts }) => {
       <table className="w-full table-auto bg-white rounded-t-2xl overflow-hidden">
         <thead className="bg-gray-50">
           <tr>
-            <th className="p-4">
+            <th className="p-4 text-left">
               <input type="checkbox" />
             </th>
             <th className="p-4 text-left text-xs font-medium text-[#718096] capitalize">
@@ -83,8 +83,8 @@ const HostsTable: React.FC<{ hosts: Host[] }> = ({ hosts }) => {
                 Status <GrTransaction className="rotate-90" />
               </div>
             </th>
-            <th className="p-4">
-              <FiMoreHorizontal className="text-gray-400" />
+            <th className="p-4 text-right text-gray-400">
+             ...
             </th>
           </tr>
         </thead>
