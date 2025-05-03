@@ -4,9 +4,9 @@ interface Props { icon: React.ReactNode; label: string; naira: string; dollar: s
 const StatCard: React.FC<Props> = ({ icon, label, naira, dollar, subtext }) => (
   
 
-   <div id="stats-grid" className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+   <div id="stats-grid" className="">
         <div 
-          className="w-[163px] lg:w-[253px] h-[121px] lg:h-[165px] bg-[#FFFFFF] shadow-sm p-3 rounded-[12px]"
+          className="w-[163px] xl:w-[232px] h-[121px] lg:h-[165px] bg-[#FFFFFF] shadow-sm p-3 rounded-[12px]"
         >
           <div id={`stat-header`} className='flex items-center gap-2 text-primary'>
               {icon}

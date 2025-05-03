@@ -49,9 +49,9 @@ const Page = () => {
   return (
     <AdminContainer>
       <div className="w-full h-full flex items-center">
-        <div className="flex w-full">
+        <div className="flex flex-col lg:flex-row gap-3 lg:gap-0 w-full">
           <div className="flex-[1.5]">
-            <div className=" w-[721px]  rounded-[12px]">
+            <div className="rounded-[12px]">
               <div id="order-status-card" className='w-full h-auto bg-[#FFFFFF] rounded-[16px] p-4 mb-5'>
                 <div id="status-container" className='flex items-center gap-2'>
                   <div id="status-icon-container" className='bg-[#FFF0E6] p-2 rounded-[20px]'>
@@ -195,7 +195,7 @@ const Page = () => {
           </div>
 
           <div id="guest-details-container" className="flex-[1]">
-            <div id="guest-card" className="max-w-md mx-auto rounded-xl overflow-hidden flex flex-col gap-6 bg-white shadow-sm p-6 mb-6">
+            <div id="guest-card" className="max-w-md mx-auto rounded-xl overflow-hidden flex flex-col gap-6 bg-white shadow-sm p-6 mb-6 lg:ml-4">
               {/* Guest Header */}
               <div id="guest-header">
                 <h1 className="text-xl font-bold text-gray-800 mb-4">Guest Details</h1>
@@ -253,7 +253,7 @@ const Page = () => {
             </div>
 
             {/* Event */}
-            <div id="event-card" className="max-w-md mx-auto rounded-xl overflow-hidden flex flex-col gap-6 bg-white shadow-sm p-6">
+            <div id="event-card" className="max-w-md mx-auto rounded-xl overflow-hidden flex flex-col gap-6 bg-white shadow-sm p-6 lg:ml-4">
               <div id="event-section">
                 <h2 className="font-bold text-[#111827] text-[18px] mb-3">Event</h2>
                 <div id="event-header" className="flex items-center gap-3 mb-3">

@@ -142,14 +142,14 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
       {/* Left: Filter + Search */}
       <div id="table-filter&search" className="flex flex-col md:flex-row items-center gap-4 md:flex-wrap w-full md:w-auto">
         {/* Show Dropdown */}
-        <div id="table-showDropDown" className="w-full md:w-[189px] h-[56px] flex justify-center items-center gap-2 bg-[#FFFFFF] rounded-[12px] px-3 py-1.5 text-sm text-[#718096] font-medium">
+        <div id="table-showDropDown" className="w-full md:w-[189px] h-[40px] flex justify-center items-center gap-2 bg-[#FFFFFF] rounded-[12px] px-3 py-1.5 text-sm text-[#718096] font-medium">
           <span>Show:</span>
           <span className="font-bold text-[#111827] text-base">All Orders</span> 
           <MdOutlineKeyboardArrowDown className="w-4 h-4 text-[#111827]"/>
         </div>
 
         {/* Search Input */}
-        <div id="table-searchField" className="w-full md:w-[339px] h-[56px] flex items-center bg-[#FFFFFF] rounded-[12px] px-3 py-1.5">
+        <div id="table-searchField" className="w-full md:w-[339px] h-[40px] flex items-center bg-[#FFFFFF] rounded-[12px] px-3 py-1.5">
           <FiSearch className="text-[#111827] mr-2 w-6 h-6" />
           <input
             type="text"
@@ -159,7 +159,7 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
         </div>
 
         {/* Filters Button */}
-        <button id="table-filterField" className="w-full md:w-[112px] h-[56px] flex justify-center items-center gap-1 bg-[#FFFFFF] rounded-[12px] px-3 py-1.5 text-sm text-[#718096] font-medium">
+        <button id="table-filterField" className="w-full md:w-[112px] h-[40px] flex justify-center items-center gap-1 bg-[#FFFFFF] rounded-[12px] px-3 py-1.5 text-sm text-[#718096] font-medium">
           <SlidersHorizontal size={16} />
           Filters
         </button>
@@ -169,7 +169,7 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
       <div id="table-export" className="w-full md:w-auto">
         <button
         onClick={() => exportToCSV(orders)}
-        className="w-full md:w-[153px] h-[56px] flex items-center justify-center gap-2 bg-[#FFFFFF] rounded-[12px] px-3 py-1.5 text-sm text-[#718096] font-medium shadow-sm">
+        className="w-full md:w-[153px] h-[40px] flex items-center justify-center gap-2 bg-[#FFFFFF] rounded-[12px] px-3 py-1.5 text-sm text-[#718096] font-medium shadow-sm">
           <HiOutlineDocumentDownload size={16} />
           Export 
           <MdOutlineKeyboardArrowDown className="w-6 h-6 text-[#718096]"/>
@@ -177,28 +177,28 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
       </div>
     </div>
 
-  <div id="main-table" className="mt-6 bg-white rounded-2xl shadow p-4 overflow-x-auto">
+    <div id="main-table" className="mt-6 w-full bg-white rounded-2xl shadow p-4 overflow-x-auto">
       {/* Table Head */}
-      <div id="table-head" className="flex py-3 text-[#718096] font-semibold text-sm border-b min-w-[800px]"> {/* Reduced min width */}
+      <div id="table-head" className="flex py-3 text-[#718096] font-semibold text-sm border-b w-full"> {/* Reduced min width */}
         <div className="w-[60px] flex items-center justify-center shrink-0">
           <FaRegCircle className="w-5 h-5"/>
         </div>
-        <div className="flex-1 min-w-[140px] flex items-center gap-1 text-base font-medium text-[#718096]">
+        <div className="flex-1 min-w-[120px] flex items-center gap-1 text-base font-medium text-[#718096]">
           Orders <PiArrowsDownUpFill />
         </div>
-        <div className="flex-1 min-w-[240px] flex items-center gap-1 text-base font-medium text-[#718096]"> {/* Increased width */}
+        <div className="flex-1 min-w-[220px] flex items-center gap-1 text-base font-medium text-[#718096]"> {/* Increased width */}
           Guest <PiArrowsDownUpFill />
         </div>
-        <div className="flex-1 min-w-[220px] flex items-center gap-1 text-base font-medium text-[#718096]"> {/* Reduced width */}
+        <div className="flex-1 min-w-[200px] flex items-center gap-1 text-base font-medium text-[#718096]"> {/* Reduced width */}
           Event <PiArrowsDownUpFill />
         </div>  
-        <div className="flex-1 min-w-[140px] flex items-center gap-1 text-base font-medium text-[#718096]">
+        <div className="flex-1 min-w-[90px] flex items-center gap-1 text-base font-medium text-[#718096]">
           Price <PiArrowsDownUpFill />
         </div>
-        <div className="flex-1 min-w-[120px] flex items-center gap-1 text-base font-medium text-[#718096]">
+        <div className="flex-1 min-w-[90px] flex items-center gap-1 text-base font-medium text-[#718096]">
           Delivery <GoArrowUp className="text-[#0CAF60]" />
         </div>
-        <div className="flex-1 min-w-[130px] flex items-center gap-1 text-base font-medium text-[#718096]">
+        <div className="flex-1 min-w-[90px] flex items-center gap-1 text-base font-medium text-[#718096]">
           Status <PiArrowsDownUpFill />
         </div>
         <div className="w-[60px] flex items-center justify-center shrink-0">
@@ -217,17 +217,17 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
         <div className="w-[60px] flex justify-center shrink-0">
             <FaRegCircle className="w-5 h-5 text-[#718096]"/>
         </div>
-        <div className="flex-1 min-w-[140px] py-3 h-20 flex flex-col justify-center">
+        <div className="flex-1 min-w-[120px] py-3 h-20 flex flex-col justify-center">
             <div className="font-semibold text-base text-[#111827]">{order.orderId}</div>
             <div className="text-sm font-medium text-[#718096]">{formatDate(order.createdAt)}</div>
         </div>
-        <div className="flex-1 min-w-[240px] py-3 h-20 flex flex-col justify-center">
+        <div className="flex-1 min-w-[220px] py-3 h-20 flex flex-col justify-center">
         <div className="font-semibold text-base text-[#111827]">
           {`${order.guestFirstName.charAt(0).toUpperCase()}${order.guestFirstName.slice(1)} ${order.guestLastName.charAt(0).toUpperCase()}${order.guestLastName.slice(1)}`}
         </div>
         <div className="text-sm font-medium text-[#718096]">{order.guestEmail}</div>
         </div>
-        <div className="flex-1 min-w-[220px] py-3 h-20">
+        <div className="flex-1 min-w-[200px] py-3 h-20">
         <div className="text-base font-medium text-[#718096] pt-2">
           {order.eventId.eventName
             .split(" ")
@@ -235,9 +235,9 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
             .join(" ")} 
         </div>
         </div>
-        <div className="flex-1 min-w-[140px] font-semibold text-base text-[#111827] py-3 h-20 flex flex-col justify-center pb-7">{order.totalAmountCurrency === "NGN" ? "₦" : "$"}{order.totalAmount.toLocaleString()}</div>
-        <div className="flex-1 min-w-[120px] font-semibold text-base text-[#111827] py-3 h-20 flex flex-col justify-center pb-7">{order.deliveryType === "homeDelivery" ? "Delivery" : "Pickup"}</div>
-        <div className="flex-1 min-w-[130px] py-3 h-20 flex flex-col justify-center pb-7">
+        <div className="flex-1 min-w-[95px] font-semibold text-base text-[#111827] py-3 h-20 flex flex-col justify-center pb-7">{order.totalAmountCurrency === "NGN" ? "₦" : "$"}{order.totalAmount.toLocaleString()}</div>
+        <div className="flex-1 min-w-[95px] font-semibold text-base text-[#111827] py-3 h-20 flex flex-col justify-center pb-7">{order.deliveryType === "homeDelivery" ? "Delivery" : "Pickup"}</div>
+        <div className="flex-1 min-w-[95px] py-3 h-20 flex flex-col justify-center pb-7">
             <span
             className={`w-[85px] px-3 py-1 text-xs font-semibold rounded-[8px] ${getStatusColor(
                 order.orderStatus

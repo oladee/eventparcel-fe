@@ -4,7 +4,7 @@ import React from "react";
 const page = () => {
   return (
     <AdminContainer>
-      <div className="w-full h-full flex items-center justify-center">
+      <div className="w-full h-full">
         This page is coming soon
       </div>
     </AdminContainer>
