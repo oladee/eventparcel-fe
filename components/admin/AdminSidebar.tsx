@@ -233,7 +233,7 @@ export const AdminSidebar: React.FC = () => {
       },
       {
         label: "Admin Users",
-        path: "/admin/adminUsers",
+        path: "/admin/admin-users",
         // Using FiCreditCard as a placeholder icon
         icon: CgProfile,
         exact: true

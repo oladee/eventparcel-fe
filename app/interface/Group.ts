@@ -5,6 +5,7 @@ export interface Package {
     _id: string;
     packageQuantity: number;
     packagePriceCurrency: string;
+    packageSize: string;
     packagePrice: number;
     packageDelivery: string[];
   }

@@ -1,13 +1,13 @@
-import { FiSearch } from "react-icons/fi";
-import { SlidersHorizontal } from "lucide-react";
+import { FiPackage, FiSearch } from "react-icons/fi";
 import { HiOutlineDocumentDownload } from "react-icons/hi";
-import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { BsThreeDots } from "react-icons/bs";
 import { FaRegCircle } from "react-icons/fa6";
 import { PiArrowsDownUpFill } from "react-icons/pi";
 import { GoArrowUp } from "react-icons/go";
-// import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { AnimatePresence, motion } from "framer-motion";
+import { useState } from "react";
+import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 
   interface EventGroup {
     _id: string;
@@ -60,14 +60,23 @@ import { useRouter } from "next/navigation";
     orders: Order[];
     currentPage: number;
     setCurrentPage: (page: number) => void;
+    setSearchTerm: (search: string) => void;
+    setOrderStatus:(status: string) => void;
+    searchTerm: string;
+    orderStatus: string;
     totalPages?: number;
     setLimit?: React.Dispatch<React.SetStateAction<number>>; 
     limit: number;
   }
 
-const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPage, totalPages, setLimit, limit}) => {
+const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPage,searchTerm, totalPages, setLimit, limit, setSearchTerm, setOrderStatus, orderStatus}) => {
     const Router = useRouter();
+    const [selected, setSelected] = useState("All Orders");
+    const [isOpen, setIsOpen] = useState(false);
 
+    console.log("o", orderStatus)
+
+    const orderOptions = ["All Orders", "pending", "shipped", "delivered"];
     const getStatusColor = (status: string) => {
         switch (status.toLowerCase()) {
           case "pending":
@@ -93,12 +102,12 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
       
       const handleSelectedOrder = (order: any) => {
         localStorage.setItem("selectedOrder", JSON.stringify(order));
-        Router.push("/admin/orderDetails");
+        Router.push("/admin/admin-orderDetails");
       };
 
       
   //EXPORT CSV FILE
-  const exportToCSV = (data: any[], filename = 'referrals.csv') => {
+  const exportToCSV = (data: any[], filename = 'orders.csv') => {
     if (!data || data.length === 0) return;
   
     const csvRows = [];
@@ -112,18 +121,29 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
       const values = headers.map(header => {
         let value = row[header];
   
-        // Convert 'createdAt' and 'acceptedAt' to locale string
-        if (header === 'createdAt' || header === 'acceptedAt' || header === 'updatedAt') {
-          value = new Date(value).toLocaleString();  // Convert to locale string
+        // Format dates
+        if (['createdAt', 'acceptedAt', 'updatedAt'].includes(header)) {
+          value = new Date(value).toLocaleString();
         }
   
-        const escaped = ('' + value).replace(/"/g, '""');
+        // Serialize nested objects (e.g., eventId, eventGroupId)
+        if (typeof value === 'object' && value !== null) {
+          try {
+            // Customize this to extract relevant fields if needed
+            value = JSON.stringify(value);
+          } catch (err) {
+            value = '[Invalid Object]';
+          }
+        }
+  
+        const escaped = ('' + value).replace(/"/g, '""'); // Escape quotes
         return `"${escaped}"`;
       });
+  
       csvRows.push(values.join(','));
     }
   
-    // 3. Download
+    // 3. Trigger download
     const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
     const url = window.URL.createObjectURL(blob);
   
@@ -135,18 +155,55 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
     a.click();
     document.body.removeChild(a);
   };
-      
+    
   return (
     <div id="order-table" className="w-full gap-4 pt-3 rounded-xl">
       <div id="table-top" className="flex flex-col md:flex-row md:flex-wrap justify-between items-center gap-4 md:gap-0">
       {/* Left: Filter + Search */}
       <div id="table-filter&search" className="flex flex-col md:flex-row items-center gap-4 md:flex-wrap w-full md:w-auto">
         {/* Show Dropdown */}
-        <div id="table-showDropDown" className="w-full md:w-[189px] h-[40px] flex justify-center items-center gap-2 bg-[#FFFFFF] rounded-[12px] px-3 py-1.5 text-sm text-[#718096] font-medium">
-          <span>Show:</span>
-          <span className="font-bold text-[#111827] text-base">All Orders</span> 
-          <MdOutlineKeyboardArrowDown className="w-4 h-4 text-[#111827]"/>
+        <div className="relative w-full md:w-[189px]">
+        {/* Trigger Button */}
+        <div
+          onClick={() => setIsOpen((prev) => !prev)}
+          className="w-[169px] h-[40px] flex justify-between items-center gap-1 bg-[#FFFFFF] rounded-[12px] px-3 py-1.5 text-sm text-[#718096] font-medium cursor-pointer"
+        >
+          <span className="whitespace-nowrap">Show:</span>
+          <span className="font-bold text-[#111827] text-base flex-1 text-right">
+            {orderStatus.charAt(0).toUpperCase() + orderStatus.slice(1) || "All Orders"}
+          </span>
+          <MdOutlineKeyboardArrowDown className="w-4 h-4 text-[#111827]" />
         </div>
+        {/* Dropdown */}
+        <AnimatePresence>
+          {isOpen && (
+            <motion.ul
+              initial={{ opacity: 0, y: -5 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -5 }}
+              transition={{ duration: 0.15 }}
+              className="absolute z-50 mt-2 w-full bg-white shadow-lg rounded-xl overflow-hidden text-sm text-[#111827]"
+            >
+              {orderOptions.map((option) => (
+                <li
+                  key={option}
+                  onClick={() => {
+                    setSelected(option);
+                    setIsOpen(false);
+                    setOrderStatus(option);
+                    // Optionally trigger filtering logic here
+                  }}
+                  className={`px-4 py-2 hover:bg-gray-100 cursor-pointer ${
+                    selected === option ? "bg-gray-100 font-semibold" : ""
+                  }`}
+                >
+                  {option.charAt(0).toUpperCase() + option.slice(1)}
+                </li>
+              ))}
+            </motion.ul>
+          )}
+        </AnimatePresence>
+      </div>
 
         {/* Search Input */}
         <div id="table-searchField" className="w-full md:w-[339px] h-[40px] flex items-center bg-[#FFFFFF] rounded-[12px] px-3 py-1.5">
@@ -155,102 +212,120 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
             type="text"
             placeholder="Search by name, email, or others..."
             className="outline-none text-sm text-[#718096] bg-transparent placeholder-[#A0AEC0] w-full"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
           />
         </div>
 
         {/* Filters Button */}
-        <button id="table-filterField" className="w-full md:w-[112px] h-[40px] flex justify-center items-center gap-1 bg-[#FFFFFF] rounded-[12px] px-3 py-1.5 text-sm text-[#718096] font-medium">
+        {/* <button id="table-filterField" className="w-full md:w-[112px] h-[40px] flex justify-center items-center gap-1 bg-[#FFFFFF] rounded-[12px] px-3 py-1.5 text-sm text-[#718096] font-medium">
           <SlidersHorizontal size={16} />
           Filters
-        </button>
+        </button> */}
       </div>
 
       {/* Right: Export */}
       <div id="table-export" className="w-full md:w-auto">
         <button
         onClick={() => exportToCSV(orders)}
-        className="w-full md:w-[153px] h-[40px] flex items-center justify-center gap-2 bg-[#FFFFFF] rounded-[12px] px-3 py-1.5 text-sm text-[#718096] font-medium shadow-sm">
+        className="w-full md:w-[153px] h-[40px] flex items-center justify-center gap-1 bg-[#FFFFFF] rounded-[12px] px-3 py-1.5 text-sm text-[#718096] font-medium shadow-sm">
           <HiOutlineDocumentDownload size={16} />
           Export 
-          <MdOutlineKeyboardArrowDown className="w-6 h-6 text-[#718096]"/>
+          {/* <MdOutlineKeyboardArrowDown className="w-6 h-6 text-[#718096]"/> */}
         </button>
       </div>
     </div>
 
     <div id="main-table" className="mt-6 w-full bg-white rounded-2xl shadow p-4 overflow-x-auto">
-      {/* Table Head */}
-      <div id="table-head" className="flex py-3 text-[#718096] font-semibold text-sm border-b w-full"> {/* Reduced min width */}
-        <div className="w-[60px] flex items-center justify-center shrink-0">
-          <FaRegCircle className="w-5 h-5"/>
+  {/* Table Head */}
+  <div id="table-head" className="flex py-3 text-[#718096] font-semibold text-sm border-b w-full">
+    <div className="w-[40px] flex items-center justify-center shrink-0"> {/* Reduced from 60px */}
+      <FaRegCircle className="w-5 h-5"/>
+    </div>
+    <div className="flex-1 min-w-[100px] flex items-center gap-1 text-base font-medium text-[#718096]"> {/* Reduced from 120px */}
+      Orders <PiArrowsDownUpFill />
+    </div>
+    <div className="flex-1 min-w-[250px] flex items-center gap-1 text-base font-medium text-[#718096]"> {/* Increased from 220px */}
+      Guest <PiArrowsDownUpFill />
+    </div>
+    <div className="flex-1 min-w-[220px] flex items-center gap-1 text-base font-medium text-[#718096]"> {/* Increased from 200px */}
+      Event <PiArrowsDownUpFill />
+    </div>  
+    <div className="flex-1 min-w-[80px] flex items-center gap-1 text-base font-medium text-[#718096]"> {/* Reduced from 90px */}
+      Price <PiArrowsDownUpFill />
+    </div>
+    <div className="flex-1 min-w-[80px] flex items-center gap-1 text-base font-medium text-[#718096]"> {/* Reduced from 90px */}
+      Delivery <GoArrowUp className="text-[#0CAF60]" />
+    </div>
+    <div className="flex-1 min-w-[80px] flex items-center gap-1 text-base font-medium text-[#718096]"> {/* Reduced from 90px */}
+      Status <PiArrowsDownUpFill />
+    </div>
+    <div className="w-[40px] flex items-center justify-center shrink-0"> {/* Reduced from 60px */}
+      <BsThreeDots className="w-5 h-5 text-[#A0AEC0]"/>
+    </div>
+  </div>
+
+  {/* Table Body */}
+  {orders.length === 0 && (
+    <div className="flex flex-col items-center justify-center w-full py-16 text-center bg-white rounded-md border border-dashed border-gray-300">
+      <FiPackage className="w-12 h-12 text-gray-400 mb-4" />
+      <h3 className="text-lg font-semibold text-gray-700 mb-2">No Orders Found</h3>
+      <p className="text-sm text-gray-500">
+        You don't have any orders matching the current filter.
+      </p>
+    </div>
+  )}
+  
+  {orders.map((order, i) => (
+    <div
+      key={i}
+      className="flex items-center border-b last:border-b-0 text-sm min-w-[900px] cursor-pointer"
+      onClick={() => handleSelectedOrder(order)}
+      id="table-body"
+    >
+      <div className="w-[40px] flex justify-center shrink-0"> {/* Reduced from 60px */}
+        <FaRegCircle className="w-5 h-5 text-[#718096]"/>
+      </div>
+      <div className="flex-1 min-w-[100px] py-3 h-20 flex flex-col justify-center"> {/* Reduced from 120px */}
+             <div className="font-semibold text-base text-[#111827]">{order.orderId}</div>
+            <div className="text-sm font-medium text-[#718096]">{formatDate(order.createdAt)}</div>
+      </div>
+      <div className="flex-1 min-w-[250px] py-3 h-20 flex flex-col justify-center overflow-hidden"> {/* Increased from 220px */}
+        <div className="font-semibold text-base text-[#111827] break-words">
+          {`${order.guestFirstName} ${order.guestLastName}`}
         </div>
-        <div className="flex-1 min-w-[120px] flex items-center gap-1 text-base font-medium text-[#718096]">
-          Orders <PiArrowsDownUpFill />
-        </div>
-        <div className="flex-1 min-w-[220px] flex items-center gap-1 text-base font-medium text-[#718096]"> {/* Increased width */}
-          Guest <PiArrowsDownUpFill />
-        </div>
-        <div className="flex-1 min-w-[200px] flex items-center gap-1 text-base font-medium text-[#718096]"> {/* Reduced width */}
-          Event <PiArrowsDownUpFill />
-        </div>  
-        <div className="flex-1 min-w-[90px] flex items-center gap-1 text-base font-medium text-[#718096]">
-          Price <PiArrowsDownUpFill />
-        </div>
-        <div className="flex-1 min-w-[90px] flex items-center gap-1 text-base font-medium text-[#718096]">
-          Delivery <GoArrowUp className="text-[#0CAF60]" />
-        </div>
-        <div className="flex-1 min-w-[90px] flex items-center gap-1 text-base font-medium text-[#718096]">
-          Status <PiArrowsDownUpFill />
-        </div>
-        <div className="w-[60px] flex items-center justify-center shrink-0">
-          <BsThreeDots className="w-5 h-5 text-[#A0AEC0]"/>
+        <div className="text-sm font-medium text-[#718096] break-words">
+          {order.guestEmail}
         </div>
       </div>
-
-    {/* Table Body */}
-    {orders.map((order, i) => (
-        <div
-        key={i}
-        className="flex items-center border-b last:border-b-0 text-sm min-w-[900px] cursor-pointer"
-        onClick={() => handleSelectedOrder(order)}
-        id="table-body"
-        >
-        <div className="w-[60px] flex justify-center shrink-0">
-            <FaRegCircle className="w-5 h-5 text-[#718096]"/>
-        </div>
-        <div className="flex-1 min-w-[120px] py-3 h-20 flex flex-col justify-center">
-            <div className="font-semibold text-base text-[#111827]">{order.orderId}</div>
-            <div className="text-sm font-medium text-[#718096]">{formatDate(order.createdAt)}</div>
-        </div>
-        <div className="flex-1 min-w-[220px] py-3 h-20 flex flex-col justify-center">
-        <div className="font-semibold text-base text-[#111827]">
-          {`${order.guestFirstName.charAt(0).toUpperCase()}${order.guestFirstName.slice(1)} ${order.guestLastName.charAt(0).toUpperCase()}${order.guestLastName.slice(1)}`}
-        </div>
-        <div className="text-sm font-medium text-[#718096]">{order.guestEmail}</div>
-        </div>
-        <div className="flex-1 min-w-[200px] py-3 h-20">
-        <div className="text-base font-medium text-[#718096] pt-2">
+      <div className="flex-1 min-w-[220px] py-3 h-20 flex flex-col justify-center"> {/* Increased from 200px */}
+        <div className="text-base font-medium text-[#718096] break-words">
           {order.eventId.eventName
             .split(" ")
             .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
             .join(" ")} 
         </div>
-        </div>
-        <div className="flex-1 min-w-[95px] font-semibold text-base text-[#111827] py-3 h-20 flex flex-col justify-center pb-7">{order.totalAmountCurrency === "NGN" ? "₦" : "$"}{order.totalAmount.toLocaleString()}</div>
-        <div className="flex-1 min-w-[95px] font-semibold text-base text-[#111827] py-3 h-20 flex flex-col justify-center pb-7">{order.deliveryType === "homeDelivery" ? "Delivery" : "Pickup"}</div>
-        <div className="flex-1 min-w-[95px] py-3 h-20 flex flex-col justify-center pb-7">
-            <span
-            className={`w-[85px] px-3 py-1 text-xs font-semibold rounded-[8px] ${getStatusColor(
-                order.orderStatus
-            )}`}
-            >
-            {order.orderStatus.charAt(0).toUpperCase()}{order.orderStatus.slice(1)}
-            </span>
-        </div>
-        <div className="w-[60px] flex justify-center shrink-0">
-            <BsThreeDots className="w-5 h-5 text-[#A0AEC0]"/>
-        </div>
-        </div>
-    ))}
+      </div>
+      <div className="flex-1 min-w-[80px] font-semibold text-base text-[#111827] py-3 h-20 flex items-center"> {/* Reduced from 95px */}
+        {order.totalAmountCurrency === "NGN" ? "₦" : "$"}{order.totalAmount.toLocaleString()}
+      </div>
+      <div className="flex-1 min-w-[80px] font-semibold text-base text-[#111827] py-3 h-20 flex items-center"> {/* Reduced from 95px */}
+        {order.deliveryType === "homeDelivery" ? "Delivery" : "Pickup"}
+      </div>
+      <div className="flex-1 min-w-[80px] py-3 h-20 flex items-center"> {/* Reduced from 95px */}
+        <span
+          className={`w-[85px] px-3 py-1 text-xs font-semibold rounded-[8px] ${getStatusColor(
+              order.orderStatus
+          )}`}
+        >
+          {order.orderStatus.charAt(0).toUpperCase()}{order.orderStatus.slice(1)}
+        </span>
+      </div>
+      <div className="w-[40px] flex justify-center shrink-0"> {/* Reduced from 60px */}
+        <BsThreeDots className="w-5 h-5 text-[#A0AEC0]"/>
+      </div>
+    </div>
+  ))}
 
     {/* Pagination */}
     <div id="pagination" className="flex flex-col sm:flex-row justify-between sm:mr-4 items-center mt-6 gap-2 sm:gap-0">

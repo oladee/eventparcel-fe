@@ -1,12 +1,13 @@
-import { FiSearch } from "react-icons/fi";
+import { FiPackage, FiSearch } from "react-icons/fi";
 import { SlidersHorizontal } from "lucide-react";
 import { HiOutlineDocumentDownload } from "react-icons/hi";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { BsThreeDots } from "react-icons/bs";
 import { FaRegCircle } from "react-icons/fa6";
 import { PiArrowsDownUpFill } from "react-icons/pi";
-import { BiChevronUp } from "react-icons/bi";
-import React from "react";
+import { BiChevronDown, BiChevronUp } from "react-icons/bi";
+import React, { useState } from "react";
+import { Order } from "@/app/interface/Order";
 
 const orders = [
   {
@@ -123,196 +124,338 @@ const orders = [
   }
 ];
 
+interface OrderSummaryItem {
+  amountReceived: number;
+  amountReceivedCurrency: string;
+  guestPayment: number;
+  guestPaymentCurrency: string;
+  homeDeliveryFee: number;
+  items: number;
+  orderNumber: string;
+  tax: number;
+  totalAmount: number;
+  totalAmountCurrency: string;
+  orderId: Order;
+}
 
-const TransactionTable: React.FC = () => {
 
-    const getStatusColor = (status: string) => {
-        switch (status.toLowerCase()) {
-          case "pending":
-            return "bg-[#FFF5EB] text-[#F97316]";
-          case "delivery":
-            return "bg-[#ECFDF5] text-[#10B981]";
-          case "shipped":
-            return "bg-[#EEF2FF] text-[#6366F1]";
-          default:
-            return "bg-gray-200 text-gray-600";
-        }
+interface TransactionProps {
+  orders: OrderSummaryItem[];
+  currentPage: number;
+  setCurrentPage: (page: number) => void;
+  setSearchTerm: (search: string) => void;
+  searchTerm: string;
+  totalPages?: number;
+  setLimit?: React.Dispatch<React.SetStateAction<number>>; 
+  limit: number;
+}
+
+
+const TransactionTable: React.FC<TransactionProps> = ({orders, currentPage, setCurrentPage,searchTerm, totalPages, setLimit, limit, setSearchTerm}) => {
+
+  const [openBreakdownOrderId, setOpenBreakdownOrderId] = useState<string | null>(null);
+
+      const formatDate = (dateString: string) => {
+        const date = new Date(dateString);
+        
+        const day = date.toLocaleString("en-GB", { day: "2-digit" });
+        const month = date.toLocaleString("en-GB", { month: "short" });
+        const year = date.getFullYear();
+      
+        return `${day} ${month}, ${year}`;
       };
+    
+    //EXPORT CSV FILE
+    const exportToCSV = (data: any[], filename = 'transactions.csv') => {
+      if (!data || data.length === 0) return;
+    
+      const csvRows = [];
+    
+      // 1. Headers
+      const headers = Object.keys(data[0]);
+      csvRows.push(headers.join(','));
+    
+      // 2. Rows
+      for (const row of data) {
+        const values = headers.map(header => {
+          let value = row[header];
+    
+          // Format dates
+          if (['createdAt', 'acceptedAt', 'updatedAt'].includes(header)) {
+            value = new Date(value).toLocaleString();
+          }
+    
+          // Serialize nested objects (e.g., eventId, eventGroupId)
+          if (typeof value === 'object' && value !== null) {
+            try {
+              // Customize this to extract relevant fields if needed
+              value = JSON.stringify(value);
+            } catch (err) {
+              value = '[Invalid Object]';
+            }
+          }
+    
+          const escaped = ('' + value).replace(/"/g, '""'); // Escape quotes
+          return `"${escaped}"`;
+        });
+    
+        csvRows.push(values.join(','));
+      }
+    
+      // 3. Trigger download
+      const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
+      const url = window.URL.createObjectURL(blob);
+    
+      const a = document.createElement('a');
+      a.setAttribute('hidden', '');
+      a.setAttribute('href', url);
+      a.setAttribute('download', filename);
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+    };
+    
       
   return (
-    <div className="w-full gap-4 pt-3 rounded-xl">
-      <div className="flex flex-col md:flex-row md:flex-wrap justify-between items-center gap-4 md:gap-0">
-      {/* Left: Filter + Search */}
-      <div className="flex flex-col md:flex-row items-center gap-4 md:flex-wrap w-full md:w-auto">
-        {/* Show Dropdown */}
-        <div className="w-full md:w-[189px] h-[40px] flex justify-center items-center gap-2 bg-[#FFFFFF] rounded-[12px] px-3 py-1.5 text-sm text-[#718096] font-medium">
-          <span>Show:</span>
-          <span className="font-bold text-[#111827] text-base">All Orders</span> 
-          <MdOutlineKeyboardArrowDown className="w-4 h-4 text-[#111827]"/>
-        </div>
-
-        {/* Search Input */}
-        <div className="w-full md:w-[339px] h-[40px] flex items-center bg-[#FFFFFF] rounded-[12px] px-3 py-1.5">
-          <FiSearch className="text-[#111827] mr-2 w-6 h-6" />
-          <input
-            type="text"
-            placeholder="Search by name, email, or others..."
-            className="outline-none text-sm text-[#718096] bg-transparent placeholder-[#A0AEC0] w-full"
-          />
-        </div>
-
-        {/* Filters Button */}
-        <button className="w-full md:w-[112px] h-[40px] flex justify-center items-center gap-1 bg-[#FFFFFF] rounded-[12px] px-3 py-1.5 text-sm text-[#718096] font-medium">
-          <SlidersHorizontal size={16} />
-          Filters
-        </button>
-      </div>
-
-      {/* Right: Export */}
-      <div className="w-full md:w-auto">
-        <button className="w-full md:w-[153px] h-[40px] flex items-center justify-center gap-2 bg-[#FFFFFF] rounded-[12px] px-3 py-1.5 text-sm text-[#718096] font-medium shadow-sm">
-          <HiOutlineDocumentDownload size={16} />
-          Export 
-          <MdOutlineKeyboardArrowDown className="w-6 h-6 text-[#718096]"/>
-        </button>
+    <div className="w-full gap-4 pt-3 rounded-xl" id="orders-container">
+  <div className="flex flex-col md:flex-row md:flex-wrap justify-between items-center gap-4 md:gap-0" id="orders-controls">
+    {/* Left: Filter + Search */}
+    <div className="flex flex-col md:flex-row items-center gap-4 md:flex-wrap w-full md:w-auto" id="search-controls">
+      {/* Search Input */}
+      <div className="w-full md:w-[339px] h-[40px] flex items-center bg-[#FFFFFF] rounded-[12px] px-3 py-1.5" id="search-container">
+        <FiSearch className="text-[#111827] mr-2 w-6 h-6" />
+        <input
+          type="text"
+          placeholder="Search by name, email, or others..."
+          className="outline-none text-sm text-[#718096] bg-transparent placeholder-[#A0AEC0] w-full"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          id="search-input"
+        />
       </div>
     </div>
 
-    <div id="main-table" className="w-full gap-4 pt-3 rounded-xl">
-        {/* Table */}
-        <div className="mt-2 bg-white rounded-2xl shadow p-4 overflow-x-auto">
-          <table className="w-full">
-          <colgroup><col className="w-[60px]" /><col className="min-w-[120px]" /><col className="min-w-[120px]" /><col className="min-w-[120px]" /><col className="min-w-[120px]" /><col className="min-w-[120px]" /><col className="min-w-[120px]" /><col className="w-[60px]" /></colgroup>
-            
-            {/* Table Head */}
-            <thead>
-              <tr className="border-b">
-                <th className="p-3 text-center">
-                  <FaRegCircle className="w-5 h-5 mx-auto text-[#718096]"/>
-                </th>
-                <th className="p-3 text-left">
-                  <div className="flex items-center gap-1 text-base font-medium text-[#718096]">
-                    Orders <PiArrowsDownUpFill />
+    {/* Right: Export */}
+    <div className="w-full md:w-auto" id="export-container">
+      <button 
+        onClick={() => exportToCSV(orders)} 
+        className="w-full md:w-[153px] h-[40px] flex items-center justify-center gap-1 bg-[#FFFFFF] rounded-[12px] px-3 py-1.5 text-sm text-[#718096] font-medium shadow-sm"
+        id="export-button"
+      >
+        <HiOutlineDocumentDownload size={16} />
+        Export 
+      </button>
+    </div>
+  </div>
+
+  <div id="main-table" className="w-full gap-4 pt-3 rounded-xl">
+    {/* Table */}
+    <div className="mt-2 bg-white rounded-2xl shadow p-4 overflow-x-auto" id="orders-table">
+      <table className="w-full" id="orders-table-content">
+        <colgroup>
+          <col className="w-[60px]" id="select-col"/>
+          <col className="min-w-[120px]" id="order-col"/>
+          <col className="min-w-[120px]" id="guest-col"/>
+          <col className="min-w-[120px]" id="total-col"/>
+          <col className="min-w-[120px]" id="payout-col"/>
+          <col className="min-w-[120px]" id="delivery-col"/>
+          <col className="min-w-[120px]" id="status-col"/>
+          <col className="w-[60px]" id="actions-col"/>
+        </colgroup>
+        
+        {/* Table Head */}
+        <thead id="table-header">
+          <tr className="border-b" id="header-row">
+            <th className="p-3 text-center" id="select-header">
+              <FaRegCircle className="w-5 h-5 mx-auto text-[#718096]"/>
+            </th>
+            <th className="p-3 text-left" id="order-header">
+              <div className="flex items-center gap-1 text-base font-medium text-[#718096]">
+                Orders <PiArrowsDownUpFill />
+              </div>
+            </th>
+            <th className="p-3 text-left" id="guest-header">
+              <div className="flex items-center gap-1 text-base font-medium text-[#718096]">
+                Guest <PiArrowsDownUpFill />
+              </div>
+            </th>
+            <th className="p-3 text-left" id="total-header">
+              <div className="flex items-center gap-1 text-base font-medium text-[#718096]">
+                Total <PiArrowsDownUpFill />
+              </div>
+            </th>
+            <th className="p-3 text-left" id="payout-header">
+              <div className="flex items-center gap-1 text-base font-medium text-[#718096]">
+                Payout <PiArrowsDownUpFill />
+              </div>
+            </th>
+            <th className="p-3 text-left" id="delivery-header">
+              <div className="flex items-center gap-1 text-base font-medium text-[#718096]">
+                Delivery <PiArrowsDownUpFill />
+              </div>
+            </th>
+            <th className="p-3 text-left" id="status-header">
+              <div className="flex items-center gap-1 text-base font-medium text-[#718096]">
+                Status <PiArrowsDownUpFill />
+              </div>
+            </th>
+            <th className="p-3 text-center" id="actions-header">
+              <BsThreeDots className="w-5 h-5 text-[#A0AEC0] mx-auto"/>
+            </th>
+          </tr>
+        </thead>
+
+        {/* Table Body */}
+        {orders.length === 0 && (
+          <div className="flex flex-col items-center justify-center w-full py-16 text-center bg-white rounded-md border border-dashed border-gray-300" id="empty-state">
+            <FiPackage className="w-12 h-12 text-gray-400 mb-4" />
+            <h3 className="text-lg font-semibold text-gray-700 mb-2">No Orders Found</h3>
+            <p className="text-sm text-gray-500">
+              You don't have any orders matching the current filter.
+            </p>
+          </div>
+        )}
+
+        <tbody id="table-body">
+          {orders?.map((order, i) => (
+            <React.Fragment key={i}>
+              <tr className="border-b last:border-b-0 hover:bg-gray-50" id={`order-row-${order.orderNumber}`}>
+                <td className="p-3 text-center" id={`select-${order.orderNumber}`}>
+                  <FaRegCircle className="w-5 h-5 text-[#718096] mx-auto"/>
+                </td>
+                <td className="p-3" id={`order-info-${order.orderNumber}`}>
+                  <div className="font-semibold text-base text-[#111827]">{order.orderNumber}</div>
+                  <div className="text-sm font-medium text-[#718096]">{formatDate(order.orderId.createdAt)}</div>
+                </td>
+                <td className="p-3" id={`guest-info-${order.orderNumber}`}>
+                  <div className="font-semibold text-base text-[#111827]">
+                  {`${order.orderId.guestFirstName.charAt(0).toUpperCase()}${order.orderId.guestFirstName.slice(1)} ${order.orderId.guestLastName.charAt(0).toUpperCase()}${order.orderId.guestLastName.slice(1)}`}
                   </div>
-                </th>
-                <th className="p-3 text-left">
-                  <div className="flex items-center gap-1 text-base font-medium text-[#718096]">
-                    Guest <PiArrowsDownUpFill />
-                  </div>
-                </th>
-                <th className="p-3 text-left">
-                  <div className="flex items-center gap-1 text-base font-medium text-[#718096]">
-                    Total <PiArrowsDownUpFill />
-                  </div>
-                </th>
-                <th className="p-3 text-left">
-                  <div className="flex items-center gap-1 text-base font-medium text-[#718096]">
-                    Payout <PiArrowsDownUpFill />
-                  </div>
-                </th>
-                <th className="p-3 text-left">
-                  <div className="flex items-center gap-1 text-base font-medium text-[#718096]">
-                    Delivery <PiArrowsDownUpFill />
-                  </div>
-                </th>
-                <th className="p-3 text-left">
-                  <div className="flex items-center gap-1 text-base font-medium text-[#718096]">
-                    Status <PiArrowsDownUpFill />
-                  </div>
-                </th>
-                <th className="p-3 text-center">
+                  <div className="text-sm font-medium text-[#718096]">{order.orderId.guestEmail}</div>
+                </td>
+                <td className="p-3" id={`total-info-${order.orderNumber}`}>
+                  <div className="text-base font-medium text-[#718096]">{order.totalAmountCurrency === "NGN" ? "₦" : "$"}{order.orderId.totalAmount.toLocaleString()}</div>
+                </td>
+                <td className="p-3 font-semibold text-base text-[#111827]" id={`payout-info-${order.orderNumber}`}>
+                  {order.totalAmountCurrency === "NGN" ? "₦" : "$"}{order.amountReceived.toLocaleString()}
+                </td>
+                {order.orderId.deliveryType === "homeDelivery" ? (
+                  <td className="p-3 font-semibold text-base text-[#111827]" id={`delivery-fee-${order.orderNumber}`}>
+                    {order.totalAmountCurrency === "NGN" ? "₦" : "$"}{order?.homeDeliveryFee}
+                  </td>
+                ) : (
+                  <td className="p-3 font-semibold text-base text-[#111827]" id={`delivery-fee-${order.orderNumber}`}>
+                    N/A
+                  </td>
+                )}
+                <td className="p-3" id={`status-action-${order.orderNumber}`}>
+                  <button
+                  onClick={() => 
+                    setOpenBreakdownOrderId((prev) => 
+                      prev === order.orderNumber ? null : order.orderNumber
+                    )
+                  }
+                    className="w-full max-w-[156px] h-[35px] flex items-center justify-center text-xs text-[#751423] border border-[#751423] py-2 rounded-[8px] font-extrabold mx-auto"
+                    id={`breakdown-button-${order.orderNumber}`}
+                  >
+                    {openBreakdownOrderId === order.orderNumber ? "See Less" : "See Breakdown"}
+                    {openBreakdownOrderId === order.orderNumber ? (
+                        <BiChevronUp size={16} className="ml-1 text-[#A0AEC0]" />
+                      ) : (
+                        <BiChevronDown size={16} className="ml-1 text-[#A0AEC0]" />
+                      )}          
+                  </button>
+                </td>
+                <td className="p-3 text-center" id={`actions-${order.orderNumber}`}>
                   <BsThreeDots className="w-5 h-5 text-[#A0AEC0] mx-auto"/>
-                </th>
+                </td>
               </tr>
-            </thead>
 
-            {/* Table Body */}
-            <tbody>
-              {orders.map((order, i) => (
-                <React.Fragment key={i}>
-                  <tr className="border-b last:border-b-0 hover:bg-gray-50">
-                    <td className="p-3 text-center">
-                      <FaRegCircle className="w-5 h-5 text-[#718096] mx-auto"/>
-                    </td>
-                    <td className="p-3">
-                      <div className="font-semibold text-base text-[#111827]">{order.id}</div>
-                      <div className="text-sm font-medium text-[#718096]">{order.date}</div>
-                    </td>
-                    <td className="p-3">
-                      <div className="font-semibold text-base text-[#111827]">{order.guest}</div>
-                      <div className="text-sm font-medium text-[#718096]">{order.email}</div>
-                    </td>
-                    <td className="p-3">
-                      <div className="text-base font-medium text-[#718096]">{order.total}</div>
-                    </td>
-                    <td className="p-3 font-semibold text-base text-[#111827]">
-                      {order.payout}
-                    </td>
-                    <td className="p-3 font-semibold text-base text-[#111827]">
-                      {order.delivery}
-                    </td>
-                    <td className="p-3">
-                      <button
-                        className="w-full max-w-[156px] h-[35px] flex items-center justify-center text-xs text-[#751423] border border-[#751423] py-2 rounded-[8px] font-extrabold mx-auto"
-                      >
-                        See Breakdown <BiChevronUp size={16} className="ml-1 text-[#A0AEC0]" />
-                      </button>
-                    </td>
-                    <td className="p-3 text-center">
-                      <BsThreeDots className="w-5 h-5 text-[#A0AEC0] mx-auto"/>
-                    </td>
-                  </tr>
-
-                  {/* Expanded Details Row */}
-                  <tr className="border-b border-gray-200">
-                    <td colSpan={8} className="pl-14 max-sm:pl-4">
-                      <div className="w-full h-[110.8px] lg:h-[76.8px] flex flex-col sm:flex-row px-4 py-2 max-sm:px-2">
-                        <div className="flex-1 flex flex-col justify-between border-r border-gray-300 max-sm:border-r-0 max-sm:pb-2">
-                          <div className="flex justify-between max-sm:gap-2">
-                            <span className="text-gray-500 text-sm">1 item</span>
-                            <span className="text-gray-500 text-sm text-left xl:pr-16 2xl:pr-28 max-sm:pr-2">N560,000</span>
-                          </div>
-                          <div className="flex justify-between max-sm:gap-2">
-                            <span className="text-gray-500 text-sm">Home Delivery</span>
-                            <span className="text-gray-500 text-sm text-left xl:pr-16 2xl:pr-28 max-sm:pr-2">N3,000</span>
-                          </div>
-                        </div>
-                        <div className="flex-1 flex flex-col justify-between max-sm:pt-2">
-                          <div className="flex justify-between max-sm:gap-2">
-                            <span className="text-gray-500 text-sm sm:pl-24">Tax</span>
-                            <span className="text-gray-500 text-sm">N7000</span>
-                          </div>
-                          <div className="flex justify-between max-sm:gap-2">
-                            <span className="text-gray-500 text-sm sm:pl-24">Total</span>
-                            <span className="text-gray-500 text-sm">N563,000</span>
-                          </div>
-                        </div>
+              {/* Expanded Details Row */}
+              {openBreakdownOrderId === order.orderNumber && (
+                <tr className="border-b border-gray-200" id={`breakdown-details-${order.orderNumber}`}>
+                <td colSpan={8} className="pl-14 max-sm:pl-4">
+                  <div className="w-full h-[110.8px] lg:h-[76.8px] flex flex-col sm:flex-row px-4 py-2 max-sm:px-2" id={`breakdown-content-${order.orderNumber}`}>
+                    <div className="flex-1 flex flex-col justify-between border-r border-gray-300 max-sm:border-r-0 max-sm:pb-2" id={`breakdown-left-${order.orderNumber}`}>
+                      <div className="flex justify-between max-sm:gap-2">
+                        <span className="text-gray-500 text-sm">{order.items} item(s)</span>
+                        <span className="text-gray-500 text-sm text-left xl:pr-16 2xl:pr-28 max-sm:pr-2">{order.totalAmountCurrency === "NGN" ? "₦" : "$"}{order.totalAmount.toLocaleString()}</span>
                       </div>
-                    </td>
-                  </tr>
-                </React.Fragment>
-              ))}
-            </tbody>
-          </table>
-
+                      <div className="flex justify-between max-sm:gap-2">
+                        {order.orderId.deliveryType === "homeDelivery" && (
+                          <>
+                            <span className="text-gray-500 text-sm">Home Delivery</span>
+                            <span className="text-gray-500 text-sm text-left xl:pr-16 2xl:pr-28 max-sm:pr-2">{order.totalAmountCurrency === "NGN" ? "₦" : "$"}{order?.homeDeliveryFee.toLocaleString()}</span>
+                          </>
+                        )}
+                      </div>
+                    </div>
+                    <div className="flex-1 flex flex-col justify-between max-sm:pt-2" id={`breakdown-right-${order.orderNumber}`}>
+                      <div className="flex justify-between max-sm:gap-2">
+                        <span className="text-gray-500 text-sm sm:pl-24">Tax</span>
+                        <span className="text-gray-500 text-sm">{order.totalAmountCurrency === "NGN" ? "₦" : "$"}{order.tax.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between max-sm:gap-2">
+                        <span className="text-gray-500 text-sm sm:pl-24">Total</span>
+                        <span className="text-gray-500 text-sm">{order.totalAmountCurrency === "NGN" ? "₦" : "$"}{order.totalAmount.toLocaleString()}</span>
+                      </div>
+                    </div>
+                  </div>
+                </td>
+              </tr>
+              )}
+            </React.Fragment>
+          ))}
+        </tbody>
+      </table>
+  
           {/* Pagination */}
-          <div className="flex flex-col sm:flex-row justify-between sm:mr-4 items-center mt-6 gap-2 sm:gap-0">
+          <div id="pagination" className="flex flex-col sm:flex-row justify-between sm:mr-4 items-center mt-6 gap-2 sm:gap-0">
             <div className="text-sm text-[#718096] whitespace-nowrap">
-              Show result: <span className="font-semibold">6</span>
+              <div className="flex items-center">
+                <span className="text-gray-600 text-sm mr-2 whitespace-nowrap">
+                  Show result:
+                </span>
+                <select
+                    id="table-limit"
+                    value={limit}
+                    onChange={(e) => {
+                      const newLimit = Number(e.target.value);
+                      localStorage.setItem("orders_limit", newLimit.toString()); // persist it
+                      setLimit && setLimit(newLimit); // update local state
+                    }}
+                    className="border rounded-[2px] px-3 py-1 text-sm focus:outline-none focus:ring-1 focus:ring-blue-500"
+                  >
+
+                  {[6, 10, 20, 30, 40, 50].map((option) => (
+                    <option key={option} value={option}>
+                      {option}
+                    </option>
+                  ))}
+                </select>
+              </div>
             </div>
             <div className="flex items-center gap-1 text-sm overflow-x-auto py-2 sm:py-0 w-full justify-center sm:w-auto">
-              <button className="text-[#A0AEC0] whitespace-nowrap">&lt;</button>
-              {[1, 2, 3, 4, "...", 20].map((n, idx) => (
+              <button
+              onClick={() => currentPage > 1 && setCurrentPage(currentPage - 1)}
+              className="text-[#A0AEC0] whitespace-nowrap">&lt;</button>
+              {Array.from({ length: totalPages || 1 }, (_, i) => i + 1).map((pageNum) => (
                 <button
-                  key={idx}
+                  id="tableNum"
+                  key={pageNum}
+                  onClick={() => setCurrentPage(pageNum)}
                   className={`w-8 h-8 rounded-[12px] p-[8px] whitespace-nowrap ${
-                    n === 2 ? "bg-[#DCFCE7] text-[#16A34A]" : "text-[#A0AEC0] hover:bg-gray-100"
+                    pageNum === currentPage
+                      ? "bg-[#DCFCE7] text-[#16A34A]"
+                      : "text-[#A0AEC0] hover:bg-gray-100"
                   }`}
                 >
-                  {n}
+                  {pageNum}
                 </button>
               ))}
-              <button className="text-[#A0AEC0] whitespace-nowrap">&gt;</button>
+              <button
+                onClick={() => currentPage < (totalPages || 1) && setCurrentPage(currentPage + 1)}
+                className="text-[#A0AEC0] whitespace-nowrap">&gt;</button>
             </div>
           </div>
         </div>

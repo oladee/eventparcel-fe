@@ -1,60 +1,76 @@
 import React from "react";
-// import { FiEye } from "react-icons/fi";
 import { PiPackageBold } from "react-icons/pi";
 import BoxTime from "../../../assets/orderIcons/box-time.png"; 
 import Finance from "../../../assets/orderIcons/finance.png"; 
 import Image from "next/image";
 import TransactionsStatCard from "./TransactionsStatCard";
+import { SalesSummary } from "@/app/(dashboard)/admin/admin-transactions/page";
 
-const stats = [
-  {
-    icon: (
+interface OrdersStatCardGroupProps {
+  orderSummary?: SalesSummary;
+}
+
+const formatCurrency = (value: number) => {
+  if (value >= 1_000_000) return `₦${(value / 1_000_000).toFixed(2)}M`;
+  if (value >= 1_000) return `₦${(value / 1_000).toFixed(2)}K`;
+  return `₦${value.toFixed(2)}`;
+};
+
+const formatDollarCurrency = (value: number) => {
+  if (value >= 1_000_000) return `$${(value / 1_000_000).toFixed(2)}M`;
+  if (value >= 1_000) return `$${(value / 1_000).toFixed(2)}K`;
+  return `$${value.toFixed(2)}`;
+};
+
+const OrdersStatCardGroup: React.FC<OrdersStatCardGroupProps> = ({ orderSummary }) => {
+  const stats = [
+    {
+      icon: (
         <Image
           src={Finance.src}
-          alt="Box Time"
+          alt="Overall Sales"
           className="w-5 h-5 object-contain"
           width={20}
           height={20}
         />
       ),
-    label: "Overall Sales",
-    naira: "₦531.49M",
-    dollar: "+374.58K",
-    subtext: "in Dollars"
-  },
-  {
-    icon: (
+      label: "Overall Sales",
+      naira: formatCurrency(orderSummary?.NGN?.overallSales || 0),
+      dollar: formatDollarCurrency(orderSummary?.USD?.overallSales || 0),
+      subtext: "in Dollars",
+    },
+    {
+      icon: (
         <Image
           src={BoxTime.src}
-          alt="Box Time"
+          alt="Net Payout"
           className="w-5 h-5 object-contain"
           width={20}
           height={20}
         />
       ),
-    label: "Net Payout",
-    naira: "₦531.49M",
-    dollar: "+374.58K",
-    subtext: "in Dollars"
-  },
-  {
-    icon: <PiPackageBold size={20} />,
-    label: "Delivery Fee",
-    naira: "₦531.49M",
-    dollar: "+374.58K",
-    subtext: "in Dollars"
-  },
-  {
-    icon: <PiPackageBold size={20} />,
-    label: "Service Fee",
-    naira: "₦531.49M",
-    dollar: "+374.58K",
-    subtext: "in Dollars"
-  }
-];
+      label: "Net Payout",
+      naira: formatCurrency(orderSummary?.NGN?.netSales || 0),
+      dollar: formatDollarCurrency(orderSummary?.USD?.netSales || 0),
+      subtext: "in Dollars",
+    },
+    {
+      icon: <PiPackageBold size={20} />,
+      label: "Delivery Fee",
+      naira: formatCurrency(orderSummary?.NGN?.deliveryFee || 0),
+      dollar: formatDollarCurrency(orderSummary?.USD?.deliveryFee || 0),
+      subtext: "in Dollars",
+    },
+    {
+      icon: <PiPackageBold size={20} />,
+      label: "Service Fee",
+      naira: formatCurrency(orderSummary?.NGN?.serviceFee || 0),
+      dollar: formatDollarCurrency(orderSummary?.USD?.serviceFee || 0),
+      subtext: "in Dollars",
+    }
+  ];
 
-const OrdersStatCardGroup: React.FC = () => (
-  <>
+  return (
     <div className="grid grid-cols-2 sm:grid-cols-2 lg:flex lg:justify-between items-center gap-4">
       {stats.map((s, i) => (
         <TransactionsStatCard
@@ -67,7 +83,7 @@ const OrdersStatCardGroup: React.FC = () => (
         />
       ))}
     </div>
-  </>
-);
+  );
+};
 
 export default OrdersStatCardGroup;

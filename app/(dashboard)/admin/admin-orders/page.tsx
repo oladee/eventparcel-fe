@@ -1,11 +1,13 @@
 "use client"
 
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
 import AdminContainer from "@/components/admin/AdminContainer";
 import OrdersStatCardGroup from "@/components/admin/dashboard/OrderStartCardGroup";
 import OrdersHeader from "@/components/admin/dashboard/OrderTable";
 import axiosInstance from "@/lib/axiosInstance";
 import { motion } from "framer-motion";
+import debounce from "lodash/debounce";
+
 
 interface EventGroup {
   _id: string;
@@ -62,6 +64,24 @@ const Page = () => {
   const [orderSummary, setOrderSummary] = useState<any>();
   const [orderData, setOrderData] = useState<Order[]>([]);
   const [totalPages, setTotalPages ] = useState();
+  const [search, setSearch] = useState("");
+  const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
+  const [orderStatus, setOrderStatus] = useState("");
+
+  const debouncedSearch = useMemo(
+    () =>
+      debounce((value: string) => {
+        setDebouncedSearchTerm(value);
+      }, 1000),
+      []
+  );
+
+  useEffect(() => {
+    debouncedSearch(search);
+    return () => {
+      debouncedSearch.cancel();
+    }
+  },[search, debouncedSearch]);
   
   useEffect(() => {
     const fetchOrders = async() => {
@@ -70,7 +90,13 @@ const Page = () => {
       try {
         const params: Record<string, any> ={
           page,
-          limit
+          limit,
+          ...(debouncedSearchTerm && {
+            search:debouncedSearchTerm,
+          }),
+          ...(orderStatus && {
+            orderStatus
+          })
         };
 
         const response = await axiosInstance.get(
@@ -87,7 +113,7 @@ const Page = () => {
       }
     };
     fetchOrders();
-  }, [page, limit]);
+  }, [page, limit, debouncedSearchTerm, orderStatus]);
 
   if (loading) {
       return (
@@ -139,6 +165,10 @@ const Page = () => {
             totalPages={totalPages}
             setLimit={setLimit}
             limit={limit}
+            searchTerm={search}
+            setSearchTerm={setSearch}
+            setOrderStatus={setOrderStatus}
+            orderStatus={orderStatus}
           />
         </div>
       </div>
