@@ -1,7 +1,7 @@
 "use client"
 
 import AdminContainer from "@/components/admin/AdminContainer";
-import DeliveryStatCardGroup from "@/components/admin/dashboard/DeliveryStatCardGroup";
+import DeliveryStatCardGroup, { OrderSummary } from "@/components/admin/dashboard/DeliveryStatCardGroup";
 import DeliveryTable from "@/components/admin/dashboard/DeliveryTable";
 import axiosInstance from "@/lib/axiosInstance";
 import { motion } from "framer-motion";
@@ -40,7 +40,7 @@ const page = () => {
     const [error, setError] = useState<string>("");
     const [page, setPage] = useState(1);
     const [limit, setLimit] = useState(6);
-    const [orderSummary, setOrderSummary] = useState<any>();
+    const [orderSummary, setOrderSummary] = useState<OrderSummary>();
     const [orderData, setOrderData] = useState<GuestOrder[]>([]);
     const [totalPages, setTotalPages ] = useState();
     const [search, setSearch] = useState("");
@@ -83,6 +83,7 @@ const page = () => {
             { params }
           );
           console.log("sum",response.data.data);
+          setOrderSummary(response.data.data.summary)
           setOrderData(response.data.data.deliveries);
           setTotalPages(response.data.data.totalPages)
         }catch (error: any) {
@@ -133,7 +134,7 @@ const page = () => {
       <div className="w-full h-full flex flex-col gap-2 items-center justify-center">
         {/* Top section: stat cards*/}
         <div className="w-full">
-            <DeliveryStatCardGroup />
+            <DeliveryStatCardGroup orderSummary={orderSummary} />
         </div>
         {/* Table section */}
         <div className="w-full">

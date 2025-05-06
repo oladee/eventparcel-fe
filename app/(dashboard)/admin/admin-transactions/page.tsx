@@ -140,14 +140,14 @@ const page: React.FC = () => {
         {/* Table section */}
         <div className="w-full">
           <TransactionTable
-               orders={orderData}
-               currentPage={page}
-               setCurrentPage={setPage}
-               totalPages={totalPages}
-               setLimit={setLimit}
-               limit={limit}
-               searchTerm={search}
-               setSearchTerm={setSearch}
+            orders={orderData}
+            currentPage={page}
+            setCurrentPage={setPage}
+            totalPages={totalPages}
+            setLimit={setLimit}
+            limit={limit}
+            searchTerm={search}
+            setSearchTerm={setSearch}
           />
         </div>
       </div>

@@ -12,13 +12,13 @@ import { BiLoaderCircle } from "react-icons/bi";
 import PhoneNumberInput from "@/components/PhoneNumberInput";
 import axiosInstance from "@/lib/axiosInstance";
 import { useCallback } from "react";
-// import LocationPickerModal from "@/components/aboutEvent/LocationPickerModal";
+import { debounce } from "lodash";
 import Container from "@/components/dashboard/Container";
 import dynamic from "next/dynamic";
 import axios from "axios";
 
-const LocationPickerModal = dynamic(
-  () => import("@/components/aboutEvent/LocationPickerModal"),
+const PickupDeliveryLoationPicker = dynamic(
+  () => import("@/components/aboutEvent/PickupDeliveryLoationPicker"),
   { ssr: false }
 );
 
@@ -26,6 +26,7 @@ const PickupDetails = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
 
+  const [debouncedAddress, setDebouncedAddress] = useState("");
   const [loading, setLoading] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
@@ -49,11 +50,14 @@ const PickupDetails = () => {
     contactName: "",
     contactPhoneNumber: "",
     pickupLocation: "",
+    pickupLatitude: "",
+    pickupLongitude: "",
     deliveryDate: new Date(),
     deliveryTime: new Date(),
     deliveryTimeZone: "WAT",
   });
 
+  console.log(formData)
   useEffect(() => {
     if (typeof window !== "undefined") {
       setIsClient(true);
@@ -99,6 +103,46 @@ const validateForm = useCallback(() => {
     deliveryTime instanceof Date;
   setIsFormValid(isValid);
 }, [formData]);
+
+  // Debounce the address input
+  useEffect(() => {
+    const handler = debounce(() => {
+      setDebouncedAddress(formData.pickupLocation);
+    }, 500); 
+
+    if (formData.pickupLocation) {
+      handler();
+    }
+
+    return () => handler.cancel();
+  }, [formData.pickupLocation]);
+
+
+// update the form data with the corresponding latitude and longitude when user type the address
+useEffect(() => {
+  const address = debouncedAddress?.trim();
+  
+  const isValidAddress = address && address.length >= 5;
+  const hasNoCoordinates = !formData.pickupLatitude && !formData.pickupLongitude;
+
+
+  if (isValidAddress && hasNoCoordinates) {
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ address }, (results, status) => {
+      if (status === "OK" && results && results[0]) {
+        const location = results[0].geometry.location;
+        setFormData((prev) => ({
+          ...prev,
+          pickupLatitude: location.lat().toString(),
+          pickupLongitude: location.lng().toString()
+        }));
+      } else {
+        console.error("Geocode failed: " + status);
+      }
+    });
+  }
+}, [debouncedAddress, formData.pickupLatitude, formData.pickupLongitude]);
+
 
 // Retrieve formData from query parameters
 useEffect(() => {
@@ -223,13 +267,16 @@ useEffect(() => {
   if (!isClient) {
     return null; 
   }
-
   return (
     <Container>
     {showMapPickerModal && (
-        <LocationPickerModal
+        <PickupDeliveryLoationPicker
           onLocationSelect={(location) => {
-            setFormData({ ...formData, pickupLocation: location });
+            setFormData({ ...formData, 
+              pickupLocation: location.address,
+              pickupLatitude: location?.lat?.toString(),
+              pickupLongitude: location?.lng?.toString()
+            });
             setShowMapPickerModal(false);
           }}
           onCancel={() => setShowMapPickerModal(false)}

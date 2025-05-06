@@ -10,19 +10,24 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import axiosInstance from "@/lib/axiosInstance";
 import { toast, ToastContainer } from "react-toastify";
 import { BiLoaderCircle } from "react-icons/bi";
+import { MapPin } from "lucide-react";
 import PhoneNumberInput from "@/components/PhoneNumberInput";
+import PickupDeliveryLoationPicker from "@/components/aboutEvent/PickupDeliveryLoationPicker";
+import { debounce } from "lodash";
 
 function DeliveryDetailsForm() {
+  const router = useRouter();
   const searchParams = useSearchParams();
   const cartItems = searchParams.get('cartItems');
   const eventData = searchParams.get('eventData')
   const parsedCartItems = cartItems ? JSON.parse(cartItems) : [];
   const parsedEventData = eventData ? JSON.parse(eventData) : [];
-  const router = useRouter();
+  const [showMapPickerModal, setShowMapPickerModal] = useState(false);
 
   // Extract the packageDelivery array
   const packageDelivery = parsedCartItems?.map((item: any) => item.packageDelivery).flat();
 
+  const [debouncedAddress, setDebouncedAddress] = useState("");
   const [deliveryType, setDeliveryType] = useState("home");
   const [stateSearch, setStateSearch] = useState("");
   const [citySearch, setCitySearch] = useState("");
@@ -36,6 +41,8 @@ function DeliveryDetailsForm() {
     guestEmail: "",
     guestPhoneNumber: "",
     shippingAddress: "",
+    addressLatitude: "",
+    addressLongitude: "",
     state: "",
     city: "",
     dispatchType: "",
@@ -56,6 +63,49 @@ function DeliveryDetailsForm() {
         city.toLowerCase().includes(citySearch.toLowerCase())
       )
     : [];
+
+
+    console.log("form", formData)
+
+
+   // Debounce the address input
+    useEffect(() => {
+      const handler = debounce(() => {
+        setDebouncedAddress(formData.shippingAddress);
+      }, 500); 
+  
+      if (formData.shippingAddress) {
+        handler();
+      }
+  
+      return () => handler.cancel();
+    }, [formData.shippingAddress]);
+  
+  
+  // update the form data with the corresponding latitude and longitude when user type the address
+  useEffect(() => {
+    const address = debouncedAddress?.trim();
+    
+    const isValidAddress = address && address.length >= 5;
+    const hasNoCoordinates = !formData.addressLatitude && !formData.addressLongitude;
+  
+  
+    if (isValidAddress && hasNoCoordinates) {
+      const geocoder = new google.maps.Geocoder();
+      geocoder.geocode({ address }, (results, status) => {
+        if (status === "OK" && results && results[0]) {
+          const location = results[0].geometry.location;
+          setFormData((prev) => ({
+            ...prev,
+            addressLatitude: location.lat().toString(),
+            addressLongitude: location.lng().toString()
+          }));
+        } else {
+          console.error("Geocode failed: " + status);
+        }
+      });
+    }
+  }, [debouncedAddress, formData.addressLatitude, formData.addressLongitude]);
 
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -100,11 +150,24 @@ function DeliveryDetailsForm() {
     return errors;
   };
 
-    // Handle input change
-    const handleChange = (name: string, value: string) => {
-      setFormData((prev) => ({ ...prev, [name]: value }));
-      validateForm();
-    };
+  // Handle input change
+  const handleChange = (name: string, value: string) => {
+    setFormData((prev) => ({ ...prev, [name]: value }));
+    validateForm();
+  };
+
+  const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+    const { id, value } = e.target;
+    setFormData((prev) => ({ ...prev, [id]: value }));
+    setErrors((prev) => ({ ...prev, [id]: "" }));
+  };
+
+  const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
+    const { id, value } = e.target;
+    if (!value.trim()) {
+      setErrors((prev) => ({ ...prev, [id]: "This field is required" }));
+    }
+  };
   
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -218,11 +281,27 @@ function DeliveryDetailsForm() {
     return () => document.removeEventListener("click", handleClickOutside);
   }, []);
 
+  const handleMapLocationSelect = () => {
+    setShowMapPickerModal(true);
+  };
 
   return (
     <>
     <ToastContainer />
     <HeaderLayout>
+    {showMapPickerModal && (
+        <PickupDeliveryLoationPicker
+          onLocationSelect={(location) => {
+            setFormData({ ...formData, 
+              shippingAddress: location.address,
+              addressLatitude: location?.lat?.toString(),
+              addressLongitude: location?.lng?.toString()
+            });
+            setShowMapPickerModal(false);
+          }}
+          onCancel={() => setShowMapPickerModal(false)}
+        />
+      )}
       <div className="rounded-xl bg-[#F9FAFB] p-4 space-y-4 mt-20">
         <div className="p-6 mt-5 bg-[#FFFFFF] rounded-[16px]">
           <h2 className="font-bold text-xl text-[#111827]">Delivery Details</h2>
@@ -330,16 +409,6 @@ function DeliveryDetailsForm() {
                   <label htmlFor="home-phone" className="font-general font-medium text-base block mb-1 text-[#718096]">
                     Phone Number
                   </label>
-                  {/* <input
-                    id="home-phone"
-                    name="guestPhoneNumber"
-                    required
-                    value={formData.guestPhoneNumber}
-                    onChange={handleInputChange}
-                    type="number"
-                    placeholder="Enter your phone number"
-                    className={`w-full h-14 px-4 py-2 rounded-[12px] border ${errors.guestPhoneNumber ? 'border-red-500' : 'border-[#E5E7EB]'} bg-[#FAFAFA] focus:outline-none focus:border-[#8B1E3F]`}
-                    /> */}
                      <PhoneNumberInput
                         onPhoneChange={(value: string) =>
                           handleChange("guestPhoneNumber", value)
@@ -349,23 +418,32 @@ function DeliveryDetailsForm() {
                       <p className="text-red-500 text-sm mt-1">{errors.guestPhoneNumber}</p>
                     )}
                 </div>
-                <div>
-                  <label htmlFor="home-address" className="font-general font-medium text-base block mb-1 text-[#718096]">
-                    Address
-                  </label>
-                  <input
-                    id="home-address"
-                    name="shippingAddress"
-                    value={formData.shippingAddress}
-                    onChange={handleInputChange}
-                    required
-                    placeholder="Enter your address"
-                    className={`w-full h-14 px-4 py-2 rounded-[12px] border ${errors.shippingAddress ? 'border-red-500' : 'border-[#E5E7EB]'} bg-[#FAFAFA] focus:outline-none focus:border-[#8B1E3F]`}
-                    />
-                    {errors.shippingAddress && (
-                      <p className="text-red-500 text-sm mt-1">{errors.shippingAddress}</p>
-                    )}
-                </div>
+                  <div className="flex flex-col">
+                      <label htmlFor="pickupLocation" className="font-general font-medium text-base block mb-1 text-[#718096]">
+                        Address
+                      </label>
+                      <div className="relative">
+                        <MapPin
+                          onClick={handleMapLocationSelect}
+                          className="absolute left-4 top-5 transform -translate-y-1/2 text-gray-500 cursor-pointer"
+                          size={20}
+                        />
+                        <input
+                          type="text"
+                          id="shippingAddress"
+                          placeholder="Enter location"
+                          name="shippingAddress"
+                          value={formData.shippingAddress}
+                          onChange={handleInputChange}
+                          onBlur={handleBlur}
+                          className="input-field outline-primary pl-12 w-full p-2 rounded-[8px] bg-[#FAFAFA]"
+                          required
+                        />
+                        {errors.shippingAddress && (
+                          <p className="text-red-500 text-sm mt-1">{errors.shippingAddress}</p>
+                        )}
+                      </div>
+                    </div>
                 {/* State and City Dropdowns */}
                 <div className="grid grid-cols-2 gap-4 relative">
                   {/* State Dropdown */}

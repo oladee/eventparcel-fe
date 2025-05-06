@@ -4,43 +4,59 @@ import BoxTime from "../../../assets/orderIcons/box-time.png";
 import Image from "next/image";
 import DeliveryStatCard from "./DeliveryStatCard";
 
-const stats = [
-  {
-    icon: <PiShoppingCartBold size={20} />,
-    label: "Total Order",
-    value: "1,256",
-    delta: "+ 1.0%",
-    subtext: "from last week"
-  },
-  {
+export interface OrderSummary {
+  deliveredThisWeek: number;
+  shippedThisWeek: number;
+  pendingThisWeek: number;
+  totalDelivered: number;
+  totalShipped: number;
+  totalPending: number;
+  totalOrders: number;
+  pctDeliveredVsLastWeek: number;
+  pctPendingVsLastWeek: number;
+  pctTotalOrdersVsLastWeek: number;
+}
+
+interface DeliveryStatProps {
+  orderSummary?: OrderSummary;
+}
+
+const OrdersStatCardGroup: React.FC<DeliveryStatProps> = ({ orderSummary }) => {
+  const stats = [
+    {
+      icon: <PiShoppingCartBold size={20} />,
+      label: "Total Orders",
+      value: orderSummary?.totalOrders.toLocaleString() || "0",
+      delta: `${orderSummary?.pctTotalOrdersVsLastWeek ?? 0}%`,
+      subtext: "from last week"
+    },
+    {
       icon: (
-          <Image
-          src={BoxTime.src}
+        <Image
+          src={BoxTime}
           alt="Box Time"
           className="w-5 h-5 object-contain"
           width={20}
           height={20}
-          />
-        ),
-    label: "Shipped Orders",
-    value: "76",
-    delta: "16",
-    subtext: "from this week"
-},
-{
-  icon: <PiPackageBold size={20} />,
-  label: "Total Completed",
-  value: "186",
-  delta: "+ 3.9%",
-  subtext: "from last week"
-},
-];
+        />
+      ),
+      label: "Shipped Orders",
+      value: orderSummary?.totalShipped.toString() || "0",
+      delta: `${orderSummary?.shippedThisWeek ?? 0}`,
+      subtext: "from this week"
+    },
+    {
+      icon: <PiPackageBold size={20} />,
+      label: "Total Completed",
+      value: orderSummary?.totalDelivered.toString() || "0",
+      delta: `${orderSummary?.pctDeliveredVsLastWeek ?? 0}%`,
+      subtext: "from last week"
+    },
+  ];
 
-const OrdersStatCardGroup: React.FC = () => (
-  <>
-    {/* <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-6 lg:gap-[338px] xl:gap-[354px] bg-red-500"> */}
+  return (
     <div className="grid grid-cols-2 sm:grid-cols-2 lg:flex lg:justify-between items-center gap-4">
-    {stats.map((s, i) => (
+      {stats.map((s, i) => (
         <DeliveryStatCard
           key={i}
           icon={s.icon}
@@ -51,7 +67,7 @@ const OrdersStatCardGroup: React.FC = () => (
         />
       ))}
     </div>
-  </>
-);
+  );
+};
 
 export default OrdersStatCardGroup;

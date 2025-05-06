@@ -306,18 +306,21 @@ const TransactionTable: React.FC<TransactionProps> = ({orders, currentPage, setC
         </thead>
 
         {/* Table Body */}
-        {orders.length === 0 && (
-          <div className="flex flex-col items-center justify-center w-full py-16 text-center bg-white rounded-md border border-dashed border-gray-300" id="empty-state">
-            <FiPackage className="w-12 h-12 text-gray-400 mb-4" />
-            <h3 className="text-lg font-semibold text-gray-700 mb-2">No Orders Found</h3>
-            <p className="text-sm text-gray-500">
-              You don't have any orders matching the current filter.
-            </p>
-          </div>
-        )}
-
         <tbody id="table-body">
-          {orders?.map((order, i) => (
+            {orders.length === 0 ? (
+              <tr>
+                <td colSpan={8} className="p-0">
+                  <div className="flex flex-col items-center justify-center w-full py-16 text-center bg-white rounded-md border border-dashed border-gray-300">
+                    <FiPackage className="w-12 h-12 text-gray-400 mb-4" />
+                    <h3 className="text-lg font-semibold text-gray-700 mb-2">No Orders Found</h3>
+                    <p className="text-sm text-gray-500">
+                      You don't have any orders matching the current filter.
+                    </p>
+                  </div>
+                </td>
+              </tr>
+            ) : (
+              orders.map((order, i) => (
             <React.Fragment key={i}>
               <tr className="border-b last:border-b-0 hover:bg-gray-50" id={`order-row-${order.orderNumber}`}>
                 <td className="p-3 text-center" id={`select-${order.orderNumber}`}>
@@ -405,7 +408,7 @@ const TransactionTable: React.FC<TransactionProps> = ({orders, currentPage, setC
               </tr>
               )}
             </React.Fragment>
-          ))}
+          )))}
         </tbody>
       </table>
   

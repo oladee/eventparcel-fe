@@ -18,7 +18,9 @@ const DeliveryStatCard: React.FC<Props> = ({ icon, label, value, delta, subtext 
             id={`stat-change`}
             className={`text-xs font-general font-normal mt-1`}
             >
-         <p className="mt-auto text-green-500 font-medium text-sm">{delta} <span className='text-[#718096]'>{subtext}</span></p> 
+            <p className={`mt-auto font-medium text-sm ${delta.startsWith("-") ? "text-red-500" : "text-green-500"}`}>
+              {delta} <span className="text-[#718096]">{subtext}</span>
+            </p>
         </div>
         </div>
 )
