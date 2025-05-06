@@ -193,7 +193,7 @@ const Login: React.FC = () => {
                 />
                 Remember me
               </label>
-              <a href="#" className="text-primary text-sm">
+              <a href="/forgot-password" className="text-primary text-sm">
                 Forgot Password?
               </a>
             </div>
