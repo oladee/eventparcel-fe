@@ -3,11 +3,11 @@ import React, { useEffect, useState, useMemo } from 'react'
 import AdminContainer from '@/components/admin/AdminContainer'
 import FiltersBar from '@/components/admin/events/FiltersBar'
 import EventCard from '@/components/admin/events/EventCard'
-import axiosInstance from '@/lib/axiosInstance'
 import { ToastContainer, toast } from 'react-toastify'
 import 'react-toastify/dist/ReactToastify.css'
 import { BiLoaderCircle } from 'react-icons/bi'
 import { FiSearch } from 'react-icons/fi'
+import axiosInstance from '@/lib/adminAxiosInterceptor/axiosInstance'
 
 interface SalesSummary { currency: string; totalSales: number; totalPackagesSold: number }
 interface EventItem {

@@ -4,7 +4,7 @@ import React, { useEffect, useState, useMemo } from "react"
 import AdminContainer from "@/components/admin/AdminContainer"
 import { FiSearch, FiDownload } from "react-icons/fi"
 import HostsTable, { Host } from "@/components/admin/hosts/HostsTable"
-import axiosInstance from "@/lib/axiosInstance"
+import axiosInstance from '@/lib/adminAxiosInterceptor/axiosInstance'
 import { ToastContainer, toast } from "react-toastify"
 import 'react-toastify/dist/ReactToastify.css'
 import { BiLoaderCircle } from "react-icons/bi"

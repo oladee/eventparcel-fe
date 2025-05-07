@@ -9,12 +9,13 @@ import Tabs from "@/components/admin/eventDetails/Tabs";
 // import OrdersTab from "@/components/admin/eventDetails/OrdersTab";
 import OverviewDashboard from "@/components/admin/hostDetails/OverviewDashboard";
 import HostSidebarInfo from "@/components/admin/hostDetails/HostSidebarInfo";
-import axiosInstance from "@/lib/axiosInstance";
 import { toast } from "react-toastify";
 import { BiLoaderCircle } from "react-icons/bi";
 import { OverviewData, HostDetails, PickupDetails } from "@/types/host";
 import GroupsTabs from "@/components/admin/hostDetails/GroupTabs";
 import OrdersTab from "@/components/admin/hostDetails/OrdersTab";
+import axiosInstance from '@/lib/adminAxiosInterceptor/axiosInstance'
+
 
 // interface WeeklySummary {
 //   week: string;

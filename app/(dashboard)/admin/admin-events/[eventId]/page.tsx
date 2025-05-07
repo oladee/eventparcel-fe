@@ -9,7 +9,7 @@ import SidebarInfo from "@/components/admin/eventDetails/SidebarInfo"
 import Tabs from "@/components/admin/eventDetails/Tabs"
 import GroupsTabs from "@/components/admin/eventDetails/GroupTabs"
 import OrdersTab, { EventOrder } from "@/components/admin/eventDetails/OrdersTab"
-import axiosInstance from "@/lib/axiosInstance"
+import axiosInstance from '@/lib/adminAxiosInterceptor/axiosInstance'
 import { ToastContainer, toast } from "react-toastify"
 import "react-toastify/dist/ReactToastify.css"
 import { BiLoaderCircle } from "react-icons/bi"
