@@ -18,7 +18,7 @@ import {
 import dynamic from "next/dynamic";
 
 const SkeletonLoader = dynamic(
-  () => import("@/components/dashboard/loadingStates/SkeletonLoader"),
+  () => import("@/components/admin/dashboard//SkeletonLoader"),
   {
     ssr: false, // Disable server-side rendering
   }
@@ -191,7 +191,7 @@ const LineChartSection: React.FC = () => {
 
   // --------------------- RENDER STATES ---------------------
   if (loading) {
-    return <SkeletonLoader />;
+    return <SkeletonLoader />;    
   }
 
   if (error || !dashboardData) {
