@@ -1,10 +1,9 @@
-"use client"
+"use client";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
-import { FiMenu, FiBell, FiSearch } from "react-icons/fi";
-import { HiOutlineEnvelope } from "react-icons/hi2";
+import { FiMenu } from "react-icons/fi";
+// import { HiOutlineEnvelope } from "react-icons/hi2";
 import { usePathname } from "next/navigation";
-
 
 interface HeaderProps {
   toggleSidebar: () => void;
@@ -183,6 +182,3 @@ const AdminHeaderDashboard: React.FC<HeaderProps> = ({ toggleSidebar }) => {
 };
 
 export default AdminHeaderDashboard;
-
-
-

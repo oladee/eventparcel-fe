@@ -16,7 +16,7 @@ const StatCard: React.FC<Props> = ({ icon, label, value, delta, subtext }) => (
     <div className="mb-3">
       <h2 className="mt-4 text-2xl font-bold text-[#111827]">{value}</h2>
       <p className="mt-auto text-green-500 font-medium text-sm">
-        {delta} <span className="text-[#718096]">{subtext}</span>
+        {delta} <span className="text-[#718096]">{subtext} from last week</span>
       </p>
     </div>
   </div>

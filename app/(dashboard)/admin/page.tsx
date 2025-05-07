@@ -1,32 +1,130 @@
 "use client"
-import React from 'react'
+import React, { useEffect, useState } from 'react'
 import AdminContainer from '@/components/admin/AdminContainer'
 import StatCardGroup from '@/components/admin/dashboard/StatCardGroup'
 import DoughnutSection from '@/components/admin/dashboard/DoughnutSection'
 import LineChartSection from '@/components/admin/dashboard/LineChartSection'
 import RecentEventsSection from '@/components/admin/dashboard/RecentEventsSection'
+import axiosInstance from '@/lib/axiosInstance'
+import { ToastContainer, toast } from 'react-toastify'
+import 'react-toastify/dist/ReactToastify.css'
+import { BiLoaderCircle } from 'react-icons/bi'
 
-const DashboardPage: React.FC = () => (
-  <AdminContainer>
-    <div className="space-y-6">
-      {/* Top section: stat cards & donut */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:col-span-2">
-          <StatCardGroup />
-        </div>
-        <DoughnutSection />
+// Local skeleton for page-level loading
+const PageSkeleton: React.FC = () => (
+  <div className="p-6 space-y-6 animate-pulse">
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:col-span-2">
+        {[...Array(4)].map((_, i) => (
+          <div key={i} className="h-32 bg-gray-200 rounded-2xl" />
+        ))}
       </div>
-
-      {/* Bottom section: line chart & recent events */}
-      <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2">
-          <LineChartSection />
-        </div>
-        <RecentEventsSection />
-      </div>
+      <div className="h-52 bg-gray-200 rounded-2xl" />
     </div>
-  </AdminContainer>
+    <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+      <div className="lg:col-span-2 h-80 bg-gray-200 rounded-[18px]" />
+      <div className="h-80 bg-gray-200 rounded-2xl" />
+    </div>
+  </div>
 )
+
+// ---------------- TYPE DEFINITIONS ----------------
+interface CurrencySales {
+  totalAmount: number
+  growthRate: number
+  monthlySales: { month: string; sales: number }[]
+  dailySales: { day: string; sales: number }[]
+}
+
+interface EventItem {
+  _id: string
+  eventName: string
+  eventImgUrl: string
+  date: string
+  time: string
+  eventLocation: string
+}
+
+interface DashboardData {
+  totalOrder: { value: number; growth: number }
+  totalEvents: { value: number; growth: number }
+  totalHosts: { value: number; growth: number }
+  totalServiceFees: { value: number; growth: number }
+  orderStats: { completed: number; shipped: number; pending: number }
+  overallSales: { naira: CurrencySales; dollar: CurrencySales }
+  recentEvents: EventItem[]
+}
+
+const DashboardPage: React.FC = () => {
+  const [data, setData] = useState<DashboardData | null>(null)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  useEffect(() => {
+    setLoading(true)
+    axiosInstance
+      .get('/admin-dashboard')
+      .then(res => {
+        if (res.data.success) {
+          setData(res.data.data)
+          toast.success(res.data.message)
+        } else {
+          const msg = res.data.message || 'Failed to load dashboard'
+          setError(msg)
+          toast.error(msg)
+        }
+      })
+      .catch(err => {
+        const msg = err.response?.data?.message || 'Network error'
+        setError(msg)
+        toast.error(msg)
+      })
+      .finally(() => {
+        setLoading(false)
+      })
+  }, [])
+
+  // Show page skeleton while loading
+  if (loading) return <PageSkeleton />
+
+  // Show spinner with text if API error
+  if (error && !data) return (
+    <div className="flex items-center justify-center h-full p-4 text-red-600">
+      <BiLoaderCircle className="mr-2 animate-spin" size={22} />
+      {error}
+    </div>
+  )
+
+  if (!data) return <div className="p-4 text-gray-600">No data available</div>
+
+  return (
+    <AdminContainer>
+      <ToastContainer position="top-right" autoClose={3000} />
+      <div className="space-y-6 p-6">
+        {/* Top panels */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:col-span-2">
+            <StatCardGroup stats={[
+              { label: 'Total Order', value: data.totalOrder.value.toLocaleString(), delta: `${data.totalOrder.growth}%` },
+              { label: 'Service Fee', value: `₦${(data.totalServiceFees.value / 1e6).toFixed(2)}M`, delta: `${data.totalServiceFees.growth}%` },
+              { label: 'Total Events', value: data.totalEvents.value.toLocaleString(), delta: `${data.totalEvents.growth}%` },
+              { label: 'Total Host', value: data.totalHosts.value.toLocaleString(), delta: `${data.totalHosts.growth}%` }
+            ]} />
+          </div>
+          <DoughnutSection orderStats={data.orderStats} />
+        </div>
+
+        {/* Bottom charts & events */}
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+          <div className="lg:col-span-2">
+            <LineChartSection />
+          </div>
+          <RecentEventsSection events={data.recentEvents} />
+        </div>
+      </div>
+    </AdminContainer>
+  )
+}
 
 export default DashboardPage
 
@@ -35,24 +133,101 @@ export default DashboardPage
 
 
 
+
+
+
+
+
+
+
+
 // "use client"
-// import React from 'react'
+// import React, { useEffect, useState } from 'react'
 // import AdminContainer from '@/components/admin/AdminContainer'
 // import StatCardGroup from '@/components/admin/dashboard/StatCardGroup'
 // import DoughnutSection from '@/components/admin/dashboard/DoughnutSection'
 // import LineChartSection from '@/components/admin/dashboard/LineChartSection'
 // import RecentEventsSection from '@/components/admin/dashboard/RecentEventsSection'
+// import axiosInstance from '@/lib/axiosInstance'
+// import { ToastContainer, toast } from 'react-toastify'
+// import 'react-toastify/dist/ReactToastify.css'
+// import { BiLoaderCircle } from 'react-icons/bi'
 
-// const DashboardPage: React.FC = () => (
-//   <AdminContainer>
-//     <div className="space-y-6">
-//       <StatCardGroup />
-//       <DoughnutSection />
-//       <LineChartSection />
-//       <RecentEventsSection />
+// interface DashboardData {
+//   totalOrder: { value: number; growth: number }
+//   totalEvents: { value: number; growth: number }
+//   totalHosts: { value: number; growth: number }
+//   totalServiceFees: { value: number; growth: number }
+//   orderStats: { completed: number; shipped: number; pending: number }
+//   overallSales: {
+//     naira: CurrencySales; dollar: CurrencySales
+//   }
+//   recentEvents: EventItem[]
+// }
+
+// const DashboardPage: React.FC = () => {
+//   const [data, setData] = useState<DashboardData | null>(null)
+//   const [loading, setLoading] = useState(false)
+//   const [error, setError] = useState<string | null>(null)
+
+//   useEffect(() => {
+//     setLoading(true)
+//     axiosInstance
+//       .get('/admin-dashboard')
+//       .then(res => {
+//         if (res.data.success) {
+//           setData(res.data.data)
+//           toast.success(res.data.message)
+//         } else {
+//           setError(res.data.message || 'Failed to load dashboard')
+//           toast.error(res.data.message || 'Failed to load dashboard')
+//         }
+//       })
+//       .catch(err => {
+//         const msg = err.response?.data?.message || 'Network error'
+//         setError(msg)
+//         toast.error(msg)
+//       })
+//       .finally(() => {
+//         setLoading(false)
+//       })
+//   }, [])
+
+//   if (loading) return (
+//     <div className="flex items-center justify-center h-full">
+//       <BiLoaderCircle className="mr-2 animate-spin" size={22} /> Loading...
 //     </div>
-//   </AdminContainer>
-// )
+//   )
+
+//   if (error || !data) return (
+//     <div className="p-4 text-red-600">{error || 'No data available'}</div>
+//   )
+
+//   return (
+//     <AdminContainer>
+//       <ToastContainer position="top-right" autoClose={3000} />
+//       <div className="space-y-6">
+//         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+//           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:col-span-2">
+//             <StatCardGroup stats={[
+//               { label: 'Total Order', value: data.totalOrder.value.toLocaleString(), delta: `${data.totalOrder.growth}%` },
+//               { label: 'Service Fee', value: `₦${(data.totalServiceFees.value / 1e6).toFixed(2)}M`, delta: `${data.totalServiceFees.growth}%` },
+//               { label: 'Total Events', value: data.totalEvents.value.toLocaleString(), delta: `${data.totalEvents.growth}%` },
+//               { label: 'Total Host', value: data.totalHosts.value.toLocaleString(), delta: `${data.totalHosts.growth}%` }
+//             ]} />
+//           </div>
+//           <DoughnutSection orderStats={data.orderStats} />
+//         </div>
+//         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+//           <div className="lg:col-span-2">
+//             <LineChartSection overallSales={data.overallSales} />
+//           </div>
+//           <RecentEventsSection events={data.recentEvents} />
+//         </div>
+//       </div>
+//     </AdminContainer>
+//   )
+// }
 
 // export default DashboardPage
 
@@ -80,192 +255,34 @@ export default DashboardPage
 
 
 
-
-
-
-
-
-
-
 // "use client"
-
 // import React from 'react'
 // import AdminContainer from '@/components/admin/AdminContainer'
-// import { FiShoppingCart, FiUser } from 'react-icons/fi'
-// import { HiOutlineCube } from 'react-icons/hi'
-// import { Doughnut, Line } from 'react-chartjs-2'
-// import 'chart.js/auto'
+// import StatCardGroup from '@/components/admin/dashboard/StatCardGroup'
+// import DoughnutSection from '@/components/admin/dashboard/DoughnutSection'
+// import LineChartSection from '@/components/admin/dashboard/LineChartSection'
+// import RecentEventsSection from '@/components/admin/dashboard/RecentEventsSection'
 
-// // Dummy data for charts
-// const doughnutData = {
-//   labels: ['Completed', 'Shipped', 'Pending'],
-//   datasets: [
-//     {
-//       data: [65.8, 20.5, 35.9],
-//       backgroundColor: ['#7E1526', '#FFD529', '#E5E7EB'],
-//       hoverOffset: 4,
-//       cutout: '70%',
-//     },
-//   ],
-// }
-
-// const lineData = {
-//   labels: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul'],
-//   datasets: [
-//     {
-//       label: 'Net Sales',
-//       data: [42, 45, 43, 51, 47, 50, 55],
-//       borderColor: '#7E1526',
-//       tension: 0.4,
-//       fill: false,
-//     },
-//   ],
-// }
-
-// // Recent events data
-// const recentEvents = [
-//   {
-//     id: 1,
-//     title: 'James & Jane Wedding Anniversary 2025',
-//     date: '12 MAR, 2025 AT 10:30AM WAT',
-//     image: '/images/event1.png',
-//   },
-//   {
-//     id: 2,
-//     title: 'James & Jane Wedding Anniversary 2025',
-//     date: '12 MAR, 2025 AT 10:30AM WAT',
-//     image: '/images/event1.png',
-//   },
-// ]
-
-// const Dashboard: React.FC = () => {
-//   return (
-//     <AdminContainer>
-//       <div className="space-y-6">
-//         {/* Top section: small cards and donut */}
-        // <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        //   {/* Small cards group */}
-        //   <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:col-span-2">
-        //     {/* Total Order */}
-        //     <div className="bg-white rounded-2xl shadow p-6 flex flex-col">
-        //       <div className="flex items-center text-gray-700">
-        //         <FiShoppingCart size={20} />
-        //         <span className="ml-2 font-medium">Total Order</span>
-        //       </div>
-        //       <h2 className="mt-4 text-3xl font-bold text-gray-900">1,256</h2>
-        //       <p className="mt-auto text-green-500 font-medium">+ 1.0% from last week</p>
-        //     </div>
-        //     {/* Service Fee */}
-        //     <div className="bg-white rounded-2xl shadow p-6 flex flex-col">
-        //       <div className="flex items-center text-gray-700">
-        //         <HiOutlineCube size={20} />
-        //         <span className="ml-2 font-medium">Service Fee</span>
-        //       </div>
-        //       <h2 className="mt-4 text-3xl font-bold text-gray-900">₦14.23M</h2>
-        //       <p className="mt-auto text-green-500 font-medium">+ 5.4% from last week</p>
-        //     </div>
-        //     {/* Total Events */}
-        //     <div className="bg-white rounded-2xl shadow p-6 flex flex-col">
-        //       <div className="flex items-center text-gray-700">
-        //         <FiUser size={20} />
-        //         <span className="ml-2 font-medium">Total Events</span>
-        //       </div>
-        //       <h2 className="mt-4 text-3xl font-bold text-gray-900">1,786</h2>
-        //       <p className="mt-auto text-green-500 font-medium">+ 3.9% from last week</p>
-        //     </div>
-        //     {/* Total Host */}
-        //     <div className="bg-white rounded-2xl shadow p-6 flex flex-col">
-        //       <div className="flex items-center text-gray-700">
-        //         <FiUser size={20} />
-        //         <span className="ml-2 font-medium">Total Host</span>
-        //       </div>
-        //       <h2 className="mt-4 text-3xl font-bold text-gray-900">786</h2>
-        //       <p className="mt-auto text-green-500 font-medium">+ 3.9% from last week</p>
-        //     </div>
-        //   </div>
-
-//           {/* Donut chart */}
-//           <div className="bg-white rounded-2xl shadow p-6 flex flex-col">
-//             <div className="flex justify-between items-center">
-//               <h3 className="text-lg font-medium text-gray-900">Order Stats</h3>
-//               <select className="text-sm text-gray-500">
-//                 <option>Month</option>
-//               </select>
-//             </div>
-//             <div className="flex-1 flex items-center justify-center py-4">
-//               <Doughnut data={doughnutData} />
-//             </div>
-//             <ul className="mt-4 space-y-2">
-//               <li className="flex items-center justify-between">
-//                 <span className="flex items-center">
-//                   <span className="inline-block w-3 h-3 rounded-full bg-[#7E1526] mr-2"></span>
-//                   Completed
-//                 </span>
-//                 <span className="text-gray-900">65.8%</span>
-//               </li>
-//               <li className="flex items-center justify-between">
-//                 <span className="flex items-center">
-//                   <span className="inline-block w-3 h-3 rounded-full bg-[#FFD529] mr-2"></span>
-//                   Shipped
-//                 </span>
-//                 <span className="text-gray-900">20.5%</span>
-//               </li>
-//               <li className="flex items-center justify-between">
-//                 <span className="flex items-center">
-//                   <span className="inline-block w-3 h-3 rounded-full bg-[#E5E7EB] mr-2"></span>
-//                   Pending
-//                 </span>
-//                 <span className="text-gray-500">35.9%</span>
-//               </li>
-//             </ul>
-//           </div>
+// const DashboardPage: React.FC = () => (
+//   <AdminContainer>
+//     <div className="space-y-6">
+//       {/* Top section: stat cards & donut */}
+//       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+//         <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:col-span-2">
+//           <StatCardGroup />
 //         </div>
-
-//         {/* Bottom section: line chart and recent events */}
-//         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-//           {/* Line chart */}
-//           <div className="bg-white rounded-2xl shadow p-6 lg:col-span-2">
-//             <div className="flex justify-between items-center">
-//               <h3 className="text-lg font-medium text-gray-900">Overall sales</h3>
-//               <div className="flex items-center space-x-2">
-//                 <span className="text-2xl font-bold text-[#7E1526]">₦131.49M</span>
-//                 <span className="text-lg font-semibold text-gray-500">$1.23k</span>
-//                 <button className="flex items-center border border-gray-200 rounded-md px-3 py-1 text-sm">
-//                   Monthly
-//                   <svg className="ml-1" width="16" height="16" fill="none"><path d="M4 6l4 4 4-4" stroke="#4B5563"/></svg>
-//                 </button>
-//               </div>
-//             </div>
-//             <div className="mt-4">
-//               <Line data={lineData} />
-//             </div>
-//           </div>
-
-//           {/* Recent events */}
-//           <div className="bg-white rounded-2xl shadow p-6">
-//             <div className="flex justify-between items-center">
-//               <h3 className="text-lg font-medium text-gray-900">Recent Events</h3>
-//               <a href="#" className="text-red-600 text-sm font-medium">See All</a>
-//             </div>
-//             <div className="mt-4 space-y-4">
-//               {recentEvents.map(event => (
-//                 <div key={event.id} className="flex items-center space-x-4">
-//                   <img src={event.image} alt={event.title} className="w-12 h-12 rounded-lg object-cover" />
-//                   <div className="flex-1">
-//                     <h4 className="font-semibold text-gray-900">{event.title}</h4>
-//                     <p className="text-gray-500 text-sm flex items-center">
-//                       <svg className="inline-block mr-1" width="16" height="16"><path d="M8 2v12M2 8h12" stroke="#9CA3AF"/></svg>
-//                       {event.date}
-//                     </p>
-//                   </div>
-//                 </div>
-//               ))}
-//             </div>
-//           </div>
-//         </div>
+//         <DoughnutSection />
 //       </div>
-//     </AdminContainer>
-//   )
-// }
 
-// export default Dashboard
+//       {/* Bottom section: line chart & recent events */}
+//       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+//         <div className="lg:col-span-2">
+//           <LineChartSection />
+//         </div>
+//         <RecentEventsSection />
+//       </div>
+//     </div>
+//   </AdminContainer>
+// )
+
+// export default DashboardPage
