@@ -9,7 +9,7 @@ import { ToastContainer, toast } from "react-toastify"
 import 'react-toastify/dist/ReactToastify.css'
 import { BiLoaderCircle } from "react-icons/bi"
 import { saveAs } from 'file-saver'
-import Image from "next/image"
+// import Image from "next/image"
 
 
 const HostsSkeleton: React.FC = () => (

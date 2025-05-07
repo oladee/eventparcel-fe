@@ -1,6 +1,7 @@
 import React from "react";
 import Image from "next/image";
 import { MdOutlineCalendarToday } from "react-icons/md";
+import Link from "next/link";
 
 interface EventItem {
   _id: string;
@@ -18,9 +19,11 @@ const RecentEventsSection: React.FC<Props> = ({ events }) => (
   <div className="bg-white rounded-2xl shadow p-6">
     <div className="flex justify-between items-center">
       <h3 className="text-lg font-medium text-gray-900">Recent Events</h3>
-      <a href="/admin/admin-events" className="text-red-600 text-sm font-medium cursor-pointer">
-        See All
-      </a>
+      <Link href="/admin/admin-events">
+        <a className="text-red-600 text-sm font-medium cursor-pointer">
+          See All
+        </a>
+      </Link>
     </div>
     <div className="max-h-96 overflow-y-auto no-scrollbar mt-4 space-y-4">
       {events.map((e) => (
