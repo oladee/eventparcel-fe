@@ -14,7 +14,6 @@ interface EventDetailsProps {
     date: string;
     time: string;
     eventLocation: string;
-    // ... include any additional fields you want to use
   };
 }
 
