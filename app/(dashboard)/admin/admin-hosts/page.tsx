@@ -68,7 +68,7 @@ const HostsPage: React.FC = () => {
           }))
           setHosts(mapped)
           setError(null)
-          toast.success(res.data.message)
+          console.log(res.data.message)
         } else {
           throw new Error(res.data.message)
         }

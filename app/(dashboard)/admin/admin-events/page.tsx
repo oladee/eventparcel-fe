@@ -67,7 +67,7 @@ const EventsPage: React.FC = () => {
             }
           })
           setEvents(mapped)
-          toast.success(res.data.message)
+          console.log(res.data.message)
         } else {
           throw new Error(res.data.message)
         }
@@ -231,7 +231,7 @@ export default EventsPage
 //             }
 //           })
 //           setEvents(mapped)
-//           toast.success(res.data.message)
+//           console.log(res.data.message)
 //         } else {
 //           throw new Error(res.data.message)
 //         }

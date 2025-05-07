@@ -111,7 +111,7 @@ const HostDetailPage: React.FC = () => {
       .then((res) => {
         if (res.data.success) {
           setData(res.data.data);
-          toast.success(res.data.message);
+          console.log(res.data.message);
         } else {
           throw new Error(res.data.message);
         }
