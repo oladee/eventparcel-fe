@@ -242,17 +242,17 @@ export const AdminSidebar: React.FC = () => {
     []
   );
 
-  const settingsMenu = useMemo(
-    () => [
-      {
-        label: "Settings",
-        path: "/admin/admin-settings",
-        icon: FiSettings,
-        exact: true
-      }
-    ],
-    []
-  );
+  // const settingsMenu = useMemo(
+  //   () => [
+  //     {
+  //       label: "Settings",
+  //       path: "/admin/admin-settings",
+  //       icon: FiSettings,
+  //       exact: true
+  //     }
+  //   ],
+  //   []
+  // );
 
   return (
     <>
@@ -344,7 +344,7 @@ export const AdminSidebar: React.FC = () => {
             </div>
 
             {/* SETTINGS & HELP Section */}
-            <div className="mt-auto pt-4 border-t">
+            {/* <div className="mt-auto pt-4 border-t">
               <nav className="space-y-2">
                 {settingsMenu.map((item, index) => (
                   <MenuItem
@@ -357,7 +357,7 @@ export const AdminSidebar: React.FC = () => {
                   />
                 ))}
               </nav>
-            </div>
+            </div> */}
           </div>
 
           {/* Close button for mobile */}
