@@ -15,8 +15,6 @@ const mapContainerStyle = {
 
 const centerDefault = { lat: 51.505, lng: -0.09 };
 
-// const libraries: ("places")[] = ["places"];
-
 const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
   onLocationSelect,
   onCancel,
@@ -25,48 +23,52 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
   const [autocomplete, setAutocomplete] = useState<google.maps.places.Autocomplete | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Callback when the Autocomplete is loaded
-  const onLoadAutocomplete = (autocompleteInstance: google.maps.places.Autocomplete) => {
-    setAutocomplete(autocompleteInstance);
+  // Autocomplete loaded
+  const onLoadAutocomplete = (ac: google.maps.places.Autocomplete) => {
+    setAutocomplete(ac);
   };
 
-  // Callback when a place is selected in the Autocomplete
+  // User picked a place from the dropdown
   const handlePlaceChanged = () => {
-    if (autocomplete !== null) {
-      const place = autocomplete.getPlace();
-      if (place.geometry && place.geometry.location) {
-        const lat = place.geometry.location.lat();
-        const lng = place.geometry.location.lng();
-        setPosition({ lat, lng });
-      } else {
-        alert("No details available for input: " + place.name);
-      }
+    if (!autocomplete) return;
+    const place = autocomplete.getPlace();
+    if (place.geometry?.location) {
+      setPosition({
+        lat: place.geometry.location.lat(),
+        lng: place.geometry.location.lng(),
+      });
     } else {
-      console.log("Autocomplete is not loaded yet!");
+      alert("No details available for input: " + place.name);
     }
   };
 
-  // When clicking on the map, update the marker position
+  // Map click handler
   const handleMapClick = (e: google.maps.MapMouseEvent) => {
-    if (e.latLng) {
-      const lat = e.latLng.lat();
-      const lng = e.latLng.lng();
-      setPosition({ lat, lng });
-    }
+    if (!e.latLng) return;
+    setPosition({ lat: e.latLng.lat(), lng: e.latLng.lng() });
   };
 
-  // When selecting a location, return the latitude and longitude as a formatted string
+  // Reverse-geocode coords → address
   const handleSelect = () => {
-    if (position) {
-      onLocationSelect(`Lat: ${position.lat.toFixed(5)}, Lng: ${position.lng.toFixed(5)}`);
-    }
+    if (!position) return;
+
+    const geocoder = new window.google.maps.Geocoder();
+    geocoder.geocode({ location: position }, (results, status) => {
+      if (status === "OK" && results && results[0]) {
+        onLocationSelect(results[0].formatted_address);
+      } else {
+        // fallback to coords if geocoding fails
+        onLocationSelect(`Lat: ${position.lat.toFixed(5)}, Lng: ${position.lng.toFixed(5)}`);
+      }
+    });
   };
 
   return (
     <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 z-50">
       <div className="bg-white w-[90%] h-[80%] p-4 rounded-md flex flex-col">
         <h2 className="text-xl font-bold mb-4">Select Location</h2>
-        {/* Google Places Autocomplete Search Input */}
+
+        {/* Autocomplete search */}
         <div className="mb-4">
           <Autocomplete onLoad={onLoadAutocomplete} onPlaceChanged={handlePlaceChanged}>
             <input
@@ -77,18 +79,20 @@ const LocationPickerModal: React.FC<LocationPickerModalProps> = ({
             />
           </Autocomplete>
         </div>
-        {/* Google Map */}
+
+        {/* Map */}
         <div className="flex-1">
           <GoogleMap
             mapContainerStyle={mapContainerStyle}
-            center={position ? position : centerDefault}
+            center={position || centerDefault}
             zoom={13}
             onClick={handleMapClick}
           >
             {position && <Marker position={position} />}
           </GoogleMap>
         </div>
-        {/* Modal Action Buttons */}
+
+        {/* Actions */}
         <div className="mt-4 flex justify-end gap-2">
           <button onClick={onCancel} className="px-4 py-2 bg-gray-300 rounded-md">
             Cancel

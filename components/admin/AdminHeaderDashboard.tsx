@@ -1,10 +1,9 @@
-"use client"
+"use client";
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
-import { FiMenu, FiBell, FiSearch } from "react-icons/fi";
-import { HiOutlineEnvelope } from "react-icons/hi2";
+import { FiMenu } from "react-icons/fi";
+// import { HiOutlineEnvelope } from "react-icons/hi2";
 import { usePathname } from "next/navigation";
-
 
 interface HeaderProps {
   toggleSidebar: () => void;
@@ -143,29 +142,29 @@ const AdminHeaderDashboard: React.FC<HeaderProps> = ({ toggleSidebar }) => {
       {/* Right side: Search, Create Event, Notification, User Avatar */}
       <div className="flex items-center space-x-4">
         {/* Search Bar */}
-        <div className="hidden md:flex items-center bg-gray-100 rounded px-2 py-1">
+        {/* <div className="hidden md:flex items-center bg-gray-100 rounded px-2 py-1">
           <FiSearch className="text-gray-500" />
           <input
             type="text"
             placeholder="Search..."
             className="bg-transparent focus:outline-none ml-2 text-sm"
           />
-        </div>
+        </div> */}
 
         {/* Messages */}
-        <button className="relative outline-none">
+        {/* <button className="relative outline-none">
           <HiOutlineEnvelope size={20} />
           <span className="absolute top-0 right-0 inline-block w-2 h-2 bg-red-500 rounded-full"></span>
-        </button>
+        </button> */}
 
         {/* Notification */}
-        <button className="relative outline-none">
+        {/* <button className="relative outline-none">
           <FiBell size={20} />
           <span className="absolute top-0 right-0 inline-block w-2 h-2 bg-red-500 rounded-full"></span>
-        </button>
+        </button> */}
 
         {/* Separator */}
-        <div className="h-[30px] bg-[#EEEFF2] w-px"></div>
+        {/* <div className="h-[30px] bg-[#EEEFF2] w-px"></div> */}
 
         {/* User Avatar + Name/Role */}
         <div className="flex items-center space-x-2">
@@ -183,6 +182,3 @@ const AdminHeaderDashboard: React.FC<HeaderProps> = ({ toggleSidebar }) => {
 };
 
 export default AdminHeaderDashboard;
-
-
-

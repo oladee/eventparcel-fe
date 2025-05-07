@@ -8,10 +8,9 @@ interface AddAdminModalProps {
 }
 
 const AddNewUser: React.FC<AddAdminModalProps> = ({ isOpen, onClose, onSubmit }) => {
-  if (!isOpen) return null;
-
   const [isOpenDropdown, setIsOpenDropdown] = useState(false);
   const [selectedRole, setSelectedRole] = useState<string | null>(null);
+  if (!isOpen) return null;
   const roles = ["Super Admin", "Admin", "Logistics", "Audit"];
 
   const handleSelect = (role: string) => {

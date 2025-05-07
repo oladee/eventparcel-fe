@@ -126,18 +126,18 @@ const orders = [
 
 const TransactionTable: React.FC = () => {
 
-    const getStatusColor = (status: string) => {
-        switch (status.toLowerCase()) {
-          case "pending":
-            return "bg-[#FFF5EB] text-[#F97316]";
-          case "delivery":
-            return "bg-[#ECFDF5] text-[#10B981]";
-          case "shipped":
-            return "bg-[#EEF2FF] text-[#6366F1]";
-          default:
-            return "bg-gray-200 text-gray-600";
-        }
-      };
+    // const getStatusColor = (status: string) => {
+    //     switch (status.toLowerCase()) {
+    //       case "pending":
+    //         return "bg-[#FFF5EB] text-[#F97316]";
+    //       case "delivery":
+    //         return "bg-[#ECFDF5] text-[#10B981]";
+    //       case "shipped":
+    //         return "bg-[#EEF2FF] text-[#6366F1]";
+    //       default:
+    //         return "bg-gray-200 text-gray-600";
+    //     }
+    //   };
       
   return (
     <div className="w-full gap-4 pt-3 rounded-xl">

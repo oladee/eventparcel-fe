@@ -18,6 +18,7 @@ interface Props {
 }
 
 const EventCard: React.FC<Props> = ({
+  id,
   image,
   title,
   date,
@@ -28,7 +29,7 @@ const EventCard: React.FC<Props> = ({
   const router = useRouter(); 
 
   const handleClick = () => {
-    router.push('admin-events/1'); // Navigate to the dynamic route
+    router.push(`admin-events/${id}`); 
   };
 
   return (
