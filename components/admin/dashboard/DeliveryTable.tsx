@@ -47,51 +47,59 @@ import { GuestOrder } from "@/app/(dashboard)/admin/admin-delivery/page";
 
       const exportToCSV = (data: any[], filename = 'delivery.csv') => {
         if (!data || data.length === 0) return;
-      
-        const csvRows = [];
-      
-        // 1. Headers
-        const headers = Object.keys(data[0]);
-        csvRows.push(headers.join(','));
-      
-        // 2. Rows
-        for (const row of data) {
-          const values = headers.map(header => {
-            let value = row[header];
-      
-            // Format dates
-            if (['createdAt', 'acceptedAt', 'updatedAt'].includes(header)) {
-              value = new Date(value).toLocaleString();
-            }
-      
-            // Serialize nested objects (e.g., eventId, eventGroupId)
-            if (typeof value === 'object' && value !== null) {
-              try {
-                // Customize this to extract relevant fields if needed
-                value = JSON.stringify(value);
-              } catch (err) {
-                value = '[Invalid Object]';
+        
+          const csvRows = [];
+          const dateFields = new Set(['createdAt', 'acceptedAt', 'updatedAt']);
+        
+          // 1. Headers (filter out keys like _V, _v, __v)
+          const headers = Object.keys(data[0]).filter(
+            key => !/^_+v$/i.test(key) // matches _v, __v, _V, etc.
+          );
+          csvRows.push(headers.join(','));
+        
+          // 2. Rows
+          for (const row of data) {
+            const values = headers.map(header => {
+              let value = row[header];
+        
+              // Format dates
+              if (dateFields.has(header) && value) {
+                value = new Date(value).toLocaleString();
               }
-            }
-      
-            const escaped = ('' + value).replace(/"/g, '""'); // Escape quotes
-            return `"${escaped}"`;
-          });
-      
-          csvRows.push(values.join(','));
-        }
-      
-        // 3. Trigger download
-        const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
-        const url = window.URL.createObjectURL(blob);
-      
-        const a = document.createElement('a');
-        a.setAttribute('hidden', '');
-        a.setAttribute('href', url);
-        a.setAttribute('download', filename);
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
+        
+              // Serialize nested objects
+              if (typeof value === 'object' && value !== null) {
+                try {
+                  value = JSON.stringify(value);
+                } catch {
+                  value = '[Invalid Object]';
+                }
+              }
+        
+              // Escape values and wrap in quotes
+              const escaped = String(value ?? '').replace(/"/g, '""');
+              return `"${escaped}"`;
+            });
+        
+            csvRows.push(values.join(','));
+          }
+        
+          // 3. Trigger download
+          const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+          const url = URL.createObjectURL(blob);
+        
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          a.style.display = 'none';
+          document.body.appendChild(a);
+          a.click();
+          
+          // Cleanup
+          setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          }, 100);
       };
       
       

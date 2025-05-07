@@ -1,128 +1,11 @@
 import { FiPackage, FiSearch } from "react-icons/fi";
-import { SlidersHorizontal } from "lucide-react";
 import { HiOutlineDocumentDownload } from "react-icons/hi";
-import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { BsThreeDots } from "react-icons/bs";
 import { FaRegCircle } from "react-icons/fa6";
 import { PiArrowsDownUpFill } from "react-icons/pi";
 import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 import React, { useState } from "react";
 import { Order } from "@/app/interface/Order";
-
-const orders = [
-  {
-    id: "#ID238976",
-    date: "24 Apr, 2025",
-    guest: "Pedro Huard",
-    email: "chieko@mail.com",
-    total: "₦1,560,000",
-    payout: "₦1,560,000",
-    delivery: "₦16,560",
-    status: "Delivery",
-    item: "1",
-    homeDelivery: "₦3000",
-    tax: "₦700",
-    totalPaid: "₦16,560"
-  },
-  {
-    id: "#ID238976",
-    date: "24 Apr, 2025",
-    guest: "Pedro Huard",
-    email: "chieko@mail.com",
-    total: "₦1,560,000",
-    payout: "₦1,560,000",
-    delivery: "₦16,560",
-    status: "Delivery",
-    item: "1",
-    homeDelivery: "₦3000",
-    tax: "₦700",
-    totalPaid: "₦16,560"
-  },
-  {
-    id: "#ID238976",
-    date: "24 Apr, 2025",
-    guest: "Pedro Huard",
-    email: "chieko@mail.com",
-    total: "₦1,560,000",
-    payout: "₦1,560,000",
-    delivery: "₦16,560",
-    status: "Delivery",
-    item: "1",
-    homeDelivery: "₦3000",
-    tax: "₦700",
-    totalPaid: "₦16,560"
-  },
-  {
-    id: "#ID238976",
-    date: "24 Apr, 2025",
-    guest: "Pedro Huard",
-    email: "chieko@mail.com",
-    total: "₦1,560,000",
-    payout: "₦1,560,000",
-    delivery: "₦16,560",
-    status: "Delivery",
-    item: "1",
-    homeDelivery: "₦3000",
-    tax: "₦700",
-    totalPaid: "₦16,560"
-  },
-  {
-    id: "#ID238976",
-    date: "24 Apr, 2025",
-    guest: "Pedro Huard",
-    email: "chieko@mail.com",
-    total: "₦1,560,000",
-    payout: "₦1,560,000",
-    delivery: "₦16,560",
-    status: "Delivery",
-    item: "1",
-    homeDelivery: "₦3000",
-    tax: "₦700",
-    totalPaid: "₦16,560"
-  },
-  {
-    id: "#ID238976",
-    date: "24 Apr, 2025",
-    guest: "Pedro Huard",
-    email: "chieko@mail.com",
-    total: "₦1,560,000",
-    payout: "₦1,560,000",
-    delivery: "₦16,560",
-    status: "Delivery",
-    item: "1",
-    homeDelivery: "₦3000",
-    tax: "₦700",
-    totalPaid: "₦16,560"
-  },
-  {
-    id: "#ID238976",
-    date: "24 Apr, 2025",
-    guest: "Pedro Huard",
-    email: "chieko@mail.com",
-    total: "₦1,560,000",
-    payout: "₦1,560,000",
-    delivery: "₦16,560",
-    status: "Delivery",
-    item: "1",
-    homeDelivery: "₦3000",
-    tax: "₦700",
-    totalPaid: "₦16,560"
-  },
-  {
-    id: "#ID238976",
-    date: "24 Apr, 2025",
-    guest: "Pedro Huard",
-    email: "chieko@mail.com",
-    total: "₦1,560,000",
-    payout: "₦1,560,000",
-    delivery: "₦16,560",
-    status: "Delivery",
-    item: "1",
-    homeDelivery: "₦3000",
-    tax: "₦700",
-    totalPaid: "₦16,560"
-  }
-];
 
 interface OrderSummaryItem {
   amountReceived: number;
@@ -168,11 +51,14 @@ const TransactionTable: React.FC<TransactionProps> = ({orders, currentPage, setC
     //EXPORT CSV FILE
     const exportToCSV = (data: any[], filename = 'transactions.csv') => {
       if (!data || data.length === 0) return;
-    
+  
       const csvRows = [];
+      const dateFields = new Set(['createdAt', 'acceptedAt', 'updatedAt']);
     
-      // 1. Headers
-      const headers = Object.keys(data[0]);
+      // 1. Headers (filter out keys like _V, _v, __v)
+      const headers = Object.keys(data[0]).filter(
+        key => !/^_+v$/i.test(key) // matches _v, __v, _V, etc.
+      );
       csvRows.push(headers.join(','));
     
       // 2. Rows
@@ -181,21 +67,21 @@ const TransactionTable: React.FC<TransactionProps> = ({orders, currentPage, setC
           let value = row[header];
     
           // Format dates
-          if (['createdAt', 'acceptedAt', 'updatedAt'].includes(header)) {
+          if (dateFields.has(header) && value) {
             value = new Date(value).toLocaleString();
           }
     
-          // Serialize nested objects (e.g., eventId, eventGroupId)
+          // Serialize nested objects
           if (typeof value === 'object' && value !== null) {
             try {
-              // Customize this to extract relevant fields if needed
               value = JSON.stringify(value);
-            } catch (err) {
+            } catch {
               value = '[Invalid Object]';
             }
           }
     
-          const escaped = ('' + value).replace(/"/g, '""'); // Escape quotes
+          // Escape values and wrap in quotes
+          const escaped = String(value ?? '').replace(/"/g, '""');
           return `"${escaped}"`;
         });
     
@@ -203,16 +89,21 @@ const TransactionTable: React.FC<TransactionProps> = ({orders, currentPage, setC
       }
     
       // 3. Trigger download
-      const blob = new Blob([csvRows.join('\n')], { type: 'text/csv' });
-      const url = window.URL.createObjectURL(blob);
+      const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      const url = URL.createObjectURL(blob);
     
       const a = document.createElement('a');
-      a.setAttribute('hidden', '');
-      a.setAttribute('href', url);
-      a.setAttribute('download', filename);
+      a.href = url;
+      a.download = filename;
+      a.style.display = 'none';
       document.body.appendChild(a);
       a.click();
-      document.body.removeChild(a);
+      
+      // Cleanup
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 100);
     };
     
       

@@ -115,14 +115,14 @@ const HeaderDashboard: React.FC<HeaderProps> = ({ toggleSidebar }) => {
       {/* Right side: Search, Create Event, Notification, User Avatar */}
       <div className="flex items-center space-x-4">
         {/* Search Bar */}
-        <div className="hidden md:flex items-center bg-gray-100 rounded px-2 py-1">
+        {/* <div className="hidden md:flex items-center bg-gray-100 rounded px-2 py-1">
           <FiSearch className="text-gray-500" />
           <input
             type="text"
             placeholder="Search..."
             className="bg-transparent focus:outline-none ml-2 text-sm"
           />
-        </div>
+        </div> */}
 
         {/* Notification */}
         <button className="relative outline-none">
