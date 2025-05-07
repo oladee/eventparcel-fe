@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect, useState, useRef } from "react";
+import { useEffect, useState } from "react";
 import axiosInstance from "@/lib/axiosInstance";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -17,7 +17,6 @@ const ResetPassword: React.FC = () => {
   const [passwordValidation, setPasswordValidation] = useState<boolean[]>([false, false, false, false, false]);
   const [showValidation, setShowValidation] = useState<boolean>(false); // New state for showing validation
   const router = useRouter();
-  const passwordInputRef = useRef<HTMLInputElement>(null);
   const [showPassword, setShowPassword] = useState<boolean>(false); 
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false); 
 

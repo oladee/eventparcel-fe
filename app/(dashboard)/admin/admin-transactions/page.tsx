@@ -39,7 +39,7 @@ export interface SalesSummary {
 }
 
 
-const page: React.FC = () => {
+const Page: React.FC = () => {
     const [loading, setLoading] = useState(true);
     const [error, setError] = useState<string>("");
     const [page, setPage] = useState(1);
@@ -155,4 +155,4 @@ const page: React.FC = () => {
   );
 };
 
-export default page;
+export default Page;

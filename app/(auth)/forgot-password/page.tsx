@@ -8,7 +8,7 @@ import { BiLoaderCircle } from "react-icons/bi";
 import axiosInstance from "@/lib/axiosInstance";
 import AuthLeft from "@/components/auth/AuthLeft";
 
-const page: React.FC = () => {
+const Page = () => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({ email: "" });
@@ -134,4 +134,4 @@ const page: React.FC = () => {
   );
 };
 
-export default page;
+export default Page;

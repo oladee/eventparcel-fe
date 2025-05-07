@@ -64,10 +64,6 @@ function DeliveryDetailsForm() {
       )
     : [];
 
-
-    console.log("form", formData)
-
-
    // Debounce the address input
     useEffect(() => {
       const handler = debounce(() => {
@@ -156,11 +152,11 @@ function DeliveryDetailsForm() {
     validateForm();
   };
 
-  const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { id, value } = e.target;
-    setFormData((prev) => ({ ...prev, [id]: value }));
-    setErrors((prev) => ({ ...prev, [id]: "" }));
-  };
+  // const handleLocationChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
+  //   const { id, value } = e.target;
+  //   setFormData((prev) => ({ ...prev, [id]: value }));
+  //   setErrors((prev) => ({ ...prev, [id]: "" }));
+  // };
 
   const handleBlur = (e: React.FocusEvent<HTMLInputElement>) => {
     const { id, value } = e.target;

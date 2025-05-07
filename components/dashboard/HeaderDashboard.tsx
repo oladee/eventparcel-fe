@@ -1,6 +1,6 @@
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
-import { FiMenu, FiBell, FiSearch } from "react-icons/fi";
+import { FiMenu, FiBell } from "react-icons/fi";
 
 interface HeaderProps {
   toggleSidebar: () => void;

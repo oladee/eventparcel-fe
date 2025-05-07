@@ -10,7 +10,6 @@ import axiosInstance from "@/lib/axiosInstance";
 import axios from "axios";
 import { z } from "zod";
 import Success from "@/components/auth/Success";
-import Cookies from "js-cookie";
 import HeaderLayout from "@/components/layout/HeaderLayout";
 
 const otpSchema = z

@@ -205,7 +205,7 @@ const TransactionTable: React.FC<TransactionProps> = ({orders, currentPage, setC
                     <FiPackage className="w-12 h-12 text-gray-400 mb-4" />
                     <h3 className="text-lg font-semibold text-gray-700 mb-2">No Orders Found</h3>
                     <p className="text-sm text-gray-500">
-                      You don't have any orders matching the current filter.
+                      You don&apos;t have any orders matching the current filter.
                     </p>
                   </div>
                 </td>

@@ -386,6 +386,14 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
         }
     };
     
+    const price = Number(formData?.packagePrice) || 0;
+
+    const whatHostReceives =
+      groupCurrency === "NGN"
+        ? price * 0.93 // deduct 7%
+        : price * 0.915; // deduct 8.5%
+    
+
     
     return (
         <>
@@ -523,6 +531,15 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
                         />
                     </div>
 
+                    <div>
+                        <p className="font-medium text-sm text-[#718096]">What you will receive: <span className="text-[#751423]">{groupCurrency === "NGN" ? "₦" : "$"}{whatHostReceives}</span></p>
+                    </div>
+
+                    <div className="w-full h-[60px] bg-[#FFF7F2] px-3 py-2 rounded-[12px] my-2">
+                        <span className="font-general font-medium text-[13px] text-[#718096]">
+                            <span className="font-semibold text-[#111827] h-[36px]">P.S</span>: {`${groupCurrency === "NGN" ? "7" : "8.5"}% fee will be deducted from the package price as service fee`}</span>
+                    </div>
+
                     {/* Quantity Input */}
                     <div className="flex-1 w-full">
                         <input 
@@ -623,7 +640,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
                             </div>
                         </div>
                     </div>
-                    <div className="relative w-full max-w-md">
+                    <div className="relative w-full max-w-md flex flex-col gap-3">
                         <p className="font-semibold text-base text-[#111827]">Package Size</p>
                         <span className="text-sm text-[#718096]">To efficiently manage you deliveries, please select the box size your package would fit.</span>
                         <div
@@ -665,8 +682,12 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
                             ))}
                             </div>
                         )}
-                          <div className="w-full h-[60px] bg-[#FFF7F2] px-3 py-2 rounded-[12px] mt-2
-                          ">
+                        {selected?.description && (
+                            <div>
+                                <span className="text-sm text-[#718096]">{selected?.description}</span>
+                            </div>
+                        )}
+                          <div className="w-full h-[60px] bg-[#FFF7F2] px-3 py-2 rounded-[12px] mt-2">
                             <span className="font-general font-medium text-[13px] text-[#718096]">
                                 <span className="font-semibold text-[#111827] h-[36px]">P.S</span>: Kindly select the best estimate as wrong selection may lead to additional cost for the host.</span>
                         </div>

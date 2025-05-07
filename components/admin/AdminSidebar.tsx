@@ -22,10 +22,10 @@ const CgProfile = dynamic(
   () => import("react-icons/cg").then((mod) => mod.CgProfile),
   { ssr: false }
 );
-const FiSettings = dynamic(
-  () => import("react-icons/fi").then((mod) => mod.FiSettings),
-  { ssr: false }
-);
+// const FiSettings = dynamic(
+//   () => import("react-icons/fi").then((mod) => mod.FiSettings),
+//   { ssr: false }
+// );
 const VscSettings = dynamic(
   () => import("react-icons/vsc").then((mod) => mod.VscSettings),
   { ssr: false }
