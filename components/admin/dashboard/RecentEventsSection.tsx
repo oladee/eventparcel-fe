@@ -1,22 +1,46 @@
-import React from 'react'
-import Image from 'next/image'
-import { MdOutlineCalendarToday } from 'react-icons/md'
+import React from "react";
+import Image from "next/image";
+import { MdOutlineCalendarToday } from "react-icons/md";
 
-interface EventItem { _id: string; eventName: string; date: string; time: string; eventLocation: string; eventImgUrl: string }
-interface Props { events: EventItem[] }
+interface EventItem {
+  _id: string;
+  eventName: string;
+  date: string;
+  time: string;
+  eventLocation: string;
+  eventImgUrl: string;
+}
+interface Props {
+  events: EventItem[];
+}
 
 const RecentEventsSection: React.FC<Props> = ({ events }) => (
   <div className="bg-white rounded-2xl shadow p-6">
     <div className="flex justify-between items-center">
       <h3 className="text-lg font-medium text-gray-900">Recent Events</h3>
-      <a href="#" className="text-red-600 text-sm font-medium">See All</a>
+      <a href="/admin/admin-events" className="text-red-600 text-sm font-medium cursor-pointer">
+        See All
+      </a>
     </div>
-    <div className="mt-4 space-y-4">
-      {events.map(e => (
-        <div key={e._id} className="flex flex-col justify-center p-3 rounde bg-[#FAFBFC]">
+    <div className="max-h-96 overflow-y-auto no-scrollbar mt-4 space-y-4">
+      {events.map((e) => (
+        <div
+          key={e._id}
+          className="flex flex-col justify-center p-3 rounde bg-[#FAFBFC]"
+        >
           <div className="flex items-center gap-4">
-            <Image width={50} height={50} src={e.eventImgUrl || '/images/placeholder_eventCover2.jpg'} alt={e.eventName} className="rounded-lg object-cover" />
-            <div className="flex-1"><h4 className="font-bold text-sm text-[#111827]">{e.eventName}</h4></div>
+            <Image
+              width={50}
+              height={50}
+              src={e.eventImgUrl || "/images/placeholder_eventCover2.jpg"}
+              alt={e.eventName}
+              className="rounded-lg object-cover"
+            />
+            <div className="flex-1">
+              <h4 className="font-bold text-sm text-[#111827]">
+                {e.eventName}
+              </h4>
+            </div>
           </div>
           <div className="mt-4 border-t pt-3 text-gray-700 w-full">
             <div className="flex items-center gap-2 text-sm font-medium text-[#111827]">
@@ -28,32 +52,8 @@ const RecentEventsSection: React.FC<Props> = ({ events }) => (
       ))}
     </div>
   </div>
-)
-export default RecentEventsSection
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+);
+export default RecentEventsSection;
 
 // import Image from "next/image";
 // import React from "react";
