@@ -4,7 +4,7 @@ import React, { useEffect, useMemo, useState } from "react";
 import AdminContainer from "@/components/admin/AdminContainer";
 import TransactionStatCard from "@/components/admin/dashboard/TransactionStatCard";
 import TransactionTable from "@/components/admin/dashboard/TransactionTable";
-import axiosInstance from "@/lib/axiosInstance";
+import axiosInstance from '@/lib/adminAxiosInterceptor/axiosInstance'
 import { debounce } from "lodash";
 import { Order } from "@/app/interface/Order";
 import { motion } from "framer-motion";

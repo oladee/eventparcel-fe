@@ -3,7 +3,7 @@
 import AdminContainer from "@/components/admin/AdminContainer";
 import DeliveryStatCardGroup, { OrderSummary } from "@/components/admin/dashboard/DeliveryStatCardGroup";
 import DeliveryTable from "@/components/admin/dashboard/DeliveryTable";
-import axiosInstance from "@/lib/axiosInstance";
+import axiosInstance from '@/lib/adminAxiosInterceptor/axiosInstance'
 import { motion } from "framer-motion";
 import { debounce } from "lodash";
 import React, { useEffect, useMemo, useState } from "react";
