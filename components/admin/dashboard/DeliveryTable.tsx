@@ -195,12 +195,12 @@ import { GuestOrder } from "@/app/(dashboard)/admin/admin-delivery/page";
         </div>
         <div className="flex-1 min-w-[150px]" id={`guest-info-${order.orderId}`}>
           <div className="font-semibold text-base text-[#111827]">
-            {`${order.guestFirstName.charAt(0).toUpperCase()}${order.guestFirstName.slice(1)} ${order.guestLastName.charAt(0).toUpperCase()}${order.guestLastName.slice(1)}`}
+            {`${order?.guestFirstName.charAt(0).toUpperCase()}${order?.guestFirstName.slice(1)} ${order?.guestLastName.charAt(0).toUpperCase()}${order?.guestLastName.slice(1)}`}
           </div>
-          <div className="text-sm font-medium text-[#718096]">{order.guestEmail}</div>
+          <div className="text-sm font-medium text-[#718096]">{order?.guestEmail}</div>
         </div>
         <div className="flex-1 min-w-[120px] font-semibold text-base text-[#111827]" id={`delivery-info-${order.orderId}`}>
-          {order.totalAmountCurrency === "NGN" ? "₦" : "$"}{order.totalAmount.toLocaleString()}
+          {order.totalAmountCurrency === "NGN" ? "₦" : "$"}{order?.totalAmount.toLocaleString()}
         </div>
         <div className="flex-1 min-w-[120px] font-semibold text-base text-[#111827]" id={`carrier-info-${order.orderId}`}>
           GIG(still dummy)
@@ -211,7 +211,7 @@ import { GuestOrder } from "@/app/(dashboard)/admin/admin-delivery/page";
               order.orderStatus
             )}`}
           >
-            {order.orderStatus.charAt(0).toUpperCase() + order.orderStatus.slice(1)}
+            {order?.orderStatus.charAt(0).toUpperCase() + order?.orderStatus.slice(1)}
           </span>
         </div>
         <div className="w-[60px] flex justify-center shrink-0" id={`actions-${order.orderId}`}>

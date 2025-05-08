@@ -223,15 +223,15 @@ const TransactionTable: React.FC<TransactionProps> = ({orders, currentPage, setC
                 </td>
                 <td className="p-3" id={`guest-info-${order.orderNumber}`}>
                   <div className="font-semibold text-base text-[#111827]">
-                  {`${order.orderId.guestFirstName.charAt(0).toUpperCase()}${order.orderId.guestFirstName.slice(1)} ${order.orderId.guestLastName.charAt(0).toUpperCase()}${order.orderId.guestLastName.slice(1)}`}
+                  {`${order.orderId.guestFirstName.charAt(0).toUpperCase()}${order?.orderId.guestFirstName.slice(1)} ${order?.orderId.guestLastName.charAt(0).toUpperCase()}${order.orderId.guestLastName.slice(1)}`}
                   </div>
                   <div className="text-sm font-medium text-[#718096]">{order.orderId.guestEmail}</div>
                 </td>
                 <td className="p-3" id={`total-info-${order.orderNumber}`}>
-                  <div className="text-base font-medium text-[#718096]">{order.totalAmountCurrency === "NGN" ? "₦" : "$"}{order.orderId.totalAmount.toLocaleString()}</div>
+                  <div className="text-base font-medium text-[#718096]">{order.totalAmountCurrency === "NGN" ? "₦" : "$"}{order?.orderId.totalAmount.toLocaleString()}</div>
                 </td>
                 <td className="p-3 font-semibold text-base text-[#111827]" id={`payout-info-${order.orderNumber}`}>
-                  {order.totalAmountCurrency === "NGN" ? "₦" : "$"}{order.amountReceived.toLocaleString()}
+                  {order?.totalAmountCurrency === "NGN" ? "₦" : "$"}{order?.amountReceived.toLocaleString()}
                 </td>
                 {order.orderId.deliveryType === "homeDelivery" ? (
                   <td className="p-3 font-semibold text-base text-[#111827]" id={`delivery-fee-${order.orderNumber}`}>

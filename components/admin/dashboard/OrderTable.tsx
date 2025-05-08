@@ -300,33 +300,33 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
       </div>
       <div className="flex-1 min-w-[250px] py-3 h-20 flex flex-col justify-center overflow-hidden"> {/* Increased from 220px */}
         <div className="font-semibold text-base text-[#111827] break-words">
-          {`${order.guestFirstName} ${order.guestLastName}`}
+          {`${order?.guestFirstName} ${order?.guestLastName}`}
         </div>
         <div className="text-sm font-medium text-[#718096] break-words">
-          {order.guestEmail}
+          {order?.guestEmail}
         </div>
       </div>
       <div className="flex-1 min-w-[220px] py-3 h-20 flex flex-col justify-center"> {/* Increased from 200px */}
         <div className="text-base font-medium text-[#718096] break-words">
-          {order.eventId.eventName
+          {order?.eventId?.eventName
             .split(" ")
             .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
             .join(" ")} 
         </div>
       </div>
       <div className="flex-1 min-w-[80px] font-semibold text-base text-[#111827] py-3 h-20 flex items-center"> {/* Reduced from 95px */}
-        {order.totalAmountCurrency === "NGN" ? "₦" : "$"}{order.totalAmount.toLocaleString()}
+        {order?.totalAmountCurrency === "NGN" ? "₦" : "$"}{order?.totalAmount.toLocaleString()}
       </div>
       <div className="flex-1 min-w-[80px] font-semibold text-base text-[#111827] py-3 h-20 flex items-center"> {/* Reduced from 95px */}
-        {order.deliveryType === "homeDelivery" ? "Delivery" : "Pickup"}
+        {order?.deliveryType === "homeDelivery" ? "Delivery" : "Pickup"}
       </div>
       <div className="flex-1 min-w-[80px] py-3 h-20 flex items-center"> {/* Reduced from 95px */}
         <span
           className={`w-[85px] px-3 py-1 text-xs font-semibold rounded-[8px] ${getStatusColor(
-              order.orderStatus
+              order?.orderStatus
           )}`}
         >
-          {order.orderStatus.charAt(0).toUpperCase()}{order.orderStatus.slice(1)}
+          {order?.orderStatus.charAt(0).toUpperCase()}{order?.orderStatus.slice(1)}
         </span>
       </div>
       <div className="w-[40px] flex justify-center shrink-0"> {/* Reduced from 60px */}
