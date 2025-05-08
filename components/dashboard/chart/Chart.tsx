@@ -196,7 +196,7 @@ const Chart: React.FC = () => {
         setError("An error occurred while fetching data");
         setLoading(false);
       });
-  }, []);
+  }, [router]);
 
   // --------------------- RENDER STATES ---------------------
   if (loading) {
