@@ -1,100 +1,133 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
+import React, { useState, useMemo, useEffect } from "react";
 import AdminContainer from "@/components/admin/AdminContainer";
 import { FiSearch } from "react-icons/fi";
 import AdminUsersTable, { AdminInterface } from "@/components/admin/adminUsers/AdminUsersTable";
 import AddNewUser from "@/components/admin/AddNewUser";
+import { useRouter } from "next/navigation";
+import axiosInstance from "@/lib/adminAxiosInterceptor/axiosInstance";
+import { motion } from "framer-motion";
 
-const adminsData: AdminInterface[] = Array.from({ length: 30 }, (_, i) => ({
-  id: i + 1,
-  name: [
-    "Chieko Chute",
-    "Annabel Rohan",
-    "Pedro Huard",
-    "Jamel Eusebio",
-    "Augustina Midgett",
-    "Geoffrey Mott"
-  ][i % 6],
-  dateAdded: "12 Mar, 2025",
-  email: [
-    "chieko@mail.com",
-    "rohan_anna@mail.com",
-    "pedrohuar@mail.com",
-    "eusebio234@mail.com",
-    "midgett245@mail.com",
-    "bettina@mail.com"
-  ][i % 6],
-  role: [
-    "Super Admin",
-    "Admin",
-    "Admin",
-    "Logistics",
-    "Audit",
-    "Audit"
-  ][i % 6] as "Super Admin" | "Admin" | "Audit" | "Logistics",
-  lastLogin: "12 Mar, 2025",
-  status: [
-    "Active",
-    "Active",
-    "Suspended",
-    "Active",
-    "Disabled",
-    "Disabled"
-  ][i % 6] as "Active" | "Suspended" | "Disabled"
-}));
-
-type StatusTab = "All Users" | "Active" | "Suspended" | "Disabled";
-const statusTabs: StatusTab[] = [
+const statusTabs: ("All Users" | "active" | "suspended" | "disabled")[] = [
   "All Users",
-  "Active",
-  "Suspended",
-  "Disabled"
+  "active",
+  "suspended",
+  "disabled"
 ];
 
 const AdminPage: React.FC = () => {
+  const Router = useRouter();
+
   const [newUser, setNewUser] = useState(false);
-  const [activeTab, setActiveTab] = useState<StatusTab>("All Users");
+  const [activeTab, setActiveTab] = useState<"All Users" | "active" | "suspended" | "disabled">("All Users");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(6);
-console.log(setActiveTab)
+  const [adminData, setAdminData] = useState<AdminInterface[]>([]); 
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>("");
+
   const filtered = useMemo(() => {
-    let data = adminsData;
-    if (activeTab !== "All Users")
+    let data = adminData;
+    if (activeTab !== "All Users") {
       data = data.filter((h) => h.status === activeTab);
-    if (search)
+    }
+    if (search) {
       data = data.filter(
         (h) =>
-          h.name.toLowerCase().includes(search.toLowerCase()) ||
+          h.firstName.toLowerCase().includes(search.toLowerCase()) ||
           h.email.toLowerCase().includes(search.toLowerCase())
       );
+    }
     return data;
-  }, [activeTab, search]);
+  }, [activeTab, search, adminData]);
+
+  useEffect(() => {
+    const fetchAdmins = async () => {
+      setLoading(true);
+      setError(null); // Reset error state before fetching
+  
+      try {
+        const response = await axiosInstance.get("/get-all-admin-users");
+        setAdminData(response.data.data);
+      } catch (error: any) {
+        const message =
+          error?.response?.data?.message ||
+          error?.message ||
+          "Something went wrong";
+        setError(message);
+      } finally {
+        setLoading(false);
+      }
+    };
+  
+    fetchAdmins();
+  }, []);
+  
 
   const pageCount = Math.ceil(filtered.length / pageSize);
   const pageData = filtered.slice((page - 1) * pageSize, page * pageSize);
 
+  const [inputId] = useState(() => `search-${Math.random().toString(36).substr(2, 9)}`);
+
+   
+  if (loading) {
+    return (
+      <AdminContainer>
+        <div className="flex flex-col justify-center items-center min-h-screen">
+          {/* Animated Spinner */}
+          <motion.div
+            animate={{ rotate: 360 }}
+            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            className="w-12 h-12 border-4 border-t-[#751423] border-gray-300 rounded-full"
+          ></motion.div>
+
+          {/* Skeleton Effect for Loading Content */}
+          <div className="mt-6 w-[80%] max-w-md bg-white p-4 shadow-lg rounded-xl">
+            <div className="animate-pulse">
+              <div className="h-6 bg-gray-300 rounded w-3/4 mb-4"></div>
+              <div className="h-4 bg-gray-300 rounded w-full mb-2"></div>
+              <div className="h-4 bg-gray-300 rounded w-5/6"></div>
+            </div>
+          </div>
+        </div>
+      </AdminContainer>
+    );
+  }
+
+  if (error) {
+    return (
+      <AdminContainer>
+        <div className="flex flex-col justify-center items-center min-h-screen">
+          <span>{error}</span>
+        </div>
+      </AdminContainer>
+    );
+  }
+
   return (
     <AdminContainer>
-      <div className="space-y-6">
+      <div className="">
         {/* Controls */}
         <div className="flex flex-col md:flex-row items-stretch md:items-center justify-between gap-4">
           <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 justify-between w-full max-w-2xl ">
-            <div className="flex items-center bg-white rounded-[12px] px-4 py-2">
+            <div id="tab" className="flex items-center bg-white rounded-[12px] px-4 py-2">
               <span className="text-[#A0AEC0]">Show:</span>
-              <select className="ml-2 text-black font-bold border-none focus:ring-0 outline-none">
-                {/* <option>All Events</option> */}
+              <select
+                className="ml-2 text-black font-bold border-none focus:ring-0 outline-none"
+                value={activeTab}
+                onChange={(e) => setActiveTab(e.target.value as "All Users" | "active" | "suspended" | "disabled")}
+              >
                 {statusTabs.map((tab) => (
                   <option key={tab} value={tab}>
-                    {tab}
+                    {tab.charAt(0).toUpperCase() + tab.slice(1)}
                   </option>
                 ))}
               </select>
-              {/* <FiChevronDown className="ml-1 text-gray-500" /> */}
             </div>
 
-            <div className="flex-1 flex items-center bg-white rounded-[12px] px-4 py-2">
+            <div id="search-input" className="flex-1 flex items-center bg-white rounded-[12px] px-4 py-2">
               <FiSearch className="text-[#000]" />
               <input
                 type="text"
@@ -105,22 +138,27 @@ console.log(setActiveTab)
                   setSearch(e.target.value);
                   setPage(1);
                 }}
+                autoComplete="new-password" 
+                name="searchQuery"
+                id={inputId}
+                readOnly  // Temporarily readonly to prevent autofill
+                onFocus={(e) => e.target.removeAttribute('readonly')}  // Enable on focus
               />
             </div>
           </div>
 
-          <div className="flex flex-row justify-between">
-            <button className="w-[153px] h-[40px] border border-[#751423] bg-[#FFFFFF] text-[#751423] rounded-[12px] font-medium text-base">Permissions</button>
-            <button className="w-[171px] h-[40px] ml-3 bg-[#751423] text-[#FFFFFF] rounded-[12px] font-bold text-base" onClick={() => setNewUser(true)}>Add New User</button>
+          <div id="permission&newUser" className="flex flex-row justify-between">
+            <button id="permissions" className="w-[153px] h-[40px] border border-[#751423] bg-[#FFFFFF] text-[#751423] rounded-[12px] font-medium text-base" onClick={() => Router.push("admin-permissions")}>Permissions</button>
+            <button id="newUser" className="w-[171px] h-[40px] ml-3 bg-[#751423] text-[#FFFFFF] rounded-[12px] font-bold text-base" onClick={() => setNewUser(true)}>Add New User</button>
           </div>
         </div>
-      <div>
+
         {/* Table */}
         <AdminUsersTable admins={pageData} />
 
         {/* Pagination */}
-        <div className="flex items-center justify-between rounded-b-2xl p-4 bg-white">
-          <div className="flex items-center space-x-2">
+        <div id="pagination" className="flex items-center justify-between rounded-b-2xl p-4 bg-white">
+          <div id="change-limit" className="flex items-center space-x-2">
             <span className="text-gray-500">Show result:</span>
             <select
               value={pageSize}
@@ -137,7 +175,7 @@ console.log(setActiveTab)
               ))}
             </select>
           </div>
-          <div className="flex items-center space-x-2">
+          <div id="decrease-page" className="flex items-center space-x-2">
             <button
               disabled={page === 1}
               onClick={() => setPage((p) => Math.max(1, p - 1))}
@@ -149,14 +187,13 @@ console.log(setActiveTab)
               <button
                 key={p}
                 onClick={() => setPage(p)}
-                className={`px-3 py-1 rounded-md ${
-                  p === page ? "bg-green-100 text-green-600" : "text-gray-500"
-                }`}
+                className={`px-3 py-1 rounded-md ${p === page ? "bg-green-100 text-green-600" : "text-gray-500"}`}
               >
                 {p}
               </button>
             ))}
             <button
+              id="increase-page"
               disabled={page === pageCount}
               onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
               className="px-2"
@@ -165,17 +202,20 @@ console.log(setActiveTab)
             </button>
           </div>
         </div>
-        </div>
-            {newUser && (
-              <AddNewUser 
-                isOpen={newUser}
-                onClose={() => setNewUser(false)}
-                onSubmit={() => {
-                  setNewUser(false);
-                }}
-              />
-            )}
       </div>
+
+      {newUser && (
+        <AddNewUser 
+          isOpen={newUser}
+          onClose={() => setNewUser(false)}
+          onSubmit={(newlyCreatedUser: AdminInterface) => {
+            setNewUser(false);
+            if (newlyCreatedUser) {
+              setAdminData((prev) => [newlyCreatedUser, ...prev]);
+            }
+          }}
+        />
+      )}
     </AdminContainer>
   );
 };

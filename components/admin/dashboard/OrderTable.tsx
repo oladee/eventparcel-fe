@@ -74,8 +74,6 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
     const [selected, setSelected] = useState("All Orders");
     const [isOpen, setIsOpen] = useState(false);
 
-    console.log("o", orderStatus)
-
     const orderOptions = ["All Orders", "pending", "shipped", "delivered"];
     const getStatusColor = (status: string) => {
         switch (status.toLowerCase()) {
@@ -106,39 +104,58 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
       };
 
       
+    const capitalize = (str?: string) =>
+      str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : '';
+    
   //EXPORT CSV FILE
   const exportToCSV = (data: any[], filename = 'orders.csv') => {
     if (!data || data.length === 0) return;
   
-    const csvRows = [];
-    const dateFields = new Set(['createdAt', 'acceptedAt', 'updatedAt']);
+    const headers = [
+      'Order ID',
+      'Order Date',
+      'Guest Name',
+      'Event Name',
+      'Price',
+      'Delivery Type',
+      'Status'
+    ];
   
-    // 1. Headers (filter out keys like _V, _v, __v)
-    const headers = Object.keys(data[0]).filter(
-      key => !/^_+v$/i.test(key) // matches _v, __v, _V, etc.
-    );
-    csvRows.push(headers.join(','));
+    const csvRows = [headers.join(',')];
+
   
-    // 2. Rows
     for (const row of data) {
       const values = headers.map(header => {
-        let value = row[header];
+        let value;
   
-        // Format dates
-        if (dateFields.has(header) && value) {
-          value = new Date(value).toLocaleString();
+        switch (header) {
+          case 'Order ID':
+            value = row.orderId;
+            break;
+          case 'Order Date':
+            value = row.createdAt ? new Date(row.createdAt).toLocaleString() : '';
+            break;
+          case 'Guest Name':
+            value = `${capitalize(row.guestFirstName)} ${capitalize(row.guestLastName)}`.trim();
+            break;
+          case 'Event Name':
+            value = capitalize(row.eventId?.eventName) || '';
+            break;
+          case 'Price':
+            value = row.totalAmount != null
+              ? `="${row.totalAmountCurrency === "NGN" ? "₦" : "$"}${row.totalAmount.toLocaleString()}"`
+              : '';
+            break;
+          case 'Delivery Type':
+            value = row.deliveryType || '';
+            break;
+          case 'Status':
+            value = row.orderStatus || '';
+            break;
+          default:
+            value = '';
         }
   
-        // Serialize nested objects
-        if (typeof value === 'object' && value !== null) {
-          try {
-            value = JSON.stringify(value);
-          } catch {
-            value = '[Invalid Object]';
-          }
-        }
-  
-        // Escape values and wrap in quotes
         const escaped = String(value ?? '').replace(/"/g, '""');
         return `"${escaped}"`;
       });
@@ -146,24 +163,24 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
       csvRows.push(values.join(','));
     }
   
-    // 3. Trigger download
-    const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
+    // Prepend BOM to ensure UTF-8 encoding is preserved
+    const BOM = '\uFEFF';
+    const blob = new Blob([BOM + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
   
+    const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
     a.download = filename;
     a.style.display = 'none';
     document.body.appendChild(a);
     a.click();
-    
-    // Cleanup
+  
     setTimeout(() => {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
     }, 100);
   };
-    
+  
   return (
     <div id="order-table" className="w-full gap-4 pt-3 rounded-xl">
       <div id="table-top" className="flex flex-col md:flex-row md:flex-wrap justify-between items-center gap-4 md:gap-0">
@@ -300,7 +317,7 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
       </div>
       <div className="flex-1 min-w-[250px] py-3 h-20 flex flex-col justify-center overflow-hidden"> {/* Increased from 220px */}
         <div className="font-semibold text-base text-[#111827] break-words">
-          {`${order?.guestFirstName} ${order?.guestLastName}`}
+          {`${capitalize(order?.guestFirstName)} ${capitalize(order?.guestLastName)}`}
         </div>
         <div className="text-sm font-medium text-[#718096] break-words">
           {order?.guestEmail}

@@ -44,64 +44,80 @@ import { GuestOrder } from "@/app/(dashboard)/admin/admin-delivery/page";
       
         return `${day} ${month}, ${year}`;
       };
-
+      
       const exportToCSV = (data: any[], filename = 'delivery.csv') => {
         if (!data || data.length === 0) return;
-        
-          const csvRows = [];
-          const dateFields = new Set(['createdAt', 'acceptedAt', 'updatedAt']);
-        
-          // 1. Headers (filter out keys like _V, _v, __v)
-          const headers = Object.keys(data[0]).filter(
-            key => !/^_+v$/i.test(key) // matches _v, __v, _V, etc.
-          );
-          csvRows.push(headers.join(','));
-        
-          // 2. Rows
-          for (const row of data) {
-            const values = headers.map(header => {
-              let value = row[header];
-        
-              // Format dates
-              if (dateFields.has(header) && value) {
-                value = new Date(value).toLocaleString();
-              }
-        
-              // Serialize nested objects
-              if (typeof value === 'object' && value !== null) {
-                try {
-                  value = JSON.stringify(value);
-                } catch {
-                  value = '[Invalid Object]';
-                }
-              }
-        
-              // Escape values and wrap in quotes
-              const escaped = String(value ?? '').replace(/"/g, '""');
-              return `"${escaped}"`;
-            });
-        
-            csvRows.push(values.join(','));
-          }
-        
-          // 3. Trigger download
-          const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
-          const url = URL.createObjectURL(blob);
-        
-          const a = document.createElement('a');
-          a.href = url;
-          a.download = filename;
-          a.style.display = 'none';
-          document.body.appendChild(a);
-          a.click();
-          
-          // Cleanup
-          setTimeout(() => {
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-          }, 100);
-      };
       
+        const headers = [
+          'Order ID',
+          'Order Date',
+          'Delivery Type',
+          'Delivery Fee',
+          'Delivery Location',
+          'Carrier',
+          'Status'
+        ];
+      
+        const csvRows = [headers.join(',')];
+      
+        // const capitalize = (str?: string) =>
+        //   str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : '';
+      
+        for (const row of data) {
+          const values = headers.map(header => {
+            let value;
+      
+            switch (header) {
+              case 'Order ID':
+                value = row.orderId;
+                break;
+              case 'Order Date':
+                value = row.createdAt ? new Date(row.createdAt).toLocaleString() : '';
+                break;
+              case 'Delivery Type':
+                value = row.deliveryType || '';
+                break;
+              case 'Delivery Fee':
+                value = row.homeDeliveryFee != null
+                  ? `="${row.totalAmountCurrency === "NGN" ? "₦" : "$"}${row.homeDeliveryFee.toLocaleString()}"`
+                  : 'N/A';
+                break;
+              case 'Delivery Location':
+                value = row.shippingAddress || 'N/A';
+                break;
+              case 'Carrier':
+                value = row.carrier || 'GIG';
+                break;
+              case 'Status':
+                value = row.orderStatus || '';
+                break;
+              default:
+                value = '';
+            }
+      
+            const escaped = String(value ?? '').replace(/"/g, '""');
+            return `"${escaped}"`;
+          });
+      
+          csvRows.push(values.join(','));
+        }
+      
+        const BOM = '\uFEFF';
+        const blob = new Blob([BOM + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+      
+        setTimeout(() => {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }, 100);
+      };
       
       
   return (
@@ -173,9 +189,9 @@ import { GuestOrder } from "@/app/(dashboard)/admin/admin-delivery/page";
     {orders.length === 0 && (
       <div className="flex flex-col items-center justify-center w-full py-16 text-center bg-white rounded-md border border-dashed border-gray-300" id="empty-state">
         <FiPackage className="w-12 h-12 text-gray-400 mb-4" />
-        <h3 className="text-lg font-semibold text-gray-700 mb-2">No Orders Found</h3>
+        <h3 className="text-lg font-semibold text-gray-700 mb-2">No Delivery Found</h3>
         <p className="text-sm text-gray-500">
-          You don&apos;t have any orders matching the current filter.
+          You don&apos;t have any delivery matching the current filter.
         </p>
       </div>
     )}
@@ -200,7 +216,9 @@ import { GuestOrder } from "@/app/(dashboard)/admin/admin-delivery/page";
           <div className="text-sm font-medium text-[#718096]">{order?.guestEmail}</div>
         </div>
         <div className="flex-1 min-w-[120px] font-semibold text-base text-[#111827]" id={`delivery-info-${order.orderId}`}>
-          {order.totalAmountCurrency === "NGN" ? "₦" : "$"}{order?.totalAmount.toLocaleString()}
+        {order.homeDeliveryFee != null
+          ? `${order.totalAmountCurrency === "NGN" ? "₦" : "$"}${order.homeDeliveryFee.toLocaleString()}`
+          : "N/A"}
         </div>
         <div className="flex-1 min-w-[120px] font-semibold text-base text-[#111827]" id={`carrier-info-${order.orderId}`}>
           GIG(still dummy)

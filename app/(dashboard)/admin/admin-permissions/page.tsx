@@ -8,7 +8,7 @@ import { PiArrowsDownUpFill } from "react-icons/pi";
 
 type StatusTab = "All Users" | "Active" | "Disabled";
 
-const initialRoles = ["Super Admin", "Admin", "Audit", "Logistics"];
+const initialRoles = ["Super Admin", "Admin"];
 const tableHeaders = ["Users", "Transactions", "Logistics", "Events", "Admin"];
 const statuses = ["Active", "Disabled"];
 const statusTabs: StatusTab[] = ["All Users", "Active", "Disabled"];

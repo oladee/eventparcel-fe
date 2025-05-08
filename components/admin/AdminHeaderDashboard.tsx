@@ -31,7 +31,8 @@ const AdminHeaderDashboard: React.FC<HeaderProps> = ({ toggleSidebar }) => {
     "/admin/admin-transactions": "Transactions",
     "/admin/admin-integrations": "Integration",
     "/admin/admin-feeSettings": "Fee Setting",
-    "/admin/adminUsers": "Admin Users",
+    "/admin/admin-users": "Admin Users",
+    "/admin/admin-permissions": "Admin Permissions",
     "/admin/admin-settings": "Settings"
   };
   const getCurrentPageTitle = () => {

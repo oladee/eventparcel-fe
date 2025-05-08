@@ -80,7 +80,8 @@ const Page = () => {
                       alt={item.packageId?.packageTitle || "Order Image"} 
                       width={42} 
                       height={42} 
-                      className="rounded-md h-[42px] w-[42px] object-contain"
+                      className="rounded-[2px] object-cover"
+                      style={{width:"42px", height:"42px"}}
                     />
     
                     {/* Order Details */}
@@ -285,7 +286,7 @@ const Page = () => {
                   <div id="event-date-time" className="flex items-center gap-2 font-medium text mb-2">
                     <Calendar className="h-4 w-4" />
                     <span className="font-medium text-sm text-[#111827]">
-                      {formatDate(order?.eventId.date)} at {order?.eventId.time} WAT
+                      {formatDate(order?.eventId?.date)} at {order?.eventId?.time} WAT
                     </span>
                   </div>
                   <p id="event-location" className="font-medium text-sm text-[#78858F]">
