@@ -16,6 +16,7 @@ import {
   TooltipProps,
 } from "recharts";
 import dynamic from "next/dynamic";
+import { useRouter } from "next/navigation";
 
 const SkeletonLoader = dynamic(
   () => import("@/components/dashboard/loadingStates/SkeletonLoader"),
@@ -169,11 +170,19 @@ const Chart: React.FC = () => {
 
   // Track which bar (index) is currently hovered
   const [hoveredIndex, setHoveredIndex] = useState(-1);
+   const router = useRouter();
 
   // --------------------- FETCH DATA ---------------------
   useEffect(() => {
+    const loggedInUserId = localStorage.getItem("loggedInUserId");
+
+    if (!loggedInUserId) {
+      router.replace("/");
+      console.log("User ID not found in localStorage. Redirecting to login page.");
+      return;
+    }
     axiosInstance
-      .get("/dashboard")
+      .get(`/dashboard-data/${loggedInUserId}`)
       .then((response) => {
         if (response.data.success) {
           setDashboardData(response.data.data);

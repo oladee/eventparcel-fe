@@ -98,7 +98,7 @@ const Page = () => {
                     onClick={() => {
                       setSelectedCohost({
                         _id: coHost._id,
-                        eventId: coHost.eventId, // ensure your coHost object has eventId (or modify as needed)
+                        eventId: coHost.eventId,
                         status: coHost.status,
                       });
                       setIsModalOpen(true);
