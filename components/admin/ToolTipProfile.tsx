@@ -1,7 +1,7 @@
 "use client";
 
+import { useRouter } from "next-nprogress-bar";
 import React from "react";
-import { useRouter } from "next/navigation"; // Import useRouter for navigation
 import { FiLogOut } from "react-icons/fi";
 
 const ToolTipProfile: React.FC = () => {
@@ -9,7 +9,7 @@ const ToolTipProfile: React.FC = () => {
 
   const handleLogout = () => {
     localStorage.clear(); // Clear localStorage
-    router.push("/adminLogin"); // Navigate to /adminLogin
+    router.replace("/adminLogin"); // Navigate to /adminLogin
   };
 
   const handleChangePassword = () => {

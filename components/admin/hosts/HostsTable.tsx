@@ -50,9 +50,10 @@ const HostsTable: React.FC<{ hosts: Host[] }> = ({ hosts }) => {
     return colors[Math.floor(Math.random() * colors.length)];
   };
 
+
   return (
     <div className="bg-white min-w-full overflow-x-scroll no-scrollbar">
-      <table className="w-full table-auto bg-white rounded-t-2xl overflow-hidden">
+      <table className="w-full table-auto bg-white rounded-t-2xl overflow-visible">
         <thead className="bg-gray-50">
           <tr>
             <th className="p-4 text-left">

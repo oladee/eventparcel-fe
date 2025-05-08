@@ -12,6 +12,7 @@ import { saveAs } from 'file-saver'
 // import Image from "next/image"
 
 
+
 const HostsSkeleton: React.FC = () => (
   <div className="bg-white rounded-2xl overflow-hidden">
     <table className="w-full table-auto animate-pulse">
@@ -92,8 +93,8 @@ const HostsPage: React.FC = () => {
 
   const handleExport = () => {
     const csv = [
-      ['Name','Email','Location','Sales','Last Login','Status'],
-      ...filtered.map(h => [h.name, h.email, h.location, h.sales, h.lastLogin, h.status])
+      ['Name','Email','Sales','Last Login','Status'],
+      ...filtered.map(h => [h.name, h.email, h.sales, h.lastLogin, h.status])
     ].map(r => r.join(',')).join('\n')
     const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
     saveAs(blob, 'hosts.csv')

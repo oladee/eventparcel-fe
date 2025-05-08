@@ -85,9 +85,10 @@ const AdminHeaderDashboard: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   };
 
   const handleMouseLeave = () => {
+    
     hideTimeoutRef.current = setTimeout(() => {
       setShowTooltip(false);
-    }, 1000); // 1 second delay
+    }, 500); // 1 second delay
   };
 
   const renderAvatar = () => {
