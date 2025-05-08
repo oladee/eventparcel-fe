@@ -1,6 +1,7 @@
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
 import { FiMenu, FiBell } from "react-icons/fi";
+import ToolTipProfileHost from "./ToolTipProfileHost";
 
 interface HeaderProps {
   toggleSidebar: () => void;
@@ -14,8 +15,12 @@ const HeaderDashboard: React.FC<HeaderProps> = ({ toggleSidebar }) => {
     imageUrl: ""
   });
 
+  
+
   // Use a ref to store the current user state
   const userRef = useRef(user);
+  const [showTooltip, setShowTooltip] = useState(false);
+  const hideTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
   const loadUserData = () => {
     const loggedInUser = localStorage.getItem("loggedInUser");
@@ -70,6 +75,21 @@ const HeaderDashboard: React.FC<HeaderProps> = ({ toggleSidebar }) => {
     // Cleanup interval on component unmount
     return () => clearInterval(interval);
   }, []); // Empty dependency array to avoid infinite loop
+
+
+  const handleMouseEnter = () => {
+    if (hideTimeoutRef.current) {
+      clearTimeout(hideTimeoutRef.current);
+    }
+    setShowTooltip(true);
+  };
+
+  const handleMouseLeave = () => {
+    
+    hideTimeoutRef.current = setTimeout(() => {
+      setShowTooltip(false);
+    }, 500); // 1 second delay
+  };
 
   const renderAvatar = () => {
     if (user.imageUrl) {
@@ -135,7 +155,15 @@ const HeaderDashboard: React.FC<HeaderProps> = ({ toggleSidebar }) => {
 
         {/* User Avatar + Name/Role */}
         <div className="flex items-center space-x-2">
-          {renderAvatar()}
+        <div
+            className="relative"
+            onMouseEnter={handleMouseEnter}
+            onMouseLeave={handleMouseLeave}
+          >
+            {renderAvatar()}
+            {showTooltip && <ToolTipProfileHost />}
+          </div>
+          {/* {renderAvatar()} */}
           <div className="leading-tight hidden md:block">
             <div className="font-semibold truncate max-w-[13ch]">
               {user.firstName} {user.lastName}
