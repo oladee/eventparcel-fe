@@ -2,14 +2,14 @@
 "use client"
 import React, { useEffect, useState, useMemo } from "react"
 import AdminContainer from "@/components/admin/AdminContainer"
-import { FiSearch, FiDownload } from "react-icons/fi"
+import { FiSearch, FiDownload, FiPackage } from "react-icons/fi"
 import HostsTable, { Host } from "@/components/admin/hosts/HostsTable"
 import axiosInstance from '@/lib/adminAxiosInterceptor/axiosInstance'
 import { ToastContainer, toast } from "react-toastify"
 import 'react-toastify/dist/ReactToastify.css'
 import { BiLoaderCircle } from "react-icons/bi"
 import { saveAs } from 'file-saver'
-import Image from "next/image"
+// import Image from "next/image"
 
 
 const HostsSkeleton: React.FC = () => (
@@ -68,7 +68,7 @@ const HostsPage: React.FC = () => {
           }))
           setHosts(mapped)
           setError(null)
-          toast.success(res.data.message)
+          console.log(res.data.message)
         } else {
           throw new Error(res.data.message)
         }
@@ -147,13 +147,7 @@ const HostsPage: React.FC = () => {
           </div>
         ) : filtered.length === 0 ? (
           <div className="flex flex-col items-center justify-center p-12">
-            <Image
-              src="/images/placeholder_no_results.svg"
-              alt="No hosts found"
-              className="w-40 h-40 mb-6"
-              height={100}
-              width={100}
-            />
+             <FiPackage className="w-12 h-12 text-gray-400 mb-4" />
             <p className="text-xl font-semibold text-gray-700">
               No hosts found for “{search || statusFilter}”
             </p>

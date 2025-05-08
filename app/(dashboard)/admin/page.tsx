@@ -67,7 +67,7 @@ const DashboardPage: React.FC = () => {
       .then(res => {
         if (res.data.success) {
           setData(res.data.data)
-          toast.success(res.data.message)
+          console.log(res.data.message)
         } else {
           const msg = res.data.message || 'Failed to load dashboard'
           setError(msg)

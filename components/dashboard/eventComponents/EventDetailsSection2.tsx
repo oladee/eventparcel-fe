@@ -32,8 +32,11 @@ const EventDetailsSection2: React.FC<EventDetailsProps> = ({ eventData }) => {
   };
 
   const handleViewOneEvent = (eventId: any) => {
+    console.log(eventId);
+    localStorage.setItem("eventId", eventId);
     router.push(`/dashboard/events/${eventId}`);
   };
+
   const handleCreateNewEvent = () => {
     router.push("/dashboard/event-creation");
   };
