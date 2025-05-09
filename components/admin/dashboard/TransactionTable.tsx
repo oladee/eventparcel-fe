@@ -48,39 +48,76 @@ const TransactionTable: React.FC<TransactionProps> = ({orders, currentPage, setC
         return `${day} ${month}, ${year}`;
       };
     
+
+      const capitalize = (str?: string) =>
+        str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : '';
+
     //EXPORT CSV FILE
     const exportToCSV = (data: any[], filename = 'transactions.csv') => {
       if (!data || data.length === 0) return;
-  
-      const csvRows = [];
-      const dateFields = new Set(['createdAt', 'acceptedAt', 'updatedAt']);
     
-      // 1. Headers (filter out keys like _V, _v, __v)
-      const headers = Object.keys(data[0]).filter(
-        key => !/^_+v$/i.test(key) // matches _v, __v, _V, etc.
-      );
-      csvRows.push(headers.join(','));
+      const headers = [
+        'Order ID',
+        'Payment Date',
+        'Guest Name',
+        'Total Amount',
+        'Net Payout',
+        'Tax',
+        'Delivery Fee',
+        'Transaction fee',
+        'Service fee'
+      ];
     
-      // 2. Rows
+      const csvRows = [headers.join(',')];
+    
       for (const row of data) {
         const values = headers.map(header => {
-          let value = row[header];
+          let value;
     
-          // Format dates
-          if (dateFields.has(header) && value) {
-            value = new Date(value).toLocaleString();
+          switch (header) {
+            case 'Order ID':
+              value = row.orderNumber;
+              break;
+            case 'Payment Date':
+              value = row.orderId.createdAt ? new Date(row.orderId.createdAt).toLocaleString() : '';
+              break;
+            case 'Guest Name':
+              value = `${capitalize(row.orderId.guestFirstName)} ${capitalize(row.orderId.guestLastName)}`.trim();
+              break;
+            case 'Total Amount':
+              value = row.totalAmount != null
+                ? `="${row.totalAmountCurrency === "NGN" ? "₦" : "$"}${row.totalAmount.toLocaleString()}"`
+                : '';
+              break;
+            case 'Net Payout':
+              value = row.amountReceived != null
+                ? `="${row.totalAmountCurrency === "NGN" ? "₦" : "$"}${row.amountReceived.toLocaleString()}"`
+                : '';
+              break;
+            case 'Tax':
+              value = row.tax != null
+                ? `="${row.totalAmountCurrency === "NGN" ? "₦" : "$"}${row.tax.toLocaleString()}"`
+                : '';
+              break;
+            case 'Delivery Fee':
+              value = row.homeDeliveryFee != null
+                ? `="${row.totalAmountCurrency === "NGN" ? "₦" : "$"}${row.homeDeliveryFee.toLocaleString()}"`
+                : 'N/A';
+              break;
+            case 'Transaction fee':
+              value = row.transactionFee != null
+                ? `="${row.totalAmountCurrency === "NGN" ? "₦" : "$"}${row.transactionFee.toLocaleString()}"`
+                : 'to be fixed';
+              break;
+            case 'Service fee':
+              value = row.serviceFee != null
+                ? `="${row.totalAmountCurrency === "NGN" ? "₦" : "$"}${row.serviceFee.toLocaleString()}"`
+                : 'to be fixed';
+              break;
+            default:
+              value = '';
           }
     
-          // Serialize nested objects
-          if (typeof value === 'object' && value !== null) {
-            try {
-              value = JSON.stringify(value);
-            } catch {
-              value = '[Invalid Object]';
-            }
-          }
-    
-          // Escape values and wrap in quotes
           const escaped = String(value ?? '').replace(/"/g, '""');
           return `"${escaped}"`;
         });
@@ -88,25 +125,25 @@ const TransactionTable: React.FC<TransactionProps> = ({orders, currentPage, setC
         csvRows.push(values.join(','));
       }
     
-      // 3. Trigger download
-      const blob = new Blob([csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
-      const url = URL.createObjectURL(blob);
+      // Prepend BOM to ensure UTF-8 encoding is preserved
+      const BOM = '\uFEFF';
+      const blob = new Blob([BOM + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
     
+      const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
       a.download = filename;
       a.style.display = 'none';
       document.body.appendChild(a);
       a.click();
-      
-      // Cleanup
+    
       setTimeout(() => {
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
       }, 100);
     };
     
-      
+    
   return (
     <div className="w-full gap-4 pt-3 rounded-xl" id="orders-container">
   <div className="flex flex-col md:flex-row md:flex-wrap justify-between items-center gap-4 md:gap-0" id="orders-controls">
@@ -203,9 +240,9 @@ const TransactionTable: React.FC<TransactionProps> = ({orders, currentPage, setC
                 <td colSpan={8} className="p-0">
                   <div className="flex flex-col items-center justify-center w-full py-16 text-center bg-white rounded-md border border-dashed border-gray-300">
                     <FiPackage className="w-12 h-12 text-gray-400 mb-4" />
-                    <h3 className="text-lg font-semibold text-gray-700 mb-2">No Orders Found</h3>
+                    <h3 className="text-lg font-semibold text-gray-700 mb-2">No Transactions Found</h3>
                     <p className="text-sm text-gray-500">
-                      You don&apos;t have any orders matching the current filter.
+                      You don&apos;t have any transactions matching the current filter.
                     </p>
                   </div>
                 </td>

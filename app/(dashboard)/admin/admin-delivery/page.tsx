@@ -46,6 +46,7 @@ const Page = () => {
     const [search, setSearch] = useState("");
     const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
     const [orderStatus, setOrderStatus] = useState("");
+
   
     const debouncedSearch = useMemo(
       () =>
@@ -82,7 +83,6 @@ const Page = () => {
             `/admin-delivery/`,
             { params }
           );
-          console.log("sum",response.data.data);
           setOrderSummary(response.data.data.summary)
           setOrderData(response.data.data.deliveries);
           setTotalPages(response.data.data.totalPages)

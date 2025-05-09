@@ -68,8 +68,6 @@ const Page = () => {
   const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
   const [orderStatus, setOrderStatus] = useState("");
 
-  console.log("order", orderData)
-
   const debouncedSearch = useMemo(
     () =>
       debounce((value: string) => {
