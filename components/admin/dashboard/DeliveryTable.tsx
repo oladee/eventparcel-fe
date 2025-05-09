@@ -22,6 +22,7 @@ import { GuestOrder } from "@/app/(dashboard)/admin/admin-delivery/page";
 
   const DeliveryTable: React.FC<DeliveryProps> = ({orders, currentPage, setCurrentPage,searchTerm, totalPages, setLimit, limit, setSearchTerm}) => {
 
+    console.log("del", orders)
     const getStatusColor = (status: string) => {
         switch (status.toLowerCase()) {
           case "pending":
@@ -221,7 +222,8 @@ import { GuestOrder } from "@/app/(dashboard)/admin/admin-delivery/page";
           : "N/A"}
         </div>
         <div className="flex-1 min-w-[120px] font-semibold text-base text-[#111827]" id={`carrier-info-${order.orderId}`}>
-          GIG(still dummy)
+          {order.deliveryType === "pickUp" 
+            ? "PickUp" : order.deliveryType === "homeDelivery" ? "Platform (GIG)" : ""}
         </div>
         <div className="flex-1 min-w-[100px]" id={`status-info-${order.orderId}`}>
           <span

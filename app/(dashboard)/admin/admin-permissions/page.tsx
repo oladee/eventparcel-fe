@@ -15,12 +15,19 @@ const statusTabs: StatusTab[] = ["All Users", "Active", "Disabled"];
 
 export default function PermissionsTable() {
   const [roles, setRoles] = useState(initialRoles);
-  const [checkedState, setCheckedState] = useState(
-    Array(initialRoles.length).fill(null).map(() => Array(tableHeaders.length).fill(false))
-  );
+  const [checkedState, setCheckedState] = useState(() => {
+    return [
+      // Super Admin: all true
+      Array(tableHeaders.length).fill(true),
+      // Admin: all true except the last column ("Admin")
+      tableHeaders.map((_, index) => index === tableHeaders.length - 1 ? false : true),
+    ];
+  });
+  
   const [statusState, setStatusState] = useState(
-    Array(initialRoles.length).fill("Disabled")
+    Array(initialRoles.length).fill("Active")
   );
+  
   const [showNewRow, setShowNewRow] = useState(false);
   const [newChecked, setNewChecked] = useState(Array(tableHeaders.length).fill(false));
 
@@ -63,7 +70,7 @@ export default function PermissionsTable() {
         <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 justify-between w-full max-w-2xl">
           <div className="flex items-center bg-white rounded-[12px] px-4 py-2">
             <span className="text-[#A0AEC0]">Show:</span>
-            <select className="ml-2 text-black font-bold border-none focus:ring-0 outline-none">
+            <select disabled className="ml-2 text-black font-bold border-none focus:ring-0 outline-none">
               {statusTabs.map((tab) => (
                 <option key={tab} value={tab}>
                   {tab}
@@ -81,6 +88,7 @@ export default function PermissionsTable() {
           </div>
         </div>
         <button
+          disabled //disabled will be removed later when other admin roles has been added
           onClick={handleCreateRole}
           className="w-[153px] h-[40px] border border-[#751423] bg-[#FFFFFF] text-[#751423] rounded-[12px] font-medium text-base"
         >
@@ -140,12 +148,12 @@ export default function PermissionsTable() {
                 <td className="text-center p-3">
                   <span
                     className={`inline-block px-3 py-1 rounded-full text-sm font-medium ${
-                      statuses[rowIndex % 2] === "Active"
+                      statusState[rowIndex] === "Active"
                         ? "bg-green-100 text-green-800"
                         : "bg-red-100 text-red-800"
                     }`}
                   >
-                    {statuses[rowIndex % 2]}
+                    {statusState[rowIndex]}
                   </span>
                 </td>
                 <td className="text-center p-3 flex justify-center px-5">
