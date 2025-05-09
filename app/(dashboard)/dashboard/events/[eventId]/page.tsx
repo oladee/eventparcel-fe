@@ -23,7 +23,7 @@ const Page: React.FC = () => {
       router.replace("/dashboard/events");
       return;
     }
-
+    localStorage.setItem("eventId", id);
     const fetchEventData = async () => {
       try {
         const response = await axiosInstance.get(`/view-event/${id}`);
@@ -126,98 +126,3 @@ const Page: React.FC = () => {
 export default Page;
 
 
-
-
-
-
-
-
-
-
-
-
-// "use client";
-
-// import React, { useEffect, useState } from "react";
-// import Container from "@/components/dashboard/Container";
-// import PackagesSection from "@/components/dashboard/eventComponents/PackagesSection";
-// import EventDetailsSection from "@/components/dashboard/eventComponents/EventDetailsSection";
-// import axiosInstance from "@/lib/axiosInstance";
-// import { useRouter } from "next-nprogress-bar";
-// import Image from "next/image";
-
-// const Page: React.FC = () => {
-//   const [eventData, setEventData] = useState<any>(null);
-//   const [loading, setLoading] = useState(true);
-//   const [error, setError] = useState<string | null>(null);
-//   const router = useRouter();
-
-//   useEffect(() => {
-//     if (typeof window !== "undefined") {
-//       const storedEventId = localStorage.getItem("eventId");
-//       if (!storedEventId) {
-//         router.replace("/event-creation");
-//         return;
-//       }
-
-//       // Fetch event data using the stored event ID
-//       const fetchEventData = async () => {
-//         try {
-//           const response = await axiosInstance.get(
-//             `/view-event/${storedEventId}`
-//           );
-//           if (response.data.success) {
-//             setEventData(response.data.data);
-//           } else {
-//             setError("Failed to fetch event data.");
-//           }
-//         } catch (error: any) {
-//           console.error("Error fetching event:", error);
-//           setError(error.response?.data?.message);
-//         } finally {
-//           setLoading(false);
-//         }
-//       };
-
-//       fetchEventData();
-//     }
-//   }, [router]);
-
-//   const handleAddGroupClick = () => {
-//     router.push("/new-group");
-//   };
-
-//   if (loading) return <div>Loading...</div>;
-//   if (error) return <div>{error}</div>;
-
-//   return (
-//     <Container>
-//       {/* Pass the eventData to both child components */}
-//       <EventDetailsSection eventData={eventData} />
-//       {/* <PackagesSection eventData={eventData} /> */}
-//       {eventData?.eventGroups?.length > 0 ? (
-//         <PackagesSection eventData={eventData} />
-//       ) : (
-//         // <button
-//         //   onClick={() => router.push("/add-group")}
-//         //   className="bg-blue-500 text-white px-4 py-2 rounded"
-//         // >
-//         //   Add a group
-//         // </button>
-//         <div className="flex justify-center">
-//           <div
-//             className="flex w-full max-w-2xl h-[100px] mt-5 rounded-2xl flex-col border-[2px] border-dashed justify-center items-center ml-[5px] bg-[#FFFFFF66] cursor-pointer"
-//             onClick={handleAddGroupClick}
-//           >
-//             <Image src="/images/plus.png" alt="plus" width={32} height={32} />
-//             <span className="font-general font-semibold text-sm text-[#751423]">
-//               Add Groups
-//             </span>
-//           </div>
-//         </div>
-//       )}
-//     </Container>
-//   );
-// };
-
-// export default Page;

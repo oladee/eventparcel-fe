@@ -1,6 +1,6 @@
 "use client";
 import RightBar from "@/components/Rightbar";
-import Container from '@/components/dashboard/Container'
+import Container from "@/components/dashboard/Container";
 import axiosInstance from "@/lib/axiosInstance";
 import { toast, ToastContainer } from "react-toastify";
 import { BiLoaderCircle } from "react-icons/bi";
@@ -9,7 +9,7 @@ import "react-datepicker/dist/react-datepicker.css";
 import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
-import CohostActionsModal from "@/components/modals/CohostActionsModal";
+import CohostActionsModal from "@/components/dashboard/cohost/CohostActionsModal";
 
 const Page = () => {
   const [isRightBarOpen, setIsRightBarOpen] = useState(false);
@@ -35,15 +35,17 @@ const Page = () => {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const storedEventId = localStorage.getItem("eventId");
-      if (!storedEventId) {
+      const hostId = localStorage.getItem("loggedInUserId");
+      if (!hostId) {
         router.replace("/event-creation");
         return;
       }
-      
+
       const fetchCoHosts = async () => {
         try {
-          const response = await axiosInstance.get(`/view-cohosts/${storedEventId}`);
+          const response = await axiosInstance.get(
+            `/view-cohosts-for-host/${hostId}`
+          );
           if (response.data.success) {
             setCoHosts(response.data.data);
           } else {
@@ -51,7 +53,7 @@ const Page = () => {
           }
         } catch (error: any) {
           console.error("Error fetching co-hosts:", error);
-          toast.error("Failed to fetch co-hosts.");
+          toast.error(error?.response?.data?.message);
         } finally {
           setLoading(false);
         }
@@ -81,17 +83,19 @@ const Page = () => {
                   key={coHost._id}
                   className="flex items-center justify-between space-x-4 bg-white rounded-[12px] p-4"
                 >
-                  {/* Avatar */}
-                  <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[#C4C4C466] text-gray-800 font-bold text-base">
-                    {coHost.firstName[0]}
-                    {coHost.lastName[0]}
-                  </div>
-                  {/* Name & Email */}
-                  <div>
-                    <h2 className="text-sm font-semibold text-[#101828]">
-                      {coHost.firstName} {coHost.lastName}
-                    </h2>
-                    <p className="text-sm text-[#667085]">{coHost.email}</p>
+                  <div className="flex items-center gap-4">
+                    {/* Avatar */}
+                    <div className="flex items-center justify-center w-10 h-10 rounded-full bg-[#C4C4C466] text-gray-800 font-bold text-base">
+                      {coHost.firstName[0]}
+                      {coHost.lastName[0]}
+                    </div>
+                    {/* Name & Email */}
+                    <div>
+                      <h2 className="text-sm font-semibold text-[#101828]">
+                        {coHost.firstName} {coHost.lastName}
+                      </h2>
+                      <p className="text-sm text-[#667085]">{coHost.email}</p>
+                    </div>
                   </div>
                   {/* More Options Button */}
                   <button
@@ -99,7 +103,7 @@ const Page = () => {
                       setSelectedCohost({
                         _id: coHost._id,
                         eventId: coHost.eventId,
-                        status: coHost.status,
+                        status: coHost.status
                       });
                       setIsModalOpen(true);
                     }}
