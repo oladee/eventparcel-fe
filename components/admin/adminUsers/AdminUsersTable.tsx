@@ -1,8 +1,10 @@
 "use client";
+import axiosInstance from "@/lib/adminAxiosInterceptor/axiosInstance";
 import { useRouter } from "next-nprogress-bar";
 import React, { useState, useRef, useEffect } from "react";
 import { FiMoreHorizontal, FiPackage } from "react-icons/fi";
 import { GrTransaction } from "react-icons/gr";
+import { toast, ToastContainer } from "react-toastify";
 
 export type AdminInterface = {
   _id: number;
@@ -17,15 +19,21 @@ export type AdminInterface = {
 
 const statusClasses: Record<AdminInterface["status"], string> = {
   active: "bg-[#2B9EA01F] text-[#2B9EA0] border border-[#2B9EA0]",
-  disabled: "bg-[#FE964A1F] text-[#DE4222] border border-[#DE4222]",
+  inactive: "bg-[#FE964A1F] text-[#DE4222] border border-[#DE4222]",
   suspended: "bg-[#DE42221F] text-[#FE964A] border border-[#FE964A]",
-  inactive: "bg-[#A0AEC01F] text-[#A0AEC0] border border-[#A0AEC0]",
+  disabled: "bg-[#A0AEC01F] text-[#A0AEC0] border border-[#A0AEC0]",
 };
 
 const AdminUsersTable: React.FC<{ admins: AdminInterface[] }> = ({ admins }) => {
   const [menuOpenId, setMenuOpenId] = useState<number | null>(null);
+  const [adminList, setAdminList] = useState<AdminInterface[]>(admins);
   const menuRef = useRef<HTMLDivElement>(null);
-  const router = useRouter();
+  // const router = useRouter();
+
+  useEffect(() => {
+    setAdminList(admins);
+  }, [admins]);
+  
 
   const toggleMenu = (id: number) => {
     console.log(id)
@@ -53,6 +61,31 @@ const AdminUsersTable: React.FC<{ admins: AdminInterface[] }> = ({ admins }) => 
     return colors[Math.floor(Math.random() * colors.length)];
   };
 
+
+    const handleUpdateStatus = async (id: number, status: AdminInterface["status"]) => {
+      const dataToPost = {
+        userId: id,
+        status
+      };
+    
+      try {
+        const response = await axiosInstance.put("update-admin-status", dataToPost);
+        const updatedAdmin = response.data.data;
+
+        toast.success("Admin status update successfully!!");
+        setAdminList((prev) =>
+          prev.map((admin) =>
+            admin._id === id ? { ...admin, status: updatedAdmin.status } : admin
+          )
+        );
+    
+        setMenuOpenId(null); // close the menu
+      } catch (error: any) {
+        toast.error(error.response?.data?.message || "Something went wrong.");
+      }
+    };
+  
+
   const formatDate = (dateString: string) => {
     const date = new Date(dateString);
     
@@ -65,6 +98,8 @@ const AdminUsersTable: React.FC<{ admins: AdminInterface[] }> = ({ admins }) => 
   
 
   return (
+    <>
+    <ToastContainer />
     <div className="bg-white min-w-full overflow-x-scroll no-scrollbar mt-8">
       <table className="w-full table-auto bg-white rounded-t-2xl overflow-hidden">
         <thead className="bg-gray-50">
@@ -104,7 +139,7 @@ const AdminUsersTable: React.FC<{ admins: AdminInterface[] }> = ({ admins }) => 
         </thead>
         <tbody>
           {admins.length === 0 ? (
-              <tr>
+            <tr>
                 <td colSpan={8} className="p-0">
                   <div className="flex flex-col items-center justify-center w-full py-16 text-center bg-white rounded-md border border-dashed border-gray-300">
                     <FiPackage className="w-12 h-12 text-gray-400 mb-4" />
@@ -113,7 +148,7 @@ const AdminUsersTable: React.FC<{ admins: AdminInterface[] }> = ({ admins }) => 
                 </td>
               </tr>
             ) : (
-              admins.map((a) => (
+              adminList.map((a) => (
                 <tr key={a._id} className="border-t relative">
               <td className="p-4">
                 <input type="checkbox" />
@@ -124,7 +159,7 @@ const AdminUsersTable: React.FC<{ admins: AdminInterface[] }> = ({ admins }) => 
               <td className="p-4 flex items-center space-x-3">
                 <div
                   className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-semibold text-white ${getRandomColorClass()}`}
-                >
+                  >
                   {a.firstName
                     .split(" ")
                     .map((n) => n[0])
@@ -148,9 +183,9 @@ const AdminUsersTable: React.FC<{ admins: AdminInterface[] }> = ({ admins }) => 
                 <span
                   className={`px-2 py-1 text-xs rounded-full ${
                     statusClasses[a.status]
-                    }`}
-                    >
-                    {a.status}
+                  }`}
+                  >
+                    {a.status === "inactive" ? "Disabled" : a.status}
                     </span>
                     </td>
                     <td className="p-4 text-right relative">
@@ -163,36 +198,90 @@ const AdminUsersTable: React.FC<{ admins: AdminInterface[] }> = ({ admins }) => 
                     className="absolute right-4 top-10 bg-white shadow-lg rounded-lg w-40 z-10"
                     >
                     <ul className="py-1">
-                      <li>
+                    <ul className="py-1">
+                      {/* <li>
                         <button
-                          onClick={() =>
-                            router.push(`/admin/admin-hosts/${a._id}`)
-                          }
-                          className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
+                        onClick={() => router.push(`/admin/admin-hosts/${a._id}`)}
+                        className="w-full text-left px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
                         >
-                          View Admin
+                        View Admin
                         </button>
-                      </li>
-                      <li>
-                        <button className="w-full text-left px-4 py-2 text-sm text-orange-300 hover:bg-gray-100">
-                          Suspend Admin
-                        </button>
-                      </li>
-                      <li>
-                        <button className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100">
-                          Disable Admin
-                        </button>
-                      </li>
+                        </li> */}
+
+                      {a.status === "active" && (
+                        <>
+                          <li>
+                            <button
+                              onClick={() => handleUpdateStatus(a._id, "suspended")}
+                              className="w-full text-left px-4 py-2 text-sm text-orange-600 hover:bg-gray-100"
+                              >
+                              Suspend Admin
+                            </button>
+                          </li>
+                          <li>
+                            <button
+                              onClick={() => handleUpdateStatus(a._id, "inactive")}
+                              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                            >
+                              Disable Admin
+                            </button>
+                          </li>
+                        </>
+                      )}
+
+                      {a.status === "suspended" && (
+                        <>
+                          <li>
+                            <button
+                              onClick={() => handleUpdateStatus(a._id, "active")}
+                              className="w-full text-left px-4 py-2 text-sm text-green-600 hover:bg-gray-100"
+                              >
+                              Activate Admin
+                            </button>
+                          </li>
+                          <li>
+                            <button
+                              onClick={() => handleUpdateStatus(a._id, "inactive")}
+                              className="w-full text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
+                            >
+                              Disable Admin
+                            </button>
+                          </li>
+                        </>
+                      )}
+
+                      {a.status === "inactive" && (
+                        <>
+                          <li>
+                            <button
+                              onClick={() => handleUpdateStatus(a._id, "active")}
+                              className="w-full text-left px-4 py-2 text-sm text-green-600 hover:bg-gray-100"
+                            >
+                              Activate Admin
+                            </button>
+                          </li>
+                          <li>
+                            <button
+                              onClick={() => handleUpdateStatus(a._id, "suspended")}
+                              className="w-full text-left px-4 py-2 text-sm text-orange-600 hover:bg-gray-100"
+                            >
+                              Suspend Admin
+                            </button>
+                          </li>
+                        </>
+                      )}
+                    </ul>
                     </ul>
                   </div>
                 )}
                 </td>
             </tr>
           ))
-          )}
+        )}
         </tbody>
       </table>
     </div>
+    </>
   );
 };
 
