@@ -26,7 +26,7 @@ const Page = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleAddNew = () => {
-    router.push("/add-cohost");
+    router.push("/dashboard/add-cohost");
   };
 
   const handleContinue = () => {

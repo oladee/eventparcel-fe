@@ -3,13 +3,14 @@
 import { useEffect, useState } from "react";
 import { IoEyeOutline } from "react-icons/io5";
 import { FiEyeOff } from "react-icons/fi";
-import { useRouter } from "next-nprogress-bar";
+// import { useRouter } from "next-nprogress-bar";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { BiLoaderCircle } from "react-icons/bi";
 import axiosInstance from "@/lib/axiosInstance";
 import SocialSignup from "@/components/auth/SocialSignup";
 import AuthLeft from "@/components/auth/AuthLeft";
+import { useRouter } from "next/navigation";
 
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -81,7 +82,7 @@ const Login: React.FC = () => {
       
       toast.success(response?.data?.message);
 
-      router.push("/dashboard");
+      router.replace("/dashboard");
       // router.push("/event-creation");
     } catch (error: any) {
       if (
