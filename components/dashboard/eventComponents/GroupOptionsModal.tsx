@@ -17,12 +17,16 @@ interface GroupOptionsModalProps {
   isOpen: boolean;
   onClose: () => void;
   group: Group | null;
+  eventData: {
+    isShared?: boolean;
+  };
 }
 
 const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
   isOpen,
   onClose,
-  group
+  group,
+  eventData
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
@@ -98,19 +102,19 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
 
   const handleDisableGroup = async () => {
     if (!group?._id) return;
-  
+
     try {
       const isCurrentlyDisabled = group.isDisabled;
-      setLoading(true); 
+      setLoading(true);
       setLoadingMessage(isCurrentlyDisabled ? "Enabling..." : "Disabling..."); // Set appropriate loading message
-  
+
       const response = await axiosInstance.put(
         `/disable-enable-group/${group._id}`,
         {
-          isDisabled: !isCurrentlyDisabled, // Toggle the isDisabled state
+          isDisabled: !isCurrentlyDisabled // Toggle the isDisabled state
         }
       );
-  
+
       console.log("Group disabled/enabled successfully");
       toast.success(response.data.message);
       window.dispatchEvent(new Event("refreshEvents"));
@@ -127,8 +131,8 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
         toast.error("Failed to update group status. Please try again.");
       }
     } finally {
-      setLoading(false); 
-      setLoadingMessage(""); 
+      setLoading(false);
+      setLoadingMessage("");
     }
   };
 
@@ -171,7 +175,7 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
             </button>
           </div>
           <div className="grid gap-4">
-            <div
+            {/* <div
               className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
               onClick={() => setIsAddGroupOpen(true)}
             >
@@ -182,7 +186,22 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
                 <span className="ml-3 font-medium">Edit Group</span>
               </div>
               <PiCaretRightBold />
-            </div>
+            </div> */}
+            {!eventData.isShared && (
+              <div
+                className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
+                onClick={() => setIsAddGroupOpen(true)}
+              >
+                <div className="flex items-center">
+                  <span className="p-2 bg-[#FFF7F2] rounded-full text-primary">
+                    <LuPencilLine size={20} />
+                  </span>
+                  <span className="ml-3 font-medium">Edit Group</span>
+                </div>
+                <PiCaretRightBold />
+              </div>
+            )}
+
             <div
               className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
               onClick={handleShareGroupLink}
@@ -209,7 +228,11 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
                 </span>
                 <span className="ml-3 font-medium">
                   {/* {group?.isDisabled ? "Enable Group" : "Disable Group"} */}
-                  {loading ? loadingMessage : group?.isDisabled ? "Enable Group" : "Disable Group"}
+                  {loading
+                    ? loadingMessage
+                    : group?.isDisabled
+                    ? "Enable Group"
+                    : "Disable Group"}
                 </span>
               </div>
               <PiCaretRightBold />
