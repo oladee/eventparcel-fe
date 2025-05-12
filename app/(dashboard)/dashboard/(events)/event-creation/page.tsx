@@ -12,7 +12,7 @@ import EventSaveSuccess from "@/components/aboutEvent/EventSaveSuccess";
 import { toast, ToastContainer } from "react-toastify";
 import "react-datepicker/dist/react-datepicker.css";
 import Cookies from "js-cookie";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Container from "@/components/dashboard/Container";
 import { motion } from "framer-motion";
 
@@ -61,6 +61,7 @@ const PageContent: React.FC = () => {
   // State for modals
   const [showImagePickerModal, setShowImagePickerModal] = useState(false);
   const [showMapPickerModal, setShowMapPickerModal] = useState(false);
+    const pathname = usePathname();
 
   const [formData, setFormData] = useState<FormData>({
     eventName: "",
@@ -328,12 +329,21 @@ const PageContent: React.FC = () => {
   };
 
   // API call triggered on clicking Continue
+  // API call triggered on clicking Continue
   const handleSaveLater = async () => {
+    const authToken = localStorage.getItem("authToken");
+  
+    if (!authToken) {
+      localStorage.setItem("unsavedFormData", JSON.stringify(formData));
+      Cookies.set("redirectAfterLogin", pathname); 
+      setShowSuccess2(true);
+      return;
+    }
+  
     // Validate all fields
     const newErrors = { ...errors };
     Object.keys(formData).forEach((key) => {
       if (key !== "eventImage") {
-        // Remove eventImage validation
         newErrors[key as keyof typeof formData] = validateField(
           key,
           formData[key as keyof typeof formData] as string
@@ -342,11 +352,13 @@ const PageContent: React.FC = () => {
     });
     setErrors(newErrors);
     if (Object.values(newErrors).some((error) => error !== "")) return;
-
+  
     setLoading2(true);
     try {
       // Create FormData to match endpoint requirements
       const submissionData = new FormData();
+      
+      // Append all standard fields
       submissionData.append("eventName", formData.eventName);
       submissionData.append("eventDescription", formData.description);
       submissionData.append("numberOfGroups", formData.numberOfGroups);
@@ -354,39 +366,44 @@ const PageContent: React.FC = () => {
         "date",
         formData.eventDate?.toISOString().split("T")[0] || ""
       );
-
+  
       // Convert eventTime if needed
       const formattedTime = formData.eventTime
         ? convertTo12Hour(formData.eventTime.toISOString().split("T")[1])
         : "";
       submissionData.append("time", formattedTime);
-
+  
       submissionData.append("eventLocation", formData.location);
       submissionData.append("hostFirstName", formData.firstName);
       submissionData.append("hostLastName", formData.lastName);
+      submissionData.append("hostEmail", formData.email);
       
       // Append isDraft as a string "true", backend converts to boolean 
       submissionData.append("isDraft", "true");
-
-      submissionData.append("hostEmail", formData.email);
+      
+      // Append image file if it exists
       if (formData.eventImage) {
         submissionData.append("eventImgUrl", formData.eventImage);
       }
-
+  
+      // Debug: Log the FormData before sending
+      // console.log("Submitting form data:");
+      // for (let [key, value] of submissionData.entries()) {
+      //   console.log(key, value instanceof File ? value.name : value);
+      // }
+  
       const response = await axiosInstance.post("/add-event", submissionData, {
-        withCredentials: true, // Ensure cookies are sent with the request
+        withCredentials: true,
         headers: {
           "Content-Type": "multipart/form-data"
         }
       });
-      // console.log("Event created:", response.data);
-      // setShowSuccess2(true);
-       console.log("Event created:", response.data);
+      console.log("Event created:", response.data);
       toast.success("Saved! Continue from your dashboard.");
       router.push("/dashboard");
     } catch (error: any) {
       console.error("Error creating event:", error);
-      toast.error(error.response?.data?.message);
+      toast.error(error.response?.data?.message || "Failed to save event");
     } finally {
       setLoading2(false);
     }

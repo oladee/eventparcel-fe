@@ -5,7 +5,7 @@ import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
 import { Search, Settings2 } from "lucide-react";
 import { cn } from '@/utils/cn';
-import { useRouter, useSearchParams } from 'next/navigation';
+import { useParams, useRouter } from 'next/navigation';
 import { IoIosSend } from 'react-icons/io';
 import GroupOptionsModal from '@/components/dashboard/eventComponents/GroupOptionsModal';
 import { Group } from '@/app/interface/Group';
@@ -42,12 +42,15 @@ interface Order {
 const tabs = ["All Orders", "Pending", "Shipped", "Completed"];
 
 const Page = () => {
-  const searchParams = useSearchParams();
   const [activeTab, setActiveTab] = useState("All Orders");
   const [orders, setOrders] = useState<OrderDashboardResponse | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+
   const modalRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const params = useParams();
+  const id = params?.groupId as string;
+
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(6);
   const [totalPages, setTotalPages] = useState<any>(1);
@@ -58,19 +61,27 @@ const Page = () => {
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
   const [statusModal, setIsStatusModal] = useState(false);
   const [group, setGroup] = useState<Group | null>(null);
+  const [error, setError] = useState("");
 
 
 
   useEffect(() => {
-    const groupData = searchParams.get("groupData");
-    if (groupData) {
+    if (!id) return;
+
+    const fetchGroup = async () => {
       try {
-        setGroup(JSON.parse(decodeURIComponent(groupData)));
-      } catch (error) {
-        console.error("Error parsing group data:", error);
+        const response = await axiosInstance.get(`/view-group/${id}`);
+        setGroup(response.data.data); 
+      } catch (error: any) {
+        setError(error);
+        toast.error('Failed to fetch group data');
+      } finally {
+        setLoading(false);
       }
-    }
-  }, [searchParams]);
+    };
+
+    fetchGroup();
+  }, [id]);
 
   
     useEffect(() => {
@@ -90,6 +101,8 @@ const Page = () => {
   
 
   useEffect(() => {
+    if (!id) return;
+
     const fetchOrders = async () => {
       setLoading(true);
   
@@ -107,13 +120,12 @@ const Page = () => {
   
         const response = await axiosInstance.post(
           `view-orders/`,
-          { eventGroupId: "67dd1fde48f2e5b414f3efcc" },
+          { eventGroupId: id },
           { params }
         );
   
         // Ensure response data exists before setting state
         if (response.data && response.data.data) {
-          console.log("res", response.data.data)
           setOrders(response.data.data as OrderDashboardResponse);
           setTotalPages(response.data.data.totalPages || 1); 
         } else {
@@ -129,7 +141,7 @@ const Page = () => {
     };
   
     fetchOrders();
-  }, [page, limit, debouncedSearchQuery, activeTab]);
+  }, [page, limit, debouncedSearchQuery, activeTab, id]);
   
   
 
@@ -194,6 +206,17 @@ const Page = () => {
     }
   };
 
+  function formatCurrencyShort(amount: number): string {
+    if (amount >= 1_000_000) {
+      return (amount / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
+    }
+    if (amount >= 1_000) {
+      return (amount / 1_000).toFixed(1).replace(/\.0$/, '') + 'K';
+    }
+    return amount.toString();
+  }
+  
+
   if (loading) {
     return (
       <Container>
@@ -217,6 +240,22 @@ const Page = () => {
       </Container>
     );
   }
+
+  if (error) {
+    return (
+      <Container>
+        <div className="flex flex-col justify-center items-center min-h-screen text-center">
+          {/* Error Icon or Emoji */}
+          <div className="text-5xl mb-4">⚠️</div>
+  
+          {/* Error Message */}
+          <h2 className="text-xl font-semibold text-red-600 mb-2">Something went wrong</h2>
+          <p className="text-gray-600 mb-6">We couldn’t load the group data. Please try again.</p>
+        </div>
+      </Container>
+    );
+  }
+  
 
   
     // Open modal and store selected group
@@ -262,24 +301,24 @@ const Page = () => {
 
             <div className="flex items-center space-x-6 py-4 text-sm text-gray-500 font-medium">
               <div className="flex flex-col items-start">
-                <span className="font-semibold text-[20px] text-[#111827] mb-2">₦121M</span>
+                <span className="font-semibold text-[20px] text-[#111827] mb-2">{group?.groupCurrency === "NGN" ? "₦" : "$"}{formatCurrencyShort(group?.summary[0].overallSales || 0)}</span>
                 <span className='font-general'>Overall sales</span>
               </div>
               <div className="h-6 w-px bg-gray-300"></div>
               <div className="flex flex-col items-start">
-                <span className="text-black font-bold text-lg">182</span>
+                <span className="text-black font-bold text-lg">{group?.summary[0]?.packagesSold || 0}</span>
                 <span>Sold</span>
               </div>
               <div className="h-6 w-px bg-gray-300"></div>
               <div className="flex flex-col items-start">
-                <span className="font-bold text-lg text-[#111827]">42</span>
+                <span className="font-bold text-lg text-[#111827]">{group?.summary[0].stock || 0}</span>
                 <span className='text-green-600'>In stock</span>
               </div>
             </div>
 
             <div className="mt-6 flex justify-between items-center">
               <button className="text-gray-500 text-sm font-medium outline-none">
-                Contacts: <span className="text-gray-900 font-bold">0</span>
+                Contacts: <span className="text-gray-900 font-bold">{group?.contacts.length}</span>
               </button>
               <button
                 onClick={handleSendInviteClick}

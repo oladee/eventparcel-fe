@@ -56,9 +56,14 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
     router.push(`/dashboard/share-contact?groupId=${groupId}`);
   };
 
+  // const handleViewOneGroup = (group: Group) => {
+  //   const groupData = encodeURIComponent(JSON.stringify(group));
+  //   router.push(`/dashboard/groups/${group._id}?groupData=${groupData}`);
+  // };
+
+  
   const handleViewOneGroup = (group: Group) => {
-    const groupData = encodeURIComponent(JSON.stringify(group));
-    router.push(`/dashboard/groups/${group._id}?groupData=${groupData}`);
+    router.push(`/dashboard/groups/${group._id}`);
   };
 
   const handleAddGroupClick = () => {

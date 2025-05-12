@@ -425,9 +425,9 @@ const PageContent: React.FC = () => {
   
       // Debug: Log the FormData before sending
       console.log("Submitting form data:");
-      for (let [key, value] of submissionData.entries()) {
-        console.log(key, value instanceof File ? value.name : value);
-      }
+      // for (const [key, value] of submissionData.entries()) {
+      //   console.log(key, value instanceof File ? value.name : value);
+      // }
   
       const response = await axiosInstance.post("/add-event", submissionData, {
         withCredentials: true,

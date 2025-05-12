@@ -8,7 +8,6 @@ import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
-import useUpdateOrderStatus from "@/hooks/useUpdateOrderStatus";
 import { toast, ToastContainer } from "react-toastify";
 import axiosInstance from "@/lib/adminAxiosInterceptor/axiosInstance";
 
@@ -80,7 +79,12 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [statusUpdateLoading, setStatusUpdateLoading] = useState(false);
+    const [ordersData, setOrdersData] = useState<Order[]>(orders);
     const modalRef = useRef<HTMLDivElement>(null);
+
+    useEffect(() => {
+      setOrdersData(orders);
+    }, [orders]);    
 
     // Close modal when clicking outside
     useEffect(() => {
@@ -208,19 +212,25 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
       const response = await axiosInstance.put(`/update-order/${orderId}`, {
         orderStatus: newStatus
       });
-      
+  
       if (response.status === 200) {
         toast.success("Order status updated successfully!");
-        Router.refresh(); 
+  
+        setOrdersData(prev =>
+          prev.map(order =>
+            order._id === orderId ? { ...order, orderStatus: newStatus } : order
+          )
+        );
       }
     } catch (error: any) {
       console.error("Error updating order status:", error);
-      toast.error(`Error: ${error.response.data.message}`);
+      toast.error(`Error: ${error.response?.data?.message || "Something went wrong"}`);
     } finally {
       setStatusUpdateLoading(false);
       setIsModalOpen(false);
     }
   };
+  
 
   const openStatusModal = (order: Order, e: React.MouseEvent) => {
     e.stopPropagation(); // Prevent triggering the row click
@@ -340,7 +350,7 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
   </div>
 
   {/* Table Body */}
-  {orders.length === 0 && (
+  {ordersData.length === 0 && (
     <div className="flex flex-col items-center justify-center w-full py-16 text-center bg-white rounded-md border border-dashed border-gray-300">
       <FiPackage className="w-12 h-12 text-gray-400 mb-4" />
       <h3 className="text-lg font-semibold text-gray-700 mb-2">No Orders Found</h3>
@@ -350,7 +360,7 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
     </div>
   )}
   
-  {orders.map((order, i) => (
+  {ordersData.map((order, i) => (
     <div
       key={i}
       className="flex items-center border-b last:border-b-0 text-sm min-w-[900px] cursor-pointer"

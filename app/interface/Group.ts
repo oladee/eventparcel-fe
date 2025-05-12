@@ -9,7 +9,18 @@ export interface Package {
     packagePrice: number;
     packageDelivery: string[];
   }
+
+  export interface Contact {
+    [key: string]: any;
+  }
   
+  export interface GroupSummary {
+    currency: string;
+    overallSales: number;
+    packagesSold: number;
+    stock: number;
+  }
+
  export  interface Group {
     _id: string;
     groupName: string;
@@ -17,6 +28,8 @@ export interface Package {
     groupPrivacy: string;
     groupCurrency: string;
     packages: Package[];
+    summary: GroupSummary[];
+    contacts: Contact[];
     link?: string;
     isDisabled:boolean;
   }
