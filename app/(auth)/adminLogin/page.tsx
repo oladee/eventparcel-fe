@@ -1,12 +1,13 @@
 "use client";
 import Image from "next/image";
 import { HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
-import { useRouter } from "next-nprogress-bar";
+// import { useRouter } from "next-nprogress-bar";
 import { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import axiosInstance from "@/lib/axiosInstance";
 import { BiLoaderCircle } from "react-icons/bi";
+import { useRouter } from "next/navigation";
 
 const Page: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -78,7 +79,7 @@ const Page: React.FC = () => {
 
       toast.success(response?.data?.message);
 
-      router.push("/admin");
+      router.replace("/admin");
       // router.push("/event-creation");
     } catch (error: any) {
       if (

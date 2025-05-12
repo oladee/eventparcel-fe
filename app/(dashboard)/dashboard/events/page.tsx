@@ -7,6 +7,7 @@ import { useRouter } from "next-nprogress-bar";
 // import Image from "next/image";
 import { motion } from "framer-motion";
 import EventDetailsSection2 from "@/components/dashboard/eventComponents/EventDetailsSection2";
+import { TbCalendarCheck } from "react-icons/tb";
 
 const Page: React.FC = () => {
   const [eventData, setEventData] = useState<any>(null);
@@ -55,7 +56,6 @@ const Page: React.FC = () => {
     }
   }, [router]);
 
-
   if (loading) {
     return (
       <Container>
@@ -68,7 +68,7 @@ const Page: React.FC = () => {
           ></motion.div>
 
           {/* Skeleton Effect for Loading Content */}
-          <div className="mt-6 w-[80%] max-w-md bg-white p-4 shadow-lg rounded-xl">
+          <div className="mt-6 w-[80%] max-w-md bg-white p-4 rounded-xl">
             <div className="animate-pulse">
               <div className="h-6 bg-gray-300 rounded w-3/4 mb-4"></div>
               <div className="h-4 bg-gray-300 rounded w-full mb-2"></div>
@@ -80,8 +80,6 @@ const Page: React.FC = () => {
     );
   }
 
-
-
   if (error) {
     return (
       <Container>
@@ -92,30 +90,35 @@ const Page: React.FC = () => {
     );
   }
 
-return (
-  <Container>
-    {eventData && eventData.length > 0 ? (
-      <EventDetailsSection2 eventData={eventData} />
-    ) : (
-      <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-[#f8f9fa] to-[#e9ecef]">
-        <div className="text-center p-8 bg-white shadow-lg rounded-lg max-w-lg">
-          <h1 className="text-4xl font-extrabold text-[#751423] mb-4">
-            No Events Found
-          </h1>
-          <p className="text-lg text-gray-600 mb-6">
-            It looks like you haven&apos;t created any events yet. Start organizing your events today!
-          </p>
-          <button
-            onClick={() => router.push("/dashboard/event-creation")}
-            className="px-6 py-3 bg-[#751423] text-white text-lg font-semibold rounded-lg shadow-md hover:bg-[#5e101b] transition duration-300"
-          >
-            Create Your First Event
-          </button>
+  return (
+    <Container>
+      {eventData && eventData.length > 0 ? (
+        <EventDetailsSection2 eventData={eventData} />
+      ) : (
+        // <div className="flex flex-col items-center justify-center min-h-screen bg-gradient-to-b from-[#f8f9fa] to-[#e9ecef]">
+        <div className="flex flex-col items-center justify-center">
+          <div className="text-cente flex flex-col items-center justify-center p-8 bg-white rounded-2xl max-w-xl mt-9">
+            <div className="rounded-[50%] w-max bg-[#EEEFF2] p-4 mb-4">
+              <TbCalendarCheck className="text-6xl text-[#751423]" />
+            </div>
+            <h1 className="text-4xl font-extrabold text-[#751423] mb-4">
+              No Events Found
+            </h1>
+            <p className="text-sm lg:text-lg font-medium text-center text-[#718096] mb-6">
+              It looks like you haven&apos;t created any events yet. Start
+              organizing your events today!
+            </p>
+            <button
+              onClick={() => router.push("/dashboard/event-creation")}
+              className="px-6 py-3 bg-[#751423] text-white text-lg font-semibold rounded-xl hover:bg-[#5e101b] transition duration-300"
+            >
+              Create Your First Event
+            </button>
+          </div>
         </div>
-      </div>
-    )}
-  </Container>
-);
+      )}
+    </Container>
+  );
 };
 
 export default Page;

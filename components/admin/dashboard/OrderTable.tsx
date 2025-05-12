@@ -61,7 +61,7 @@ import axiosInstance from "@/lib/adminAxiosInterceptor/axiosInstance";
 
   interface OrdersProps {
     orders: Order[];
-    setOrders: React.Dispatch<React.SetStateAction<Order[]>>;
+    // setOrders: React.Dispatch<React.SetStateAction<Order[]>>;
     currentPage: number;
     setCurrentPage: (page: number) => void;
     setSearchTerm: (search: string) => void;
@@ -199,7 +199,7 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
     setTimeout(() => {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    }, 100);
+    }, 100);  
   };
 
   const handleStatusUpdate = async (orderId: string, newStatus: string) => {
