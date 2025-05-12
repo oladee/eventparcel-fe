@@ -87,6 +87,10 @@ const PageContent: React.FC = () => {
     numberOfGroups: "",
     eventImage: ""
   });
+  
+  useEffect(() => {
+    Cookies.remove("redirectAfterLogin");
+  }, []);
 
   useEffect(() => {
     const redirect = Cookies.get("redirectAfterLogin");
@@ -298,6 +302,10 @@ const PageContent: React.FC = () => {
       submissionData.append("hostLastName", formData.lastName);
       submissionData.append("hostEmail", formData.email);
       submissionData.append("numberOfGroups", formData.numberOfGroups);
+      
+      // Append isDraft as a string "false", backend converts to boolean 
+      submissionData.append("isDraft", "false");
+
       if (formData.eventImage) {
         submissionData.append("eventImgUrl", formData.eventImage);
       }
@@ -356,7 +364,10 @@ const PageContent: React.FC = () => {
       submissionData.append("eventLocation", formData.location);
       submissionData.append("hostFirstName", formData.firstName);
       submissionData.append("hostLastName", formData.lastName);
-      submissionData.append("hostLastName", formData.numberOfGroups);
+      
+      // Append isDraft as a string "true", backend converts to boolean 
+      submissionData.append("isDraft", "true");
+
       submissionData.append("hostEmail", formData.email);
       if (formData.eventImage) {
         submissionData.append("eventImgUrl", formData.eventImage);
@@ -368,8 +379,11 @@ const PageContent: React.FC = () => {
           "Content-Type": "multipart/form-data"
         }
       });
-      console.log("Event created:", response.data);
-      setShowSuccess2(true);
+      // console.log("Event created:", response.data);
+      // setShowSuccess2(true);
+       console.log("Event created:", response.data);
+      toast.success("Saved! Continue from your dashboard.");
+      router.push("/dashboard");
     } catch (error: any) {
       console.error("Error creating event:", error);
       toast.error(error.response?.data?.message);

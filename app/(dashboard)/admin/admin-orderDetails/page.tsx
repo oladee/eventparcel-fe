@@ -5,27 +5,12 @@ import AdminContainer from "@/components/admin/AdminContainer";
 import Image from "next/image";
 import BoxTime from "../../../../assets/orderIcons/box-time-orange.png";
 import { Mail, Phone, MapPin, CircleDollarSign, Calendar } from "lucide-react";
+import { useRouter } from "next/navigation";
 
 const Page = () => {
 
-//   // Add these to your existing order object
-// const dummyPayment = {
-//     // ... existing properties ...
-//     guestName: "John Doe",
-//     guestEmail: "john.doe@example.com",
-//     guestPhoneNumber: "+2348012345678",
-//     shippingAddress: "123 Main Street, Lagos, Nigeria",
-//     totalAmountCurrency: "NGN",
-//     totalAmount: 65000, // 25000*2 + 15000 = 65000
-//     tax: 3250, // 5% of total
-//     homeDeliveryFee: 2000,
-//     // Add helper function for initials
-//     getInitials: (name: string) => {
-//       return name.split(' ').map(n => n[0]).join('').toUpperCase();
-//     }
-//   };
-
     const [order, setOrder] = useState<any>(null);
+    const Router = useRouter();
 
     useEffect(() => {
       const storedOrder = localStorage.getItem("selectedOrder");
@@ -45,6 +30,10 @@ const Page = () => {
       return `${day} ${month}, ${year}`;
     };
     
+    const handleClick = (id: any) => {
+      Router.push(`admin-events/${id}`); 
+    };
+      
   
   return (
     <AdminContainer>
@@ -164,17 +153,6 @@ const Page = () => {
                     {order?.totalAmountCurrency === "NGN" ? "₦" : "$"}{order?.tax.toLocaleString()}
                     </span>
                 </div>
-
-                <div id="tax-cost" className='flex items-center justify-between'>
-                    <div className="flex items-center gap-12">
-                        <span id="item-label" className='text-[#718096] font-general font-medium text-[14px]'>
-                            Tax
-                        </span>
-                    </div>                   
-                     <span id="tax-price" className='text-[#718096] font-general font-medium text-[14px]'>
-                    {order?.totalAmountCurrency === "NGN" ? "₦" : "$"}{order?.tax.toLocaleString()}
-                    </span>
-                </div>
                 
                 <div id="total-cost" className='flex items-center justify-between'>
                     <span id="total-label" className='font-general font-bold text-[14px] text-[#111827]'>Total</span>
@@ -269,8 +247,8 @@ const Page = () => {
                     priority
                     style={{width: "80px", height: "80px"}}
                   />
-                  <div id="event-name-container" className="w-[195px]">
-                    <span id="event-name" className="text-[#111827] font-bold text-base">
+                  <div id="event-name-container" className="w-[195px] cursor-pointer">
+                    <span  onClick={() => handleClick(order?.eventId?._id)} id="event-name" className="text-[#111827] font-bold text-base">
                       {order?.eventId?.eventName
                         .split(" ")
                         .map((word: any) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())

@@ -6,8 +6,11 @@ import { PiArrowsDownUpFill } from "react-icons/pi";
 import { GoArrowUp } from "react-icons/go";
 import { useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
+import useUpdateOrderStatus from "@/hooks/useUpdateOrderStatus";
+import { toast, ToastContainer } from "react-toastify";
+import axiosInstance from "@/lib/adminAxiosInterceptor/axiosInstance";
 
   interface EventGroup {
     _id: string;
@@ -58,6 +61,7 @@ import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 
   interface OrdersProps {
     orders: Order[];
+    // setOrders: React.Dispatch<React.SetStateAction<Order[]>>;
     currentPage: number;
     setCurrentPage: (page: number) => void;
     setSearchTerm: (search: string) => void;
@@ -73,6 +77,24 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
     const Router = useRouter();
     const [selected, setSelected] = useState("All Orders");
     const [isOpen, setIsOpen] = useState(false);
+    const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+    const [isModalOpen, setIsModalOpen] = useState(false);
+    const [statusUpdateLoading, setStatusUpdateLoading] = useState(false);
+    const modalRef = useRef<HTMLDivElement>(null);
+
+    // Close modal when clicking outside
+    useEffect(() => {
+      const handleClickOutside = (event: MouseEvent) => {
+        if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+          setIsModalOpen(false);
+        }
+      };
+
+      document.addEventListener("mousedown", handleClickOutside);
+      return () => {
+        document.removeEventListener("mousedown", handleClickOutside);
+      };
+    }, []);
 
     const orderOptions = ["All Orders", "pending", "shipped", "delivered"];
     const getStatusColor = (status: string) => {
@@ -122,7 +144,6 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
     ];
   
     const csvRows = [headers.join(',')];
-
   
     for (const row of data) {
       const values = headers.map(header => {
@@ -178,10 +199,38 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
     setTimeout(() => {
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
-    }, 100);
+    }, 100);  
   };
-  
+
+  const handleStatusUpdate = async (orderId: string, newStatus: string) => {
+    setStatusUpdateLoading(true);
+    try {
+      const response = await axiosInstance.put(`/update-order/${orderId}`, {
+        orderStatus: newStatus
+      });
+      
+      if (response.status === 200) {
+        toast.success("Order status updated successfully!");
+        Router.refresh(); 
+      }
+    } catch (error: any) {
+      console.error("Error updating order status:", error);
+      toast.error(`Error: ${error.response.data.message}`);
+    } finally {
+      setStatusUpdateLoading(false);
+      setIsModalOpen(false);
+    }
+  };
+
+  const openStatusModal = (order: Order, e: React.MouseEvent) => {
+    e.stopPropagation(); // Prevent triggering the row click
+    setSelectedOrder(order);
+    setIsModalOpen(true);
+  };
+
   return (
+    <>
+    <ToastContainer />
     <div id="order-table" className="w-full gap-4 pt-3 rounded-xl">
       <div id="table-top" className="flex flex-col md:flex-row md:flex-wrap justify-between items-center gap-4 md:gap-0">
       {/* Left: Filter + Search */}
@@ -239,14 +288,14 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
             className="outline-none text-sm text-[#718096] bg-transparent placeholder-[#A0AEC0] w-full"
             value={searchTerm}
             onChange={(e) => setSearchTerm(e.target.value)}
-          />
+            />
         </div>
 
         {/* Filters Button */}
         {/* <button id="table-filterField" className="w-full md:w-[112px] h-[40px] flex justify-center items-center gap-1 bg-[#FFFFFF] rounded-[12px] px-3 py-1.5 text-sm text-[#718096] font-medium">
           <SlidersHorizontal size={16} />
           Filters
-        </button> */}
+          </button> */}
       </div>
 
       {/* Right: Export */}
@@ -305,17 +354,21 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
     <div
       key={i}
       className="flex items-center border-b last:border-b-0 text-sm min-w-[900px] cursor-pointer"
-      onClick={() => handleSelectedOrder(order)}
+      // onClick={() => handleSelectedOrder(order)}
       id="table-body"
-    >
-      <div className="w-[40px] flex justify-center shrink-0"> {/* Reduced from 60px */}
+      >
+      <div onClick={() => handleSelectedOrder(order)} className="w-[40px] flex justify-center shrink-0"> {/* Reduced from 60px */}
         <FaRegCircle className="w-5 h-5 text-[#718096]"/>
       </div>
-      <div className="flex-1 min-w-[100px] py-3 h-20 flex flex-col justify-center"> {/* Reduced from 120px */}
+      <div
+        onClick={() => handleSelectedOrder(order)}
+        className="flex-1 min-w-[100px] py-3 h-20 flex flex-col justify-center"> {/* Reduced from 120px */}
              <div className="font-semibold text-base text-[#111827]">{order.orderId}</div>
             <div className="text-sm font-medium text-[#718096]">{formatDate(order.createdAt)}</div>
       </div>
-      <div className="flex-1 min-w-[250px] py-3 h-20 flex flex-col justify-center overflow-hidden"> {/* Increased from 220px */}
+      <div
+      onClick={() => handleSelectedOrder(order)}
+      className="flex-1 min-w-[250px] py-3 h-20 flex flex-col justify-center overflow-hidden"> {/* Increased from 220px */}
         <div className="font-semibold text-base text-[#111827] break-words">
           {`${capitalize(order?.guestFirstName)} ${capitalize(order?.guestLastName)}`}
         </div>
@@ -323,7 +376,9 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
           {order?.guestEmail}
         </div>
       </div>
-      <div className="flex-1 min-w-[220px] py-3 h-20 flex flex-col justify-center"> {/* Increased from 200px */}
+      <div
+      onClick={() => handleSelectedOrder(order)}
+      className="flex-1 min-w-[220px] py-3 h-20 flex flex-col justify-center"> {/* Increased from 200px */}
         <div className="text-base font-medium text-[#718096] break-words">
           {order?.eventId?.eventName
             .split(" ")
@@ -331,24 +386,57 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
             .join(" ")} 
         </div>
       </div>
-      <div className="flex-1 min-w-[80px] font-semibold text-base text-[#111827] py-3 h-20 flex items-center"> {/* Reduced from 95px */}
+      <div
+      onClick={() => handleSelectedOrder(order)}
+      className="flex-1 min-w-[80px] font-semibold text-base text-[#111827] py-3 h-20 flex items-center"> {/* Reduced from 95px */}
         {order?.totalAmountCurrency === "NGN" ? "₦" : "$"}{order?.totalAmount.toLocaleString()}
       </div>
-      <div className="flex-1 min-w-[80px] font-semibold text-base text-[#111827] py-3 h-20 flex items-center"> {/* Reduced from 95px */}
+      <div
+      onClick={() => handleSelectedOrder(order)}
+      className="flex-1 min-w-[80px] font-semibold text-base text-[#111827] py-3 h-20 flex items-center"> {/* Reduced from 95px */}
         {order?.deliveryType === "homeDelivery" ? "Delivery" : "Pickup"}
       </div>
-      <div className="flex-1 min-w-[80px] py-3 h-20 flex items-center"> {/* Reduced from 95px */}
+      <div
+      onClick={() => handleSelectedOrder(order)}
+      className="flex-1 min-w-[80px] py-3 h-20 flex items-center"> {/* Reduced from 95px */}
         <span
           className={`w-[85px] px-3 py-1 text-xs font-semibold rounded-[8px] ${getStatusColor(
-              order?.orderStatus
+            order?.orderStatus
           )}`}
         >
           {order?.orderStatus.charAt(0).toUpperCase()}{order?.orderStatus.slice(1)}
         </span>
       </div>
-      <div className="w-[40px] flex justify-center shrink-0"> {/* Reduced from 60px */}
+      <div className="w-[40px] flex justify-center shrink-0" onClick={(e) => openStatusModal(order, e)}> {/* Reduced from 60px */}
         <BsThreeDots className="w-5 h-5 text-[#A0AEC0]"/>
       </div>
+      {isModalOpen && selectedOrder && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div 
+            ref={modalRef}
+            className="bg-white p-4 rounded-[15px] shadow-md w-64"
+          >
+            <ul className="space-y-2">
+              {["pending", "shipped", "delivered"].map((status) => (
+                <li
+                key={status}
+                  onClick={() => !statusUpdateLoading && handleStatusUpdate(selectedOrder._id, status)}
+                  className={`p-2 hover:bg-[#F9FAFB] rounded-md cursor-pointer ${
+                    statusUpdateLoading ? "opacity-50 cursor-not-allowed" : ""
+                  } ${
+                    selectedOrder.orderStatus === status ? "bg-[#F9FAFB] font-semibold" : ""
+                  }`}
+                  >
+                  {status.charAt(0).toUpperCase() + status.slice(1)}
+                  {statusUpdateLoading && selectedOrder.orderStatus === status && (
+                    <span className="ml-2">...</span>
+                  )}
+                </li>
+              ))}
+            </ul>
+          </div>
+        </div>
+      )}
     </div>
   ))}
 
@@ -391,7 +479,7 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
                 pageNum === currentPage
                   ? "bg-[#DCFCE7] text-[#16A34A]"
                   : "text-[#A0AEC0] hover:bg-gray-100"
-              }`}
+                }`}
             >
               {pageNum}
             </button>
@@ -403,6 +491,7 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
       </div>
     </div>
     </div>
+    </>
   );
 }
 
