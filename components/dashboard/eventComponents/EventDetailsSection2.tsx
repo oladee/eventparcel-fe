@@ -9,6 +9,8 @@ import { useRouter } from "next-nprogress-bar";
 
 interface EventDetailsProps {
   eventData: Array<{
+    isDraft: React.JSX.Element;
+    isDrafted: React.JSX.Element;
     _id: string;
     eventImgUrl: string;
     eventName: string;
@@ -81,6 +83,12 @@ const EventDetailsSection2: React.FC<EventDetailsProps> = ({ eventData }) => {
               {event?.isShared && (
                 <label className="absolute top-3 left-3 bg-[#F5E6DD] border border-primary text-primary text-sm font-medium px-4 py-1 rounded-[50px] shadow-md">
                   Shared
+                </label>
+              )}
+
+              {event?.isDraft && (
+                <label className="absolute top-3 left-3 bg-[#F5E6DD] border border-primary text-primary text-sm font-medium px-4 py-1 rounded-[50px] shadow-md">
+                  Drafted
                 </label>
               )}
 

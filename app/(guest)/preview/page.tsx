@@ -44,7 +44,6 @@ const ViewEvent = () => {
     const fetchData = async () => {
       try {
         const res = await axiosInstance.get(`/invite-details?code=${code}`);
-        console.log("preview", res.data.data)
         setData(res.data.data);
       } catch (error: any) {
           toast.error(error.response?.data?.message);

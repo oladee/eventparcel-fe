@@ -85,11 +85,12 @@ function DeliveryDetailsForm() {
     const isValidAddress = address && address.length >= 5;
     const hasNoCoordinates = !formData.addressLatitude && !formData.addressLongitude;
   
-  
     if (isValidAddress && hasNoCoordinates) {
       const geocoder = new google.maps.Geocoder();
       geocoder.geocode({ address }, (results, status) => {
         if (status === "OK" && results && results[0]) {
+          console.log("status", status)
+          console.log("results", results)
           const location = results[0].geometry.location;
           setFormData((prev) => ({
             ...prev,

@@ -499,8 +499,11 @@ const Page = () => {
         <GroupOptionsModal
           isOpen={isModalOpen && !!selectedGroup}
           onClose={toggleModal}
-          group={selectedGroup}
-        />
+          group={selectedGroup} 
+          eventData={{
+            isShared: undefined
+          }}        
+          />
       </div>
 
        {/* Pagination */}
