@@ -64,14 +64,12 @@ const Page = () => {
   const [error, setError] = useState("");
 
 
-
   useEffect(() => {
     if (!id) return;
 
     const fetchGroup = async () => {
       try {
         const response = await axiosInstance.get(`/view-group/${id}`);
-        console.log("order", response.data)
         setGroup(response.data.data); 
       } catch (error: any) {
         setError(error);
@@ -100,7 +98,6 @@ const Page = () => {
     }, [statusModal, isModalOpen]);
   
   
-
   useEffect(() => {
     if (!id) return;
 
@@ -167,7 +164,7 @@ const Page = () => {
   };
 
   const handleSendInviteClick = () => {
-    router.push("/share-contact");
+    router.push("/dashboard/share-contact");
   };
 
   const toggleModal = () => setIsModalOpen((prev) => !prev);

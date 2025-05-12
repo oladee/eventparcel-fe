@@ -293,7 +293,7 @@ const Page = () => {
                                     style={{width: "80px", height: "80px"}}
                                 />
                             </div>
-                            <p onClick={() => handleViewOneEvent(orders?.eventId?._id)} id="event-title" className="text-gray-700 font-general font-bold text-[16px]">
+                            <p onClick={() => handleViewOneEvent(orders?.eventId?._id)} id="event-title" className="text-gray-700 font-general cursor-pointer font-bold text-[16px]">
                             {orders?.eventId?.eventName
                                 ? orders.eventId.eventName
                                     .split(" ")
