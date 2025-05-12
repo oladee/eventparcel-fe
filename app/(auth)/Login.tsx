@@ -21,6 +21,7 @@ const Login: React.FC = () => {
   const [errors, setErrors] = useState({ email: "", password: "" });
   const router = useRouter();
   // const [localEmail, setLocalEmail] = useState("");
+  
 
   useEffect(() => {
     // Get eventDetails from localStorage
