@@ -137,6 +137,7 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
   };
 
   if (!isOpen) return null; // Don't render if modal is closed
+  
 
   return (
     <>
