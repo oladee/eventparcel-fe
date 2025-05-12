@@ -71,6 +71,7 @@ const Page = () => {
     const fetchGroup = async () => {
       try {
         const response = await axiosInstance.get(`/view-group/${id}`);
+        console.log("order", response.data)
         setGroup(response.data.data); 
       } catch (error: any) {
         setError(error);
@@ -295,13 +296,13 @@ const Page = () => {
               {group?.groupName}
               </h2>
               <p className="text-[#718096] text-sm mt-1 truncate-text2">
-               {group?.groupDescription}
+              {group?.groupDescription ? group.groupDescription[0].toUpperCase() + group.groupDescription.slice(1) : ''}
               </p>
             </div>
 
             <div className="flex items-center space-x-6 py-4 text-sm text-gray-500 font-medium">
               <div className="flex flex-col items-start">
-                <span className="font-semibold text-[20px] text-[#111827] mb-2">{group?.groupCurrency === "NGN" ? "₦" : "$"}{formatCurrencyShort(group?.summary[0].overallSales || 0)}</span>
+                <span className="font-semibold text-[20px] text-[#111827] mb-2">{group?.groupCurrency === "NGN" ? "₦" : "$"}{formatCurrencyShort(group?.summary[0]?.overallSales || 0)}</span>
                 <span className='font-general'>Overall sales</span>
               </div>
               <div className="h-6 w-px bg-gray-300"></div>
@@ -311,14 +312,14 @@ const Page = () => {
               </div>
               <div className="h-6 w-px bg-gray-300"></div>
               <div className="flex flex-col items-start">
-                <span className="font-bold text-lg text-[#111827]">{group?.summary[0].stock || 0}</span>
+                <span className="font-bold text-lg text-[#111827]">{group?.summary[0]?.stock || 0}</span>
                 <span className='text-green-600'>In stock</span>
               </div>
             </div>
 
             <div className="mt-6 flex justify-between items-center">
               <button className="text-gray-500 text-sm font-medium outline-none">
-                Contacts: <span className="text-gray-900 font-bold">{group?.contacts.length}</span>
+                Contacts: <span className="text-gray-900 font-bold">{group?.contacts?.length}</span>
               </button>
               <button
                 onClick={handleSendInviteClick}
