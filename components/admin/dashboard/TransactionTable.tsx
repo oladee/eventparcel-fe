@@ -35,7 +35,7 @@ interface TransactionProps {
 
 
 const TransactionTable: React.FC<TransactionProps> = ({orders, currentPage, setCurrentPage,searchTerm, totalPages, setLimit, limit, setSearchTerm}) => {
-
+  
   const [openBreakdownOrderId, setOpenBreakdownOrderId] = useState<string | null>(null);
 
       const formatDate = (dateString: string) => {
@@ -142,7 +142,6 @@ const TransactionTable: React.FC<TransactionProps> = ({orders, currentPage, setC
         URL.revokeObjectURL(url);
       }, 100);
     };
-    
     
   return (
     <div className="w-full gap-4 pt-3 rounded-xl" id="orders-container">

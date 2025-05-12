@@ -12,7 +12,7 @@ import EventSaveSuccess from "@/components/aboutEvent/EventSaveSuccess";
 import { toast, ToastContainer } from "react-toastify";
 import "react-datepicker/dist/react-datepicker.css";
 import Cookies from "js-cookie";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import HeaderLayout from "@/components/layout/HeaderLayout";
 import { motion } from "framer-motion";
 
@@ -61,6 +61,8 @@ const PageContent: React.FC = () => {
   // State for modals
   const [showImagePickerModal, setShowImagePickerModal] = useState(false);
   const [showMapPickerModal, setShowMapPickerModal] = useState(false);
+  const pathname = usePathname();
+
 
   const [formData, setFormData] = useState<FormData>({
     eventName: "",
@@ -87,6 +89,45 @@ const PageContent: React.FC = () => {
     numberOfGroups: "",
     eventImage: ""
   });
+
+  useEffect(() => {
+    Cookies.remove("redirectAfterLogin");
+  }, []);
+
+  useEffect(() => {
+    const resume = searchParams.get("resumeForm");
+    if (resume === "true") {
+      const storedData = localStorage.getItem("unsavedFormData");
+      const imageData = localStorage.getItem("eventImageBase64");
+  
+      if (storedData) {
+        try {
+          const parsedData = JSON.parse(storedData);
+  
+          const hydratedData = {
+            ...parsedData,
+            eventDate: parsedData.eventDate ? new Date(parsedData.eventDate) : null,
+            eventTime: parsedData.eventTime ? new Date(parsedData.eventTime) : null,
+            eventImage: null, // Don't try to restore the file directly
+          };
+  
+          setFormData(hydratedData);
+  
+          if (imageData) {
+            setSelectedImage(imageData); 
+          }
+  
+          localStorage.removeItem("unsavedFormData");
+          localStorage.removeItem("eventImageBase64");
+        } catch (err) {
+          console.error("Error parsing saved data:", err);
+        }
+      }
+    }
+  }, [searchParams]);
+  
+  console.log("is fill", formData)
+
 
   useEffect(() => {
     const redirect = Cookies.get("redirectAfterLogin");
@@ -299,6 +340,9 @@ const PageContent: React.FC = () => {
       submissionData.append("hostLastName", formData.lastName);
       submissionData.append("hostEmail", formData.email);
       submissionData.append("numberOfGroups", formData.numberOfGroups);
+
+      // Append isDraft as a string "false", backend converts to boolean 
+      submissionData.append("isDraft", "false");
       if (formData.eventImage) {
         submissionData.append("eventImgUrl", formData.eventImage);
       }
@@ -320,13 +364,23 @@ const PageContent: React.FC = () => {
     }
   };
 
+  console.log(formData)
+
   // API call triggered on clicking Continue
   const handleSaveLater = async () => {
+    const authToken = localStorage.getItem("authToken");
+  
+    if (!authToken) {
+      localStorage.setItem("unsavedFormData", JSON.stringify(formData));
+      Cookies.set("redirectAfterLogin", pathname); 
+      setShowSuccess2(true);
+      return;
+    }
+  
     // Validate all fields
     const newErrors = { ...errors };
     Object.keys(formData).forEach((key) => {
       if (key !== "eventImage") {
-        // Remove eventImage validation
         newErrors[key as keyof typeof formData] = validateField(
           key,
           formData[key as keyof typeof formData] as string
@@ -335,11 +389,13 @@ const PageContent: React.FC = () => {
     });
     setErrors(newErrors);
     if (Object.values(newErrors).some((error) => error !== "")) return;
-
+  
     setLoading2(true);
     try {
       // Create FormData to match endpoint requirements
       const submissionData = new FormData();
+      
+      // Append all standard fields
       submissionData.append("eventName", formData.eventName);
       submissionData.append("eventDescription", formData.description);
       submissionData.append("numberOfGroups", formData.numberOfGroups);
@@ -347,33 +403,44 @@ const PageContent: React.FC = () => {
         "date",
         formData.eventDate?.toISOString().split("T")[0] || ""
       );
-
+  
       // Convert eventTime if needed
       const formattedTime = formData.eventTime
         ? convertTo12Hour(formData.eventTime.toISOString().split("T")[1])
         : "";
       submissionData.append("time", formattedTime);
-
+  
       submissionData.append("eventLocation", formData.location);
       submissionData.append("hostFirstName", formData.firstName);
       submissionData.append("hostLastName", formData.lastName);
-      submissionData.append("hostLastName", formData.numberOfGroups);
       submissionData.append("hostEmail", formData.email);
+      
+      // Append isDraft as a string "true", backend converts to boolean 
+      submissionData.append("isDraft", "true");
+      
+      // Append image file if it exists
       if (formData.eventImage) {
         submissionData.append("eventImgUrl", formData.eventImage);
       }
-
+  
+      // Debug: Log the FormData before sending
+      console.log("Submitting form data:");
+      for (let [key, value] of submissionData.entries()) {
+        console.log(key, value instanceof File ? value.name : value);
+      }
+  
       const response = await axiosInstance.post("/add-event", submissionData, {
-        withCredentials: true, // Ensure cookies are sent with the request
+        withCredentials: true,
         headers: {
           "Content-Type": "multipart/form-data"
         }
       });
       console.log("Event created:", response.data);
-      setShowSuccess2(true);
+      toast.success("Saved! Continue from your dashboard.");
+      router.push("/dashboard");
     } catch (error: any) {
       console.error("Error creating event:", error);
-      toast.error(error.response?.data?.message);
+      toast.error(error.response?.data?.message || "Failed to save event");
     } finally {
       setLoading2(false);
     }
@@ -406,11 +473,24 @@ const PageContent: React.FC = () => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       const imageUrl = URL.createObjectURL(file);
+  
+      // Save image preview URL in state
       setSelectedImage(imageUrl);
       setFormData({ ...formData, eventImage: file });
       setErrors({ ...errors, eventImage: "" });
+  
+      // Save to localStorage as base64 for restoration
+      const reader = new FileReader();
+      reader.onloadend = () => {
+        if (reader.result) {
+          localStorage.setItem("eventImageBase64", reader.result as string);
+        }
+      };
+      reader.readAsDataURL(file); // Convert to base64
     }
   };
+  
+  
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();

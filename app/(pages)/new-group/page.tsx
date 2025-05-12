@@ -13,6 +13,7 @@ import HeaderLayout from "@/components/layout/HeaderLayout";
 import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import axios from "axios";
+import Cookies from "js-cookie";
 
 const AddGroup = dynamic(() => import("@/components/AddGroupCaller"), {
   ssr: false
@@ -29,6 +30,10 @@ const NewGroup: React.FC = () => {
   const router = useRouter();
   const [, setIsDialogOpen] = useState(false);
   const [loadingGroup, setLoadingGroup] = useState(false);
+
+  useEffect(() => {
+    Cookies.remove("redirectAfterLogin");
+  }, []);
 
   useEffect(() => {
     if (typeof window !== "undefined") {

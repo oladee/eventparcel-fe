@@ -203,11 +203,7 @@ const Page: React.FC = ({  }) => {
         </div>
       </Container>
     );
-  }
-
-  console.log(orders)
-  
-  
+  };
 
   return (
     <Container>

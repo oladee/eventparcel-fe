@@ -223,7 +223,7 @@ import { GuestOrder } from "@/app/(dashboard)/admin/admin-delivery/page";
         </div>
         <div className="flex-1 min-w-[120px] font-semibold text-base text-[#111827]" id={`carrier-info-${order.orderId}`}>
           {order.deliveryType === "pickUp" 
-            ? "PickUp" : order.deliveryType === "homeDelivery" ? "Platform (GIG)" : ""}
+            ? "PickUp" : order.deliveryType === "homeDelivery" ? "GIG" : ""}
         </div>
         <div className="flex-1 min-w-[100px]" id={`status-info-${order.orderId}`}>
           <span

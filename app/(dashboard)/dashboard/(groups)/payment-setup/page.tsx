@@ -11,12 +11,13 @@ import { FormEvent } from "react";
 import { PiCalendarMinus } from "react-icons/pi";
 import { AiOutlineClockCircle } from "react-icons/ai";
 // import HeaderLayout from "@/components/layout/HeaderLayout";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import NairaPayoutForm from "@/components/NairaPayoutForm";
 import DollarPayoutForm from "@/components/DollarPayoutForm";
 import axiosInstance from "@/lib/axiosInstance";
 import Container from "@/components/dashboard/Container";
-
+import Cookies from "js-cookie";
+import EventSaveSuccess from "@/components/aboutEvent/EventSaveSuccess";
 
 const LocationPickerModal = dynamic(
   () => import("@/components/aboutEvent/LocationPickerModal"),
@@ -79,6 +80,9 @@ const PaymentSetupContent = () => {
   const [selectedUSBank, setSelectedUSBank] = useState<USBank | null>(null);
   const [showModal] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
+  const [isSaveLoading, setIsSaveLoading] = useState(false);
+  const [showSuccess2, setShowSuccess2] = useState(false);
+  const pathname = usePathname();
 
   const router = useRouter();
 
@@ -121,6 +125,10 @@ const PaymentSetupContent = () => {
   };
 
   const allSelfManaged = isAllSelfManaged(groups);
+
+  useEffect(() => {
+    Cookies.remove("redirectAfterLogin");
+  }, []);
 
   useEffect(() => {
     const isAllFieldsFilled = Object.values(formData).every((value) => {
@@ -268,6 +276,32 @@ const PaymentSetupContent = () => {
       setLoading(true); 
     }
   };
+
+  const handleSaveForLater = async() => {
+    setIsSaveLoading(true);
+    const authToken = localStorage.getItem("authToken");
+    const storedEventId = localStorage.getItem("eventId");
+
+  
+    if (!authToken) {
+      Cookies.set("redirectAfterLogin", pathname); 
+      setShowSuccess2(true);
+      return;
+    }
+
+    try{
+      await axiosInstance.put(`save-for-later/${storedEventId}`, {
+        isDraft: true
+      });
+      toast.success("Saved! Continue from your dashboard.");
+      router.push("/dashboard");    
+    }catch(error: any) {
+      console.log(error)
+      toast.error(error.response?.data?.message || "Failed to save event");
+    }finally{
+      setIsSaveLoading(false);
+    }
+  };
   
   // Helper function to check if account details are filled
   const isFilled = (obj: { [key: string]: string }) =>
@@ -294,6 +328,7 @@ const PaymentSetupContent = () => {
           onCancel={() => setShowMapPickerModal(false)}
         />
       )}
+      <div>{showSuccess2 && <EventSaveSuccess />}</div>
       <section className="!overflow-hidden relative">
         <div className="mt-4 pb-20 lg:py-24 px-3 sm:px-4 mx-auto max-w-screen-md h-[98vh] overflow-y-auto no-scrollbar">
           <div className="md:mb-12 text-center p-3 sm:p-0 space-y-3 lg:flex lg:justify-center lg:flex-col">
@@ -463,9 +498,13 @@ const PaymentSetupContent = () => {
 
             <div className="bg-[#FFFF] py-4 flex justify-center fixed z-10 left-0 bottom-0 w-full">
               <div className="max-w-3xl flex gap-4 items-center justify-center sm:justify-end w-full px-4">
-                <button className="p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827]">
-                  Save for later
-                </button>
+              <button
+                id="save"
+                className="p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827]"
+                onClick={() => handleSaveForLater()}
+                >
+                  {isSaveLoading ? "saving..." : "Save for later"}
+              </button>
                 <button
                   type="submit"
                   disabled={!isFormValid}

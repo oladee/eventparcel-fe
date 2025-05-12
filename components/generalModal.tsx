@@ -92,7 +92,7 @@ const GeneralModal: React.FC<generalGroupProps> = ({ group, handleDuplicate, han
               id="groupDesc"
               className="font-general font-medium text-sm text-[#718096]"
             >
-              {group.groupDescription}
+              {group.groupDescription.charAt(0).toUpperCase() + group.groupDescription.slice(1)}
             </span>
           </div>
           <div className="flex flex-col gap-3">

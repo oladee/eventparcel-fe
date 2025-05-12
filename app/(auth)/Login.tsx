@@ -10,6 +10,7 @@ import { BiLoaderCircle } from "react-icons/bi";
 import axiosInstance from "@/lib/axiosInstance";
 import SocialSignup from "@/components/auth/SocialSignup";
 import AuthLeft from "@/components/auth/AuthLeft";
+import Cookies from "js-cookie";
 
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -81,8 +82,16 @@ const Login: React.FC = () => {
       
       toast.success(response?.data?.message);
 
-      router.push("/dashboard");
-      // router.push("/event-creation");
+      const redirectPath = Cookies.get("redirectAfterLogin");
+      const formData = localStorage.getItem("unsavedFormData");
+
+      if (redirectPath || formData) {
+        router.push(`${redirectPath}?resumeForm=true`);
+        return;
+      }else {
+        router.push("/dashboard");
+      }
+
     } catch (error: any) {
       if (
         error.response?.data?.message ===

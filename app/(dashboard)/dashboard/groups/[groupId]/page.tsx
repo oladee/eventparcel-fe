@@ -97,7 +97,7 @@ const Page = () => {
         const params: Record<string, any> = { 
           page, 
           limit, 
-          query: debouncedSearchQuery 
+          // query: debouncedSearchQuery 
         };
   
         if (activeTab && activeTab !== "All Orders") {
