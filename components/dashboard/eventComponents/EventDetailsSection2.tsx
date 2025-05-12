@@ -7,7 +7,6 @@ import { MdOutlineCalendarToday } from "react-icons/md";
 import EventOptionsModal from "./EventOptionsModal";
 import { useRouter } from "next-nprogress-bar";
 
-
 interface EventDetailsProps {
   eventData: Array<{
     _id: string;
@@ -17,6 +16,7 @@ interface EventDetailsProps {
     date: string;
     time: string;
     eventLocation: string;
+    isShared?: boolean;
     // ... include any additional fields you want to use
   }>;
 }
@@ -25,6 +25,7 @@ const EventDetailsSection2: React.FC<EventDetailsProps> = ({ eventData }) => {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [selectedEvent, setSelectedEvent] = useState(null);
+  console.log(eventData);
 
   const toggleModal = (event: any) => {
     setSelectedEvent(event);
@@ -75,10 +76,18 @@ const EventDetailsSection2: React.FC<EventDetailsProps> = ({ eventData }) => {
                 quality={100}
                 priority
               />
+
+              {/* Shared tag */}
+              {event?.isShared && (
+                <label className="absolute top-3 left-3 bg-[#F5E6DD] border border-primary text-primary text-sm font-medium px-4 py-1 rounded-[50px] shadow-md">
+                  Shared
+                </label>
+              )}
+
               {/* More Options Button */}
               <button
                 onClick={() => toggleModal(event)}
-                className="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md"
+                className="absolute top-3 right-3 bg-white p-2 rounded-[8px] shadow-md"
               >
                 <FiMoreHorizontal size={20} className="text-gray-600" />
               </button>

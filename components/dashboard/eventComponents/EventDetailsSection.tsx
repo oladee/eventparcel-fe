@@ -14,20 +14,31 @@ interface EventDetailsProps {
     date: string;
     time: string;
     eventLocation: string;
+    isShared?: boolean;
   };
 }
 
 const EventDetailsSection: React.FC<EventDetailsProps> = ({ eventData }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const toggleModal = () => setIsModalOpen((prev) => !prev);
-  const { eventImgUrl, eventName, eventDescription, date, time, eventLocation } = eventData;
+  const {
+    eventImgUrl,
+    eventName,
+    eventDescription,
+    date,
+    time,
+    eventLocation,
+    isShared
+  } = eventData;
 
   return (
     <div className="bg-[#fff4ed] p-4 rounded-2xl">
       {/* Image Section */}
       <div className="relative w-full rounded-xl overflow-hidden">
         <Image
-          src={eventImgUrl? eventImgUrl :  "/images/placeholder_eventCover2.jpg"}
+          src={
+            eventImgUrl ? eventImgUrl : "/images/placeholder_eventCover2.jpg"
+          }
           alt={eventName}
           className="w-full h-48 object-cover rounded-xl"
           width={600}
@@ -35,10 +46,18 @@ const EventDetailsSection: React.FC<EventDetailsProps> = ({ eventData }) => {
           quality={100}
           priority
         />
+
+        {/* Shared tag */}
+        {isShared && (
+          <label className="absolute top-3 left-3 bg-[#F5E6DD] border border-primary text-primary text-sm font-medium px-4 py-1 rounded-[50px] shadow-md">
+            Shared
+          </label>
+        )}
+
         {/* More Options Button */}
         <button
           onClick={toggleModal}
-          className="absolute top-3 right-3 bg-white p-2 rounded-full shadow-md"
+          className="absolute top-3 right-3 bg-white p-2 rounded-[8px] shadow-md"
         >
           <FiMoreHorizontal size={20} className="text-gray-600" />
         </button>
@@ -46,11 +65,12 @@ const EventDetailsSection: React.FC<EventDetailsProps> = ({ eventData }) => {
 
       {/* Details Section */}
       <div className="mt-4">
-        <h2 className="text-xl font-bold text-gray-900 capitalize">{eventName}</h2>
+        <h2 className="text-xl font-bold text-gray-900 capitalize">
+          {eventName}
+        </h2>
         <p className="text-gray-600 text-sm mt-1 w-full max-w-3xl truncate-text">
           {eventDescription}
         </p>
-    
 
         {/* Event Info */}
         <div className="mt-4 border-t pt-3 text-gray-700">
@@ -63,27 +83,18 @@ const EventDetailsSection: React.FC<EventDetailsProps> = ({ eventData }) => {
           <p className="text-sm mt-1 text-gray-500">{eventLocation}</p>
         </div>
       </div>
-      <EventOptionsModal isOpen={isModalOpen} onClose={toggleModal} eventData={eventData} />
+      <EventOptionsModal
+        isOpen={isModalOpen}
+        onClose={toggleModal}
+        eventData={eventData}
+      />
     </div>
   );
 };
 
 export default EventDetailsSection;
 
-
-
-
-
-
-
-
-
-
-
-
-
 // "use client";
-
 
 // import Image from "next/image";
 // import React, { useState } from "react";
