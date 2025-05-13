@@ -66,7 +66,7 @@ const Page = () => {
   return (
     <Container>
       <ToastContainer />
-      <section className="bg-[#F9FAFB] !overflow-hidden relative">
+      <section className="bg-[#F9FAFB] relative">
         <div className="py-20 lg:py-24 px-3 sm:px-4 mx-auto max-w-screen-md h-screen overflow-y-auto no-scrollbar">
           {loading ? (
             <div className="flex justify-center items-center">
