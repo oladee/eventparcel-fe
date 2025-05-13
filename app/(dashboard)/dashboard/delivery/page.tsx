@@ -38,17 +38,17 @@ const Page = () => {
 
 
     useEffect(() => {
-      const loggedInUserString = localStorage.getItem("loggedInUser");
-      const loggedInUser = loggedInUserString ? JSON.parse(loggedInUserString) : null;
+      const loggedInUserString = localStorage.getItem("loggedInUserId");
+      // const loggedInUser = loggedInUserString ? JSON.parse(loggedInUserString) : null;
   
-      if (!loggedInUser?._id) {
+      if (!loggedInUserString) {
         router.replace("/");
         return;
       }
       
       const fetchDeliverySummary = async () => {
         const response = await axiosInstance.get(
-          `/delivery-summary/${loggedInUser._id}`);
+          `/delivery-summary/${loggedInUserString}`);
 
         setStats([         
           { 
@@ -70,10 +70,10 @@ const Page = () => {
 
     useEffect(() => {
       const fetchOrders = async () => {
-        const loggedInUserString = localStorage.getItem("loggedInUser");
-        const loggedInUser = loggedInUserString ? JSON.parse(loggedInUserString) : null;
+        const loggedInUserString = localStorage.getItem("loggedInUserId");
+        // const loggedInUser = loggedInUserString ? JSON.parse(loggedInUserString) : null;
     
-        if (!loggedInUser?._id) {
+        if (!loggedInUserString) {
           router.replace("/");
           return;
         }
@@ -94,7 +94,7 @@ const Page = () => {
   
           const response = await axiosInstance.post(
               `view-orders/`,
-              { hostId: loggedInUser._id },
+              { hostId: loggedInUserString },
               { params }
             );
             

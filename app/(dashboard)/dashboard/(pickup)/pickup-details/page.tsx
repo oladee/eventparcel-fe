@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { MapPin } from "lucide-react";
@@ -17,6 +17,7 @@ import Container from "@/components/dashboard/Container";
 import dynamic from "next/dynamic";
 import axios from "axios";
 
+
 const PickupDeliveryLoationPicker = dynamic(
   () => import("@/components/aboutEvent/PickupDeliveryLoationPicker"),
   { ssr: false }
@@ -31,6 +32,7 @@ const PickupDetails = () => {
   const [isClient, setIsClient] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [isSaveLoading, setIsSaveLoading] = useState(false);
   const [showMapPickerModal, setShowMapPickerModal] = useState(false);
   const [formData, setFormData] = useState({
     nairaAccount: {
@@ -44,6 +46,7 @@ const PickupDetails = () => {
       usBankName: "",
       usAccountName: "",
     },
+    isDraft: false,
     paymentDate: new Date(),
     paymentTime: new Date(),
     paymentTimeZone: "WAT",
@@ -144,6 +147,33 @@ useEffect(() => {
 }, [debouncedAddress, formData.pickupLatitude, formData.pickupLongitude]);
 
 
+
+// update the form data with the corresponding latitude and longitude when user type the address
+useEffect(() => {
+  const address = debouncedAddress?.trim();
+  
+  const isValidAddress = address && address.length >= 5;
+  const hasNoCoordinates = !formData.pickupLatitude && !formData.pickupLongitude;
+
+
+  if (isValidAddress && hasNoCoordinates) {
+    const geocoder = new google.maps.Geocoder();
+    geocoder.geocode({ address }, (results, status) => {
+      if (status === "OK" && results && results[0]) {
+        const location = results[0].geometry.location;
+        setFormData((prev) => ({
+          ...prev,
+          pickupLatitude: location.lat().toString(),
+          pickupLongitude: location.lng().toString()
+        }));
+      } else {
+        console.error("Geocode failed: " + status);
+      }
+    });
+  }
+}, [debouncedAddress, formData.pickupLatitude, formData.pickupLongitude]);
+
+
 // Retrieve formData from query parameters
 useEffect(() => {
   if(!isClient) return;
@@ -206,6 +236,10 @@ useEffect(() => {
     return `${paddedHours}:${paddedMinutes} ${ampm}`;
   };
 
+  
+    const isFilled = (obj: Record<string, any>) =>
+      Object.values(obj).some((val) => val && val.toString().trim() !== "");
+  
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
       if (!isFormValid) return;
@@ -218,10 +252,6 @@ useEffect(() => {
             ([_, v]) => v !== null && v !== undefined && v !== ""
           )
         );
-    
-      const isFilled = (obj: Record<string, any>) =>
-        Object.values(obj).some((val) => val && val.toString().trim() !== "");
-    
       try {
         const { nairaAccount, dollarAccount, ...rest } = formData;
     
@@ -258,7 +288,37 @@ useEffect(() => {
       }
     };
     
+  /**
+   * Handles saving form data for later completion
+   */
+  const handleSaveForLater = async () => {
+    setIsSaveLoading(true);
+
+    const authToken = localStorage.getItem("authToken");
+    if (!authToken) {
+      setIsSaveLoading(false);
+      return;
+    }
   
+    try {
+      const { nairaAccount, dollarAccount, ...rest } = formData;
+      const fullFormData = {
+        ...rest,
+        ...(isFilled(nairaAccount) ? { nairaAccount } : {}),
+        ...(isFilled(dollarAccount) ? { dollarAccount } : {}),
+        paymentTime: formatTime12Hour(formData.paymentTime),
+        isDraft: true
+      };
+  
+      await axiosInstance.post(`/payment-save-for-later`, fullFormData);
+      toast.success("Saved! Continue from your dashboard.");
+      router.push("/dashboard/events");
+    } catch (error: any) {
+      toast.error(error.response?.data?.message || "Failed to save event");
+    } finally {
+      setIsSaveLoading(false);
+    }
+  };
 
   const handleMapLocationSelect = () => {
     setShowMapPickerModal(true);
@@ -416,11 +476,17 @@ useEffect(() => {
               </div>
             </div>
             {/* Save and continue */}
+          
             <div className="bg-[#FFFF] py-4 flex justify-center fixed z-10 left-0 bottom-0 w-full">
               <div className="max-w-3xl flex gap-4 items-center justify-center sm:justify-end w-full px-4">
-                <button className="p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827]">
-                  Save for later
-                </button>
+              <button
+                id="save"
+                type="button"
+                className="p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827]"
+                onClick={() => handleSaveForLater()}
+                >
+                  {isSaveLoading ? "saving..." : "Save for later"}
+              </button>
                 <button
                   type="submit"
                   disabled={!isFormValid}

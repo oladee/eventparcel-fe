@@ -28,27 +28,28 @@ const FormButtons: React.FC<FormButtonsProps> = ({ isFormValid, groups, fromDash
 
   const handleContinue = async () => {
     if (!isFormValid || loading) return;
-
+  
     setLoading(true);
-
-    const authToken = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
+  
+    const groupQuery = encodeURIComponent(JSON.stringify(groups));
   
     try {
-      if (authToken) {
-        const groupQuery = encodeURIComponent(JSON.stringify(groups));
-        if(fromDashboard) {
+      if (fromDashboard) {
+        const authToken = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
+        
+        if (authToken) {
           router.push(`/dashboard/payment-setup?groups=${groupQuery}`);
         } else {
-          router.push(`/payment-setup?groups=${groupQuery}`);
+          router.push("/signup");
         }
-        console.log("loading", loading)
       } else {
-        router.push("/signup")
+        router.push(`/payment-setup?groups=${groupQuery}`);
       }
     } finally {
-      setLoading(true);
+      setLoading(false); 
     }
   };
+  
 
   const handleSaveForLater = async() => {
     setIsSaveLoading(true);

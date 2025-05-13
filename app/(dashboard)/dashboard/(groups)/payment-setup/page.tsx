@@ -16,8 +16,6 @@ import NairaPayoutForm from "@/components/NairaPayoutForm";
 import DollarPayoutForm from "@/components/DollarPayoutForm";
 import axiosInstance from "@/lib/axiosInstance";
 import Container from "@/components/dashboard/Container";
-import Cookies from "js-cookie";
-import EventSaveSuccess from "@/components/aboutEvent/EventSaveSuccess";
 
 const LocationPickerModal = dynamic(
   () => import("@/components/aboutEvent/LocationPickerModal"),
@@ -81,8 +79,6 @@ const PaymentSetupContent = () => {
   const [showModal] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [isSaveLoading, setIsSaveLoading] = useState(false);
-  const [showSuccess2, setShowSuccess2] = useState(false);
-  const pathname = usePathname();
 
   const router = useRouter();
 
@@ -100,7 +96,7 @@ const PaymentSetupContent = () => {
       usBankName: "",
       usAccountName: ""
     },
-
+    isDraft: false,
     paymentDate: new Date(),
     paymentTime: new Date(),
     paymentTimeZone: "WAT"
@@ -125,10 +121,6 @@ const PaymentSetupContent = () => {
   };
 
   const allSelfManaged = isAllSelfManaged(groups);
-
-  useEffect(() => {
-    Cookies.remove("redirectAfterLogin");
-  }, []);
 
   useEffect(() => {
     const isAllFieldsFilled = Object.values(formData).every((value) => {
@@ -277,31 +269,57 @@ const PaymentSetupContent = () => {
     }
   };
 
-  const handleSaveForLater = async() => {
+  const handleSaveForLater = async () => {
     setIsSaveLoading(true);
-    const authToken = localStorage.getItem("authToken");
-    const storedEventId = localStorage.getItem("eventId");
-
   
-    if (!authToken) {
-      Cookies.set("redirectAfterLogin", pathname); 
-      setShowSuccess2(true);
-      return;
-    }
-
-    try{
-      await axiosInstance.put(`save-for-later/${storedEventId}`, {
+    try {
+      const { nairaAccount, dollarAccount, ...rest } = formData;
+  
+      const fullFormData = {
+        ...rest,
+        ...(isFilled(nairaAccount) ? { nairaAccount } : {}),
+        ...(isFilled(dollarAccount) ? { dollarAccount } : {}),
+        paymentTime: formatTime12Hour(formData.paymentTime),
         isDraft: true
-      });
+      };
+  
+      await axiosInstance.put(`/payment-save-for-later`, fullFormData);
       toast.success("Saved! Continue from your dashboard.");
-      router.push("/dashboard");    
-    }catch(error: any) {
-      console.log(error)
+      router.push("/dashboard");
+    } catch (error: any) {
+      console.error("Error saving for later:", error);
       toast.error(error.response?.data?.message || "Failed to save event");
-    }finally{
+    } finally {
       setIsSaveLoading(false);
     }
   };
+  
+
+  // const handleSaveForLater = async() => {
+  //   setIsSaveLoading(true);
+  //   const authToken = localStorage.getItem("authToken");
+  //   const storedEventId = localStorage.getItem("eventId");
+
+  
+  //   if (!authToken) {
+  //     Cookies.set("redirectAfterLogin", pathname); 
+  //     setShowSuccess2(true);
+  //     return;
+  //   }
+
+  //   try{
+  //     await axiosInstance.put(`/payment-save-for-later`, {
+  //       isDraft: true
+  //     });
+  //     toast.success("Saved! Continue from your dashboard.");
+  //     router.push("/dashboard");    
+  //   }catch(error: any) {
+  //     console.log(error)
+  //     toast.error(error.response?.data?.message || "Failed to save event");
+  //   }finally{
+  //     setIsSaveLoading(false);
+  //   }
+  // };
   
   // Helper function to check if account details are filled
   const isFilled = (obj: { [key: string]: string }) =>
@@ -328,7 +346,6 @@ const PaymentSetupContent = () => {
           onCancel={() => setShowMapPickerModal(false)}
         />
       )}
-      <div>{showSuccess2 && <EventSaveSuccess />}</div>
       <section className="!overflow-hidden relative">
         <div className="mt-4 pb-20 lg:py-24 px-3 sm:px-4 mx-auto max-w-screen-md h-[98vh] overflow-y-auto no-scrollbar">
           <div className="md:mb-12 text-center p-3 sm:p-0 space-y-3 lg:flex lg:justify-center lg:flex-col">

@@ -83,19 +83,19 @@ const Page = () => {
   }, [id]);
 
   
-    useEffect(() => {
-      function handleClickOutside(event: MouseEvent) {
-        if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
-          setIsModalOpen(false);
-        }
-      }
-      if(isModalOpen) {
-        document.addEventListener("mousedown", handleClickOutside);
-      }
-      return () => {
-        document.removeEventListener("mousedown", handleClickOutside);
-      }
-    }, [statusModal, isModalOpen]);
+    // useEffect(() => {
+    //   function handleClickOutside(event: MouseEvent) {
+    //     if (modalRef.current && !modalRef.current.contains(event.target as Node)) {
+    //       setIsModalOpen(false);
+    //     }
+    //   }
+    //   if(isModalOpen) {
+    //     document.addEventListener("mousedown", handleClickOutside);
+    //   }
+    //   return () => {
+    //     document.removeEventListener("mousedown", handleClickOutside);
+    //   }
+    // }, [statusModal, isModalOpen]);
   
   
   useEffect(() => {

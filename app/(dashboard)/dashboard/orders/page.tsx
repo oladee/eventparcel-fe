@@ -62,10 +62,10 @@ const Page: React.FC = ({  }) => {
   useEffect(() => {
 
     const fetchOrders = async () => {
-      const loggedInUserString = localStorage.getItem("loggedInUser");
-      const loggedInUser = loggedInUserString ? JSON.parse(loggedInUserString) : null;
+      const loggedInUserString = localStorage.getItem("loggedInUserId");
+      // const loggedInUser = loggedInUserString ? JSON.parse(loggedInUserString) : null;
   
-      if (!loggedInUser?._id) {
+      if (!loggedInUserString) {
         router.replace("/");
         return;
       }
@@ -85,9 +85,11 @@ const Page: React.FC = ({  }) => {
 
         const response = await axiosInstance.post(
           `view-orders/`,
-          { hostId: loggedInUser._id },
+          { hostId: loggedInUserString },
           { params }
         );
+
+        console.log("res", response.data)
 
         const safeParse = (value?: string | number) => {
           const num = Number(value);

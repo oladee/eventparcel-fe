@@ -31,15 +31,15 @@ const Page = () => {
 
   useEffect(() => {
     const loggedInUserEmail = localStorage.getItem("loggedInUserEmail");
-    const loggedInUserString = localStorage.getItem("loggedInUser");
-    const loggedInUser = loggedInUserString ? JSON.parse(loggedInUserString) : null;
+    const loggedInUserString = localStorage.getItem("loggedInUserId");
+    // const loggedInUser = loggedInUserString ? JSON.parse(loggedInUserString) : null;
 
-    if (!loggedInUserEmail || !loggedInUser?._id) {
+    if (!loggedInUserEmail || !loggedInUserString) {
       router.replace("/");
       return;
     }
 
-    setHostId(loggedInUser._id);
+    setHostId(loggedInUserString);
     setIsReady(true);
   }, [router]);
 

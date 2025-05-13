@@ -30,10 +30,10 @@ const Page = () => {
 
 
     useEffect(() => {
-      const loggedInUserString = localStorage.getItem("loggedInUser");
-      const loggedInUser = loggedInUserString ? JSON.parse(loggedInUserString) : null;
+      const loggedInUserString = localStorage.getItem("loggedInUserId");
+      // const loggedInUser = loggedInUserString ? JSON.parse(loggedInUserString) : null;
   
-      if (!loggedInUser?._id) {
+      if (!loggedInUserString) {
         router.replace("/");
         return;
       }
@@ -43,7 +43,7 @@ const Page = () => {
         try {
   
           const response = await axiosInstance.get(
-              `payment-history/${loggedInUser._id}`);
+              `payment-history/${loggedInUserString}`);
 
               const safeCount = (value?: number) => {
                 return typeof value === 'number' && !isNaN(value) ? value : 0;

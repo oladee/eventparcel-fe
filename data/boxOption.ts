@@ -26,7 +26,7 @@ export const boxOptions = [
       icon: box3,
     },
     {
-      value: "extraLlargeBox",
+      value: "extraLargeBox",
       label: "Extra Large Box",
       description:
         "Heavy fabric plus accessories and weighty souvenirs like: Fan, TV, blenders etc",
