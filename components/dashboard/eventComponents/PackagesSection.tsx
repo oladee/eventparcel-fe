@@ -9,6 +9,7 @@ import Image from "next/image";
 import { Group, Package } from "@/app/interface/Group";
 import CreatePackageModal from "@/components/CreatePackageModal";
 import { useRouter } from "next-nprogress-bar";
+import { toast, ToastContainer } from "react-toastify";
 
 interface PackagesSectionProps {
   eventData: {
@@ -57,12 +58,6 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
     router.push(`/dashboard/share-contact?groupId=${groupId}`);
   };
 
-  // const handleViewOneGroup = (group: Group) => {
-  //   const groupData = encodeURIComponent(JSON.stringify(group));
-  //   router.push(`/dashboard/groups/${group._id}?groupData=${groupData}`);
-  // };
-
-  
   const handleViewOneGroup = (group: Group) => {
     router.push(`/dashboard/groups/${group._id}`);
   };
@@ -72,8 +67,13 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
     router.push("/dashboard/create-group");
   };
 
+  const handleDisabledAction = () => {
+    toast.warning("This action is not allowed on a disabled group.");
+  };
+
   return (
     <>
+      <ToastContainer />
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-11">
         {groups.map((group) => (
           <div key={group._id} className="bg-white rounded-2xl p-6">
@@ -101,9 +101,17 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
               onClick={() => handleViewOneGroup(group)}
               className="cursor-pointer"
             >
-              <h2 className="text-xl font-bold text-[#111827] mt-2 capitalize">
-                {group.groupName}
-              </h2>
+              <div className="flex items-center mt-2">
+                <h2 className="text-xl font-bold text-[#111827] capitalize">
+                  {group.groupName}
+                </h2>
+                {group.isDisabled && (
+                  <span className="ml-2 px-3 text-xs font-medium border border-[#DE4222] bg-[#DE42221F] text-[#DE4222] rounded-full">
+                    Disabled
+                  </span>
+                )}
+              </div>
+
               <p className="text-[#718096] text-sm mt-1 truncate-text2">
                 {group.groupDescription}
               </p>
@@ -112,7 +120,7 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
             {/* Packages Section */}
             <div className="flex justify-between items-center mt-6">
               <h3 className="text-lg font-bold text-gray-900">Packages</h3>
-              <button
+              {/* <button
                 onClick={() => {
                   setModalMode("create");
                   setSelectedPackage(null);
@@ -120,6 +128,23 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
                   setGroup1(group);
                 }}
                 className="text-primary flex items-center gap-1 font-medium"
+              >
+                <AiOutlinePlus size={18} /> Add New
+              </button> */}
+              <button
+                onClick={() => {
+                  if (group.isDisabled) {
+                    handleDisabledAction();
+                  } else {
+                    setModalMode("create");
+                    setSelectedPackage(null);
+                    setOpenModalPackage(true);
+                    setGroup1(group);
+                  }
+                }}
+                className={`text-primary flex items-center gap-1 font-medium ${
+                  group.isDisabled ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
                 <AiOutlinePlus size={18} /> Add New
               </button>
@@ -162,12 +187,18 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
                   {!eventData.isShared && (
                     <AiOutlineEdit
                       onClick={() => {
-                        setModalMode("update");
-                        setSelectedPackage(pkg);
-                        setOpenModalPackage(true);
+                        if (group.isDisabled) {
+                          handleDisabledAction();
+                        } else {
+                          setModalMode("update");
+                          setSelectedPackage(pkg);
+                          setOpenModalPackage(true);
+                        }
                       }}
                       size={20}
-                      className="text-[#718096] cursor-pointer"
+                      className={`text-[#718096] cursor-pointer ${
+                        group.isDisabled ? "opacity-50 cursor-not-allowed" : ""
+                      }`}
                     />
                   )}
                 </div>
@@ -177,22 +208,38 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
             {/* Contacts and Invite Section */}
             <div className="mt-6 flex justify-between items-center">
               {/* Pass the dynamic group id when clicking Contacts */}
-              <button
-                onClick={() => handleInvitedContacts(group._id)}
-                className="text-gray-500 text-sm font-medium outline-none"
-              >
-                Contacts
-              </button>
+              {!group.isDisabled && (
+                <button
+                  onClick={() => handleInvitedContacts(group._id)}
+                  className="text-gray-500 text-sm font-medium outline-none"
+                >
+                  Contacts
+                </button>
+              )}
               {/* <button
                 onClick={() => handleInvitedContacts(group._id)}
                 className="text-gray-500 text-sm font-medium outline-none"
               >
                 Contacts: <span className="text-gray-900 font-bold">0</span>
               </button> */}
-              <button
+              {/* <button
                 // onClick={handleSendInviteClick}
                 onClick={() => handleSendInviteClick(group._id)}
                 className="text-primary flex items-center gap-1 font-medium outline-none"
+              >
+                <IoIosSend size={18} /> Send Invite
+              </button> */}
+              <button
+                onClick={() => {
+                  if (group.isDisabled) {
+                    handleDisabledAction();
+                  } else {
+                    handleSendInviteClick(group._id);
+                  }
+                }}
+                className={`text-primary flex items-center gap-1 font-medium outline-none ${
+                  group.isDisabled ? "opacity-50 cursor-not-allowed" : ""
+                }`}
               >
                 <IoIosSend size={18} /> Send Invite
               </button>
@@ -235,22 +282,6 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
 };
 
 export default PackagesSection;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // "use client";
 
