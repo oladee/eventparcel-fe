@@ -5,6 +5,7 @@ import { useRouter } from "next-nprogress-bar";
 import { useEffect, useState } from "react";
 import { toast } from "react-toastify";
 
+
 function Container({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const [isAuthenticated, setIsAuthenticated] = useState(false);
