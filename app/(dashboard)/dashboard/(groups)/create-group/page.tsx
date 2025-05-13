@@ -137,7 +137,7 @@ const NewGroup: React.FC = () => {
     <>
     <ToastContainer />
     <Container>
-      <section className="w-auto h-full">
+      <section className="w-auto h-screen">
         <div className="py-6 lg:py-12">
           {/* Header Section */}
           <div className="mb-6 lg:mb-12 text-start pl-5 lg:text-center">
@@ -173,7 +173,7 @@ const NewGroup: React.FC = () => {
           ) : groups.length === 0 ? (
             <div
             onClick={handleAddGroupClick}
-            className="w-full flex justify-center xl:justify-start xl:pl-[380px]"
+            className="w-full flex justify-center xl:justify-start xl:pl-[380px] h-full"
             >
               <AddGroup mode="noGroup" setIsAddGroupOpen={setIsAddGroupOpen} />
             </div>

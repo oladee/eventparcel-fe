@@ -515,7 +515,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
                         className="w-full h-[100px] p-2 rounded-xl outline-primary bg-[#FAFAFA]" 
                         />
                     {errors.packageDescription && <p className="text-red-500 text-sm mt-1">{errors.packageDescription}</p>}
-                    <div className="flex flex-col md:flex-row items-start md:items-center gap-3">
+                    <div className="flex flex-col items-start md:items-center gap-3">
                     {/* Price Input */}
                     <div className="w-full flex items-center rounded-[10px] px-4 py-2 bg-[#FAFAFA] flex-1 
                         focus-within:outline focus-within:outline-primary focus-within:outline-2">
