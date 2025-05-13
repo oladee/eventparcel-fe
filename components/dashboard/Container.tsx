@@ -42,7 +42,7 @@ function Container({ children }: { children: React.ReactNode }) {
         // Save the user profile in localStorage
         localStorage.setItem("loggedInUser", JSON.stringify(response.data));
         localStorage.setItem("loggedInUserEmail", response.data.email)
-        localStorage.setItem("loggedInUserId", response.data._id)
+        // localStorage.setItem("loggedInUserId", response.data._id)
         console.log("User profile fetched successfully:", response.data);
       } catch (error: any) {
         console.error("Error fetching user profile:", error);

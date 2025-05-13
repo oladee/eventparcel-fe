@@ -4,9 +4,9 @@ import React, { useEffect, useState, useCallback, useRef } from "react";
 import ReactDOM from "react-dom";
 import axiosInstance from "@/lib/axiosInstance";
 import { toast } from "react-toastify";
-import { useRouter } from "next/navigation";
 import { motion, AnimatePresence } from "framer-motion";
 import FocusLock from "react-focus-lock";
+import { useRouter } from "next-nprogress-bar";
 
 interface CohostActionsModalProps {
   isOpen: boolean;
