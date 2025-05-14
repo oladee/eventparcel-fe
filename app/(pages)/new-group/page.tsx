@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
+// import Image from "next/image";
 import RightBar from "@/components/Rightbar";
 import CreateGroupCaller from "@/components/AddNew";
 import GeneralModal from "@/components/generalModal";
@@ -70,30 +70,34 @@ const NewGroup: React.FC = () => {
     setIsAddGroupOpen(true);
   };
 
-  
   const handleDuplicate = async (groupId: string) => {
-    setLoadingGroup(true)
+    setLoadingGroup(true);
     try {
       const response = await axiosInstance.get(`/clone-group/${groupId}`);
-  
+
       if (!response) throw new Error("Failed to duplicate group");
-  
+
       await response.data.data;
       // setGroups((prevGroups) => [...prevGroups, data]);
-      window.location.reload()
+      window.location.reload();
     } catch (error: any) {
       toast.error("Error duplicating group");
-      console.error(error.response?.data?.message || error.message || "An unknown error occurred.");
+      console.error(
+        error.response?.data?.message ||
+          error.message ||
+          "An unknown error occurred."
+      );
     } finally {
-      setLoadingGroup(false)
+      setLoadingGroup(false);
     }
   };
 
   const handleDeleteGroup = async (groupId: string) => {
-
     try {
       await axiosInstance.delete(`/delete-group/${groupId}`);
-      setGroups((prevGroups) => prevGroups.filter((group) => group._id !== groupId));
+      setGroups((prevGroups) =>
+        prevGroups.filter((group) => group._id !== groupId)
+      );
 
       toast.success(`Group deleted successfully `, {
         position: "top-right",
@@ -129,9 +133,6 @@ const NewGroup: React.FC = () => {
     }
   };
 
- 
-
- 
   return (
     <HeaderLayout>
       <section className="w-auto border border-gray-300 bg-[#EEEFF2] mt-14 h-full">
@@ -147,8 +148,14 @@ const NewGroup: React.FC = () => {
             <div className="w-[313px] lg:w-full flex items-center justify-center gap-2 text-sm sm:text-base text-gray-600">
               <span id="desc">
                 Create groups and packages for different types of guests
+                <span
+                  onClick={() => setIsRightBarOpen(true)}
+                  className="px-2 text-sm cursor-pointer ml-2 rounded-[200px] bg-[#ECB795] text-white"
+                >
+                  !
+                </span>
               </span>
-              <Image
+              {/* <Image
                 onClick={() => setIsRightBarOpen(true)}
                 src="/images/information.png"
                 width={20}
@@ -156,18 +163,19 @@ const NewGroup: React.FC = () => {
                 alt="information"
                 className="cursor-pointer absolute right-2 lg:right-[500px]"
                 id="infoButton"
-                />
+                /> */}
             </div>
           </div>
 
           {loading ? (
-           <div className="h-screen flex flex-col items-center justify-center">
-           <div className="flex flex-col items-center">
-             <div className="w-12 h-12 border-4 border-[#751423] border-t-transparent rounded-full animate-spin"></div>
-             <p className="text-xl font-semibold text-[#751423] mt-4">Loading groups...</p>
-           </div>
-         </div>
-         
+            <div className="h-screen flex flex-col items-center justify-center">
+              <div className="flex flex-col items-center">
+                <div className="w-12 h-12 border-4 border-[#751423] border-t-transparent rounded-full animate-spin"></div>
+                <p className="text-xl font-semibold text-[#751423] mt-4">
+                  Loading groups...
+                </p>
+              </div>
+            </div>
           ) : groups.length === 0 ? (
             <div
               onClick={handleAddGroupClick}
@@ -179,8 +187,14 @@ const NewGroup: React.FC = () => {
             // Render content when it's just a single group
             <div className="flex flex-col md:flex-row gap-7 justify-center px-8">
               {groups.map((group) => (
-                  <GeneralModal key={group._id} group={group} handleDuplicate={handleDuplicate}  handleDeleteGroup={handleDeleteGroup} loadingGroup={loadingGroup} />
-                ))}
+                <GeneralModal
+                  key={group._id}
+                  group={group}
+                  handleDuplicate={handleDuplicate}
+                  handleDeleteGroup={handleDeleteGroup}
+                  loadingGroup={loadingGroup}
+                />
+              ))}
 
               {isAddSingleGroupOpen && (
                 <AddGroup
@@ -197,12 +211,17 @@ const NewGroup: React.FC = () => {
               </div>
             </div>
           ) : (
-            
             // Render content for when there are multiple groups
             <div className="flex flex-col sm:flex-row lg:justify-center">
               <div className=" flex flex-wrap w-full max-w-3xl space-x-2 space-y-4 pl-6 md:pl-2 xl:pl-24 -mr-6">
                 {groups.map((group) => (
-                  <GeneralModal key={group._id} group={group} handleDuplicate={handleDuplicate}  handleDeleteGroup={handleDeleteGroup} loadingGroup={loadingGroup}  />
+                  <GeneralModal
+                    key={group._id}
+                    group={group}
+                    handleDuplicate={handleDuplicate}
+                    handleDeleteGroup={handleDeleteGroup}
+                    loadingGroup={loadingGroup}
+                  />
                 ))}
 
                 {isAddSingleGroupOpen && (
@@ -228,7 +247,11 @@ const NewGroup: React.FC = () => {
           {/* Right Bar */}
           <RightBar isOpen={isRightBarOpen} setIsOpen={setIsRightBarOpen} />
         </div>
-        <FormButtons fromDashboard={false} isFormValid={!!isFormValid} groups={groups}/>
+        <FormButtons
+          fromDashboard={false}
+          isFormValid={!!isFormValid}
+          groups={groups}
+        />
       </section>
     </HeaderLayout>
   );
