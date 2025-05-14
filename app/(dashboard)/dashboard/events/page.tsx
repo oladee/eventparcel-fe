@@ -9,6 +9,7 @@ import { motion } from "framer-motion";
 import EventDetailsSection2 from "@/components/dashboard/eventComponents/EventDetailsSection2";
 import { TbCalendarCheck } from "react-icons/tb";
 
+
 const Page: React.FC = () => {
   const [eventData, setEventData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
