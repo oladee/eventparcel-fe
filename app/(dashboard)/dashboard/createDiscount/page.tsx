@@ -33,22 +33,30 @@ const Page = () => {
   const symbolDropdownRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    const loggedInUserEmail = localStorage.getItem("loggedInUserEmail");
+    const authToken = localStorage.getItem("authToken");
     const loggedInUserString = localStorage.getItem("loggedInUser");
     const loggedInUser = loggedInUserString ? JSON.parse(loggedInUserString) : null;
 
     setHostId(loggedInUser?._id);
 
-    if (!loggedInUserEmail) {
+    if (!authToken) {
       router.replace("/");
       return;
     }
 
     const fetchEventData = async () => {
+      const authToken = localStorage.getItem("authToken");
+      if (!authToken) {
+        router.replace("/");
+        return;
+      }
+    
       try {
         setFetchingEvents(true);
-        const response = await axiosInstance.post("/view-events", {
-          email: loggedInUserEmail
+        const response = await axiosInstance.get("/view-events", {
+          headers: {
+            Authorization: `Bearer ${authToken}`
+          }
         });
         if (response.data.success) {
           setEventData(response.data.data || []);
