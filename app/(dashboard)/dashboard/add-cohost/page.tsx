@@ -44,9 +44,7 @@ const Page = () => {
 
       const fetchEventData = async () => {
         try {
-          const response = await axiosInstance.post("/view-events", {
-            email: loggedInUserEmail,
-          });
+          const response = await axiosInstance.get("/view-events");
           if (response.data.success) {
             setEventData(response.data.data);
             localStorage.setItem(

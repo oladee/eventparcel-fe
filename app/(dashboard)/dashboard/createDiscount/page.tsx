@@ -53,11 +53,15 @@ const Page = () => {
     
       try {
         setFetchingEvents(true);
+<<<<<<< HEAD
         const response = await axiosInstance.get("/view-events", {
           headers: {
             Authorization: `Bearer ${authToken}`
           }
         });
+=======
+        const response = await axiosInstance.get("/view-events");
+>>>>>>> 9cf3ddcddc6eee5774eda04e16104025239cafa1
         if (response.data.success) {
           setEventData(response.data.data || []);
         }
