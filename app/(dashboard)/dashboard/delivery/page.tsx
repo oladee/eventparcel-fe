@@ -169,8 +169,8 @@ const Page = () => {
         // toast.error("Failed to update status. Please try again.");
       }
   
-    } catch (error) {
-      // toast.error("An error occurred. Please try again.");
+    } catch (error:any) {
+      toast.error(error?.response?.data?.message);
     } finally {
       setIsModalOpen(false);
     }
