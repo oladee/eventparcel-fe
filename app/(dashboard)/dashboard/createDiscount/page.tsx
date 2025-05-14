@@ -47,9 +47,7 @@ const Page = () => {
     const fetchEventData = async () => {
       try {
         setFetchingEvents(true);
-        const response = await axiosInstance.post("/view-events", {
-          email: loggedInUserEmail
-        });
+        const response = await axiosInstance.get("/view-events");
         if (response.data.success) {
           setEventData(response.data.data || []);
         }

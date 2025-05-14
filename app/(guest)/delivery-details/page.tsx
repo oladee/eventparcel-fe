@@ -240,9 +240,9 @@ function DeliveryDetailsForm() {
       }).toString();
 
       router.push(`/guest-payment-details?${query}`);
-    } catch (err) {
+    } catch (err:any) {
       console.error("Submission error:", err);
-      toast.error("Submission error");
+      toast.error(err.response?.data?.message);
     } finally {
       setIsSubmitting(false);
     }
