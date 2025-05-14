@@ -305,15 +305,26 @@ function DeliveryDetailsForm() {
       <HeaderLayout>
         {showMapPickerModal && (
           <PickupDeliveryLoationPicker
-            onLocationSelect={(location) => {
-              setFormData({
-                ...formData,
-                shippingAddress: location.address,
-                addressLatitude: location?.lat?.toString(),
-                addressLongitude: location?.lng?.toString()
-              });
-              setShowMapPickerModal(false);
-            }}
+          onLocationSelect={(location) => {
+            setFormData((prev) => ({
+              ...prev,
+              shippingAddress: location.address,
+              addressLatitude: location?.lat?.toString(),
+              addressLongitude: location?.lng?.toString(),
+            }));
+          
+            // Clear the address error if present
+            setErrors((prev) => {
+              const updated = { ...prev };
+              if (updated.shippingAddress) {
+                delete updated.shippingAddress;
+              }
+              return updated;
+            });
+          
+            setShowMapPickerModal(false);
+          }}
+          
             onCancel={() => setShowMapPickerModal(false)}
           />
         )}
