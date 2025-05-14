@@ -92,7 +92,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
           <AccessError
             title="We couldn't access your contact"
             subtitle="You need to grant us access to your google contacts to import from contacts"
-            route="https://contacts.google.com/"
+            route="https://api-eventparcel.onrender.com/auth/google/contacts"
             buttonText="Grant Access Contact"
           />
         )}
@@ -119,15 +119,31 @@ export default ContactModal;
 
 
 
-// "use client";
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+// "use client";
 
 // import React from "react";
 // import { FiX } from "react-icons/fi";
 // import ContactSelection from "@/components/shareContact/ContactSelection";
 // import AccessError from "@/components/modals/AccessError";
 
-// // Types (you can also import this type from a shared types file if preferred)
 // export type Contact = {
 //   name: string[];
 //   email?: string[];
@@ -214,7 +230,7 @@ export default ContactModal;
 //         ) : (
 //           <AccessError
 //             title="We couldn't access your contact"
-//             subtitle="You need to grant us access to your google contact to import from contact"
+//             subtitle="You need to grant us access to your google contacts to import from contacts"
 //             route="https://contacts.google.com/"
 //             buttonText="Grant Access Contact"
 //           />
