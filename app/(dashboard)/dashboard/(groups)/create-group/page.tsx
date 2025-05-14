@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Image from "next/image";
+// import Image from "next/image";
 import RightBar from "@/components/Rightbar";
 import CreateGroupCaller from "@/components/AddNew";
 import GeneralModal from "@/components/generalModal";
@@ -150,8 +150,14 @@ const NewGroup: React.FC = () => {
             <div className="w-[313px] lg:w-full flex items-center justify-center gap-2 text-sm sm:text-base text-gray-600">
               <span id="desc">
                 Create groups and packages for different types of guests
+                <span
+              onClick={() => setIsRightBarOpen(true)}
+              className="px-2 text-sm cursor-pointer ml-2 rounded-[200px] bg-[#ECB795] text-white"
+            >
+              !
+            </span> 
               </span>
-              <Image
+              {/* <Image
                 onClick={() => setIsRightBarOpen(true)}
                 src="/images/information.png"
                 width={20}
@@ -159,7 +165,7 @@ const NewGroup: React.FC = () => {
                 alt="information"
                 className="cursor-pointer absolute right-2 lg:right-96"
                 id="infoButton"
-                />
+                /> */}
             </div>
           </div>
 

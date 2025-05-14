@@ -49,10 +49,11 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
 
   // Share group link function
   const handleShareGroupLink = async () => {
-    if (!group) return;
-    // Use group.link if it exists, otherwise create a default link.
-    const shareUrl =
-      group.link || `https://yourwebsite.com/groups/${group._id}`;
+    if (!group || !group.link){
+      alert("No link available to share.");
+      return;
+    }    
+    const shareUrl = group.link;
 
     if (navigator.share) {
       try {
@@ -108,17 +109,21 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
       setLoading(true);
       setLoadingMessage(isCurrentlyDisabled ? "Enabling..." : "Disabling..."); // Set appropriate loading message
 
-      const response = await axiosInstance.put(
+       await axiosInstance.put(
         `/disable-enable-group/${group._id}`,
         {
           isDisabled: !isCurrentlyDisabled // Toggle the isDisabled state
         }
       );
-
-      console.log("Group disabled/enabled successfully");
-      toast.success(response.data.message);
+      // toast.success(response.data.message || "Group status updated successfully");
+      toast.success(
+        `Group ${isCurrentlyDisabled ? "enabled" : "disabled"} successfully`
+      );
+      setTimeout(() => {
       window.dispatchEvent(new Event("refreshEvents"));
-      onClose();
+        onClose();
+      }, 2000);
+
     } catch (error: any) {
       console.error("Error disabling/enabling group:", error);
       if (
@@ -188,7 +193,7 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
               </div>
               <PiCaretRightBold />
             </div> */}
-            {!eventData.isShared && (
+            {!eventData.isShared && !group?.isDisabled && (
               <div
                 className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
                 onClick={() => setIsAddGroupOpen(true)}
@@ -203,7 +208,9 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
               </div>
             )}
 
-            <div
+
+            {
+              !group?.isDisabled &&     <div
               className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
               onClick={handleShareGroupLink}
             >
@@ -215,6 +222,9 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
               </div>
               <PiCaretRightBold />
             </div>
+            }
+
+        
             <div
               className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
               onClick={handleDisableGroup}

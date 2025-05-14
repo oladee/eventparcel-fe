@@ -226,9 +226,11 @@ const Page = () => {
                             <MapPin id="shipping-icon" className='text-[#A0AEC0] h-[24px] w-[24px]' />
                             <p id="shipping-text" className='text-[#718096] font-general font-medium text-[14px]'>
                             {orders.shippingAddress
-                                .split(" ")
-                                .map((word: any) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-                                .join(" ")}
+                                ? orders.shippingAddress
+                                    .split(" ")
+                                    .map((word: any) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                                    .join(" ")
+                                : "Not Applicable For PickUp"}
                             </p>
                         </div>
                     </div>
