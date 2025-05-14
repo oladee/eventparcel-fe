@@ -153,7 +153,11 @@ const Page = () => {
         <div className="w-[343px] h-[82.62px] flex flex-col gap-2">
           <h2 className="font-general text-2xl font-bold text-[#111827]">Discounts</h2>
           <p className="text-sm font-medium text-[#718096] w-[343px] h-[44px]">
-            Treat your guests to something special! Set a custom discount by value or percentage
+            {discountData.length === 0 ? (
+              " Treat your guests to something special! Set a custom discount by value or percentage"
+            ) : (
+              "Create a special discount for some of your guest, can be in percent or actual value"
+            )}
           </p>
         </div>
         <div className="w-full grid gap-6 sm:grid-cols-2 md:grid-cols-3">
