@@ -1,5 +1,4 @@
-"use client"
-
+"use client";
 
 import React, { useState, useEffect, useCallback, Suspense } from "react";
 import { CSV, Doc, Done } from "@/components/icons/Icons";
@@ -8,6 +7,7 @@ import ContactModal from "@/components/shareContact/ContactModal";
 import SendContactModal from "@/components/shareContact/SendContactModal";
 import Container from "@/components/dashboard/Container";
 import { useSearchParams } from "next/navigation";
+import axiosInstance from "@/lib/axiosInstance"; // Importing axiosInstance
 
 // API contact type
 interface APICONTACT {
@@ -26,13 +26,22 @@ type OptionCardProps = {
   description: React.ReactNode;
 };
 
-const OptionCard: React.FC<OptionCardProps> = ({ option, selectedOption, onSelect, Icon, title, description }) => (
+const OptionCard: React.FC<OptionCardProps> = ({
+  option,
+  selectedOption,
+  onSelect,
+  Icon,
+  title,
+  description,
+}) => (
   <div
     role="button"
     tabIndex={0}
     onClick={() => onSelect(option)}
     onKeyPress={(e) => e.key === "Enter" && onSelect(option)}
-    className={`relative flex items-center p-4 bg-white rounded-[10px] gap-4 border cursor-pointer transition ${selectedOption === option ? "border-primary" : "border-[#1118271F]"}`}
+    className={`relative flex items-center p-4 bg-white rounded-[10px] gap-4 border cursor-pointer transition ${
+      selectedOption === option ? "border-primary" : "border-[#1118271F]"
+    }`}
   >
     <div className="hidden sm:block">
       <Icon width={60} height={60} />
@@ -71,9 +80,10 @@ const ShareContact: React.FC = () => {
   useEffect(() => {
     if (popUpParam === "true") {
       setPopupLoading(true);
-      fetch("https://api-eventparcel.onrender.com/auth/fetch-contacts")
-        .then((res) => res.json())
-        .then((data) => {
+      axiosInstance
+        .get("/auth/fetch-contacts") // Using axiosInstance
+        .then((response) => {
+          const data = response.data;
           if (data.success && Array.isArray(data.data)) {
             setPopupContacts(data.data);
           } else {
@@ -136,7 +146,9 @@ const ShareContact: React.FC = () => {
           <button
             onClick={handleContinue}
             disabled={!selectedOption}
-            className={`bg-primary text-white py-3 px-8 rounded-[12px] transition flex items-center justify-center font-extrabold ${!selectedOption ? "opacity-50 cursor-not-allowed" : "hover:bg-red-800"}`}
+            className={`bg-primary text-white py-3 px-8 rounded-[12px] transition flex items-center justify-center font-extrabold ${
+              !selectedOption ? "opacity-50 cursor-not-allowed" : "hover:bg-red-800"
+            }`}
           >
             Continue
           </button>
@@ -161,7 +173,7 @@ const ShareContact: React.FC = () => {
         tabFilteredContacts={[]}
         selectedContacts={[]}
         handleContactSelect={() => {}}
-        handleImportContacts={() => {} }
+        handleImportContacts={() => {}}
         isImportingContacts={false}
       />
 
@@ -170,7 +182,10 @@ const ShareContact: React.FC = () => {
         isOpen={popupModalOpen}
         onClose={() => setPopupModalOpen(false)}
         eventGroupId={groupId}
-        contacts={popupContacts.map((c) => ({ guestName: c.name, phoneNumber: c.phoneNumber }))}
+        contacts={popupContacts.map((c) => ({
+          guestName: c.name,
+          phoneNumber: c.phoneNumber,
+        }))}
         phoneNumbers={popupContacts.map((c) => c.phoneNumber)}
       />
     </Container>
@@ -184,7 +199,6 @@ export default function Page() {
     </Suspense>
   );
 }
-
 
 
 
