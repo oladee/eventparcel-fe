@@ -9,82 +9,95 @@ import RightBar from "@/components/Rightbar";
 import HeaderLayout from "@/components/layout/HeaderLayout";
 import { useRouter } from "next/navigation";
 
-
-interface EventDetailsProps {
-  eventData: Array<{
-    _id: string;
-    eventImgUrl: string;
-    eventName: string;
-    eventDescription: string;
-    date: string;
-    time: string;
-    eventLocation: string;
-  }>;
-}
-
+// interface EventDetailsProps {
+//   eventData: Array<{
+//     _id: string;
+//     eventImgUrl: string;
+//     eventName: string;
+//     eventDescription: string;
+//     date: string;
+//     time: string;
+//     eventLocation: string;
+//   }>;
+// }
 
 const Page = () => {
   const [isRightBarOpen, setIsRightBarOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [eventData, setEventData] = useState<EventDetailsProps["eventData"]>([]);
-  const [selectedEventId, setSelectedEventId] = useState<string>(""); // Store selected event ID
-  const [error, setError] = useState<string | null>(null);
+  // const [eventData, setEventData] = useState<EventDetailsProps["eventData"]>(
+  //   []
+  // );
+  // const [selectedEventId, setSelectedEventId] = useState<string>(""); // Store selected event ID
+  // const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-        console.log(error);
-  
+  // console.log(error);
+
+  const [selectedEventId, setSelectedEventId] = useState<string>("");
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const loggedInUserEmail = localStorage.getItem("loggedInUserEmail");
-      if (!loggedInUserEmail) {
-        router.replace("/");
-        return;
+      const storedEventId = localStorage.getItem("eventId");
+      if (storedEventId) {
+        setSelectedEventId(storedEventId);
+      } else {
+        router.replace("/event-creation");
       }
-
-      const fetchEventData = async () => {
-        try {
-          const response = await axiosInstance.post("/view-events", {
-            email: loggedInUserEmail,
-          });
-          if (response.data.success) {
-            setEventData(response.data.data);
-            localStorage.setItem(
-              "eventData",
-              JSON.stringify(response.data.data)
-            );
-          } else {
-            setError("Failed to fetch event data.");
-          }
-        } catch (error: any) {
-          console.error("Error fetching event:", error);
-          setError(error.response?.data?.message);
-        } finally {
-          setLoading(false);
-        }
-      };
-
-      fetchEventData();
-
-      window.addEventListener("refreshEvents", fetchEventData);
-
-      return () => {
-        window.removeEventListener("refreshEvents", fetchEventData);
-      };
     }
   }, [router]);
+
+  // useEffect(() => {
+  //   if (typeof window !== "undefined") {
+  //     const loggedInUserEmail = localStorage.getItem("loggedInUserEmail");
+  //     const storedEventId = localStorage.getItem("eventId");
+  //     if (!loggedInUserEmail && !storedEventId) {
+  //       router.replace("/");
+  //       return;
+  //     }
+
+  //     const fetchEventData = async () => {
+  //       try {
+  //         const response = await axiosInstance.post("/view-events", {
+  //           email: loggedInUserEmail,
+  //         });
+  //         if (response.data.success) {
+  //           setEventData(response.data.data);
+  //           localStorage.setItem(
+  //             "eventData",
+  //             JSON.stringify(response.data.data)
+  //           );
+  //         } else {
+  //           setError("Failed to fetch event data.");
+  //         }
+  //       } catch (error: any) {
+  //         console.error("Error fetching event:", error);
+  //         setError(error.response?.data?.message);
+  //       } finally {
+  //         setLoading(false);
+  //       }
+  //     };
+
+  //     fetchEventData();
+
+  //     window.addEventListener("refreshEvents", fetchEventData);
+
+  //     return () => {
+  //       window.removeEventListener("refreshEvents", fetchEventData);
+  //     };
+  //   }
+  // }, [router]);
 
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
-    email: "",
+    email: ""
   });
 
   const [errors, setErrors] = useState({
     firstName: "",
     lastName: "",
-    email: "",
-    event: "", // Add validation for event selection
+    email: ""
+    // event: "", // Add validation for event selection
   });
 
   const [isFormValid, setIsFormValid] = useState(false);
@@ -94,8 +107,9 @@ const Page = () => {
       (value) => value.trim() !== ""
     );
     const noErrors = Object.values(errors).every((error) => error === "");
-    const eventSelected = selectedEventId.trim() !== ""; // Ensure an event is selected
-    setIsFormValid(allFilled && noErrors && eventSelected);
+    // const eventSelected = selectedEventId.trim() !== ""; // Ensure an event is selected
+    // setIsFormValid(allFilled && noErrors && eventSelected);
+    setIsFormValid(allFilled && noErrors);
   }, [formData, errors, selectedEventId]);
 
   const validateField = (field: string, value: string): string => {
@@ -127,14 +141,14 @@ const Page = () => {
     setErrors((prev) => ({ ...prev, [id]: validateField(id, value) }));
   };
 
-  const handleEventChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
-    const value = e.target.value;
-    setSelectedEventId(value);
-    setErrors((prev) => ({
-      ...prev,
-      event: value ? "" : "Please select an event",
-    }));
-  };
+  // const handleEventChange = (e: React.ChangeEvent<HTMLSelectElement>) => {
+  //   const value = e.target.value;
+  //   setSelectedEventId(value);
+  //   setErrors((prev) => ({
+  //     ...prev,
+  //     event: value ? "" : "Please select an event"
+  //   }));
+  // };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -148,10 +162,10 @@ const Page = () => {
           firstName: formData.firstName.trim(),
           lastName: formData.lastName.trim(),
           email: formData.email.trim(),
-          eventId: selectedEventId, // Send eventId to the backend
+          eventId: selectedEventId // Send eventId to the backend
         },
         {
-          withCredentials: true,
+          withCredentials: true
         }
       );
       console.log("Response:", response.data);
@@ -277,7 +291,7 @@ const Page = () => {
                   <p className="text-red-500 text-sm mt-1">{errors.email}</p>
                 )}
               </div>
-              <div className="flex flex-col mt-3">
+              {/* <div className="flex flex-col mt-3">
                 <label
                   id="eventSelection"
                   htmlFor="eventSelection"
@@ -301,7 +315,7 @@ const Page = () => {
                 {errors.event && (
                   <p className="text-red-500 text-sm mt-1">{errors.event}</p>
                 )}
-              </div>
+              </div> */}
               <button
                 type="submit"
                 disabled={!isFormValid}
@@ -321,35 +335,28 @@ const Page = () => {
           <RightBar isOpen={isRightBarOpen} setIsOpen={setIsRightBarOpen} />
         </div>
       </section>
-      {showModal && (
+      {/* {showModal && (
         <ReusuableSuccess
           title="Co-host Invited"
           subtitle="An invite has been sent to David via email to join you as a co-host for your event"
           route="/view-cohost"
           buttonText="Ok, thank you"
         />
-      )}
+      )} */}
+      {showModal && (
+  <ReusuableSuccess
+    title="Co-host Invited"
+    subtitle={`An invite has been sent to ${formData.firstName} ${formData.lastName} via email to join you as a co-host for your event`}
+    route="/view-cohost"
+    buttonText="Ok, thank you"
+  />
+)}
+
     </HeaderLayout>
   );
 };
 
 export default Page;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // "use client";
 // import React, { useState, useEffect, FormEvent } from "react";
@@ -361,7 +368,6 @@ export default Page;
 // import RightBar from "@/components/Rightbar";
 // import HeaderLayout from "@/components/layout/HeaderLayout";
 // import { useRouter } from "next/navigation";
-
 
 // interface EventDetailsProps {
 //   eventData: Array<{
@@ -382,7 +388,7 @@ export default Page;
 //   const [eventData, setEventData] = useState<EventDetailsProps["eventData"]>([]);
 //     const [error, setError] = useState<string | null>(null);
 //     const router = useRouter();
-  
+
 //     useEffect(() => {
 //       if (typeof window !== "undefined") {
 //         const loggedInUserEmail = localStorage.getItem("loggedInUserEmail");
@@ -391,7 +397,7 @@ export default Page;
 //           router.replace("/");
 //           return;
 //         }
-  
+
 //         const fetchEventData = async () => {
 //           try {
 //             const response = await axiosInstance.post("/view-events", {
@@ -413,11 +419,11 @@ export default Page;
 //             setLoading(false);
 //           }
 //         };
-  
+
 //         fetchEventData();
-  
+
 //         window.addEventListener("refreshEvents", fetchEventData);
-  
+
 //         return () => {
 //           window.removeEventListener("refreshEvents", fetchEventData);
 //         };
@@ -559,7 +565,7 @@ export default Page;
 //                 >
 //                   Co-host Details
 //                 </h2>
-//                 <p id="coHostDes" className="text-[#718096] mb-4">Enter the name and email address of your 
+//                 <p id="coHostDes" className="text-[#718096] mb-4">Enter the name and email address of your
 //                 co-host</p>
 //               </div>
 //               <label
