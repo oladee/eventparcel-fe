@@ -459,39 +459,47 @@ const Orders: React.FC = ({  }) => {
                       </div>
                     </div>
 
-                {isModalOpen && (
-                  <div id="status-modal" className="fixed inset-0 flex items-center justify-center">
-                  <div 
-                      id="status-modal-content"
-                      ref={modalRef} 
-                      className="bg-white p-4 rounded-[15px] shadow-md w-64"
-                    >
-                      <ul id="status-options" className="mt-1 space-y-2">
-                        <li 
-                          id="status-option-pending"
-                          onClick={() => handleStatusChange("pending")}
-                          className="p-2 hover:bg-gray-100 rounded-md cursor-pointer font-general font-medium text-xl text-gray-700"
+                    {isModalOpen && selectedOrder && (
+                      <div id="status-modal" className="fixed inset-0 flex items-center justify-center z-50">
+                        <div
+                          id="status-modal-content"
+                          ref={modalRef}
+                          className="bg-white p-4 rounded-[15px] shadow-md w-64"
                         >
-                          Pending
-                        </li>
-                        <li 
-                          id="status-option-shipped"
-                          onClick={() => handleStatusChange("shipped")}
-                          className="p-2 hover:bg-gray-100 rounded-md cursor-pointer font-general font-medium text-xl text-gray-700"
-                          >
-                          Shipped
-                        </li>
-                        <li 
-                          id="status-option-delivered"
-                          onClick={() => handleStatusChange("delivered")}
-                          className="p-2 hover:bg-gray-100 rounded-md cursor-pointer font-general font-medium text-xl text-gray-700"
-                          >
-                          Delivered
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                )}
+                          <ul id="status-options" className="mt-1 space-y-2">
+                            {(() => {
+                              const allStatuses = [
+                                { key: "pending", label: "Pending" },
+                                { key: "shipped", label: "Shipped" },
+                                { key: "delivered", label: "Delivered" },
+                                { key: "pickedUp", label: "Picked Up" },
+                              ];
+
+                              const deliveryType = 
+                              typeof selectedOrder.deliveryType === 'string' 
+                                ? selectedOrder.deliveryType.toLowerCase() 
+                                : '';
+                            
+                              const filteredStatuses =
+                                deliveryType === "pickup"
+                                  ? allStatuses.filter(s => ["pending", "pickedUp"].includes(s.key))
+                                  : allStatuses.filter(s => s.key !== "pickedUp");
+
+                              return filteredStatuses.map(status => (
+                                <li
+                                  key={status.key}
+                                  id={`status-option-${status.key}`}
+                                  onClick={() => handleStatusChange(status.key)}
+                                  className="p-2 hover:bg-[#F9FAFB] rounded-md cursor-pointer font-general font-medium text-base text-[#111827]"
+                                >
+                                  {status.label}
+                                </li>
+                              ));
+                            })()}
+                          </ul>
+                        </div>
+                      </div>
+                    )}
                   </React.Fragment>
                 ))
               ) : (

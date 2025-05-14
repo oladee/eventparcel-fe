@@ -11,7 +11,7 @@ import { useRouter } from 'next/navigation';
 import useDebounce from '@/hooks/useDebounce';
 import axiosInstance from '@/lib/axiosInstance';
 import useUpdateOrderStatus from '@/hooks/useUpdateOrderStatus';
-import { toast } from 'react-toastify';
+import { toast, ToastContainer } from 'react-toastify';
 import OrderPagination from '@/components/OrderPagination';
 import { cn } from '@/utils/cn';
 import { motion } from 'framer-motion';
@@ -137,38 +137,44 @@ const Page = () => {
     
     const { updateOrderStatus } = useUpdateOrderStatus();
   
-    const handleStatusChange = async (status: string) => {
-      try {
-        if (!selectedOrder?.orderId) {
-          toast.error("Invalid order. Please try again.");
-          return;
-        }
-    
-        await updateOrderStatus(
-          selectedOrder?._id,
-          selectedOrder.paymentStatus ?? "Unknown",
-          status
-        );
-    
+ const handleStatusChange = async (status: string) => {
+    try {
+      if (!selectedOrder?.orderId) {
+        toast.error("Invalid order. Please try again.");
+        return;
+      }
+  
+      const response = await updateOrderStatus(
+        selectedOrder._id,
+        selectedOrder.paymentStatus ?? "Unknown",
+        status
+      );
+  
+      // Only update UI if status update is successful
+      if (response?.success) {
         setOrders((prevOrders) => {
-          if (!prevOrders) return prevOrders; 
-    
+          if (!prevOrders) return prevOrders;
+  
           return {
             ...prevOrders,
             orders: prevOrders.orders.map((order) =>
               order.orderId === selectedOrder.orderId
-                ? { ...order, orderStatus: status } 
+                ? { ...order, orderStatus: status }
                 : order
             ),
           };
         });
-    
-      } catch (error) {
-        console.error("Error updating order status:", error);
-      } finally {
-        setIsModalOpen(false);
+  
+      } else {
+        // toast.error("Failed to update status. Please try again.");
       }
-    };
+  
+    } catch (error) {
+      // toast.error("An error occurred. Please try again.");
+    } finally {
+      setIsModalOpen(false);
+    }
+  };
 
     if (loading) {
       return (
@@ -196,6 +202,7 @@ const Page = () => {
 
   return (
    <Container>
+    <ToastContainer />
     <div className="w-[343px] lg:w-[700px] h-full flex flex-col gap-5 items-center justify-center">
       <div id="discount-header" className="w-full flex justify-start">
         <h2 id="discount-title" className="font-general text-2xl font-bold text-[#111827]">Delivery</h2>
@@ -374,39 +381,47 @@ const Page = () => {
                       </div>
                     </div>
 
-                {isModalOpen && (
-                  <div id="status-modal" className="fixed inset-0 flex items-center justify-center">
-                  <div 
-                      id="status-modal-content"
-                      ref={modalRef} 
-                      className="bg-white p-4 rounded-[15px] shadow-md w-64"
-                    >
-                      <ul id="status-options" className="mt-1 space-y-2">
-                        <li 
-                          id="status-option-pending"
-                          onClick={() => handleStatusChange("pending")}
-                          className="p-2 hover:bg-gray-100 rounded-md cursor-pointer font-general font-medium text-xl text-gray-700"
-                          >
-                          Pending
-                        </li>
-                        <li 
-                          id="status-option-shipped"
-                          onClick={() => handleStatusChange("shipped")}
-                          className="p-2 hover:bg-gray-100 rounded-md cursor-pointer font-general font-medium text-xl text-gray-700"
-                          >
-                          Shipped
-                        </li>
-                        <li 
-                          id="status-option-delivered"
-                          onClick={() => handleStatusChange("delivered")}
-                          className="p-2 hover:bg-gray-100 rounded-md cursor-pointer font-general font-medium text-xl text-gray-700"
-                          >
-                          Delivered
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                )}
+                    {isModalOpen && selectedOrder && (
+                      <div id="status-modal" className="fixed inset-0 flex items-center justify-center z-50">
+                        <div
+                          id="status-modal-content"
+                          ref={modalRef}
+                          className="bg-white p-4 rounded-[15px] shadow-md w-64"
+                        >
+                          <ul id="status-options" className="mt-1 space-y-2">
+                            {(() => {
+                              const allStatuses = [
+                                { key: "pending", label: "Pending" },
+                                { key: "shipped", label: "Shipped" },
+                                { key: "delivered", label: "Delivered" },
+                                { key: "pickedUp", label: "Picked Up" },
+                              ];
+
+                              const deliveryType = 
+                              typeof selectedOrder.deliveryType === 'string' 
+                                ? selectedOrder.deliveryType.toLowerCase() 
+                                : '';
+                            
+                              const filteredStatuses =
+                                deliveryType === "pickup"
+                                  ? allStatuses.filter(s => ["pending", "pickedUp"].includes(s.key))
+                                  : allStatuses.filter(s => s.key !== "pickedUp");
+
+                              return filteredStatuses.map(status => (
+                                <li
+                                  key={status.key}
+                                  id={`status-option-${status.key}`}
+                                  onClick={() => handleStatusChange(status.key)}
+                                  className="p-2 hover:bg-[#F9FAFB] rounded-md cursor-pointer font-general font-medium text-base text-[#111827]"
+                                >
+                                  {status.label}
+                                </li>
+                              ));
+                            })()}
+                          </ul>
+                        </div>
+                      </div>
+                    )}
                   </React.Fragment>
                 ))
               ) : (
