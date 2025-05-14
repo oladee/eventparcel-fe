@@ -89,8 +89,6 @@ const Page: React.FC = ({  }) => {
           { params }
         );
 
-        console.log("res", response.data)
-
         const safeParse = (value?: string | number) => {
           const num = Number(value);
           return isNaN(num) ? "0.00%" : `${num.toFixed(1)}%`;
@@ -157,31 +155,38 @@ const Page: React.FC = ({  }) => {
         return;
       }
   
-      await updateOrderStatus(
-        selectedOrder?._id,
+      const response = await updateOrderStatus(
+        selectedOrder._id,
         selectedOrder.paymentStatus ?? "Unknown",
         status
       );
   
-      setOrders((prevOrders) => {
-        if (!prevOrders) return prevOrders; 
+      // Only update UI if status update is successful
+      if (response?.success) {
+        setOrders((prevOrders) => {
+          if (!prevOrders) return prevOrders;
   
-        return {
-          ...prevOrders,
-          orders: prevOrders.orders.map((order) =>
-            order.orderId === selectedOrder.orderId
-              ? { ...order, orderStatus: status } 
-              : order
-          ),
-        };
-      });
+          return {
+            ...prevOrders,
+            orders: prevOrders.orders.map((order) =>
+              order.orderId === selectedOrder.orderId
+                ? { ...order, orderStatus: status }
+                : order
+            ),
+          };
+        });
+  
+      } else {
+        // toast.error("Failed to update status. Please try again.");
+      }
   
     } catch (error) {
-      console.error("Error updating order status:", error);
+      // toastsss.error("An error occurred. Please try again.");
     } finally {
       setIsModalOpen(false);
     }
   };
+  
 
   if (loading) {
     return (
@@ -458,37 +463,47 @@ const Page: React.FC = ({  }) => {
                       </div>
                     </div>
 
-                {isModalOpen && (
-                  <div id="status-modal" className="fixed inset-0 flex items-center justify-center">
-                  <div 
-                      id="status-modal-content"
-                      ref={modalRef} 
-                      className="bg-white p-4 rounded-[15px] shadow-md w-64"
-                    >
-                      <ul id="status-options" className="mt-1 space-y-2">
-                        <li 
-                          id="status-option-pending"
-                          onClick={() => handleStatusChange("pending")}
-                          className="p-2 hover:bg-[#F9FAFB] rounded-md cursor-pointer font-general font-medium text-base text-[#111827]"
+                    {isModalOpen && selectedOrder && (
+                      <div id="status-modal" className="fixed inset-0 flex items-center justify-center z-50">
+                        <div
+                          id="status-modal-content"
+                          ref={modalRef}
+                          className="bg-white p-4 rounded-[15px] shadow-md w-64"
                         >
-                          Pending
-                        </li>
-                        <li 
-                          id="status-option-shipped"
-                          onClick={() => handleStatusChange("shipped")}
-                          className="p-2 hover:bg-[#F9FAFB] rounded-md cursor-pointer font-general font-medium text-base text-[#111827]">
-                          Shipped
-                        </li>
-                        <li 
-                          id="status-option-delivered"
-                          onClick={() => handleStatusChange("delivered")}
-                          className="p-2 hover:bg-[#F9FAFB] rounded-md cursor-pointer font-general font-medium text-base text-[#111827]">
-                          Delivered
-                        </li>
-                      </ul>
-                    </div>
-                  </div>
-                )}
+                          <ul id="status-options" className="mt-1 space-y-2">
+                            {(() => {
+                              const allStatuses = [
+                                { key: "pending", label: "Pending" },
+                                { key: "shipped", label: "Shipped" },
+                                { key: "delivered", label: "Delivered" },
+                                { key: "pickedUp", label: "Picked Up" },
+                              ];
+
+                              const deliveryType = 
+                              typeof selectedOrder.deliveryType === 'string' 
+                                ? selectedOrder.deliveryType.toLowerCase() 
+                                : '';
+                            
+                              const filteredStatuses =
+                                deliveryType === "pickup"
+                                  ? allStatuses.filter(s => ["pending", "pickedUp"].includes(s.key))
+                                  : allStatuses.filter(s => s.key !== "pickedUp");
+
+                              return filteredStatuses.map(status => (
+                                <li
+                                  key={status.key}
+                                  id={`status-option-${status.key}`}
+                                  onClick={() => handleStatusChange(status.key)}
+                                  className="p-2 hover:bg-[#F9FAFB] rounded-md cursor-pointer font-general font-medium text-base text-[#111827]"
+                                >
+                                  {status.label}
+                                </li>
+                              ));
+                            })()}
+                          </ul>
+                        </div>
+                      </div>
+                    )}
                   </React.Fragment>
                 ))
               ) : (

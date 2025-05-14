@@ -1,6 +1,7 @@
 import { useState } from "react";
 import axiosInstance from "@/lib/axiosInstance";
-import toast from "react-hot-toast";
+import axios from "axios";
+import { toast } from "react-toastify";
 
 const useUpdateOrderStatus = () => {
   const [loading, setLoading] = useState(false);
@@ -20,10 +21,14 @@ const useUpdateOrderStatus = () => {
       
       if (response.status === 200) {
         toast.success("Order status updated successfully!");
+        return { success: true }; 
     }
-    } catch (err) {
-        toast.error("Failed to update order status. Please try again.");
-      setError(err instanceof Error ? err.message : "Failed to update order status");
+    } catch (error: any) {
+      if (axios.isAxiosError(error)) {
+        toast.error(error.response?.data?.message || "Failed to update order status. Please try again.");
+
+      }      
+      setError(error instanceof Error ? error.message : "Failed to update order status");
     } finally {
       setLoading(false);
     }
