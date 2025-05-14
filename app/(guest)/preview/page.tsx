@@ -24,7 +24,7 @@ const ViewEvent = () => {
   const [cartOpen, setCartOpen] = useState(false);
   const [data, setData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
-  const [error] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
   const [selectedPackage, setSelectedPackage] = useState<any>(null);
   const [loadDeliveryDetails, setLoadDeliveryDetails] = useState(false);
 
@@ -46,7 +46,8 @@ const ViewEvent = () => {
         const res = await axiosInstance.get(`/invite-details?code=${code}`);
         setData(res.data.data);
       } catch (error: any) {
-          toast.error(error.response?.data?.message);
+          setError(error.response?.data?.message);
+          // toast.error(error.response?.data?.message);/
       } finally {
         setLoading(false);
       }
