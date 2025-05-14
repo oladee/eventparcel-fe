@@ -15,6 +15,7 @@ export default function ConfirmationCards() {
   useEffect(() => {
     clearCart();
   }, [clearCart]);
+  
 
   return (
     <HeaderLayout>
