@@ -49,10 +49,11 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
 
   // Share group link function
   const handleShareGroupLink = async () => {
-    if (!group) return;
-    // Use group.link if it exists, otherwise create a default link.
-    const shareUrl =
-      group.link || `https://yourwebsite.com/groups/${group._id}`;
+    if (!group || !group.link){
+      alert("No link available to share.");
+      return;
+    }    
+    const shareUrl = group.link;
 
     if (navigator.share) {
       try {
