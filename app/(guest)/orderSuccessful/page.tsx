@@ -36,7 +36,7 @@ export default function ConfirmationCards() {
             <h4 id="order-placed-title" className="text-2xl font-bold text-[#111827] font-general">Order placed</h4>
             <p
                 id="order-placed-description"
-                className="text-sm text-[#718096] font-medium mt-1 w-[269px] h-[66px] leading-[160%] tracking-[0px]"
+                className="text-sm  w-full text-[#718096] font-medium mt-1 h-[66px] leading-[160%] tracking-[0px]"
               >
                 You have successfully placed an order, your delivery update will be sent via email and phone
             </p>
