@@ -7,7 +7,7 @@ import CsvModal from "@/components/shareContact/CsvModal";
 import ContactModal from "@/components/shareContact/ContactModal";
 import SendContactModal from "@/components/shareContact/SendContactModal";
 import Container from "@/components/dashboard/Container";
-import { useSearchParams } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 
 // API contact type
 interface APICONTACT {
@@ -66,6 +66,7 @@ const ShareContact: React.FC = () => {
   const [, setPopupLoading] = useState(false);
   const [, setPopupError] = useState<string>("");
   const [popupModalOpen, setPopupModalOpen] = useState(false);
+  const router=useRouter()
 
   // // Fetch & auto-show popup
   // useEffect(() => {
@@ -95,16 +96,31 @@ const ShareContact: React.FC = () => {
       setPopupLoading(true);
   
       // Extract the token from cookies
+      console.log("Cookies:", document.cookie);
       const cookies = document.cookie.split("; ").reduce((acc, cookie) => {
         const [key, value] = cookie.split("=");
         acc[key] = value;
         return acc;
       }, {} as Record<string, string>);
       const googleAccessToken = cookies["googleAccessToken"];
+      
+      if (!googleAccessToken) {
+        console.error("Google access token is missing in cookies");
+        setPopupError("Authentication token is missing. Please log in again.");
+        setPopupLoading(false);
+        return;
+      }
+      // const cookies = document.cookie.split("; ").reduce((acc, cookie) => {
+      //   const [key, value] = cookie.split("=");
+      //   acc[key] = value;
+      //   return acc;
+      // }, {} as Record<string, string>);
+      // const googleAccessToken = cookies["googleAccessToken"];
+
   
       fetch("https://api-eventparcel.onrender.com/auth/fetch-contacts", {
         headers: {
-          Authorization: `Bearer ${googleAccessToken}`, // Pass the token in the Authorization header
+          Authorization: `Bearer ${googleAccessToken}`,
         },
       })
         .then((res) => res.json())
@@ -135,7 +151,8 @@ const ShareContact: React.FC = () => {
     if (selectedOption === "csv") {
       setCsvModalOpen(true);
     } else if (selectedOption === "contact") {
-      setIsContactModalOpen(true);
+      router.push("https://api-eventparcel.onrender.com/auth/google/contacts")
+      // setIsContactModalOpen(true);
     }
   }, [selectedOption]);
 
