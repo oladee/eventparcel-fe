@@ -1,7 +1,10 @@
+"use client"
+
+
 import React, { useState, useEffect, useCallback, Suspense } from "react";
 import { CSV, Doc, Done } from "@/components/icons/Icons";
 import CsvModal from "@/components/shareContact/CsvModal";
-import ContactModal, { Contact } from "@/components/shareContact/ContactModal";
+import ContactModal from "@/components/shareContact/ContactModal";
 import SendContactModal from "@/components/shareContact/SendContactModal";
 import Container from "@/components/dashboard/Container";
 import { useSearchParams } from "next/navigation";
@@ -60,8 +63,8 @@ const ShareContact: React.FC = () => {
 
   // Popup contacts states
   const [popupContacts, setPopupContacts] = useState<APICONTACT[]>([]);
-  const [popupLoading, setPopupLoading] = useState(false);
-  const [popupError, setPopupError] = useState<string>("");
+  const [, setPopupLoading] = useState(false);
+  const [, setPopupError] = useState<string>("");
   const [popupModalOpen, setPopupModalOpen] = useState(false);
 
   // Fetch & auto-show popup

@@ -11,7 +11,7 @@ import { FormEvent } from "react";
 import { PiCalendarMinus } from "react-icons/pi";
 import { AiOutlineClockCircle } from "react-icons/ai";
 // import HeaderLayout from "@/components/layout/HeaderLayout";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import NairaPayoutForm from "@/components/NairaPayoutForm";
 import DollarPayoutForm from "@/components/DollarPayoutForm";
 import axiosInstance from "@/lib/axiosInstance";
@@ -66,10 +66,7 @@ const validTimeZones = [
 
 const PaymentSetupContent = () => {
 // URL Search Params Handling
-const searchParams = useSearchParams();
-const groupsString = searchParams.get("groups");
-const groups = groupsString ? JSON.parse(decodeURIComponent(groupsString)) : [];
-const firstEventId = groups.length > 0 && groups[0].event ? groups[0].event._id : "";
+const firstEventId = typeof window !== "undefined" ? localStorage.getItem("eventId") : null;;
 
 // State Management
 const [showMapPickerModal, setShowMapPickerModal] = useState(false);
@@ -77,8 +74,10 @@ const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
 const [selectedUSBank, setSelectedUSBank] = useState<USBank | null>(null);
 const [showModal] = useState<boolean>(false);
 const [loading, setLoading] = useState<boolean>(false);
-const [isSaveLoading, setIsSaveLoading] = useState(false);
 const [isLoadingPaymentData, setIsLoadingPaymentData] = useState(true);
+const [hasNGN, setHasNGN] = useState<boolean>(false);
+const [hasUSD, setHasUSD] = useState<boolean>(false);
+const [noGroup, setNoGroup] = useState(false);
 const router = useRouter();
 
 // Form Data State
@@ -88,13 +87,16 @@ const [formData, setFormData] = useState({
     accountNumber: "",
     accountName: "",
     bankName: "",
-    bankCode: ""
+    bankCode: "",
+    recipientCode:"ignore",//ignore this line
+    _id: "ignore"//ignore this line
   },
   dollarAccount: {
     usAccountNumber: "",
     routingNumber: "",
     usBankName: "",
-    usAccountName: ""
+    usAccountName: "",
+    _id: "ignore"//ignore this line
   },
   isDraft: false,
   paymentDate: new Date(),
@@ -106,23 +108,13 @@ const [formData, setFormData] = useState({
 const [errors, setErrors] = useState<{ [key: string]: string }>({});
 const [isFormValid, setIsFormValid] = useState(false);
 
+
 // Helper Functions
 /**
- * Checks if all packages in all groups are self-managed
  */
-const isAllSelfManaged = (groupList: any[]) => {
-  if (groupList.length === 0) return false;
-  return groupList.every((group) =>
-    group.packages.every((pkg: any) =>
-      pkg.packageDelivery.every((delivery: string) =>
-        delivery.includes("selfManaged")
-      )
-    )
-  );
-};
-
-const allSelfManaged = isAllSelfManaged(groups);
-
+const formatToYYYYMMDD = (date: Date) =>
+    date.toISOString().split('T')[0];
+  
 /**
  * Validates form fields based on their type and requirements
  */
@@ -177,58 +169,86 @@ const formatTime12Hour = (date: Date): string => {
  */
 const isFilled = (obj: { [key: string]: string }) =>
   Object.values(obj).some((val) => val && typeof val === "string" && val.trim() !== "");
-
-// Currency Check
-// const hasNGN = groups.some(
-//   (group: { groupCurrency: string }) => group.groupCurrency === "NGN"
-// );
-// const hasUSD = groups.some(
-//   (group: { groupCurrency: string }) => group.groupCurrency === "USD"
-// );
-
-const hasNGN = true;
-const hasUSD = true;
-
+        
 // Current Date
 const today = new Date();
 
-useEffect(() => {
+// Add these helper functions near your other utility functions
+const parseAPIDate = (dateString: string | undefined): Date | null => {
+    if (!dateString) return null;
+    const date = new Date(dateString);
+    return isNaN(date.getTime()) ? null : date;
+  };
+  
+  const parseAPITime = (timeString: string | undefined, referenceDate: Date = new Date()): Date | null => {
+    if (!timeString) return null;
+    
+    // Parse time in "08:36 AM" format
+    const timeParts = timeString.match(/(\d+):(\d+) (AM|PM)/i);
+    if (!timeParts) return null;
+  
+    let hours = parseInt(timeParts[1], 10);
+    const minutes = parseInt(timeParts[2], 10);
+    const period = timeParts[3].toUpperCase();
+  
+    // Convert 12-hour to 24-hour format
+    if (period === "PM" && hours < 12) hours += 12;
+    if (period === "AM" && hours === 12) hours = 0;
+  
+    const timeDate = new Date(referenceDate);
+    timeDate.setHours(hours, minutes, 0, 0);
+    return timeDate;
+  };
+
+  useEffect(() => {
     const fetchPaymentData = async () => {
       try {
-        const storedEventId = localStorage.getItem('eventId');
-        
-        // If no eventId in localStorage or URL params, return early
+        const storedEventId = localStorage.getItem("eventId");
+        const nairaAccountExists = localStorage.getItem("isNairaAccount");
+        const dollarAccountExists = localStorage.getItem("isDollarAccount");
+        const groupLength = localStorage.getItem("groupLength");
+
+  
         if (!storedEventId && !firstEventId) {
           setIsLoadingPaymentData(false);
           return;
         }
   
-        // Use the eventId from localStorage if available, otherwise use firstEventId
+        setHasNGN(nairaAccountExists === "true");
+        setHasUSD(dollarAccountExists === "true");
+  
+        if (nairaAccountExists === "false" && dollarAccountExists === "false" || groupLength === "0") {
+          setNoGroup(true);
+        }
+  
         const eventIdToUse = storedEventId || firstEventId;
-        
-        const response = await axiosInstance.get(
-          `/view-a-payment/${eventIdToUse}`
-        );
-
-        console.log("payment",response.data)
-        
-        // const paymentData = response.data.data;
-        
-        // Update formData with the fetched payment data
-        // setFormData(prev => ({
-        //   ...prev,
-        //   event: eventIdToUse,
-        //   nairaAccount: paymentData.nairaAccount || prev.nairaAccount,
-        //   dollarAccount: paymentData.dollarAccount || prev.dollarAccount,
-        //   paymentDate: paymentData.paymentDate ? new Date(paymentData.paymentDate) : prev.paymentDate,
-        //   paymentTime: paymentData.paymentTime ? new Date(paymentData.paymentTime) : prev.paymentTime,
-        //   paymentTimeZone: paymentData.paymentTimeZone || prev.paymentTimeZone,
-        //   isDraft: paymentData.isDraft || false
-        // }));
-        
-      } catch (error) {
-        console.error("Error fetching payment data:", error);
-        toast.error("Failed to load payment details");
+        const response = await axiosInstance.get(`/view-a-payment/${eventIdToUse}`);
+        const paymentData = response.data.data;
+  
+        setFormData(prev => ({
+          ...prev,
+          event: eventIdToUse,
+          nairaAccount: paymentData.nairaAccount || prev.nairaAccount,
+          dollarAccount: paymentData.dollarAccount || prev.dollarAccount,
+          paymentDate: parseAPIDate(paymentData.paymentDate) || prev.paymentDate,
+          paymentTime: parseAPITime(paymentData.paymentTime) || prev.paymentTime,
+          paymentTimeZone: paymentData.paymentTimeZone || prev.paymentTimeZone,
+          isDraft: paymentData.isDraft || false
+        }));
+      } catch (error: any) {
+        toast.error( error.response?.data?.message || "Please try again.");
+        const errorMsg = error.response?.data?.message || "Please try again.";
+        const nairaAccountExists = localStorage.getItem("isNairaAccount");
+        const dollarAccountExists = localStorage.getItem("isDollarAccount");
+  
+        if (errorMsg.toLowerCase().includes("record not found")) {
+          if (nairaAccountExists === "true") setHasNGN(true);
+          if (dollarAccountExists === "true") setHasUSD(true);
+        } else {
+          // fallback: assume both accounts may exist
+          setHasNGN(true);
+          setHasUSD(true);
+        }
       } finally {
         setIsLoadingPaymentData(false);
       }
@@ -236,23 +256,46 @@ useEffect(() => {
   
     fetchPaymentData();
   }, [firstEventId]);
+  
 
 // Effects
+// Update your useEffect for form validation
 useEffect(() => {
-  // Validate all form fields whenever formData or errors change
-  const isAllFieldsFilled = Object.values(formData).every((value) => {
-    if (typeof value === "string") {
-      return value.trim() !== "";
-    } else if (value instanceof Date) {
-      return !isNaN(value.getTime());
+  const isStringFieldFilled = (value: any) =>
+    typeof value === "string" ? value.trim() !== "" : true;
+
+  const isValidDate = (value: any) =>
+    value instanceof Date ? !isNaN(value.getTime()) : true;
+
+  const isAllFieldsFilled = Object.entries(formData).every(([key, value]) => {
+    // Skip validation for currency accounts that shouldn't be included
+    if (key === "nairaAccount" && !hasNGN) return true;
+    if (key === "dollarAccount" && !hasUSD) return true;
+
+    if (key === "nairaAccount" || key === "dollarAccount") {
+      if (typeof value === "object" && value !== null) {
+        const entriesToCheck = Object.entries(value).filter(
+          ([innerKey]) => innerKey !== "_id" && innerKey !== "recipientCode"
+        );
+        return entriesToCheck.every(([, val]) => isStringFieldFilled(val));
+      }
+      return false;
     }
-    return true;
+
+    if (value instanceof Date) {
+      return isValidDate(value);
+    }
+
+    return isStringFieldFilled(value);
   });
+
   const isAllFieldsValid = Object.values(errors).every(
     (error) => error === ""
   );
+
   setIsFormValid(isAllFieldsFilled && isAllFieldsValid);
-}, [formData, errors]);
+}, [formData, errors, hasNGN, hasUSD]); // Add hasNGN and hasUSD to dependencies
+
 
 // Event Handlers
 const handleDateChange = (date: Date | null, field: string) => {
@@ -293,7 +336,6 @@ const handleBlur = (
   const { id, value } = e.target;
   setErrors((prev) => ({ ...prev, [id]: validateField(id, value) }));
 };
-
 const handleSubmit = async (e: FormEvent) => {
   e.preventDefault();
 
@@ -302,71 +344,77 @@ const handleSubmit = async (e: FormEvent) => {
     return;
   }
 
+  const storedEventId = localStorage.getItem('eventId');
+  if (!storedEventId && !firstEventId) {
+    setIsLoadingPaymentData(false);
+    return;
+  }
+
   setLoading(true);
 
   try {
-    const { nairaAccount, dollarAccount, ...rest } = formData;
+    const { nairaAccount, dollarAccount, event, isDraft, ...rest } = formData;
 
-    // Prepare payload with conditional account inclusion
+    console.log(isDraft)
+    console.log(event)
+
+    // Clean account objects - handle null/undefined cases properly
+    const cleanNairaAccount = nairaAccount ? {
+      accountNumber: nairaAccount.accountNumber,
+      accountName: nairaAccount.accountName,
+      bankName: nairaAccount.bankName,
+      bankCode: nairaAccount.bankCode
+    } : null;
+
+    const cleanDollarAccount = dollarAccount ? {
+      usAccountNumber: dollarAccount.usAccountNumber,
+      routingNumber: dollarAccount.routingNumber,
+      usBankName: dollarAccount.usBankName,
+      usAccountName: dollarAccount.usAccountName
+    } : null;
+
     const formattedData = {
       ...rest,
-      ...(isFilled(nairaAccount) ? { nairaAccount } : {}),
-      ...(isFilled(dollarAccount) ? { dollarAccount } : {}),
+      ...(hasNGN && isFilled(cleanNairaAccount || {}) ? { nairaAccount: cleanNairaAccount } : {}),
+      ...(hasUSD && isFilled(cleanDollarAccount || {}) ? { dollarAccount: cleanDollarAccount } : {}),
+      paymentDate: formatToYYYYMMDD(new Date(formData.paymentDate)),
       paymentTime: formatTime12Hour(formData.paymentTime),
     };
 
-    const queryString = new URLSearchParams({
-      data: JSON.stringify(formattedData),
-    }).toString();
-
-    if (allSelfManaged) {
-      await axiosInstance.post("/add-payment", formattedData);
-      toast.success("Payment details successfully submitted!");
-      router.push("/dashboard/events");
-    } else {
-      router.push(`/dashboard/pickup-details?${queryString}`);
-    }
-  } catch (error: any) {
-    console.error("Error submitting payment details:", error);
-
-    if (error.response?.data?.message) {
-      toast.error(`Error: ${error.response.data.message}`);
-    } else {
-      toast.error("Failed to submit payment details. Please try again.");
-    }
+    await axiosInstance.put(`/update/${storedEventId}`, formattedData);
+    toast.success("Payment details successfully submitted!");
+  } catch(error: any) {
+    toast.error(error.response?.data?.message || "Please try again.");
   } finally {
-    setLoading(true); 
+    setLoading(false);
   }
 };
+  
 
-const handleSaveForLater = async () => {
-  setIsSaveLoading(true);
-
-  try {
-    const { nairaAccount, dollarAccount, ...rest } = formData;
-
-    const fullFormData = {
-      ...rest,
-      ...(isFilled(nairaAccount) ? { nairaAccount } : {}),
-      ...(isFilled(dollarAccount) ? { dollarAccount } : {}),
-      paymentTime: formatTime12Hour(formData.paymentTime),
-      isDraft: true
+    const handleCancel = async () => {
+    router.push("/dashboard/events");
     };
 
-    await axiosInstance.put(`/payment-save-for-later`, fullFormData);
-    toast.success("Saved! Continue from your dashboard.");
-    router.push("/dashboard");
-  } catch (error: any) {
-    console.error("Error saving for later:", error);
-    toast.error(error.response?.data?.message || "Failed to save event");
-  } finally {
-    setIsSaveLoading(false);
+  if (isLoadingPaymentData) {
+    return <div className="flex justify-center items-center bg-[#FFFFFF] w-full h-screen">Loading payment details...</div>;
   }
-};
 
-if (isLoadingPaymentData) {
-    return <div>Loading payment details...</div>;
+  if (noGroup) {
+    return (
+      <section className="flex flex-col justify-center items-center bg-white w-full h-screen text-center px-4">
+        <p className="text-lg font-semibold text-red-600">
+          You don’t have any groups yet.
+        </p>
+        <p>
+        Please create a group to get started.{" "}
+        <a href={`/dashboard/events/${firstEventId}`} className="whitespace-nowrap text-blue-600 underline hover:text-blue-800">
+          Click Here!!
+        </a>
+      </p>
+      </section>
+    );
   }
+  
 
   return (
     <Container>
@@ -545,15 +593,17 @@ if (isLoadingPaymentData) {
                 </div>
               </div>
             </div>
+            
 
             <div className="bg-[#FFFF] py-4 flex justify-center fixed z-10 left-0 bottom-0 w-full">
               <div className="max-w-3xl flex gap-4 items-center justify-center sm:justify-end w-full px-4">
               <button
-                id="save"
-                className="p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827]"
-                onClick={() => handleSaveForLater()}
+                id="cancel"
+                type="button"
+                className=" w-[142.24px] p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827]"
+                onClick={() => handleCancel()}
                 >
-                  {isSaveLoading ? "saving..." : "Save for later"}
+                  Cancel
               </button>
                 <button
                   type="submit"
@@ -565,14 +615,13 @@ if (isLoadingPaymentData) {
                   {loading ? (
                     <BiLoaderCircle className="animate-spin mr-2" size={22} />
                   ) : (
-                    "Continue"
+                    "Save"
                   )}
                 </button>
               </div>
             </div>
           </form>
 
-          {/* <RightBar isOpen={isRightBarOpen} setIsOpen={setIsRightBarOpen} /> */}
         </div>
       </section>
       {showModal && (

@@ -11,6 +11,7 @@ import axiosInstance from "@/lib/axiosInstance";
 // import { useRouter } from "next/navigation";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { useRouter } from "next-nprogress-bar";
 
 interface EventOptionsModalProps {
   isOpen: boolean;
@@ -28,7 +29,8 @@ const EventOptionsModal: React.FC<EventOptionsModalProps> = ({
   const [isDeleteDialogOpen, setIsDeleteDialogOpen] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingMessage, setLoadingMessage] = useState<string | null>("");
-  // const router = useRouter();
+  const router = useRouter();
+
 
   // Focus on the modal when it opens and add Escape key support
   useEffect(() => {
@@ -168,6 +170,45 @@ const EventOptionsModal: React.FC<EventOptionsModalProps> = ({
                     <LuPencilLine size={20} />
                   </span>
                   <span className="ml-3 font-medium">Edit Event</span>
+                </div>
+                <PiCaretRightBold />
+              </div>
+            )}
+
+            {!eventData?.isShared && (
+              <div
+                className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
+                onClick={() => {
+                  localStorage.setItem("eventId", eventData._id);
+                  localStorage.setItem("groupLength", eventData.eventGroups.length);
+                  localStorage.setItem("isNairaAccount", eventData.isNairaAccount)
+                  localStorage.setItem("isDollarAccount", eventData.isDollarAccount)
+                  router.push("/dashboard/editPaymentDetails");
+                }}
+              >
+                <div className="flex items-center">
+                  <span className="p-2 bg-[#FFF7F2] rounded-full text-primary">
+                    <LuPencilLine size={20} />
+                  </span>
+                  <span className="ml-3 font-medium">Edit Payment</span>
+                </div>
+                <PiCaretRightBold />
+              </div>
+            )}
+            {!eventData?.isShared && (
+              <div
+                className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
+                onClick={() => {
+                  localStorage.setItem("eventId", eventData._id);
+                  localStorage.setItem("groupLength", eventData.eventGroups.length);
+                  router.push("/dashboard/editPickupDetail");
+                }}
+              >
+                <div className="flex items-center">
+                  <span className="p-2 bg-[#FFF7F2] rounded-full text-primary">
+                    <LuPencilLine size={20} />
+                  </span>
+                  <span className="ml-3 font-medium">Edit Pickup</span>
                 </div>
                 <PiCaretRightBold />
               </div>

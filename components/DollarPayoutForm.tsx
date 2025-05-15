@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import USBankDropdown from "./USBankDropdown";
 
 interface USBank {
@@ -41,11 +41,29 @@ const DollarPayoutForm: React.FC<DollarPayoutFormProps> = ({
   setErrors
 }) => {
 
+  // Watch for bank change or routing number input change
+  useEffect(() => {
+    if (!selectedUSBank || !formData.dollarAccount.routingNumber) return;
+
+    const currentRoutingNumber = formData.dollarAccount.routingNumber;
+    const newErrors = { ...errors };
+
+    if (!/^\d{9}$/.test(currentRoutingNumber)) {
+      newErrors.routingNumber = "Must be 9 digits";
+    } else if (!selectedUSBank.routingNumber.includes(currentRoutingNumber)) {
+      newErrors.routingNumber = "Invalid routing number";
+    } else {
+      delete newErrors.routingNumber;
+    }
+
+    setErrors(newErrors);
+  }, [selectedUSBank, formData.dollarAccount.routingNumber, errors, setErrors]);
+
   // Function to validate routing number
   const validateRoutingNumber = (routingNumber: string): boolean => {
-    if (!selectedUSBank) return false; 
-    return selectedUSBank.routingNumber.includes(routingNumber);
+    return !!selectedUSBank?.routingNumber.includes(routingNumber);
   };
+  
 
   // Handle routing number input change
   const handleRoutingNumberChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -115,6 +133,7 @@ const DollarPayoutForm: React.FC<DollarPayoutFormProps> = ({
           <div className="flex-1">
             <label className="block mb-2 font-semibold text-[#111827]">Bank Name</label>
             <USBankDropdown
+              formData={formData}
               selectedUSBank={selectedUSBank}
               setSelectedUSBank={setSelectedUSBank}
               setFormData={setFormData}

@@ -1,13 +1,23 @@
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import PhoneInput from "react-phone-input-2";
 import "react-phone-input-2/lib/style.css";
 import { parsePhoneNumberFromString } from "libphonenumber-js";
 
-const PhoneNumberInput = ({ onPhoneChange }: {onPhoneChange: (value: string) => void}) => {
+const PhoneNumberInput = ({
+  onPhoneChange,
+  phoneValue = ""
+}: {
+  onPhoneChange: (value: string) => void;
+  phoneValue?: string;
+}) => {
   const [phone, setPhone] = useState("");
   const [country, setCountry] = useState("NG"); 
   const [error, setError] = useState("");
   const [touched, setTouched] = useState(false);
+
+  useEffect(() => {
+    setPhone(phoneValue || "");
+  }, [phoneValue]);
 
   const handlePhoneChange = (value: string, countryData: any) => {
     const countryCode = countryData.countryCode?.toUpperCase();

@@ -1,13 +1,12 @@
 "use client";
 
 import { useState, useEffect, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
 import { MapPin } from "lucide-react";
 import { AiOutlineClockCircle } from "react-icons/ai";
 import { PiCalendarMinus } from "react-icons/pi";
-import toast from "react-hot-toast";
 import { BiLoaderCircle } from "react-icons/bi";
 import PhoneNumberInput from "@/components/PhoneNumberInput";
 import axiosInstance from "@/lib/axiosInstance";
@@ -16,6 +15,7 @@ import { debounce } from "lodash";
 import Container from "@/components/dashboard/Container";
 import dynamic from "next/dynamic";
 import axios from "axios";
+import { ToastContainer, toast} from "react-toastify";
 
 
 const PickupDeliveryLoationPicker = dynamic(
@@ -25,31 +25,17 @@ const PickupDeliveryLoationPicker = dynamic(
 
 const PickupDetails = () => {
   const router = useRouter();
-  const searchParams = useSearchParams();
+  const firstEventId = typeof window !== "undefined" ? localStorage.getItem("eventId") : null;;
 
   const [debouncedAddress, setDebouncedAddress] = useState("");
   const [loading, setLoading] = useState(false);
   const [isClient, setIsClient] = useState(false);
   const [isFormValid, setIsFormValid] = useState(false);
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-  const [isSaveLoading, setIsSaveLoading] = useState(false);
+  const [isLoadingPaymentData,setIsLoadingPaymentData] = useState(false)
   const [showMapPickerModal, setShowMapPickerModal] = useState(false);
+  const [noGroup, setNoGroup] = useState(false);
   const [formData, setFormData] = useState({
-    nairaAccount: {
-      accountNumber: "",
-      accountName: "",
-      bankName: "",
-    },
-    dollarAccount: {
-      usAccountNumber: "",
-      routingNumber: "",
-      usBankName: "",
-      usAccountName: "",
-    },
-    isDraft: false,
-    paymentDate: new Date(),
-    paymentTime: new Date(),
-    paymentTimeZone: "WAT",
     contactName: "",
     contactPhoneNumber: "",
     pickupLocation: "",
@@ -60,7 +46,6 @@ const PickupDetails = () => {
     deliveryTimeZone: "WAT",
   });
 
-  console.log(formData)
   useEffect(() => {
     if (typeof window !== "undefined") {
       setIsClient(true);
@@ -93,6 +78,94 @@ const PickupDetails = () => {
     "ACST",
     "AWST",
   ];
+
+  
+// Add these helper functions near your other utility functions
+const parseAPIDate = (dateString: string | undefined): Date | null => {
+  if (!dateString) return null;
+  const date = new Date(dateString);
+  return isNaN(date.getTime()) ? null : date;
+};
+
+const parseAPITime = (timeString: string | undefined, referenceDate: Date = new Date()): Date | null => {
+  if (!timeString) return null;
+  
+  // Parse time in "08:36 AM" format
+  const timeParts = timeString.match(/(\d+):(\d+) (AM|PM)/i);
+  if (!timeParts) return null;
+
+  let hours = parseInt(timeParts[1], 10);
+  const minutes = parseInt(timeParts[2], 10);
+  const period = timeParts[3].toUpperCase();
+
+  // Convert 12-hour to 24-hour format
+  if (period === "PM" && hours < 12) hours += 12;
+  if (period === "AM" && hours === 12) hours = 0;
+
+  const timeDate = new Date(referenceDate);
+  timeDate.setHours(hours, minutes, 0, 0);
+  return timeDate;
+};
+useEffect(() => {
+  const fetchDeliveryData = async () => {
+    try {
+      const storedEventId = localStorage.getItem("eventId");
+      const groupLength = localStorage.getItem("groupLength");
+
+      if (!storedEventId && !firstEventId) {
+        setIsLoadingPaymentData(false);
+        return;
+      }
+
+      if (groupLength === "0") {
+        setNoGroup(true);
+      }
+
+      const eventIdToUse = storedEventId || firstEventId;
+      const response = await axiosInstance.get(`/view-a-payment/${eventIdToUse}`);
+      const deliveryData = response.data.data;
+
+      // Check if delivery data exists
+      const hasDeliveryData = [
+        deliveryData?.contactName,
+        deliveryData?.contactPhoneNumber,
+        deliveryData?.pickupLocation,
+        deliveryData?.pickupLatitude,
+        deliveryData?.pickupLongitude,
+        deliveryData?.deliveryDate,
+        deliveryData?.deliveryTime,
+        deliveryData?.deliveryTimeZone
+      ].some(field => field !== undefined && field !== null && field !== '');
+
+      if (!hasDeliveryData) {
+        toast.error("Record not found");
+        setIsLoadingPaymentData(false);
+        return;
+      }
+
+      setFormData(prev => ({
+        ...prev,
+        contactName: deliveryData.contactName || prev.contactName,
+        contactPhoneNumber: deliveryData.contactPhoneNumber || prev.contactPhoneNumber,
+        pickupLocation: deliveryData.pickupLocation || prev.pickupLocation,
+        pickupLatitude: deliveryData.pickupLatitude || prev.pickupLatitude,
+        pickupLongitude: deliveryData.pickupLongitude || prev.pickupLongitude,
+        deliveryDate: parseAPIDate(deliveryData.deliveryDate) || prev.deliveryDate,
+        deliveryTime: parseAPITime(deliveryData.deliveryTime) || prev.deliveryTime,
+        deliveryTimeZone: deliveryData.deliveryTimeZone || prev.deliveryTimeZone,
+      }));
+
+    } catch (error: any) {
+      console.log(error);
+      toast.error(error.response?.data?.message || "Please try again.");
+    } finally {
+      setIsLoadingPaymentData(false);
+    }
+  };
+
+  fetchDeliveryData();
+}, [firstEventId]);
+  
 
   
 // Refactor validateForm to use useCallback
@@ -147,58 +220,6 @@ useEffect(() => {
 }, [debouncedAddress, formData.pickupLatitude, formData.pickupLongitude]);
 
 
-
-// update the form data with the corresponding latitude and longitude when user type the address
-useEffect(() => {
-  const address = debouncedAddress?.trim();
-  
-  const isValidAddress = address && address.length >= 5;
-  const hasNoCoordinates = !formData.pickupLatitude && !formData.pickupLongitude;
-
-
-  if (isValidAddress && hasNoCoordinates) {
-    const geocoder = new google.maps.Geocoder();
-    geocoder.geocode({ address }, (results, status) => {
-      if (status === "OK" && results && results[0]) {
-        const location = results[0].geometry.location;
-        setFormData((prev) => ({
-          ...prev,
-          pickupLatitude: location.lat().toString(),
-          pickupLongitude: location.lng().toString()
-        }));
-      } else {
-        console.error("Geocode failed: " + status);
-      }
-    });
-  }
-}, [debouncedAddress, formData.pickupLatitude, formData.pickupLongitude]);
-
-
-// Retrieve formData from query parameters
-useEffect(() => {
-  if(!isClient) return;
-
-  const data = searchParams.get("data");
-  if (data) {
-    try {
-      const parsedData = JSON.parse(data);
-
-      setFormData((prev) => ({
-        ...prev,
-        ...parsedData,
-        nairaAccount: { ...prev.nairaAccount, ...parsedData.nairaAccount },
-        dollarAccount: { ...prev.dollarAccount, ...parsedData.dollarAccount },
-        paymentDate: parsedData.paymentDate ? new Date(parsedData.paymentDate) : prev.paymentDate,
-        paymentTime: parsedData.paymentTime ? new Date(parsedData.paymentTime) : prev.paymentTime,
-        deliveryDate: parsedData.deliveryDate ? new Date(parsedData.deliveryDate) : prev.deliveryDate,
-        deliveryTime: parsedData.deliveryTime ? new Date(parsedData.deliveryTime) : prev.deliveryTime,
-      }));
-    } catch (error) {
-      console.error("Error parsing form data:", error);
-    }
-  }
-}, [searchParams, isClient]);
-
 // Validate form whenever formData changes
 useEffect(() => {
   validateForm();
@@ -220,64 +241,38 @@ useEffect(() => {
       setErrors((prev) => ({ ...prev, [id]: "This field is required" }));
     }
   };
+  const formatToYYYYMMDD = (date: Date) =>
+    date.toISOString().split('T')[0];
 
-  // Helper function to format a Date object to a 12-hour time string.
   const formatTime12Hour = (date: Date): string => {
-    if (isNaN(date.getTime())) {
-      // Return a fallback value if the date is invalid
-      return "12:00 AM";
-    }
     let hours = date.getHours();
     const minutes = date.getMinutes();
     const ampm = hours >= 12 ? "PM" : "AM";
-    hours = hours % 12 || 12; 
+    hours = hours % 12 || 12;
     const paddedHours = hours < 10 ? `0${hours}` : `${hours}`;
     const paddedMinutes = minutes < 10 ? `0${minutes}` : `${minutes}`;
     return `${paddedHours}:${paddedMinutes} ${ampm}`;
   };
 
   
-    const isFilled = (obj: Record<string, any>) =>
-      Object.values(obj).some((val) => val && val.toString().trim() !== "");
-  
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
       if (!isFormValid) return;
+      const storedEventId = localStorage.getItem("eventId");
+
     
       setLoading(true);
     
-      const cleanObject = (obj: Record<string, any>) =>
-        Object.fromEntries(
-          Object.entries(obj).filter(
-            ([_, v]) => v !== null && v !== undefined && v !== ""
-          )
-        );
       try {
-        const { nairaAccount, dollarAccount, ...rest } = formData;
-    
         const formattedData = {
-          ...rest,
-          ...(isFilled(nairaAccount) ? { nairaAccount } : {}),
-          ...(isFilled(dollarAccount) ? { dollarAccount } : {}),
-          deliveryDate:
-            formData.deliveryDate instanceof Date
-              ? formData.deliveryDate.toISOString().split("T")[0]
-              : "",
-          deliveryTime:
-            formData.deliveryTime instanceof Date
-              ? formatTime12Hour(formData.deliveryTime)
-              : "",
-          paymentTime:
-            formData.paymentTime instanceof Date
-              ? formatTime12Hour(formData.paymentTime)
-              : "",
-        };
+          ...formData,
+          deliveryDate: formatToYYYYMMDD(new Date(formData.deliveryDate)),
+          deliveryTime: formatTime12Hour(formData.deliveryTime),
+        }
     
-        const cleanedData = cleanObject(formattedData);
-    
-        await axiosInstance.post("/add-payment", cleanedData);
+        await axiosInstance.put(`/update/${storedEventId}`, formattedData);
         toast.success("Details submitted successfully!");
-        router.push("/dashboard/events");
+        // router.push("/dashboard/events");
       } catch (error: any) {
         if (axios.isAxiosError(error)) {
           const errorMessage = error.response?.data?.message || "An error occurred. Please try again.";
@@ -291,44 +286,41 @@ useEffect(() => {
   /**
    * Handles saving form data for later completion
    */
-  const handleSaveForLater = async () => {
-    setIsSaveLoading(true);
-
-    const authToken = localStorage.getItem("authToken");
-    if (!authToken) {
-      setIsSaveLoading(false);
-      return;
-    }
-  
-    try {
-      const { nairaAccount, dollarAccount, ...rest } = formData;
-      const fullFormData = {
-        ...rest,
-        ...(isFilled(nairaAccount) ? { nairaAccount } : {}),
-        ...(isFilled(dollarAccount) ? { dollarAccount } : {}),
-        paymentTime: formatTime12Hour(formData.paymentTime),
-        isDraft: true
-      };
-  
-      await axiosInstance.post(`/payment-save-for-later`, fullFormData);
-      toast.success("Saved! Continue from your dashboard.");
-      router.push("/dashboard/events");
-    } catch (error: any) {
-      toast.error(error.response?.data?.message || "Failed to save event");
-    } finally {
-      setIsSaveLoading(false);
-    }
-  };
+  const handleCancel = async () => {
+    router.push("/dashboard/events");
+    };
 
   const handleMapLocationSelect = () => {
     setShowMapPickerModal(true);
   };
+
+  if (isLoadingPaymentData) {
+    return <div className="flex justify-center items-center bg-[#FFFFFF] w-full h-screen">Loading pick-up details...</div>;
+  }
+
+  
+  if (noGroup) {
+    return (
+      <section className="flex flex-col justify-center items-center bg-white w-full h-screen text-center px-4">
+        <p className="text-lg font-semibold text-red-600">
+          You don’t have any groups yet.
+        </p>
+        <p>
+        Please create a group to get started.{" "}
+        <a href={`/dashboard/events/${firstEventId}`} className="whitespace-nowrap text-blue-600 underline hover:text-blue-800">
+          Click Here!!
+        </a>
+      </p>
+      </section>
+    );
+  }
     
   if (!isClient) {
     return null; 
   }
   return (
     <Container>
+      <ToastContainer />
     {showMapPickerModal && (
         <PickupDeliveryLoationPicker
           onLocationSelect={(location) => {
@@ -382,7 +374,8 @@ useEffect(() => {
                       setFormData((prev) => ({ ...prev, contactPhoneNumber: value }));
                       setErrors((prev) => ({ ...prev, contactPhoneNumber: "" }));
                     }}
-                  />
+                    phoneValue={formData.contactPhoneNumber}
+                    />
                 </div>
                 {errors.contactPhone && (
                   <p className="text-red-500 text-sm mt-1">{errors.contactPhone}</p>
@@ -475,17 +468,17 @@ useEffect(() => {
                 </div>
               </div>
             </div>
-            {/* Save and continue */}
+            {/* cancel and save*/}
           
             <div className="bg-[#FFFF] py-4 flex justify-center fixed z-10 left-0 bottom-0 w-full">
               <div className="max-w-3xl flex gap-4 items-center justify-center sm:justify-end w-full px-4">
               <button
                 id="save"
                 type="button"
-                className="p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827]"
-                onClick={() => handleSaveForLater()}
+                className="w-[142.24px] p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827]"
+                onClick={() => handleCancel()}
                 >
-                  {isSaveLoading ? "saving..." : "Save for later"}
+                  Cancel
               </button>
                 <button
                   type="submit"
@@ -497,7 +490,7 @@ useEffect(() => {
                   {loading ? (
                     <BiLoaderCircle className="animate-spin mr-2" size={22} />
                   ) : (
-                    "Continue"
+                    "Save"
                   )}
                 </button>
               </div>
