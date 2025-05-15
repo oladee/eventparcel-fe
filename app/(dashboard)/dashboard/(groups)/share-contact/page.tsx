@@ -101,6 +101,19 @@ const ShareContact: React.FC = () => {
         return acc;
       }, {} as Record<string, string>);
       const googleAccessToken = cookies["googleAccessToken"];
+      
+      if (!googleAccessToken) {
+        console.error("Google access token is missing in cookies");
+        setPopupError("Authentication token is missing. Please log in again.");
+        setPopupLoading(false);
+        return;
+      }
+      // const cookies = document.cookie.split("; ").reduce((acc, cookie) => {
+      //   const [key, value] = cookie.split("=");
+      //   acc[key] = value;
+      //   return acc;
+      // }, {} as Record<string, string>);
+      // const googleAccessToken = cookies["googleAccessToken"];
   
       fetch("https://api-eventparcel.onrender.com/auth/fetch-contacts", {
         headers: {
