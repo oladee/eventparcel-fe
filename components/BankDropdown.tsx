@@ -12,12 +12,21 @@ interface BankDropdownProps {
   selectedBank: Bank | null;
   setSelectedBank: (bank: Bank) => void;
   setFormData: (data: any) => void;
+  formData: {
+    nairaAccount: {
+      accountNumber: string;
+      accountName: string;
+      bankName: string;
+      bankCode: string;
+    };
+  };
 }
 
 const BankDropdown: React.FC<BankDropdownProps> = ({
   selectedBank,
   setSelectedBank,
   setFormData,
+  formData
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchInput, setSearchInput] = useState("");
@@ -25,6 +34,11 @@ const BankDropdown: React.FC<BankDropdownProps> = ({
   const filteredBanks = banks.filter((bank: Bank) =>
     bank.name.toLowerCase().includes(searchInput.toLowerCase())
   );
+
+    // Get the display name - prioritize formData, then selectedBank, then "Select Bank"
+    const displayName = formData.nairaAccount?.bankName 
+    ? formData.nairaAccount.bankName 
+    : selectedBank?.name || "Select Bank"
 
   return (
     <div className="relative mb-6">
@@ -42,21 +56,20 @@ const BankDropdown: React.FC<BankDropdownProps> = ({
         }}
         tabIndex={0}
       >
-        {selectedBank ? (
-          <div className="flex items-center">
-            <Image
-              src={selectedBank.url}
-              alt={selectedBank.name}
-              className="w-6 h-6 mr-2"
-              width={24}
-              height={24}
-            />
-            <span>{selectedBank.name}</span>
-            <span className="ml-auto">({selectedBank.code})</span>
-          </div>
-        ) : (
-          <span>Select Bank</span>
-        )}
+          {selectedBank && (
+            <>
+              <Image
+                src={selectedBank.url}
+                alt={selectedBank.name}
+                className="w-6 h-6 mr-2"
+                width={24}
+                height={24}
+              />
+              <span>{displayName}</span>
+              <span className="ml-auto">({selectedBank.code})</span>
+            </>
+          )}
+          {!selectedBank && <span>{displayName}</span>}
       </div>
       {isDropdownOpen && (
         <div

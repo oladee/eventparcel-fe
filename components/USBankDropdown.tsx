@@ -16,12 +16,21 @@ interface BankDropdownProps {
   selectedUSBank: USBank | null;
   setSelectedUSBank: (usBank: USBank) => void;
   setFormData: (data: any) => void;
+  formData: {
+    dollarAccount: {
+      usAccountNumber: string;
+      routingNumber: string;
+      usBankName: string;
+      usAccountName: string;
+    };
+  };
 }
 
 const USBankDropdown: React.FC<BankDropdownProps> = ({
   selectedUSBank,
   setSelectedUSBank,
   setFormData,
+  formData
 }) => {
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const [searchInput, setSearchInput] = useState("");
@@ -73,6 +82,11 @@ const USBankDropdown: React.FC<BankDropdownProps> = ({
     }
   };
 
+    // Get the display name - prioritize formData, then selectedBank, then "Select Bank"
+    const displayName = formData.dollarAccount?.usBankName 
+    ? formData.dollarAccount.usBankName
+    : selectedUSBank?.name || "Select Bank"
+
   return (
     <div className="relative mb-6">
       <div
@@ -85,11 +99,9 @@ const USBankDropdown: React.FC<BankDropdownProps> = ({
         onKeyDown={(e) => handleKeyDown(e)}
         tabIndex={0}
       >
-        {selectedUSBank ? (
-          <span className="font-medium">{selectedUSBank.name}</span>
-        ) : (
-          <span>Select Bank</span>
-        )}
+        {selectedUSBank && (<span className="font-medium">{displayName}</span>)}
+        {!selectedUSBank && <span>{displayName}</span>}
+
       </div>
       {isDropdownOpen && (
         <div

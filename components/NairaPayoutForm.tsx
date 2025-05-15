@@ -179,6 +179,7 @@ const NairaPayoutForm: React.FC<NairaPayoutFormProps> = ({
       <div className="lg:mt-12">
         <label className="block mb-2 font-semibold text-[#111827]">Bank Name</label>
         <BankDropdown
+          formData={formData}
           selectedBank={selectedBank}
           setSelectedBank={setSelectedBank}
           setFormData={setFormData}

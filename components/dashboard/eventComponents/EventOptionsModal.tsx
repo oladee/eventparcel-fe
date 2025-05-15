@@ -31,6 +31,7 @@ const EventOptionsModal: React.FC<EventOptionsModalProps> = ({
   const [loadingMessage, setLoadingMessage] = useState<string | null>("");
   const router = useRouter();
 
+
   // Focus on the modal when it opens and add Escape key support
   useEffect(() => {
     if (isOpen && modalRef.current) {
@@ -179,6 +180,9 @@ const EventOptionsModal: React.FC<EventOptionsModalProps> = ({
                 className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
                 onClick={() => {
                   localStorage.setItem("eventId", eventData._id);
+                  localStorage.setItem("groupLength", eventData.eventGroups.length);
+                  localStorage.setItem("isNairaAccount", eventData.isNairaAccount)
+                  localStorage.setItem("isDollarAccount", eventData.isDollarAccount)
                   router.push("/dashboard/editPaymentDetails");
                 }}
               >
@@ -196,6 +200,7 @@ const EventOptionsModal: React.FC<EventOptionsModalProps> = ({
                 className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
                 onClick={() => {
                   localStorage.setItem("eventId", eventData._id);
+                  localStorage.setItem("groupLength", eventData.eventGroups.length);
                   router.push("/dashboard/editPickupDetail");
                 }}
               >

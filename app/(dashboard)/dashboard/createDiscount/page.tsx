@@ -162,7 +162,7 @@ const Page = () => {
         <div id="discount-header" className="w-[343px] flex flex-col gap-2">
           <h2 id="discount-title" className="font-general text-2xl font-bold text-[#111827]">Create Discounts</h2>
           <p id="discount-description" className="text-sm font-medium text-[#718096]">
-            Create a special discount for some of your guest. It can be in percent or actual value
+            Treat your guests to something special! Set a custom discount by value or percentage
           </p>
         </div>
 
