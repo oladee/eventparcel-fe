@@ -8,6 +8,8 @@ import ContactModal from "@/components/shareContact/ContactModal";
 import SendContactModal from "@/components/shareContact/SendContactModal";
 import Container from "@/components/dashboard/Container";
 import { useRouter, useSearchParams } from "next/navigation";
+import Cookies from "js-cookie";
+
 
 // API contact type
 interface APICONTACT {
@@ -95,14 +97,17 @@ const ShareContact: React.FC = () => {
     if (popUpParam === "true") {
       setPopupLoading(true);
   
+
       // Extract the token from cookies
-      console.log("Cookies:", document.cookie);
-      const cookies = document.cookie.split("; ").reduce((acc, cookie) => {
-        const [key, value] = cookie.split("=");
-        acc[key] = value;
-        return acc;
-      }, {} as Record<string, string>);
-      const googleAccessToken = cookies["googleAccessToken"];
+      // console.log("Cookies:", document.cookie);
+      // const cookies = document.cookie.split("; ").reduce((acc, cookie) => {
+      //   const [key, value] = cookie.split("=");
+      //   acc[key] = value;
+      //   return acc;
+      // }, {} as Record<string, string>);
+      // const googleAccessToken = cookies["googleAccessToken"];
+      const googleAccessToken = Cookies.get("googleAccessToken")
+      console.log("Google Access Token:", googleAccessToken);
       
       if (!googleAccessToken) {
         console.error("Google access token is missing in cookies");
