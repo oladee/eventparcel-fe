@@ -97,6 +97,7 @@ const ShareContact: React.FC = () => {
     if (popUpParam === "true") {
       setPopupLoading(true);
   
+      
       // Extract the token from cookies
       // console.log("Cookies:", document.cookie);
       // const cookies = document.cookie.split("; ").reduce((acc, cookie) => {
