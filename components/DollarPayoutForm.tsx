@@ -44,20 +44,23 @@ const DollarPayoutForm: React.FC<DollarPayoutFormProps> = ({
   // Watch for bank change or routing number input change
   useEffect(() => {
     if (!selectedUSBank || !formData.dollarAccount.routingNumber) return;
-
+  
     const currentRoutingNumber = formData.dollarAccount.routingNumber;
-    const newErrors = { ...errors };
-
+    const newErrors: typeof errors = {};
+  
     if (!/^\d{9}$/.test(currentRoutingNumber)) {
       newErrors.routingNumber = "Must be 9 digits";
     } else if (!selectedUSBank.routingNumber.includes(currentRoutingNumber)) {
       newErrors.routingNumber = "Invalid routing number";
-    } else {
-      delete newErrors.routingNumber;
     }
-
-    setErrors(newErrors);
-  }, [selectedUSBank, formData.dollarAccount.routingNumber, errors, setErrors]);
+  
+    // Only update if errors changed
+    const isDifferent = JSON.stringify(errors.routingNumber) !== JSON.stringify(newErrors.routingNumber);
+    if (isDifferent) {
+      setErrors((prev) => ({ ...prev, ...newErrors }));
+    }
+  }, [selectedUSBank, formData.dollarAccount.routingNumber, errors.routingNumber, setErrors]);
+  
 
   // Function to validate routing number
   const validateRoutingNumber = (routingNumber: string): boolean => {

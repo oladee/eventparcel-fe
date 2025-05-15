@@ -137,7 +137,7 @@ const NewGroup: React.FC = () => {
     <>
     <ToastContainer />
     <Container>
-      <section className="w-auto h-screen">
+      <section className="flex flex-col w-auto h-screen">
         <div className="py-6 lg:py-12">
           {/* Header Section */}
           <div className="mb-6 lg:mb-12 text-start pl-5 lg:text-center">
@@ -151,21 +151,12 @@ const NewGroup: React.FC = () => {
               <span id="desc">
                 Create groups and packages for different types of guests
                 <span
-              onClick={() => setIsRightBarOpen(true)}
-              className="px-2 text-sm cursor-pointer ml-2 rounded-[200px] bg-[#ECB795] text-white"
-            >
-              !
-            </span> 
+                  onClick={() => setIsRightBarOpen(true)}
+                  className="px-2 text-sm cursor-pointer ml-2 rounded-[200px] bg-[#ECB795] text-white"
+                >
+                  !
+                </span> 
               </span>
-              {/* <Image
-                onClick={() => setIsRightBarOpen(true)}
-                src="/images/information.png"
-                width={20}
-                height={20}
-                alt="information"
-                className="cursor-pointer absolute right-2 lg:right-96"
-                id="infoButton"
-                /> */}
             </div>
           </div>
 
@@ -230,11 +221,10 @@ const NewGroup: React.FC = () => {
               </div>
             </div>
           )}
-
-          {/* Right Bar */}
           <RightBar isOpen={isRightBarOpen} setIsOpen={setIsRightBarOpen} />
         </div>
-        <FormButtons fromDashboard={true} isFormValid={!!isFormValid} groups={groups}/>
+          {/* Right Bar */}
+            <FormButtons fromDashboard={true} isFormValid={!!isFormValid} groups={groups}/>
       </section>
     </Container>
     </>

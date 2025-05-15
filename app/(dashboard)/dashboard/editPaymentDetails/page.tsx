@@ -10,7 +10,6 @@ import "react-datepicker/dist/react-datepicker.css";
 import { FormEvent } from "react";
 import { PiCalendarMinus } from "react-icons/pi";
 import { AiOutlineClockCircle } from "react-icons/ai";
-// import HeaderLayout from "@/components/layout/HeaderLayout";
 import { useRouter } from "next/navigation";
 import NairaPayoutForm from "@/components/NairaPayoutForm";
 import DollarPayoutForm from "@/components/DollarPayoutForm";
@@ -391,9 +390,9 @@ const handleSubmit = async (e: FormEvent) => {
 };
   
 
-    const handleCancel = async () => {
+  const handleCancel = async () => {
     router.push("/dashboard/events");
-    };
+  };
 
   if (isLoadingPaymentData) {
     return <div className="flex justify-center items-center bg-[#FFFFFF] w-full h-screen">Loading payment details...</div>;
