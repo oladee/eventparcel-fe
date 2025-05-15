@@ -67,13 +67,49 @@ const ShareContact: React.FC = () => {
   const [, setPopupError] = useState<string>("");
   const [popupModalOpen, setPopupModalOpen] = useState(false);
 
-  // Fetch & auto-show popup
+  // // Fetch & auto-show popup
+  // useEffect(() => {
+  //   if (popUpParam === "true") {
+  //     setPopupLoading(true);
+  //     fetch("https://api-eventparcel.onrender.com/auth/fetch-contacts")
+  //       .then((res) => res.json())
+  //       .then((data) => {
+  //         if (data.success && Array.isArray(data.data)) {
+  //           setPopupContacts(data.data);
+  //         } else {
+  //           setPopupError(data.message || "Failed to fetch contacts");
+  //         }
+  //       })
+  //       .catch((err) => {
+  //         console.error(err);
+  //         setPopupError("Network error fetching contacts");
+  //       })
+  //       .finally(() => {
+  //         setPopupLoading(false);
+  //         setPopupModalOpen(true);
+  //       });
+  //   }
+  // }, [popUpParam]);
   useEffect(() => {
     if (popUpParam === "true") {
       setPopupLoading(true);
-      fetch("https://api-eventparcel.onrender.com/auth/fetch-contacts")
+  
+      // Extract the token from cookies
+      const cookies = document.cookie.split("; ").reduce((acc, cookie) => {
+        const [key, value] = cookie.split("=");
+        acc[key] = value;
+        return acc;
+      }, {} as Record<string, string>);
+      const googleAccessToken = cookies["googleAccessToken"];
+  
+      fetch("https://api-eventparcel.onrender.com/auth/fetch-contacts", {
+        headers: {
+          Authorization: `Bearer ${googleAccessToken}`, // Pass the token in the Authorization header
+        },
+      })
         .then((res) => res.json())
         .then((data) => {
+          
           if (data.success && Array.isArray(data.data)) {
             setPopupContacts(data.data);
           } else {
