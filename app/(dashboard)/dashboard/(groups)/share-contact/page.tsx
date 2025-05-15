@@ -96,6 +96,7 @@ const ShareContact: React.FC = () => {
       setPopupLoading(true);
   
       // Extract the token from cookies
+      console.log("Cookies:", document.cookie);
       const cookies = document.cookie.split("; ").reduce((acc, cookie) => {
         const [key, value] = cookie.split("=");
         acc[key] = value;
