@@ -74,7 +74,7 @@ const OverviewHeader: React.FC<OverviewHeaderProps> = ({
       <div>
             {hasBothSales && (
               <>
-                <div className="flex items-center justify-between">
+                <div className="flex flex-col">
                   <p className="text-xl text-[#751423] font-semibold">
                     {overallSales}
                   </p>
