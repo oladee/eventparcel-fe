@@ -8,7 +8,7 @@ import ContactModal from "@/components/shareContact/ContactModal";
 import SendContactModal from "@/components/shareContact/SendContactModal";
 import Container from "@/components/dashboard/Container";
 import { useRouter, useSearchParams } from "next/navigation";
-import Cookies from "js-cookie";
+// import Cookies from "js-cookie";
 
 
 // API contact type
@@ -149,7 +149,7 @@ const ShareContact: React.FC = () => {
   //   }
   // }, [popUpParam]);
 
-  
+
 
   useEffect(() => {
     if (popUpParam === "true") {
