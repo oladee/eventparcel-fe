@@ -105,7 +105,7 @@ const Verification = () => {
       setOnSuccess(true);
 
       setTimeout(() => {
-        router.push("/reset-password");
+        router.push("/admin-reset-password");
       }, 3000);
     } catch (error: unknown) {
       console.error("Verification error:", error);

@@ -81,7 +81,7 @@ const ResetPassword: React.FC = () => {
       });
       toast.success(response?.data?.message || "Password reset successful.");
       setOnSuccess(true);
-      setTimeout(() => router.push("/"), 3000);
+      setTimeout(() => router.push("/adminLogin"), 3000);
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Something went wrong.");
     } finally {

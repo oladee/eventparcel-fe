@@ -77,8 +77,8 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
     const [selected, setSelected] = useState("All Orders");
     const [isOpen, setIsOpen] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
-    const [isModalOpen, setIsModalOpen] = useState(false);
     const [statusUpdateLoading, setStatusUpdateLoading] = useState(false);
+    const [isModalOpen, setIsModalOpen] = useState(false);
     const [ordersData, setOrdersData] = useState<Order[]>(orders);
     const modalRef = useRef<HTMLDivElement>(null);
 

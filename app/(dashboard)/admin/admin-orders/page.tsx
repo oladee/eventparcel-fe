@@ -88,15 +88,15 @@ const Page = () => {
       setLoading(true);
 
       try {
-        const params: Record<string, any> ={
+        const params: Record<string, any> = {
           page,
           limit,
           ...(debouncedSearchTerm && {
-            search:debouncedSearchTerm,
+            search: debouncedSearchTerm,
           }),
-          ...(orderStatus && {
-            orderStatus
-          })
+          ...(orderStatus && orderStatus !== "All Orders" && {
+            orderStatus,
+          }),
         };
 
         const response = await axiosInstance.get(

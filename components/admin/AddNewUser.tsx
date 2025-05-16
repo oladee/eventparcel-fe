@@ -39,46 +39,51 @@ const AddNewUser: React.FC<AddAdminModalProps> = ({ isOpen, onClose, onSubmit })
   };
 
   const handleSubmit = async () => {
-    if (!firstName || !lastName || !email || !selectedRole) return;
-
+    const trimmedFirstName = firstName.trim();
+    const trimmedLastName = lastName.trim();
+    const trimmedEmail = email.trim().toLowerCase();
+  
+    if (!trimmedFirstName || !trimmedLastName || !trimmedEmail || !selectedRole) return;
+  
     setIsSubmitting(true);
-
+  
     const adminRole = selectedRole === "Super Admin" ? "superAdmin" : "admin";
-
+  
     const newUser = {
-      firstName,
-      lastName,
-      email,
-      role: adminRole
+      firstName: trimmedFirstName,
+      lastName: trimmedLastName,
+      email: trimmedEmail,
+      role: adminRole,
     };
-
+  
     try {
       const res = await axiosInstance.post("/add-admin", newUser);
       const createdAdmin: AdminInterface = res.data.data;
-
+  
       if (!res) throw new Error("Failed to add admin");
-
+  
       toast.success("New Admin added!!!", {
-        autoClose: 100, 
-        onClose: () => { 
+        autoClose: 100,
+        onClose: () => {
           setFirstName("");
           setLastName("");
           setEmail("");
           setSelectedRole(null);
           onClose();
           onSubmit?.(createdAdmin);
-        }
+        },
       });
     } catch (error) {
       const message =
-      axios.isAxiosError(error) && error.response?.data?.message
-        ? error.response.data.message
-        : "Failed to add admin. Please try again.";
-    toast.error(message);
+        axios.isAxiosError(error) && error.response?.data?.message
+          ? error.response.data.message
+          : "Failed to add admin. Please try again.";
+      toast.error(message);
     } finally {
       setIsSubmitting(false);
     }
   };
+  
 
   if (!isOpen) return null;
 

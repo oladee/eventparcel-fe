@@ -194,7 +194,7 @@ const Page: React.FC = () => {
                 <span className="ml-2">Remember me</span>
               </label>
               <a
-                href="/forgot-password"
+                href="/admin-forgotPassword"
                 className="text-primary text-xs font-semibold hover:underline"
               >
                 Forgot Password?
