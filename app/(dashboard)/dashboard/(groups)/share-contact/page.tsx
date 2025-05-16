@@ -93,44 +93,72 @@ const ShareContact: React.FC = () => {
   //       });
   //   }
   // }, [popUpParam]);
+  // useEffect(() => {
+  //   if (popUpParam === "true") {
+  //     setPopupLoading(true);
+  
+
+  //     // Extract the token from cookies
+  //     // console.log("Cookies:", document.cookie);
+  //     // const cookies = document.cookie.split("; ").reduce((acc, cookie) => {
+  //     //   const [key, value] = cookie.split("=");
+  //     //   acc[key] = value;
+  //     //   return acc;
+  //     // }, {} as Record<string, string>);
+  //     // const googleAccessToken = cookies["googleAccessToken"];
+  //     const googleAccessToken = Cookies.get("googleAccessToken")
+  //     console.log("Google Access Token:", googleAccessToken);
+      
+  //     if (!googleAccessToken) {
+  //       console.error("Google access token is missing in cookies");
+  //       setPopupError("Authentication token is missing. Please log in again.");
+  //       setPopupLoading(false);
+  //       return;
+  //     }
+  //     // const cookies = document.cookie.split("; ").reduce((acc, cookie) => {
+  //     //   const [key, value] = cookie.split("=");
+  //     //   acc[key] = value;
+  //     //   return acc;
+  //     // }, {} as Record<string, string>);
+
+  //     // const googleAccessToken = cookies["googleAccessToken"];
+
+  
+  //     fetch("https://api-eventparcel.onrender.com/auth/fetch-contacts", {
+  //       headers: {
+  //         Authorization: `Bearer ${googleAccessToken}`,
+  //       },
+  //     })
+  //       .then((res) => res.json())
+  //       .then((data) => {
+          
+  //         if (data.success && Array.isArray(data.data)) {
+  //           setPopupContacts(data.data);
+  //         } else {
+  //           setPopupError(data.message || "Failed to fetch contacts");
+  //         }
+  //       })
+  //       .catch((err) => {
+  //         console.error(err);
+  //         setPopupError("Network error fetching contacts");
+  //       })
+  //       .finally(() => {
+  //         setPopupLoading(false);
+  //         setPopupModalOpen(true);
+  //       });
+  //   }
+  // }, [popUpParam]);
+
   useEffect(() => {
     if (popUpParam === "true") {
       setPopupLoading(true);
   
-
-      // Extract the token from cookies
-      // console.log("Cookies:", document.cookie);
-      // const cookies = document.cookie.split("; ").reduce((acc, cookie) => {
-      //   const [key, value] = cookie.split("=");
-      //   acc[key] = value;
-      //   return acc;
-      // }, {} as Record<string, string>);
-      // const googleAccessToken = cookies["googleAccessToken"];
-      const googleAccessToken = Cookies.get("googleAccessToken")
-      console.log("Google Access Token:", googleAccessToken);
-      
-      if (!googleAccessToken) {
-        console.error("Google access token is missing in cookies");
-        setPopupError("Authentication token is missing. Please log in again.");
-        setPopupLoading(false);
-        return;
-      }
-      // const cookies = document.cookie.split("; ").reduce((acc, cookie) => {
-      //   const [key, value] = cookie.split("=");
-      //   acc[key] = value;
-      //   return acc;
-      // }, {} as Record<string, string>);
-      // const googleAccessToken = cookies["googleAccessToken"];
-
-  
       fetch("https://api-eventparcel.onrender.com/auth/fetch-contacts", {
-        headers: {
-          Authorization: `Bearer ${googleAccessToken}`,
-        },
+        method: "GET",
+        credentials: "include", 
       })
         .then((res) => res.json())
         .then((data) => {
-          
           if (data.success && Array.isArray(data.data)) {
             setPopupContacts(data.data);
           } else {
@@ -147,6 +175,7 @@ const ShareContact: React.FC = () => {
         });
     }
   }, [popUpParam]);
+  
 
   const handleOptionSelect = useCallback((option: OptionType) => {
     setSelectedOption(option);
