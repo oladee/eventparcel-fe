@@ -1,5 +1,6 @@
 "use client";
 import axiosInstance from "@/lib/adminAxiosInterceptor/axiosInstance";
+import { useRouter } from "next/navigation";
 // import { useRouter } from "next-nprogress-bar";
 import React, { useState, useRef, useEffect } from "react";
 import { FiMoreHorizontal, FiPackage } from "react-icons/fi";
@@ -29,7 +30,19 @@ const AdminUsersTable: React.FC<{ admins: AdminInterface[] }> = ({ admins }) => 
   const [adminList, setAdminList] = useState<AdminInterface[]>(admins);
   const menuRef = useRef<HTMLDivElement>(null);
   const [loadingButton, setLoadingButton] = useState<{ id: number; action: string } | null>(null);
-  // const router = useRouter();
+  const router = useRouter();
+  const [role, setRole] = useState<string | null>(null);
+
+    useEffect(() => {
+      const loggedInUser = localStorage.getItem("loggedInUser");
+      const user = loggedInUser ? JSON.parse(loggedInUser) : null
+  
+      if (!user) {
+        router.push("/");
+        return;
+      }
+      setRole(user.role);
+    }, [router]);
 
   useEffect(() => {
     setAdminList(admins);
@@ -203,8 +216,8 @@ const AdminUsersTable: React.FC<{ admins: AdminInterface[] }> = ({ admins }) => 
                     </span>
                     </td>
                     <td className="p-4 text-right relative">
-                    <button onClick={() => toggleMenu(a._id)}>
-                    <FiMoreHorizontal className="text-gray-400" />
+                    <button disabled={role !== "superAdmin"} onClick={() => toggleMenu(a._id)}>
+                      <FiMoreHorizontal className="text-gray-400" />
                     </button>
                     {menuOpenId === a._id && (
                       <div

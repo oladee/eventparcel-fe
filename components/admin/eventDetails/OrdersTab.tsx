@@ -2,6 +2,7 @@
 import React, { useState, useMemo } from "react"
 import { FiSearch, FiCalendar, FiDownload } from "react-icons/fi"
 import OrderTable, { Order } from "./OrderTable"
+import { saveAs } from 'file-saver'
 
 // Matches the API shape for each order
 export interface EventOrder {
@@ -12,10 +13,10 @@ export interface EventOrder {
   guestEmail: string
   totalAmount: number
   totalAmountCurrency: string
-  orderStatus: "Pending" | "Shipped" | "Completed"
+  orderStatus: "pending" | "shipped" | "delivered"
 }
 
-const statusTabs = ["All Orders", "Pending", "Shipped", "Completed"] as const
+const statusTabs = ["All Orders", "pending", "shipped", "delivered"] as const
 type Status = typeof statusTabs[number]
 
 interface OrdersTabProps {
@@ -27,41 +28,76 @@ const OrdersTab: React.FC<OrdersTabProps> = ({ orders }) => {
   const [search, setSearch] = useState("")
 
   // Filter & map into the table’s Order shape
-  const tableOrders: Order[] = useMemo(
-    () =>
-      orders
-        .filter(o => {
-          if (activeTab !== "All Orders" && o.orderStatus !== activeTab) return false
-          if (
-            search &&
-            !(
-              o.orderId.includes(search) ||
-              `${o.guestFirstName} ${o.guestLastName}`
-                .toLowerCase()
-                .includes(search.toLowerCase())
-            )
-          ) {
-            return false
-          }
-          return true
-        })
-        .map(o => ({
-          id: o.orderId,
-          date: new Date(o.createdAt).toLocaleDateString("en-GB", {
-            day: "2-digit",
-            month: "short",
-            year: "numeric",
-          }),
-          guest: `${o.guestFirstName} ${o.guestLastName}`,
-          email: o.guestEmail,
-          amount:
-            o.totalAmountCurrency === "NGN"
-              ? `₦${o.totalAmount.toLocaleString()}`
-              : `$${o.totalAmount.toLocaleString()}`,
-          status: o.orderStatus,
-        })),
-    [activeTab, search, orders]
-  )
+  const tableOrders: Order[] = useMemo(() => {
+    return orders
+      .filter(order => {
+        const matchesStatus =
+          activeTab === "All Orders" || order.orderStatus === activeTab
+  
+        const fullName = `${order.guestFirstName} ${order.guestLastName}`.toLowerCase()
+        const matchesSearch =
+          !search ||
+          order.orderId.toLowerCase().includes(search.toLowerCase()) ||
+          fullName.includes(search.toLowerCase())
+  
+        return matchesStatus && matchesSearch
+      })
+      .map(order => ({
+        id: order.orderId,
+        date: new Date(order.createdAt).toLocaleDateString("en-GB", {
+          day: "2-digit",
+          month: "short",
+          year: "numeric",
+        }),
+        guest: `${order.guestFirstName} ${order.guestLastName}`,
+        email: order.guestEmail,
+        amount:
+          order.totalAmountCurrency === "NGN"
+            ? `₦${order.totalAmount.toLocaleString()}`
+            : `$${order.totalAmount.toLocaleString()}`,
+        status: order.orderStatus,
+      }))
+  }, [orders, search, activeTab])
+
+  console.log("tableOrders", tableOrders)
+
+
+
+  
+const handleExport = () => {
+  const csvHeaders = ['Order ID', 'Date', 'Guest', 'Email', 'Amount', 'Status']
+
+  const escapeCSV = (value: string) => {
+    if (value.includes(',') || value.includes('"')) {
+      return `"${value.replace(/"/g, '""')}"`
+    }
+    return value
+  }
+
+  const csvRows = tableOrders.map(order => [
+    order.id,
+    order.date,
+    order.guest,
+    order.email,
+    escapeCSV(order.amount), // Quote to protect values like ₦4,000 or $2,000
+    order.status === 'delivered' ? 'Completed' : capitalize(order.status),
+  ])
+
+  const csvContent = [
+    csvHeaders,
+    ...csvRows
+  ]
+    .map(row => row.join(','))
+    .join('\n')
+
+  // Add BOM to handle special characters like ₦
+  const BOM = '\uFEFF'
+  const blob = new Blob([BOM + csvContent], { type: 'text/csv;charset=utf-8;' })
+  saveAs(blob, 'orders.csv')
+}
+
+const capitalize = (text: string) =>
+  text.charAt(0).toUpperCase() + text.slice(1).toLowerCase()
 
   return (
     <div className="space-y-4 bg-white rounded-2xl py-4 overflow-x-auto">
@@ -78,7 +114,7 @@ const OrdersTab: React.FC<OrdersTabProps> = ({ orders }) => {
                   : "text-[#718096]"
               }`}
             >
-              {tab}
+              {tab === "delivered" ? "Completed" : tab}
             </button>
           ))}
         </nav>
@@ -100,7 +136,7 @@ const OrdersTab: React.FC<OrdersTabProps> = ({ orders }) => {
           <FiCalendar className="text-gray-400 mr-2" />
           <span className="text-[#718096] text-sm">All dates</span>
         </div>
-        <button className="flex items-center bg-[#FAFAFA] rounded-[12px] px-4 py-4 text-[#718096] text-sm">
+        <button onClick={handleExport} className="flex items-center bg-[#FAFAFA] rounded-[12px] px-4 py-4 text-[#718096] text-sm">
           <FiDownload className="mr-2" /> Download
         </button>
       </div>

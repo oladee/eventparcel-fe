@@ -27,8 +27,17 @@ interface PayoutDetails {
     accountNumber: string
     bankName: string
     accountName: string
-  }
+  },
+  dollarAccount?: {
+    usBankName: string
+    usAccountNumber: string
+    usAccountName: string
+    routingNumber: string
+  },
+  pickupLocation: string
+  contactPhoneNumber: string
 }
+
 interface HostDetails {
   hostFirstName: string
   hostLastName: string
@@ -116,16 +125,64 @@ const EventDetailPage: React.FC = () => {
     )
   }
 
-  // calculate overall Naira sales
-  const totalNaira = data.orders.orders
-    .filter(o => o.totalAmountCurrency === "NGN")
-    .reduce((sum, o) => sum + o.totalAmount, 0)
-  const formattedOverall = `₦${totalNaira.toLocaleString()}`
+  // // calculate overall Naira sales
+  // const totalNaira = data.orders.orders
+  //   .filter(o => o.totalAmountCurrency === "NGN")
+  //   .reduce((sum, o) => sum + o.totalAmount, 0)
+  // const totalDollar = data.orders.orders
+  // .filter(o => o.totalAmountCurrency === "USD")
+  // .reduce((sum, o) => sum + o.totalAmount, 0)
 
-  // safe payout
-  const acctNum = data.payoutDetails?.nairaAccount?.accountNumber ?? "-"
+  // const formattedOverall = `₦${totalNaira.toLocaleString()}`
+  // const formattedOverallDollar = `$${totalDollar.toLocaleString()}`
 
-  console.log(data)
+
+  // // safe payout
+  // const acctNum = data.payoutDetails?.nairaAccount?.accountNumber ?? "-"
+
+  // console.log(data)
+
+    // Calculate sales based on currency
+    const calculateSales = () => {
+      const nairaSales = data.orders.orders
+        .filter(o => o.totalAmountCurrency === "NGN")
+        .reduce((sum, o) => sum + o.totalAmount, 0)
+      
+      const dollarSales = data.orders.orders
+        .filter(o => o.totalAmountCurrency === "USD")
+        .reduce((sum, o) => sum + o.totalAmount, 0)
+  
+      return {
+        naira: `₦${nairaSales.toLocaleString()}`,
+        dollar: `$${dollarSales.toLocaleString()}`
+      }
+    }
+
+    const sales = data ? calculateSales() : { naira: "", dollar: "" }
+
+    // Determine which sales to pass based on account types
+    const getSalesProps = () => {
+      const hasNairaAccount = !!data?.payoutDetails?.nairaAccount
+      const hasDollarAccount = !!data?.payoutDetails?.dollarAccount
+  
+      if (hasNairaAccount && hasDollarAccount) {
+        return {
+          overallSales: sales.naira,
+          overallSalesDollar: sales.dollar
+        }
+      } else if (hasNairaAccount) {
+        return { overallSales: sales.naira }
+      } else if (hasDollarAccount) {
+        return { overallSalesDollar: sales.dollar }
+      }
+      return {} // No accounts, pass neither
+    }
+  
+    const salesProps = getSalesProps()
+  
+    // safe payout
+    // const acctNum = data?.payoutDetails?.nairaAccount?.accountNumber ?? "-"
+    const acctNum = "dummy"
 
   return (
     <AdminContainer>
@@ -139,7 +196,9 @@ const EventDetailPage: React.FC = () => {
             date={data.date}
             time={data.time}
             location={data.eventLocation}
-            overallSales={formattedOverall}
+            // overallSales={formattedOverall}
+            // overallSalesDollar={formattedOverallDollar}
+            {...salesProps} // Spread the conditional sales props
             netPayout={acctNum}
             packagesSold={data.orders.orders.length}
           />

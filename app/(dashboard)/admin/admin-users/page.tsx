@@ -27,6 +27,7 @@ const AdminPage: React.FC = () => {
   const [adminData, setAdminData] = useState<AdminInterface[]>([]); 
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>("");
+  const [role, setRole] = useState<string | null>(null);
 
   const filtered = useMemo(() => {
     let data = adminData;
@@ -42,6 +43,18 @@ const AdminPage: React.FC = () => {
     }
     return data;
   }, [activeTab, search, adminData]);
+
+  
+  useEffect(() => {
+    const loggedInUser = localStorage.getItem("loggedInUser");
+    const user = loggedInUser ? JSON.parse(loggedInUser) : null
+
+    if (!user) {
+      Router.push("/");
+      return;
+    }
+    setRole(user.role);
+  }, [Router]);
 
   useEffect(() => {
     const fetchAdmins = async () => {
@@ -146,11 +159,13 @@ const AdminPage: React.FC = () => {
               />
             </div>
           </div>
-
+          
+        {role === "superAdmin" && (
           <div id="permission&newUser" className="flex flex-row justify-between">
             <button id="permissions" className="w-[153px] h-[40px] border border-[#751423] bg-[#FFFFFF] text-[#751423] rounded-[12px] font-medium text-base" onClick={() => Router.push("admin-permissions")}>Permissions</button>
             <button id="newUser" className="w-[171px] h-[40px] ml-3 bg-[#751423] text-[#FFFFFF] rounded-[12px] font-bold text-base" onClick={() => setNewUser(true)}>Add New User</button>
           </div>
+        )}
         </div>
 
         {/* Table */}

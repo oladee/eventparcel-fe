@@ -8,12 +8,71 @@ import { GrLocation } from "react-icons/gr"
 
 interface SidebarInfoProps {
   host: { hostFirstName: string; hostLastName: string; hostEmail: string }
-  payout?: { nairaAccount?: { accountNumber: string; bankName: string; accountName: string } }
+  payout?: {
+    nairaAccount?: {
+      accountNumber: string
+      bankName: string
+      accountName: string
+    },
+    dollarAccount?: {
+      usBankName: string
+      usAccountNumber: string
+      usAccountName: string
+      routingNumber: string
+    },
+    pickupLocation: string,
+    contactPhoneNumber: string
+  }
   deliveryStat: { homeDelivery: number; pickUp: number }
 }
 
+const AccountSection: React.FC<{
+  type: 'Naira' | 'Dollar'
+  account?: {
+    accountName: string
+    accountNumber: string
+    bankName?: string
+    usBankName?: string
+    routingNumber?: string
+  }
+}> = ({ type, account }) => {
+  if (!account) return null
+
+  return (
+    <>
+      <div className="mt-2 border-t border-[#EEEFF2] pt-3">
+        <p className="font-semibold text-black-100">{account.accountName}</p>
+        <p className="text-[#718096] text-sm font-medium">{type}</p>
+      </div>
+      <div className="mt-4 border-t pt-3 text-sm">
+        <p>
+          <span className="text-[#718096]">Account:</span>{' '}
+          <span className="font-semibold text-[#718096]">{account.accountNumber}</span>
+        </p>
+        {account.bankName && (
+          <p className="mt-2">
+            <span className="text-[#718096]">Bank:</span>{' '}
+            <span className="font-semibold text-[#718096]">{account.bankName}</span>
+          </p>
+        )}
+        {account.usBankName && (
+          <p className="mt-2">
+            <span className="text-[#718096]">US Bank:</span>{' '}
+            <span className="font-semibold text-[#718096]">{account.usBankName}</span>
+          </p>
+        )}
+        {account.routingNumber && (
+          <p className="mt-2">
+            <span className="text-[#718096]">Routing Number:</span>{' '}
+            <span className="font-semibold text-[#718096]">{account.routingNumber}</span>
+          </p>
+        )}
+      </div>
+    </>
+  )
+}
+
 const SidebarInfo: React.FC<SidebarInfoProps> = ({ host, payout, deliveryStat }) => {
-  const account = payout?.nairaAccount || { accountNumber: '-', bankName: '-', accountName: '-' }
   return (
     <div className="space-y-6">
       {/* host details */}
@@ -36,20 +95,35 @@ const SidebarInfo: React.FC<SidebarInfoProps> = ({ host, payout, deliveryStat })
       {/* payout details */}
       <div className="bg-white rounded-2xl p-4">
         <h4 className="text-lg font-bold text-black-100">Payout Details</h4>
-        <div className="mt-2 border-t border-[#EEEFF2] pt-3">
-          <p className="font-semibold text-black-100">{account.accountName}</p>
-          <p className="text-[#718096] text-sm font-medium">Naira</p>
-        </div>
-        <div className="mt-4 border-t pt-3 text-sm">
-          <p>
-            <span className="text-[#718096]">Account:</span>{' '}
-            <span className="font-semibold text-[#718096]">{account.accountNumber}</span>
-          </p>
-          <p className="mt-2">
-            <span className="text-[#718096]">Bank:</span>{' '}
-            <span className="font-semibold text-[#718096]">{account.bankName}</span>
-          </p>
-        </div>
+        
+        {payout?.nairaAccount && (
+          <AccountSection 
+            type="Naira" 
+            account={{
+              accountName: payout.nairaAccount.accountName,
+              accountNumber: payout.nairaAccount.accountNumber,
+              bankName: payout.nairaAccount.bankName
+            }} 
+          />
+        )}
+        
+        {payout?.dollarAccount && (
+          <AccountSection 
+            type="Dollar" 
+            account={{
+              accountName: payout.dollarAccount.usAccountName.charAt(0).toUpperCase() + payout.dollarAccount.usAccountName.slice(1),
+              accountNumber: payout.dollarAccount.usAccountNumber,
+              usBankName: payout.dollarAccount.usBankName,
+              routingNumber: payout.dollarAccount.routingNumber
+            }} 
+          />
+        )}
+
+        {!payout?.nairaAccount && !payout?.dollarAccount && (
+          <div className="mt-2 border-t border-[#EEEFF2] pt-3 text-[#718096] text-sm">
+            No payout details available
+          </div>
+        )}
       </div>
 
       {/* delivery stats */}
@@ -81,11 +155,18 @@ const SidebarInfo: React.FC<SidebarInfoProps> = ({ host, payout, deliveryStat })
           </div>
           <div className="flex items-center gap-3">
             <PiPhoneBold className="text-[#A0AEC0]" size={24} />{' '}
-            N/A
+            {payout?.contactPhoneNumber || "N/A"}
           </div>
         </div>
         <div className="flex items-start gap-3 mt-2 text-[#A0AEC0] font-medium border-t border-[#EEEFF2] pt-3">
-          <GrLocation size={24} /> <p className="text-sm text-[#718096]">N/A</p>
+          <GrLocation size={24} /> <p className="text-sm text-[#718096]">
+          {payout?.pickupLocation
+              ? payout.pickupLocation
+                  .split(" ")
+                  .map(word => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+                  .join(" ")
+              : "N/A"}
+          </p>
         </div>
       </div>
     </div>
@@ -93,9 +174,6 @@ const SidebarInfo: React.FC<SidebarInfoProps> = ({ host, payout, deliveryStat })
 }
 
 export default SidebarInfo
-
-
-
 
 
 

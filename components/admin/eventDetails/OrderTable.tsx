@@ -59,14 +59,16 @@ const OrderTable: React.FC<{ orders: Order[] }> = ({ orders }) => (
           <td className="p-4">
             <span
               className={`px-2 py-1 text-xs rounded-full ${
-                o.status === "Pending"
+                o.status === "pending"
                   ? "bg-yellow-100 text-yellow-700"
-                  : o.status === "Shipped"
+                  : o.status === "shipped"
                   ? "bg-purple-100 text-purple-700"
                   : "bg-green-100 text-green-700"
               }`}
             >
-              {o.status}
+              {o.status === "delivered"
+                ? "Completed"
+                : o.status.charAt(0).toUpperCase() + o.status.slice(1)}
             </span>
           </td>
           <td className="p-4 text-right">
