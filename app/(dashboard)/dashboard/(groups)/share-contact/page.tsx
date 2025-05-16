@@ -149,6 +149,8 @@ const ShareContact: React.FC = () => {
   //   }
   // }, [popUpParam]);
 
+  
+
   useEffect(() => {
     if (popUpParam === "true") {
       setPopupLoading(true);
