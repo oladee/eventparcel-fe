@@ -283,7 +283,7 @@ const PaymentSetupContent = () => {
         isDraft: true
       };
   
-      await axiosInstance.put(`/payment-save-for-later`, fullFormData);
+      await axiosInstance.post(`/payment-save-for-later`, fullFormData);
       toast.success("Saved! Continue from your dashboard.");
       router.push("/dashboard");
     } catch (error: any) {
@@ -517,6 +517,7 @@ const PaymentSetupContent = () => {
               <div className="max-w-3xl flex gap-4 items-center justify-center sm:justify-end w-full px-4">
               <button
                 id="save"
+                type="button"
                 className="p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827]"
                 onClick={() => handleSaveForLater()}
                 >
