@@ -174,32 +174,70 @@ const Chart: React.FC = () => {
   const router = useRouter();
 
   // --------------------- FETCH DATA ---------------------
-  useEffect(() => {
-    const loggedInUserId = localStorage.getItem("loggedInUserId");
+  const [userId, setUserId] = useState<string | null>(null);
 
-    if (!loggedInUserId) {
-      router.replace("/");
-      console.log(
-        "User ID not found in localStorage. Redirecting to login page."
-      );
-      return;
-    }
-    axiosInstance
-      .get(`/dashboard-data/${loggedInUserId}`)
-      .then((response) => {
-        if (response.data.success) {
-          setDashboardData(response.data.data);
-        } else {
-          setError("Failed to fetch dashboard data");
-        }
-        setLoading(false);
-      })
-      .catch((err) => {
-        console.error(err);
-        setError("An error occurred while fetching data");
-        setLoading(false);
-      });
-  }, [router]);
+// Fetch userId safely in useEffect
+useEffect(() => {
+  const storedUserId = localStorage.getItem("loggedInUserId");
+
+  if (!storedUserId) {
+    console.warn("User ID not found in localStorage.");
+    router.replace("/");
+    return;
+  }
+
+  setUserId(storedUserId);
+}, [router]);
+
+// Another useEffect to fetch data only after userId is available
+useEffect(() => {
+  if (!userId) return;
+
+  setLoading(true);
+  axiosInstance
+    .get(`/dashboard-data/${userId}`)
+    .then((response) => {
+      if (response.data.success) {
+        setDashboardData(response.data.data);
+      } else {
+        setError("Failed to fetch dashboard data");
+      }
+    })
+    .catch((err) => {
+      console.error(err);
+      setError("An error occurred while fetching data");
+    })
+    .finally(() => {
+      setLoading(false);
+    });
+}, [userId]);
+
+  // useEffect(() => {
+  //   const loggedInUserId = localStorage.getItem("loggedInUserId");
+
+  //   if (!loggedInUserId) {
+  //     router.replace("/");
+  //     console.log(
+  //       "User ID not found in localStorage. Redirecting to login page."
+  //     );
+  //     return;
+  //   }
+  //   axiosInstance
+  //     .get(`/dashboard-data/${loggedInUserId}`)
+  //     .then((response) => {
+  //       if (response.data.success) {
+  //         setDashboardData(response.data.data);
+  //       } else {
+  //         setError("Failed to fetch dashboard data");
+  //       }
+  //       setLoading(false);
+  //     })
+  //     .catch((err) => {
+  //       console.error(err);
+  //       setError("An error occurred while fetching data");
+  //       setLoading(false);
+  //     });
+  // }, [router]);
 
   // --------------------- RENDER STATES ---------------------
   if (loading) {
