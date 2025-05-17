@@ -299,15 +299,19 @@ const Chart: React.FC = () => {
                 }`}
               >
                 ₦
-                {(dashboardData.overallSales.naira.totalAmount / 1e6).toFixed(
+                {/* {(dashboardData.overallSales.naira.totalAmount / 1e6).toFixed(
                   2
-                )}
-                M
+                )} */}
+                {dashboardData.overallSales.naira.totalAmount.toLocaleString()}
               </p>
               {currency === "naira" && (
                 <span className="hidden md:flex items-center text-[10px] md:text-xs font-medium text-white bg-primary px-2 py-2 rounded-full">
                   <GrLineChart className="mr-1" />
-                  {Math.abs(dashboardData.overallSales.naira.growthRate)}%
+                  {/* {Math.abs(dashboardData.overallSales.naira.growthRate)}% */}
+                  {Math.abs(
+                    dashboardData.overallSales.naira.growthRate
+                  ).toFixed(2)}
+                  %
                 </span>
               )}
             </div>
@@ -325,17 +329,22 @@ const Chart: React.FC = () => {
                   currency === "dollar" ? "text-[#F7B500]" : "text-gray-400"
                 }`}
               >
-                $
+                {/* $
                 {dashboardData.overallSales.dollar.totalAmount >= 1000
                   ? `${(
                       dashboardData.overallSales.dollar.totalAmount / 1000
                     ).toFixed(2)}k`
-                  : dashboardData.overallSales.dollar.totalAmount}
+                  : dashboardData.overallSales.dollar.totalAmount} */}
+                $
+                {dashboardData.overallSales.dollar.totalAmount.toLocaleString()}
               </p>
               {currency === "dollar" && (
                 <span className="hidden md:flex items-center text-[10px] md:text-xs font-medium text-white bg-[#F7B500] px-2 py-2 rounded-full">
                   <GrLineChart className="mr-1" />
-                  {Math.abs(dashboardData.overallSales.dollar.growthRate)}%
+                  {Math.abs(
+                    dashboardData.overallSales.dollar.growthRate
+                  ).toFixed(2)}
+                  %
                 </span>
               )}
             </div>
