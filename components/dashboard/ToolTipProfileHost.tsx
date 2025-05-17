@@ -12,9 +12,9 @@ const ToolTipProfileHost: React.FC = () => {
     router.replace("/"); // Navigate to /login
   };
 
-//   const handleChangePassword = () => {
-//     router.push("/admin/admin-changePassword"); // Navigate to change password page
-//   };
+  const handleChangePassword = () => {
+    router.push("/admin/admin-changePassword"); // Navigate to change password page
+  };
 
   return (
     <div
@@ -23,14 +23,14 @@ const ToolTipProfileHost: React.FC = () => {
         w-56 bg-white rounded-xl shadow-xl z-50
       "
     >
-      {/* <div className="flex flex-col divide-y divide-gray-200">
+      <div className="flex flex-col divide-y divide-gray-200">
         <button
           onClick={handleChangePassword} // Attach the change password handler
           className="px-4 py-3 text-left text-gray-700 hover:bg-gray-50"
         >
           Change Password
         </button>
-      </div> */}
+      </div>
 
       <div className="border-gray-200 px-4 py-3 rounded-b-xl">
         <button
