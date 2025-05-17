@@ -20,7 +20,7 @@ const EventSaveSuccess: React.FC = () => {
         Create an account or login to your account to complete this action
       </p>
       
-      <Link href="/sign-up" className="button_v1">
+      <Link href="/signup" className="button_v1">
         <button className="">Create Account</button>
       </Link>
       <Link href="/" className="w-full bg-[#FFFFFF] text-[#111827] border border-[#111827] py-3 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center">
