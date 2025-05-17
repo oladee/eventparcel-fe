@@ -38,7 +38,7 @@ export default function ConfirmationCards() {
               id="order-placed-description"
               className="text-sm w-full text-[#718096] font-medium mt-1 leading-[160%] tracking-[0px] text-center"
             >
-              You have successfully placed an order. Details regarding your preferred delivery mode alongside updates will be sent via email.
+             You have successfully placed an order, your delivery update will be sent via email and phone
             </p>
           </div>
 
