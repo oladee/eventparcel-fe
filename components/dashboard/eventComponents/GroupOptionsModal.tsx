@@ -49,10 +49,10 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
 
   // Share group link function
   const handleShareGroupLink = async () => {
-    if (!group || !group.link){
+    if (!group || !group.link) {
       alert("No link available to share.");
       return;
-    }    
+    }
     const shareUrl = group.link;
 
     if (navigator.share) {
@@ -109,21 +109,17 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
       setLoading(true);
       setLoadingMessage(isCurrentlyDisabled ? "Enabling..." : "Disabling..."); // Set appropriate loading message
 
-       await axiosInstance.put(
-        `/disable-enable-group/${group._id}`,
-        {
-          isDisabled: !isCurrentlyDisabled // Toggle the isDisabled state
-        }
-      );
+      await axiosInstance.put(`/disable-enable-group/${group._id}`, {
+        isDisabled: !isCurrentlyDisabled // Toggle the isDisabled state
+      });
       // toast.success(response.data.message || "Group status updated successfully");
       toast.success(
         `Group ${isCurrentlyDisabled ? "enabled" : "disabled"} successfully`
       );
       setTimeout(() => {
-      window.dispatchEvent(new Event("refreshEvents"));
+        window.dispatchEvent(new Event("refreshEvents"));
         onClose();
       }, 2000);
-
     } catch (error: any) {
       console.error("Error disabling/enabling group:", error);
       if (
@@ -142,7 +138,6 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
   };
 
   if (!isOpen) return null; // Don't render if modal is closed
-  
 
   return (
     <>
@@ -181,19 +176,21 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
             </button>
           </div>
           <div className="grid gap-4">
-            {/* <div
-              className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
-              onClick={() => setIsAddGroupOpen(true)}
-            >
-              <div className="flex items-center">
-                <span className="p-2 bg-[#FFF7F2] rounded-full text-primary">
-                  <LuPencilLine size={20} />
-                </span>
-                <span className="ml-3 font-medium">Edit Group</span>
+            {/* {!eventData.isShared && !group?.isDisabled && (
+              <div
+                className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
+                onClick={() => setIsAddGroupOpen(true)}
+              >
+                <div className="flex items-center">
+                  <span className="p-2 bg-[#FFF7F2] rounded-full text-primary">
+                    <LuPencilLine size={20} />
+                  </span>
+                  <span className="ml-3 font-medium">Edit Group</span>
+                </div>
+                <PiCaretRightBold />
               </div>
-              <PiCaretRightBold />
-            </div> */}
-            {!eventData.isShared && !group?.isDisabled && (
+            )} */}
+            {!group?.isDisabled && (
               <div
                 className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
                 onClick={() => setIsAddGroupOpen(true)}
@@ -208,23 +205,21 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
               </div>
             )}
 
-
-            {
-              !group?.isDisabled &&     <div
-              className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
-              onClick={handleShareGroupLink}
-            >
-              <div className="flex items-center">
-                <span className="p-2 bg-[#FFF7F2] rounded-full text-primary">
-                  <GoShareAndroid size={20} />
-                </span>
-                <span className="ml-3 font-medium">Share Group Link</span>
+            {!group?.isDisabled && (
+              <div
+                className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
+                onClick={handleShareGroupLink}
+              >
+                <div className="flex items-center">
+                  <span className="p-2 bg-[#FFF7F2] rounded-full text-primary">
+                    <GoShareAndroid size={20} />
+                  </span>
+                  <span className="ml-3 font-medium">Share Group Link</span>
+                </div>
+                <PiCaretRightBold />
               </div>
-              <PiCaretRightBold />
-            </div>
-            }
+            )}
 
-        
             <div
               className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
               onClick={handleDisableGroup}

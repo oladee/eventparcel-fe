@@ -30,7 +30,7 @@ const EventDetailsSection: React.FC<EventDetailsProps> = ({ eventData }) => {
     date,
     time,
     eventLocation,
-    isShared,
+    isShared
   } = eventData;
 
   // Format the date
@@ -64,12 +64,14 @@ const EventDetailsSection: React.FC<EventDetailsProps> = ({ eventData }) => {
         )}
 
         {/* More Options Button */}
-        <button
-          onClick={toggleModal}
-          className="absolute top-3 right-3 bg-white p-2 rounded-[8px] shadow-md"
-        >
-          <FiMoreHorizontal size={20} className="text-gray-600" />
-        </button>
+        {!isShared && (
+          <button
+            onClick={toggleModal}
+            className="absolute top-3 right-3 bg-white p-2 rounded-[8px] shadow-md"
+          >
+            <FiMoreHorizontal size={20} className="text-gray-600" />
+          </button>
+        )}
       </div>
 
       {/* Details Section */}
@@ -104,21 +106,6 @@ const EventDetailsSection: React.FC<EventDetailsProps> = ({ eventData }) => {
 };
 
 export default EventDetailsSection;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // // "use client";
 
@@ -215,31 +202,6 @@ export default EventDetailsSection;
 // };
 
 // export default EventDetailsSection;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // "use client";
 
