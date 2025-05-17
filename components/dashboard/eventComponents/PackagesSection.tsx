@@ -275,7 +275,7 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
         isOpen={isModalOpen}
         onClose={toggleModal}
         group={selectedGroup}
-        eventData={eventData}
+        // eventData={eventData}
       />
     </>
   );
