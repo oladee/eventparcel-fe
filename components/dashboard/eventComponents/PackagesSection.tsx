@@ -71,10 +71,27 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
     toast.warning("This action is not allowed on a disabled group.");
   };
 
+
+
   return (
     <>
       <ToastContainer />
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-11">
+      <div className="flex justify-between items-center mb-4 mt-11">
+        <h1 className="capitalize text-2xl text-[#111827] font-bold font-general">
+          Groups
+        </h1>
+
+        <button
+          onClick={handleAddGroupClick}
+          className="flex items-center outline-none"
+        >
+          <Image src="/images/plus.png" alt="plus" width={32} height={32} />
+          <span className="font-general font-medium text-base text-[#751423] capitalize">
+            Add New Group
+          </span>
+        </button>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
         {groups.map((group) => (
           <div key={group._id} className="bg-white rounded-2xl p-6">
             {/* Header Section */}
@@ -246,7 +263,7 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
             </div>
           </div>
         ))}
-        <div className="flex justify-center">
+        {/* <div className="flex justify-center">
           <div
             className="flex w-full max-w-2xl py-4 rounded-2xl flex-col border-[2px] border-dashed justify-center items-center ml-[5px] bg-[#FFFFFF66] cursor-pointer"
             onClick={handleAddGroupClick}
@@ -256,7 +273,7 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
               Add Groups
             </span>
           </div>
-        </div>
+        </div> */}
       </div>
 
       {openModalPackage && (
