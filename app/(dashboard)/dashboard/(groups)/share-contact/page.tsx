@@ -7,7 +7,6 @@ import ContactModal from "@/components/shareContact/ContactModal";
 import SendContactModal from "@/components/shareContact/SendContactModal";
 import Container from "@/components/dashboard/Container";
 import { useRouter, useSearchParams } from "next/navigation";
-import Cookies from "js-cookie";
 
 // API contact type
 interface APICONTACT {
@@ -62,7 +61,7 @@ const ShareContact: React.FC = () => {
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
   const [popupContacts, setPopupContacts] = useState<APICONTACT[]>([]);
-  const [, setPopupLoading] = useState(false);
+  const [popupLoading, setPopupLoading] = useState(false);
   const [, setPopupError] = useState<string>("");
   const [popupModalOpen, setPopupModalOpen] = useState(false);
 
@@ -72,39 +71,30 @@ const ShareContact: React.FC = () => {
     if (popUpParam === "true") {
       setPopupLoading(true);
 
-      const googleAccessToken = Cookies.get("googleAccessToken");
-      const token = Cookies.get("refreshToken");
-      console.log('this is the refresh token',token)
+      const delayAndFetch = async () => {
+        await new Promise((resolve) => setTimeout(resolve, 5000));
 
-      if (!googleAccessToken) {
-        console.error("Google access token is missing in cookies");
-        setPopupError("Authentication token is missing. Please log in again.");
-        setPopupLoading(false);
-        return;
-      }
+        try {
+          const res = await fetch(
+            "https://api-eventparcel.onrender.com/auth/fetch-contacts"
+          );
+          const data = await res.json();
 
-      fetch("https://api-eventparcel.onrender.com/auth/fetch-contacts", {
-        method: "GET",
-        headers: {
-          Authorization: `Bearer ${googleAccessToken}`,
-        },
-      })
-        .then((res) => res.json())
-        .then((data) => {
           if (data.success && Array.isArray(data.data)) {
             setPopupContacts(data.data);
           } else {
             setPopupError(data.message || "Failed to fetch contacts");
           }
-        })
-        .catch((err) => {
+        } catch (err) {
           console.error(err);
-          setPopupError("Network error fetching contacts");
-        })
-        .finally(() => {
+          setPopupError("Network error while fetching contacts");
+        } finally {
           setPopupLoading(false);
           setPopupModalOpen(true);
-        });
+        }
+      };
+
+      delayAndFetch();
     }
   }, [popUpParam]);
 
@@ -118,17 +108,29 @@ const ShareContact: React.FC = () => {
     } else if (selectedOption === "contact") {
       router.push("https://api-eventparcel.onrender.com/auth/google/contacts");
     }
-  }, [selectedOption,router]);
+  }, [selectedOption, router]);
 
   return (
     <Container>
+      {popupLoading && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-40">
+          <div className="bg-white px-6 py-4 rounded-md shadow-md text-center">
+            <p className="text-lg font-medium">Fetching your contacts...</p>
+            <p className="text-sm text-gray-500 mt-1">
+              This may take a few seconds
+            </p>
+          </div>
+        </div>
+      )}
+
       <div className="h-screen bg-gray-50 flex flex-col justify-between">
         <div className="flex flex-col items-center justify-center p-6 mt-28">
           <h2 className="text-2xl md:text-3xl font-bold text-[#111827] capitalize">
             Import Contacts
           </h2>
           <p className="text-gray-600 mt-2 text-center">
-            Import contacts to send a unique invite to each of your imported contacts.
+            Import contacts to send a unique invite to each of your imported
+            contacts.
           </p>
           <div className="mt-8 w-full max-w-md grid gap-4">
             <OptionCard
@@ -145,7 +147,9 @@ const ShareContact: React.FC = () => {
               onSelect={handleOptionSelect}
               Icon={CSV}
               title="Upload CSV"
-              description={<>Upload a CSV file exported from your contact list</>}
+              description={
+                <>Upload a CSV file exported from your contact list</>
+              }
             />
           </div>
         </div>
@@ -155,7 +159,9 @@ const ShareContact: React.FC = () => {
             onClick={handleContinue}
             disabled={!selectedOption}
             className={`bg-primary text-white py-3 px-8 rounded-[12px] transition flex items-center justify-center font-extrabold ${
-              !selectedOption ? "opacity-50 cursor-not-allowed" : "hover:bg-red-800"
+              !selectedOption
+                ? "opacity-50 cursor-not-allowed"
+                : "hover:bg-red-800"
             }`}
           >
             Continue
@@ -192,7 +198,7 @@ const ShareContact: React.FC = () => {
         eventGroupId={groupId}
         contacts={popupContacts.map((c) => ({
           guestName: c.name,
-          phoneNumber: c.phoneNumber,
+          phoneNumber: c.phoneNumber
         }))}
         phoneNumbers={popupContacts.map((c) => c.phoneNumber)}
       />
@@ -207,38 +213,6 @@ export default function Page() {
     </Suspense>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // "use client";
 
@@ -523,8 +497,6 @@ export default function Page() {
 //   );
 // };
 
-
-
 // export default function Page() {
 //   return (
 //     <Suspense fallback={<div>Loading...</div>}>
@@ -532,6 +504,3 @@ export default function Page() {
 //     </Suspense>
 //   );
 // }
-
-
-
