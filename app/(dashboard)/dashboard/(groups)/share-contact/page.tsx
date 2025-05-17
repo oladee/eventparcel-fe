@@ -1,5 +1,4 @@
-"use client"
-
+"use client";
 
 import React, { useState, useEffect, useCallback, Suspense } from "react";
 import { CSV, Doc, Done } from "@/components/icons/Icons";
@@ -8,8 +7,7 @@ import ContactModal from "@/components/shareContact/ContactModal";
 import SendContactModal from "@/components/shareContact/SendContactModal";
 import Container from "@/components/dashboard/Container";
 import { useRouter, useSearchParams } from "next/navigation";
-// import Cookies from "js-cookie";
-
+import Cookies from "js-cookie";
 
 // API contact type
 interface APICONTACT {
@@ -19,22 +17,22 @@ interface APICONTACT {
 
 type OptionType = "contact" | "csv";
 
-type OptionCardProps = {
+const OptionCard: React.FC<{
   option: OptionType;
   selectedOption: OptionType | null;
   onSelect: (option: OptionType) => void;
   Icon: React.ComponentType<{ width: number; height: number }>;
   title: string;
   description: React.ReactNode;
-};
-
-const OptionCard: React.FC<OptionCardProps> = ({ option, selectedOption, onSelect, Icon, title, description }) => (
+}> = ({ option, selectedOption, onSelect, Icon, title, description }) => (
   <div
     role="button"
     tabIndex={0}
     onClick={() => onSelect(option)}
     onKeyPress={(e) => e.key === "Enter" && onSelect(option)}
-    className={`relative flex items-center p-4 bg-white rounded-[10px] gap-4 border cursor-pointer transition ${selectedOption === option ? "border-primary" : "border-[#1118271F]"}`}
+    className={`relative flex items-center p-4 bg-white rounded-[10px] gap-4 border cursor-pointer transition ${
+      selectedOption === option ? "border-primary" : "border-[#1118271F]"
+    }`}
   >
     <div className="hidden sm:block">
       <Icon width={60} height={60} />
@@ -63,103 +61,31 @@ const ShareContact: React.FC = () => {
   const [csvModalOpen, setCsvModalOpen] = useState(false);
   const [isContactModalOpen, setIsContactModalOpen] = useState(false);
 
-  // Popup contacts states
   const [popupContacts, setPopupContacts] = useState<APICONTACT[]>([]);
   const [, setPopupLoading] = useState(false);
   const [, setPopupError] = useState<string>("");
   const [popupModalOpen, setPopupModalOpen] = useState(false);
-  const router=useRouter()
 
-  // // Fetch & auto-show popup
-  // useEffect(() => {
-  //   if (popUpParam === "true") {
-  //     setPopupLoading(true);
-  //     fetch("https://api-eventparcel.onrender.com/auth/fetch-contacts")
-  //       .then((res) => res.json())
-  //       .then((data) => {
-  //         if (data.success && Array.isArray(data.data)) {
-  //           setPopupContacts(data.data);
-  //         } else {
-  //           setPopupError(data.message || "Failed to fetch contacts");
-  //         }
-  //       })
-  //       .catch((err) => {
-  //         console.error(err);
-  //         setPopupError("Network error fetching contacts");
-  //       })
-  //       .finally(() => {
-  //         setPopupLoading(false);
-  //         setPopupModalOpen(true);
-  //       });
-  //   }
-  // }, [popUpParam]);
-  // useEffect(() => {
-  //   if (popUpParam === "true") {
-  //     setPopupLoading(true);
-  
-
-  //     // Extract the token from cookies
-  //     // console.log("Cookies:", document.cookie);
-  //     // const cookies = document.cookie.split("; ").reduce((acc, cookie) => {
-  //     //   const [key, value] = cookie.split("=");
-  //     //   acc[key] = value;
-  //     //   return acc;
-  //     // }, {} as Record<string, string>);
-  //     // const googleAccessToken = cookies["googleAccessToken"];
-  //     const googleAccessToken = Cookies.get("googleAccessToken")
-  //     console.log("Google Access Token:", googleAccessToken);
-      
-  //     if (!googleAccessToken) {
-  //       console.error("Google access token is missing in cookies");
-  //       setPopupError("Authentication token is missing. Please log in again.");
-  //       setPopupLoading(false);
-  //       return;
-  //     }
-  //     // const cookies = document.cookie.split("; ").reduce((acc, cookie) => {
-  //     //   const [key, value] = cookie.split("=");
-  //     //   acc[key] = value;
-  //     //   return acc;
-  //     // }, {} as Record<string, string>);
-
-  //     // const googleAccessToken = cookies["googleAccessToken"];
-
-  
-  //     fetch("https://api-eventparcel.onrender.com/auth/fetch-contacts", {
-  //       headers: {
-  //         Authorization: `Bearer ${googleAccessToken}`,
-  //       },
-  //     })
-  //       .then((res) => res.json())
-  //       .then((data) => {
-          
-  //         if (data.success && Array.isArray(data.data)) {
-  //           setPopupContacts(data.data);
-  //         } else {
-  //           setPopupError(data.message || "Failed to fetch contacts");
-  //         }
-  //       })
-  //       .catch((err) => {
-  //         console.error(err);
-  //         setPopupError("Network error fetching contacts");
-  //       })
-  //       .finally(() => {
-  //         setPopupLoading(false);
-  //         setPopupModalOpen(true);
-  //       });
-  //   }
-  // }, [popUpParam]);
-
-
+  const router = useRouter();
 
   useEffect(() => {
     if (popUpParam === "true") {
       setPopupLoading(true);
 
-      const token = localStorage.getItem("authToken");
-  
+      const googleAccessToken = Cookies.get("googleAccessToken");
+
+      if (!googleAccessToken) {
+        console.error("Google access token is missing in cookies");
+        setPopupError("Authentication token is missing. Please log in again.");
+        setPopupLoading(false);
+        return;
+      }
+
       fetch("https://api-eventparcel.onrender.com/auth/fetch-contacts", {
         method: "GET",
-        credentials: "include", 
+        headers: {
+          Authorization: `Bearer ${googleAccessToken}`,
+        },
       })
         .then((res) => res.json())
         .then((data) => {
@@ -179,7 +105,6 @@ const ShareContact: React.FC = () => {
         });
     }
   }, [popUpParam]);
-  
 
   const handleOptionSelect = useCallback((option: OptionType) => {
     setSelectedOption(option);
@@ -189,10 +114,9 @@ const ShareContact: React.FC = () => {
     if (selectedOption === "csv") {
       setCsvModalOpen(true);
     } else if (selectedOption === "contact") {
-      router.push("https://api-eventparcel.onrender.com/auth/google/contacts")
-      // setIsContactModalOpen(true);
+      router.push("https://api-eventparcel.onrender.com/auth/google/contacts");
     }
-  }, [selectedOption]);
+  }, [selectedOption,router]);
 
   return (
     <Container>
@@ -223,11 +147,14 @@ const ShareContact: React.FC = () => {
             />
           </div>
         </div>
+
         <div className="bg-white py-10 flex justify-center">
           <button
             onClick={handleContinue}
             disabled={!selectedOption}
-            className={`bg-primary text-white py-3 px-8 rounded-[12px] transition flex items-center justify-center font-extrabold ${!selectedOption ? "opacity-50 cursor-not-allowed" : "hover:bg-red-800"}`}
+            className={`bg-primary text-white py-3 px-8 rounded-[12px] transition flex items-center justify-center font-extrabold ${
+              !selectedOption ? "opacity-50 cursor-not-allowed" : "hover:bg-red-800"
+            }`}
           >
             Continue
           </button>
@@ -252,7 +179,7 @@ const ShareContact: React.FC = () => {
         tabFilteredContacts={[]}
         selectedContacts={[]}
         handleContactSelect={() => {}}
-        handleImportContacts={() => {} }
+        handleImportContacts={() => {}}
         isImportingContacts={false}
       />
 
@@ -261,7 +188,10 @@ const ShareContact: React.FC = () => {
         isOpen={popupModalOpen}
         onClose={() => setPopupModalOpen(false)}
         eventGroupId={groupId}
-        contacts={popupContacts.map((c) => ({ guestName: c.name, phoneNumber: c.phoneNumber }))}
+        contacts={popupContacts.map((c) => ({
+          guestName: c.name,
+          phoneNumber: c.phoneNumber,
+        }))}
         phoneNumbers={popupContacts.map((c) => c.phoneNumber)}
       />
     </Container>

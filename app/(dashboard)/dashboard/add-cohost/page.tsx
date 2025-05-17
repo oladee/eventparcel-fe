@@ -9,7 +9,6 @@ import RightBar from "@/components/Rightbar";
 import { useRouter } from "next/navigation";
 import Container from "@/components/dashboard/Container";
 
-
 interface EventDetailsProps {
   eventData: Array<{
     _id: string;
@@ -22,17 +21,17 @@ interface EventDetailsProps {
   }>;
 }
 
-
 const Page = () => {
   const [isRightBarOpen, setIsRightBarOpen] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [eventData, setEventData] = useState<EventDetailsProps["eventData"]>([]);
+  const [eventData, setEventData] = useState<EventDetailsProps["eventData"]>(
+    []
+  );
   const [selectedEventId, setSelectedEventId] = useState<string>(""); // Store selected event ID
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-        console.log(error);
-  
+  console.log(error);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -75,14 +74,14 @@ const Page = () => {
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
-    email: "",
+    email: ""
   });
 
   const [errors, setErrors] = useState({
     firstName: "",
     lastName: "",
     email: "",
-    event: "", // Add validation for event selection
+    event: "" // Add validation for event selection
   });
 
   const [isFormValid, setIsFormValid] = useState(false);
@@ -130,7 +129,7 @@ const Page = () => {
     setSelectedEventId(value);
     setErrors((prev) => ({
       ...prev,
-      event: value ? "" : "Please select an event",
+      event: value ? "" : "Please select an event"
     }));
   };
 
@@ -146,10 +145,10 @@ const Page = () => {
           firstName: formData.firstName.trim(),
           lastName: formData.lastName.trim(),
           email: formData.email.trim(),
-          eventId: selectedEventId, // Send eventId to the backend
+          eventId: selectedEventId // Send eventId to the backend
         },
         {
-          withCredentials: true,
+          withCredentials: true
         }
       );
       console.log("Response:", response.data);
@@ -289,7 +288,9 @@ const Page = () => {
                   onChange={handleEventChange}
                   className="px-3 py-2 input-field outline-primary rounded-[8px] bg-slate-50"
                 >
-                  <option value="" className="text-[#A0AEC0]">Select event</option>
+                  <option value="" className="text-[#A0AEC0]">
+                    Select event
+                  </option>
                   {eventData.map((event) => (
                     <option key={event._id} value={event._id}>
                       {event.eventName}
@@ -320,13 +321,13 @@ const Page = () => {
         </div>
       </section>
       {showModal && (
-    <ReusuableSuccess
-    title="Co-host Invited"
-    subtitle={`An invite has been sent to ${formData.firstName} ${formData.lastName} via email to join you as a co-host for your event`}
-    route="/view-cohost"
-    buttonText="Ok, thank you"
-  />
-)}
+        <ReusuableSuccess
+          title="Co-host Invited"
+          subtitle={`An invite has been sent to ${formData.firstName} ${formData.lastName} via email to join you as a co-host for your event`}
+          route="/view-cohost"
+          buttonText="Ok, thank you"
+        />
+      )}
     </Container>
   );
 };
