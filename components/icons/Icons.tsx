@@ -16,7 +16,7 @@ interface LogoProps {
 export const Logo: React.FC<LogoProps> = ({ width, height }) => {
   return (
     <Image
-      src="/images/logo.png" // Path relative to the public folder
+      src="/images/logo4.png" // Path relative to the public folder
       alt="Company Logo"
       width={width}
       height={height}
