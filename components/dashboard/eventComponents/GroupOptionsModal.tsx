@@ -17,16 +17,16 @@ interface GroupOptionsModalProps {
   isOpen: boolean;
   onClose: () => void;
   group: Group | null;
-  eventData: {
-    isShared?: boolean;
-  };
+  // eventData: {
+  //   isShared?: boolean;
+  // };
 }
 
 const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
   isOpen,
   onClose,
   group,
-  eventData
+  // eventData
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
   const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
