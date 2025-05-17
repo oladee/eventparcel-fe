@@ -75,9 +75,10 @@ const ShareContact: React.FC = () => {
         await new Promise((resolve) => setTimeout(resolve, 5000));
 
         try {
-          const res = await fetch(
-            "https://api-eventparcel.onrender.com/auth/fetch-contacts"
-          );
+          const res = await fetch("https://api-eventparcel.onrender.com/auth/fetch-contacts", {
+            method: "GET",
+            credentials: "include",
+          });
           const data = await res.json();
 
           if (data.success && Array.isArray(data.data)) {
