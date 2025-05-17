@@ -73,6 +73,8 @@ const ShareContact: React.FC = () => {
       setPopupLoading(true);
 
       const googleAccessToken = Cookies.get("googleAccessToken");
+      const token = Cookies.get("refreshToken");
+      console.log('this is the refresh token',token)
 
       if (!googleAccessToken) {
         console.error("Google access token is missing in cookies");
