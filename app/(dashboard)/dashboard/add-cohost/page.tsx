@@ -320,13 +320,13 @@ const Page = () => {
         </div>
       </section>
       {showModal && (
-        <ReusuableSuccess
-          title="Co-host Invited"
-          subtitle="An invite has been sent to David via email to join you as a co-host for your event"
-          route="/dashboard/co-host"
-          buttonText="Ok, thank you"
-        />
-      )}
+    <ReusuableSuccess
+    title="Co-host Invited"
+    subtitle={`An invite has been sent to ${formData.firstName} ${formData.lastName} via email to join you as a co-host for your event`}
+    route="/view-cohost"
+    buttonText="Ok, thank you"
+  />
+)}
     </Container>
   );
 };

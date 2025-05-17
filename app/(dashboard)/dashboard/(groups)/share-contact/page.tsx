@@ -159,11 +159,7 @@ const ShareContact: React.FC = () => {
   
       fetch("https://api-eventparcel.onrender.com/auth/fetch-contacts", {
         method: "GET",
-        // credentials: "include", 
-        headers: {
-          "Content-Type": "application/json",
-          "Authorization": `Bearer ${token}`
-        }
+        credentials: "include", 
       })
         .then((res) => res.json())
         .then((data) => {
