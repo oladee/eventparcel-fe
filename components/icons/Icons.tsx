@@ -64,6 +64,19 @@ export const Apple: React.FC<LogoProps> = ({ width, height }) => {
   );
 };
 
+// Calendar icon component
+export const Calendar: React.FC<LogoProps> = ({ width, height }) => {
+  return (
+    <Image
+      src="/icons/calendar.svg"
+      alt="Calendar Icon"
+      width={width}
+      height={height}
+      priority // Use this prop if the image is critical (e.g., logo)
+    />
+  );
+};
+
 // Checked icon component
 export const Checked: React.FC<LogoProps> = ({ width, height }) => {
   return (

@@ -1,6 +1,5 @@
 "use client";
 
-
 import React, { useState, useEffect } from "react";
 import { FaCalendarAlt } from "react-icons/fa";
 import { GrLineChart } from "react-icons/gr";
@@ -13,15 +12,17 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  TooltipProps,
+  TooltipProps
 } from "recharts";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
+import EmptyStateWithAction from "../EmptyState";
+import Container from "../Container";
 
 const SkeletonLoader = dynamic(
   () => import("@/components/dashboard/loadingStates/SkeletonLoader"),
   {
-    ssr: false, // Disable server-side rendering
+    ssr: false // Disable server-side rendering
   }
 );
 
@@ -66,7 +67,7 @@ interface DashboardResponse {
 const CustomTooltip: React.FC<TooltipProps<number, string>> = ({
   active,
   payload,
-  label,
+  label
 }) => {
   if (active && payload && payload.length) {
     const { netSales, sales } = payload[0].payload as SalesData;
@@ -103,7 +104,7 @@ const CustomBackgroundBar: React.FC<CustomBarProps> = ({
   onBarHover,
   onBarLeave,
   viewBox,
-  fillColor,
+  fillColor
 }) => {
   // Use the chart's viewBox for chart area dimensions.
   const chartY = viewBox?.y ?? 0;
@@ -156,9 +157,9 @@ const CustomBackgroundBar: React.FC<CustomBarProps> = ({
 // --------------------- CHART COMPONENT ---------------------
 const Chart: React.FC = () => {
   // State for dashboard data from API
-  const [dashboardData, setDashboardData] = useState<DashboardResponse["data"] | null>(
-    null
-  );
+  const [dashboardData, setDashboardData] = useState<
+    DashboardResponse["data"] | null
+  >(null);
   // Loading and error states
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -170,7 +171,7 @@ const Chart: React.FC = () => {
 
   // Track which bar (index) is currently hovered
   const [hoveredIndex, setHoveredIndex] = useState(-1);
-   const router = useRouter();
+  const router = useRouter();
 
   // --------------------- FETCH DATA ---------------------
   useEffect(() => {
@@ -178,7 +179,9 @@ const Chart: React.FC = () => {
 
     if (!loggedInUserId) {
       router.replace("/");
-      console.log("User ID not found in localStorage. Redirecting to login page.");
+      console.log(
+        "User ID not found in localStorage. Redirecting to login page."
+      );
       return;
     }
     axiosInstance
@@ -218,12 +221,21 @@ const Chart: React.FC = () => {
     viewType === "monthly"
       ? currentSalesData.monthlySales.map((item) => ({
           month: item.month,
-          sales: item.sales,
+          sales: item.sales
         }))
       : currentSalesData.dailySales.map((item) => ({
           month: item.day, // Reuse the "month" key for labeling
-          sales: item.sales,
+          sales: item.sales
         }));
+
+  const isEmptyData = chartData.every((item) => item.sales === 0);
+  if (isEmptyData) {
+    return (
+      <Container>
+        <EmptyStateWithAction />
+      </Container>
+    );
+  }
 
   // A small multiplier for the top range in the chart so that bars and line don't touch the top
   const maxSales = Math.max(...chartData.map((item) => item.sales)) * 1.1;
@@ -286,7 +298,11 @@ const Chart: React.FC = () => {
                   currency === "naira" ? "text-primary" : "text-[#718096]"
                 }`}
               >
-                ₦{(dashboardData.overallSales.naira.totalAmount / 1e6).toFixed(2)}M
+                ₦
+                {(dashboardData.overallSales.naira.totalAmount / 1e6).toFixed(
+                  2
+                )}
+                M
               </p>
               {currency === "naira" && (
                 <span className="hidden md:flex items-center text-[10px] md:text-xs font-medium text-white bg-primary px-2 py-2 rounded-full">
@@ -311,9 +327,9 @@ const Chart: React.FC = () => {
               >
                 $
                 {dashboardData.overallSales.dollar.totalAmount >= 1000
-                  ? `${(dashboardData.overallSales.dollar.totalAmount / 1000).toFixed(
-                      2
-                    )}k`
+                  ? `${(
+                      dashboardData.overallSales.dollar.totalAmount / 1000
+                    ).toFixed(2)}k`
                   : dashboardData.overallSales.dollar.totalAmount}
               </p>
               {currency === "dollar" && (
@@ -338,8 +354,6 @@ const Chart: React.FC = () => {
           </button>
         </div>
       </div>
-
-    
 
       {/* Chart Container */}
       <div className="w-full relative">
@@ -389,34 +403,6 @@ const Chart: React.FC = () => {
 };
 
 export default Chart;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // "use client";
 // import React, { useState, useEffect } from "react";
@@ -468,7 +454,6 @@ export default Chart;
 //   sales: number;
 //   netSales?: string;
 // }
-
 
 // const CustomTooltip: React.FC<TooltipProps<number, string>> = ({
 //   active,
@@ -599,7 +584,6 @@ export default Chart;
 //         setLoading(false);
 //       });
 //   }, []);
-
 
 //   if (loading) {
 //     return <SkeletonLoader />;
