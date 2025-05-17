@@ -46,7 +46,7 @@ const ChangePass: React.FC = () => {
 
     setIsSubmitting(true);
     try {
-      await axiosInstance.put("/change-admin-password", {
+      await axiosInstance.put("/change-password", {
         email,
         currentPassword,
         password,
