@@ -42,6 +42,9 @@ const EventDetailsSection: React.FC<EventDetailsProps> = ({ eventData }) => {
     return `${day} ${month}, ${year}`;
   })();
 
+  const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser") || "{}");
+
+
   return (
     <div className="bg-[#fff4ed] p-4 rounded-2xl">
       {/* Image Section */}
@@ -64,7 +67,7 @@ const EventDetailsSection: React.FC<EventDetailsProps> = ({ eventData }) => {
         )}
 
         {/* More Options Button */}
-        {!isShared && (
+        {!isShared && loggedInUser.role !== "cohost" && (
           <button
             onClick={toggleModal}
             className="absolute top-3 right-3 bg-white p-2 rounded-[8px] shadow-md"

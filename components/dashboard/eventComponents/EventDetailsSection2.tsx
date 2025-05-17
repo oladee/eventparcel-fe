@@ -115,7 +115,7 @@ const EventDetailsSection2: React.FC<EventDetailsProps> = ({ eventData }) => {
                 )}
 
                 {/* More Options Button */}
-                {!event?.isShared && (
+                {!event?.isShared && loggedInUser.role !== "cohost" && (
                   <button
                     onClick={() => toggleModal(event)}
                     className="absolute top-3 right-3 bg-white p-2 rounded-[8px] shadow-md"
