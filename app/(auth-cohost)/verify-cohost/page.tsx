@@ -95,7 +95,7 @@ const Verification = () => {
 
       if (!email) {
         toast.error("Email is required. Redirecting to signup.");
-        router.push("/create-cohost");
+        router.push("/complete-cohost");
         return;
       }
 

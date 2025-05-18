@@ -4,7 +4,7 @@ import { BsThreeDots } from "react-icons/bs";
 import { FaRegCircle } from "react-icons/fa6";
 import { PiArrowsDownUpFill } from "react-icons/pi";
 import { BiChevronDown, BiChevronUp } from "react-icons/bi";
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { Order } from "@/app/interface/Order";
 
 interface OrderSummaryItem {
@@ -35,22 +35,29 @@ interface TransactionProps {
 
 
 const TransactionTable: React.FC<TransactionProps> = ({orders, currentPage, setCurrentPage,searchTerm, totalPages, setLimit, limit, setSearchTerm}) => {
+  console.log(orders)
   
   const [openBreakdownOrderId, setOpenBreakdownOrderId] = useState<string | null>(null);
+  const [currencySortState, setCurrencySortState] = useState<"asc" | "desc">("asc");
+  const [ordersData, setOrdersData] = useState<OrderSummaryItem[]>(orders);
+  
+  useEffect(() => {
+    setOrdersData(orders);
+  }, [orders]);  
 
-      const formatDate = (dateString: string) => {
-        const date = new Date(dateString);
-        
-        const day = date.toLocaleString("en-GB", { day: "2-digit" });
-        const month = date.toLocaleString("en-GB", { month: "short" });
-        const year = date.getFullYear();
-      
-        return `${day} ${month}, ${year}`;
-      };
+  const formatDate = (dateString: string) => {
+    const date = new Date(dateString);
     
+    const day = date.toLocaleString("en-GB", { day: "2-digit" });
+    const month = date.toLocaleString("en-GB", { month: "short" });
+    const year = date.getFullYear();
+  
+    return `${day} ${month}, ${year}`;
+  };
 
-      const capitalize = (str?: string) =>
-        str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : '';
+
+  const capitalize = (str?: string) =>
+    str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : '';
 
     //EXPORT CSV FILE
     const exportToCSV = (data: any[], filename = 'transactions.csv') => {
@@ -142,6 +149,111 @@ const TransactionTable: React.FC<TransactionProps> = ({orders, currentPage, setC
         URL.revokeObjectURL(url);
       }, 100);
     };
+
+    
+  const getPageNumbers = (currentPage: any, totalPages: any) => {
+    const pageNumbers = [];
+  
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pageNumbers.push(i);
+    } else {
+      if (currentPage <= 4) {
+        pageNumbers.push(1, 2, 3, 4, 5, '...', totalPages);
+      } else if (currentPage >= totalPages - 3) {
+        pageNumbers.push(1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pageNumbers.push(
+          1,
+          '...',
+          currentPage - 1,
+          currentPage,
+          currentPage + 1,
+          '...',
+          totalPages
+        );
+      }
+    }
+  
+    return pageNumbers;
+  };
+
+  //sort total amount
+  const sortTotalAmount = () => {
+    const newSortState = currencySortState === "asc" ? "desc" : "asc";
+  
+    const sorted = [...ordersData].sort((a, b) => {
+      const isNGNa = a.totalAmountCurrency === "NGN";
+      const isNGNb = b.totalAmountCurrency === "NGN";
+  
+      // NGN always above Dollar
+      if (isNGNa && !isNGNb) return -1;
+      if (!isNGNa && isNGNb) return 1;
+  
+      // Both NGN or both Dollar — sort by amount
+      const amountA = a.totalAmount || 0;
+      const amountB = b.totalAmount || 0;
+  
+      return newSortState === "asc" ? amountA - amountB : amountB - amountA;
+    });
+  
+    setOrdersData(sorted);
+    setCurrencySortState(newSortState);
+  };
+  
+  
+  //sort payout amount
+  const sortPayoutAmount = () => {
+    const newSortState = currencySortState === "asc" ? "desc" : "asc";
+  
+    const sorted = [...ordersData].sort((a, b) => {
+      const isNGNa = a.totalAmountCurrency === "NGN";
+      const isNGNb = b.totalAmountCurrency === "NGN";
+  
+      // NGN always above Dollar
+      if (isNGNa && !isNGNb) return -1;
+      if (!isNGNa && isNGNb) return 1;
+  
+      // Both NGN or both Dollar — sort by amount
+      const amountA = a.amountReceived || 0;
+      const amountB = b.amountReceived || 0;
+  
+      return newSortState === "asc" ? amountA - amountB : amountB - amountA;
+    });
+  
+    setOrdersData(sorted);
+    setCurrencySortState(newSortState);
+  };
+
+  //sort by delivery
+  const sortDeliveryFee = () => {
+    const newSortState = currencySortState === "asc" ? "desc" : "asc";
+  
+    const sorted = [...ordersData].sort((a, b) => {
+      const isNGNa = a.totalAmountCurrency === "NGN" && a.homeDeliveryFee;
+      const isNGNb = b.totalAmountCurrency === "NGN" && b.homeDeliveryFee;
+  
+      const hasDeliveryA = typeof a.homeDeliveryFee === "number" && a.homeDeliveryFee > 0;
+      const hasDeliveryB = typeof b.homeDeliveryFee === "number" && b.homeDeliveryFee > 0;
+  
+      // 1. NGN with valid homeDeliveryFee goes above all
+      if (isNGNa && !isNGNb) return -1;
+      if (!isNGNa && isNGNb) return 1;
+  
+      // 2. If one has delivery fee and one doesn’t, prioritize the one that has
+      if (hasDeliveryA && !hasDeliveryB) return -1;
+      if (!hasDeliveryA && hasDeliveryB) return 1;
+  
+      // 3. Sort by delivery fee (only among items that both have or both don’t)
+      const amountA = a.homeDeliveryFee || 0;
+      const amountB = b.homeDeliveryFee || 0;
+  
+      return newSortState === "asc" ? amountA - amountB : amountB - amountA;
+    });
+  
+    setOrdersData(sorted);
+    setCurrencySortState(newSortState);
+  };
+  
     
   return (
     <div className="w-full gap-4 pt-3 rounded-xl" id="orders-container">
@@ -198,32 +310,32 @@ const TransactionTable: React.FC<TransactionProps> = ({orders, currentPage, setC
             </th>
             <th className="p-3 text-left" id="order-header">
               <div className="flex items-center gap-1 text-base font-medium text-[#718096]">
-                Orders <PiArrowsDownUpFill />
+                Orders
               </div>
             </th>
             <th className="p-3 text-left" id="guest-header">
               <div className="flex items-center gap-1 text-base font-medium text-[#718096]">
-                Guest <PiArrowsDownUpFill />
+                Guest 
               </div>
             </th>
             <th className="p-3 text-left" id="total-header">
               <div className="flex items-center gap-1 text-base font-medium text-[#718096]">
-                Total <PiArrowsDownUpFill />
+                Total <PiArrowsDownUpFill onClick={sortTotalAmount} className="cursor-pointer"/>
               </div>
             </th>
             <th className="p-3 text-left" id="payout-header">
               <div className="flex items-center gap-1 text-base font-medium text-[#718096]">
-                Payout <PiArrowsDownUpFill />
+                Payout <PiArrowsDownUpFill onClick={sortPayoutAmount} className="cursor-pointer"/>
               </div>
             </th>
             <th className="p-3 text-left" id="delivery-header">
               <div className="flex items-center gap-1 text-base font-medium text-[#718096]">
-                Delivery <PiArrowsDownUpFill />
+                Delivery <PiArrowsDownUpFill onClick={sortDeliveryFee} className="cursor-pointer"/>
               </div>
             </th>
             <th className="p-3 text-left" id="status-header">
               <div className="flex items-center gap-1 text-base font-medium text-[#718096]">
-                Status <PiArrowsDownUpFill />
+                Status 
               </div>
             </th>
             <th className="p-3 text-center" id="actions-header">
@@ -234,7 +346,7 @@ const TransactionTable: React.FC<TransactionProps> = ({orders, currentPage, setC
 
         {/* Table Body */}
         <tbody id="table-body">
-            {orders.length === 0 ? (
+            {ordersData.length === 0 ? (
               <tr>
                 <td colSpan={8} className="p-0">
                   <div className="flex flex-col items-center justify-center w-full py-16 text-center bg-white rounded-md border border-dashed border-gray-300">
@@ -247,7 +359,7 @@ const TransactionTable: React.FC<TransactionProps> = ({orders, currentPage, setC
                 </td>
               </tr>
             ) : (
-              orders.map((order, i) => (
+              ordersData.map((order, i) => (
             <React.Fragment key={i}>
               <tr className="border-b last:border-b-0 hover:bg-gray-50" id={`order-row-${order.orderNumber}`}>
                 <td className="p-3 text-center" id={`select-${order.orderNumber}`}>
@@ -367,22 +479,30 @@ const TransactionTable: React.FC<TransactionProps> = ({orders, currentPage, setC
             </div>
             <div className="flex items-center gap-1 text-sm overflow-x-auto py-2 sm:py-0 w-full justify-center sm:w-auto">
               <button
-              onClick={() => currentPage > 1 && setCurrentPage(currentPage - 1)}
-              className="text-[#A0AEC0] whitespace-nowrap">&lt;</button>
-              {Array.from({ length: totalPages || 1 }, (_, i) => i + 1).map((pageNum) => (
-                <button
-                  id="tableNum"
-                  key={pageNum}
-                  onClick={() => setCurrentPage(pageNum)}
-                  className={`w-8 h-8 rounded-[12px] p-[8px] whitespace-nowrap ${
-                    pageNum === currentPage
-                      ? "bg-[#DCFCE7] text-[#16A34A]"
-                      : "text-[#A0AEC0] hover:bg-gray-100"
-                  }`}
-                >
-                  {pageNum}
-                </button>
-              ))}
+                onClick={() => currentPage > 1 && setCurrentPage(currentPage - 1)}
+                className="text-[#A0AEC0] whitespace-nowrap"
+              >
+                &lt;
+              </button>
+
+              {getPageNumbers(currentPage, totalPages).map((pageNum, index) =>
+                pageNum === '...' ? (
+                  <span key={`ellipsis-${index}`} className="px-2 text-[#A0AEC0]">...</span>
+                ) : (
+                  <button
+                    key={pageNum}
+                    onClick={() => setCurrentPage(pageNum)}
+                    className={`w-8 h-8 rounded-[12px] p-[8px] whitespace-nowrap ${
+                      pageNum === currentPage
+                        ? "bg-[#DCFCE7] text-[#16A34A]"
+                        : "text-[#A0AEC0] hover:bg-gray-100"
+                    }`}
+                  >
+                    {pageNum}
+                  </button>
+                )
+              )}
+
               <button
                 onClick={() => currentPage < (totalPages || 1) && setCurrentPage(currentPage + 1)}
                 className="text-[#A0AEC0] whitespace-nowrap">&gt;</button>

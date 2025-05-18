@@ -138,7 +138,7 @@ useEffect(() => {
       ].some(field => field !== undefined && field !== null && field !== '');
 
       if (!hasDeliveryData) {
-        toast.error("Record not found");
+        // toast.error("Record not found");
         setIsLoadingPaymentData(false);
         return;
       }
@@ -157,7 +157,7 @@ useEffect(() => {
 
     } catch (error: any) {
       console.log(error);
-      toast.error(error.response?.data?.message || "Please try again.");
+      // toast.error(error.response?.data?.message || "Please try again.");
     } finally {
       setIsLoadingPaymentData(false);
     }

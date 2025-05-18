@@ -16,7 +16,7 @@ interface LogoProps {
 export const Logo: React.FC<LogoProps> = ({ width, height }) => {
   return (
     <Image
-      src="/images/logo.png" // Path relative to the public folder
+      src="/images/logo4.png" // Path relative to the public folder
       alt="Company Logo"
       width={width}
       height={height}
@@ -57,6 +57,19 @@ export const Apple: React.FC<LogoProps> = ({ width, height }) => {
     <Image
       src="/icons/apple.svg" // Path relative to the public folder
       alt="Apple Icon"
+      width={width}
+      height={height}
+      priority // Use this prop if the image is critical (e.g., logo)
+    />
+  );
+};
+
+// Calendar icon component
+export const Calendar: React.FC<LogoProps> = ({ width, height }) => {
+  return (
+    <Image
+      src="/icons/calendar.svg"
+      alt="Calendar Icon"
       width={width}
       height={height}
       priority // Use this prop if the image is critical (e.g., logo)

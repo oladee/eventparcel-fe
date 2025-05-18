@@ -25,9 +25,11 @@ interface EventDetailsProps {
 const EventDetailsSection2: React.FC<EventDetailsProps> = ({ eventData }) => {
   const router = useRouter();
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [selectedEvent, setSelectedEvent] = useState<null | typeof eventData[0]>(null);
+  const [selectedEvent, setSelectedEvent] = useState<
+    null | (typeof eventData)[0]
+  >(null);
 
-  const toggleModal = (event: typeof eventData[0]) => {
+  const toggleModal = (event: (typeof eventData)[0]) => {
     setSelectedEvent(event);
     setIsModalOpen((prev) => !prev);
   };
@@ -42,6 +44,8 @@ const EventDetailsSection2: React.FC<EventDetailsProps> = ({ eventData }) => {
     router.push("/dashboard/event-creation");
   };
 
+  const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser") || "{}");
+
   return (
     <>
       <div className="">
@@ -49,7 +53,7 @@ const EventDetailsSection2: React.FC<EventDetailsProps> = ({ eventData }) => {
           <h1 className="capitalize text-2xl md:text-4xl text-[#111827] font-bold font-general">
             Events
           </h1>
-          <button
+          {/* <button
             onClick={handleCreateNewEvent}
             className="flex items-center outline-none"
           >
@@ -57,7 +61,18 @@ const EventDetailsSection2: React.FC<EventDetailsProps> = ({ eventData }) => {
             <span className="font-general font-medium text-base text-[#751423] capitalize">
               Create New
             </span>
-          </button>
+          </button> */}
+          {loggedInUser.role !== "cohost" && (
+            <button
+              onClick={handleCreateNewEvent}
+              className="flex items-center outline-none"
+            >
+              <Image src="/images/plus.png" alt="plus" width={32} height={32} />
+              <span className="font-general font-medium text-base text-[#751423] capitalize">
+                Create New
+              </span>
+            </button>
+          )}
         </div>
         {eventData.map((event, i) => {
           const formattedDate = (() => {
@@ -100,12 +115,14 @@ const EventDetailsSection2: React.FC<EventDetailsProps> = ({ eventData }) => {
                 )}
 
                 {/* More Options Button */}
-                <button
-                  onClick={() => toggleModal(event)}
-                  className="absolute top-3 right-3 bg-white p-2 rounded-[8px] shadow-md"
-                >
-                  <FiMoreHorizontal size={20} className="text-gray-600" />
-                </button>
+                {!event?.isShared && loggedInUser.role !== "cohost" && (
+                  <button
+                    onClick={() => toggleModal(event)}
+                    className="absolute top-3 right-3 bg-white p-2 rounded-[8px] shadow-md"
+                  >
+                    <FiMoreHorizontal size={20} className="text-gray-600" />
+                  </button>
+                )}
               </div>
 
               {/* Details Section */}
@@ -153,26 +170,6 @@ const EventDetailsSection2: React.FC<EventDetailsProps> = ({ eventData }) => {
 
 export default EventDetailsSection2;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // "use client";
 
 // import Image from "next/image";
@@ -203,7 +200,6 @@ export default EventDetailsSection2;
 //   const [isModalOpen, setIsModalOpen] = useState(false);
 //   const [selectedEvent, setSelectedEvent] = useState(null);
 //   console.log(eventData);
-  
 
 //   const toggleModal = (event: any) => {
 //     setSelectedEvent(event);

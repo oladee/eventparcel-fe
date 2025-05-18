@@ -2,7 +2,7 @@
 
 
 import { useEffect } from 'react';
-import { Facebook, Google, Apple } from '../icons/Icons';
+import { Google } from '../icons/Icons';
 import axios from 'axios';
 
 const SocialSignup: React.FC = () => {
@@ -38,16 +38,17 @@ const SocialSignup: React.FC = () => {
   }, []);
 
   return (
-    <div className="grid grid-cols-3 gap-4 place-items-center">
+    // <div className="grid grid-cols-3 gap-4 place-items-center justify-center">
+    <div className="flex items-center justify-center">
       <a href='https://api-eventparcel.onrender.com/auth/google' className="authButton w-max">
         <Google width={20} height={20} /> <span className='hidden sm:block'>Google</span>
       </a>
-      <a href='https://api-eventparcel.onrender.com/auth/facebook' className="authButton w-max">
+      {/* <a href='https://api-eventparcel.onrender.com/auth/facebook' className="authButton w-max">
         <Facebook width={20} height={20} /> <span className='hidden sm:block'>Facebook</span>
       </a>
       <button className="authButton w-max">
         <Apple width={20} height={20} /> <span className='hidden sm:block'>Apple</span>
-      </button>
+      </button> */}
     </div>
   );
 };

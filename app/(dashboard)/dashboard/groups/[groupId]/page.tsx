@@ -3,7 +3,7 @@
 import Container from '@/components/dashboard/Container';
 import Image from 'next/image';
 import React, { useEffect, useRef, useState } from 'react';
-import { Search, Settings2 } from "lucide-react";
+import { Search } from "lucide-react";
 import { cn } from '@/utils/cn';
 import { useParams, useRouter } from 'next/navigation';
 import { IoIosSend } from 'react-icons/io';
@@ -17,6 +17,7 @@ import toast from 'react-hot-toast';
 import useUpdateOrderStatus from '@/hooks/useUpdateOrderStatus';
 import OrderPagination from '@/components/OrderPagination';
 import { motion } from 'framer-motion';
+
 
 interface Order {
   _id: string;
@@ -359,11 +360,11 @@ const Page = () => {
                 onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <div className='bg-[#FAFAFA] h-14 w-14 flex justify-center items-center'>
+            {/* <div className='bg-[#FAFAFA] h-14 w-14 flex justify-center items-center'>
               <button className="p-2 rounded-[12x]">
                 <Settings2 className='text-[#A0AEC0]' />
               </button>
-            </div>
+            </div> */}
           </div>
 
           {/* Order List */}
@@ -498,9 +499,9 @@ const Page = () => {
           isOpen={isModalOpen && !!selectedGroup}
           onClose={toggleModal}
           group={selectedGroup} 
-          eventData={{
-            isShared: undefined
-          }}        
+          // eventData={{
+          //   isShared: undefined
+          // }}        
           />
       </div>
 

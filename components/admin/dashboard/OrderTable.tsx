@@ -81,6 +81,7 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [ordersData, setOrdersData] = useState<Order[]>(orders);
     const modalRef = useRef<HTMLDivElement>(null);
+    const [currencySortState, setCurrencySortState] = useState<"asc" | "desc">("asc");
 
 
     useEffect(() => {
@@ -239,6 +240,55 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
     setIsModalOpen(true);
   };
 
+  const getPageNumbers = (currentPage: any, totalPages: any) => {
+    const pageNumbers = [];
+  
+    if (totalPages <= 7) {
+      for (let i = 1; i <= totalPages; i++) pageNumbers.push(i);
+    } else {
+      if (currentPage <= 4) {
+        pageNumbers.push(1, 2, 3, 4, 5, '...', totalPages);
+      } else if (currentPage >= totalPages - 3) {
+        pageNumbers.push(1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+      } else {
+        pageNumbers.push(
+          1,
+          '...',
+          currentPage - 1,
+          currentPage,
+          currentPage + 1,
+          '...',
+          totalPages
+        );
+      }
+    }
+  
+    return pageNumbers;
+  };
+
+  const sortOrdersByCurrency = () => {
+    const newSortState = currencySortState === "asc" ? "desc" : "asc";
+  
+    const sorted = [...ordersData].sort((a, b) => {
+      const isNGNa = a.totalAmountCurrency === "NGN";
+      const isNGNb = b.totalAmountCurrency === "NGN";
+  
+      // NGN always above Dollar
+      if (isNGNa && !isNGNb) return -1;
+      if (!isNGNa && isNGNb) return 1;
+  
+      // Both NGN or both Dollar — sort by amount
+      const amountA = a.totalAmount || 0;
+      const amountB = b.totalAmount || 0;
+  
+      return newSortState === "asc" ? amountA - amountB : amountB - amountA;
+    });
+  
+    setOrdersData(sorted);
+    setCurrencySortState(newSortState);
+  };
+  
+
   return (
     <>
     <ToastContainer />
@@ -324,28 +374,28 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
     <div id="main-table" className="mt-6 w-full bg-white rounded-2xl shadow p-4 overflow-x-auto">
   {/* Table Head */}
   <div id="table-head" className="flex py-3 text-[#718096] font-semibold text-sm border-b w-full">
-    <div className="w-[40px] flex items-center justify-center shrink-0"> {/* Reduced from 60px */}
+    <div className="w-[40px] flex items-center justify-center shrink-0"> 
       <FaRegCircle className="w-5 h-5"/>
     </div>
-    <div className="flex-1 min-w-[100px] flex items-center gap-1 text-base font-medium text-[#718096]"> {/* Reduced from 120px */}
-      Orders <PiArrowsDownUpFill />
+    <div className="flex-1 min-w-[100px] flex items-center gap-1 text-base font-medium text-[#718096]"> 
+      Orders <PiArrowsDownUpFill   onClick={sortOrdersByCurrency} className="cursor-pointer"/>
     </div>
-    <div className="flex-1 min-w-[250px] flex items-center gap-1 text-base font-medium text-[#718096]"> {/* Increased from 220px */}
-      Guest <PiArrowsDownUpFill />
+    <div className="flex-1 min-w-[250px] flex items-center gap-1 text-base font-medium text-[#718096]"> 
+      Guest <PiArrowsDownUpFill   onClick={sortOrdersByCurrency} className="cursor-pointer"/>
     </div>
-    <div className="flex-1 min-w-[220px] flex items-center gap-1 text-base font-medium text-[#718096]"> {/* Increased from 200px */}
-      Event <PiArrowsDownUpFill />
+    <div className="flex-1 min-w-[220px] flex items-center gap-1 text-base font-medium text-[#718096]"> 
+      Event <PiArrowsDownUpFill   onClick={sortOrdersByCurrency} className="cursor-pointer"/>
     </div>  
-    <div className="flex-1 min-w-[80px] flex items-center gap-1 text-base font-medium text-[#718096]"> {/* Reduced from 90px */}
-      Price <PiArrowsDownUpFill />
+    <div className="flex-1 min-w-[80px] flex items-center gap-1 text-base font-medium text-[#718096]"> 
+      Price <PiArrowsDownUpFill   onClick={sortOrdersByCurrency} className="cursor-pointer"/>
     </div>
-    <div className="flex-1 min-w-[80px] flex items-center gap-1 text-base font-medium text-[#718096]"> {/* Reduced from 90px */}
+    <div className="flex-1 min-w-[80px] flex items-center gap-1 text-base font-medium text-[#718096]"> 
       Delivery <GoArrowUp className="text-[#0CAF60]" />
     </div>
-    <div className="flex-1 min-w-[80px] flex items-center gap-1 text-base font-medium text-[#718096]"> {/* Reduced from 90px */}
-      Status <PiArrowsDownUpFill />
+    <div className="flex-1 min-w-[80px] flex items-center gap-1 text-base font-medium text-[#718096]"> 
+      Status <PiArrowsDownUpFill   onClick={sortOrdersByCurrency} className="cursor-pointer"/>
     </div>
-    <div className="w-[40px] flex items-center justify-center shrink-0"> {/* Reduced from 60px */}
+    <div className="w-[40px] flex items-center justify-center shrink-0"> 
       <BsThreeDots className="w-5 h-5 text-[#A0AEC0]"/>
     </div>
   </div>
@@ -479,22 +529,30 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
         </div>
         <div className="flex items-center gap-1 text-sm overflow-x-auto py-2 sm:py-0 w-full justify-center sm:w-auto">
           <button
-          onClick={() => currentPage > 1 && setCurrentPage(currentPage - 1)}
-          className="text-[#A0AEC0] whitespace-nowrap">&lt;</button>
-          {Array.from({ length: totalPages || 1 }, (_, i) => i + 1).map((pageNum) => (
-            <button
-              id="tableNum"
-              key={pageNum}
-              onClick={() => setCurrentPage(pageNum)}
-              className={`w-8 h-8 rounded-[12px] p-[8px] whitespace-nowrap ${
-                pageNum === currentPage
-                  ? "bg-[#DCFCE7] text-[#16A34A]"
-                  : "text-[#A0AEC0] hover:bg-gray-100"
+            onClick={() => currentPage > 1 && setCurrentPage(currentPage - 1)}
+            className="text-[#A0AEC0] whitespace-nowrap"
+          >
+            &lt;
+          </button>
+
+          {getPageNumbers(currentPage, totalPages).map((pageNum, index) =>
+            pageNum === '...' ? (
+              <span key={`ellipsis-${index}`} className="px-2 text-[#A0AEC0]">...</span>
+            ) : (
+              <button
+                key={pageNum}
+                onClick={() => setCurrentPage(pageNum)}
+                className={`w-8 h-8 rounded-[12px] p-[8px] whitespace-nowrap ${
+                  pageNum === currentPage
+                    ? "bg-[#DCFCE7] text-[#16A34A]"
+                    : "text-[#A0AEC0] hover:bg-gray-100"
                 }`}
-            >
-              {pageNum}
-            </button>
-          ))}
+              >
+                {pageNum}
+              </button>
+            )
+          )}
+
           <button
             onClick={() => currentPage < (totalPages || 1) && setCurrentPage(currentPage + 1)}
             className="text-[#A0AEC0] whitespace-nowrap">&gt;</button>
@@ -505,5 +563,38 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
     </>
   );
 }
-
 export default OrdersHeader;
+
+
+
+
+
+
+
+
+
+
+
+
+{/* <div className="flex items-center gap-1 text-sm overflow-x-auto py-2 sm:py-0 w-full justify-center sm:w-auto">
+<button
+onClick={() => currentPage > 1 && setCurrentPage(currentPage - 1)}
+className="text-[#A0AEC0] whitespace-nowrap">&lt;</button>
+{Array.from({ length: totalPages || 1 }, (_, i) => i + 1).map((pageNum) => (
+  <button
+    id="tableNum"
+    key={pageNum}
+    onClick={() => setCurrentPage(pageNum)}
+    className={`w-8 h-8 rounded-[12px] p-[8px] whitespace-nowrap ${
+      pageNum === currentPage
+        ? "bg-[#DCFCE7] text-[#16A34A]"
+        : "text-[#A0AEC0] hover:bg-gray-100"
+      }`}
+  >
+    {pageNum}
+  </button>
+))}
+<button
+  onClick={() => currentPage < (totalPages || 1) && setCurrentPage(currentPage + 1)}
+  className="text-[#A0AEC0] whitespace-nowrap">&gt;</button>
+</div> */}

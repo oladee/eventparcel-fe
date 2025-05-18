@@ -30,7 +30,7 @@ const EventDetailsSection: React.FC<EventDetailsProps> = ({ eventData }) => {
     date,
     time,
     eventLocation,
-    isShared,
+    isShared
   } = eventData;
 
   // Format the date
@@ -41,6 +41,9 @@ const EventDetailsSection: React.FC<EventDetailsProps> = ({ eventData }) => {
     const year = dateObj.getFullYear();
     return `${day} ${month}, ${year}`;
   })();
+
+  const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser") || "{}");
+
 
   return (
     <div className="bg-[#fff4ed] p-4 rounded-2xl">
@@ -64,12 +67,14 @@ const EventDetailsSection: React.FC<EventDetailsProps> = ({ eventData }) => {
         )}
 
         {/* More Options Button */}
-        <button
-          onClick={toggleModal}
-          className="absolute top-3 right-3 bg-white p-2 rounded-[8px] shadow-md"
-        >
-          <FiMoreHorizontal size={20} className="text-gray-600" />
-        </button>
+        {!isShared && loggedInUser.role !== "cohost" && (
+          <button
+            onClick={toggleModal}
+            className="absolute top-3 right-3 bg-white p-2 rounded-[8px] shadow-md"
+          >
+            <FiMoreHorizontal size={20} className="text-gray-600" />
+          </button>
+        )}
       </div>
 
       {/* Details Section */}
@@ -104,21 +109,6 @@ const EventDetailsSection: React.FC<EventDetailsProps> = ({ eventData }) => {
 };
 
 export default EventDetailsSection;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // // "use client";
 
@@ -215,31 +205,6 @@ export default EventDetailsSection;
 // };
 
 // export default EventDetailsSection;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // "use client";
 

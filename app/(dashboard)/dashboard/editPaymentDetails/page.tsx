@@ -235,7 +235,7 @@ const parseAPIDate = (dateString: string | undefined): Date | null => {
           isDraft: paymentData.isDraft || false
         }));
       } catch (error: any) {
-        toast.error( error.response?.data?.message || "Please try again.");
+        // toast.error( error.response?.data?.message || "Please try again.");
         const errorMsg = error.response?.data?.message || "Please try again.";
         const nairaAccountExists = localStorage.getItem("isNairaAccount");
         const dollarAccountExists = localStorage.getItem("isDollarAccount");
@@ -354,8 +354,8 @@ const handleSubmit = async (e: FormEvent) => {
   try {
     const { nairaAccount, dollarAccount, event, isDraft, ...rest } = formData;
 
-    console.log(isDraft)
-    console.log(event)
+    console.log(isDraft)//prevents build error
+    console.log(event)//prevents build error
 
     // Clean account objects - handle null/undefined cases properly
     const cleanNairaAccount = nairaAccount ? {

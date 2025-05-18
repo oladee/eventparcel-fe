@@ -170,7 +170,7 @@ const Page = () => {
                         <p id="mark-shipped-text" onClick={() => handleStatusChange("delivered")} className="font-manrope font-extrabold text-sm text-[#111827]">
                             Mark as Delivered
                         </p>
-                        ) : orders?.orderStatus === "delivered" ? (
+                        ) : orders?.orderStatus === "delivered" || orders?.orderStatus === "pickedup" ? (
                         <p id="order-completed-text"  className="font-manrope font-extrabold text-sm text-gray-400 cursor-not-allowed">
                             Order Completed
                         </p>
@@ -186,7 +186,7 @@ const Page = () => {
                             id="guest-avatar"
                             className="bg-[#9BB3E366] rounded-[20px] p-2 flex items-center justify-center text-[#3C5C98] font-semibold text-base"
                             >
-                            {getInitials(orders.guestName)}
+                            {getInitials(orders.guestFirstName)}{getInitials(orders.guestLastName)}
                             </p>                        
                         </div>
                         <div id="guest-details" className='flex flex-col gap-1'>
@@ -263,7 +263,7 @@ const Page = () => {
                     )}
                     <div id="delivery-cost" className='flex items-center justify-between'>
                         <span id="tax-label" className='text-[#718096] font-general font-medium text-[14px]'>Tax</span>
-                        <span id="tax-price" className='text-[#718096] font-general font-medium text-[14px]'>{orders.totalAmountCurrency === "NGN" ? "₦" : "$"}{orders?.tax}</span>
+                        <span id="tax-price" className='text-[#718096] font-general font-medium text-[14px]'>{orders.totalAmountCurrency === "NGN" ? "₦" : "$"}{orders?.tax.toLocaleString()}</span>
                     </div>
                     <div id="total-cost" className='flex items-center justify-between'>
                         <span id="total-label" className='font-general font-bold text-[14px] text-[#111827]'>Total</span>

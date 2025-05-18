@@ -53,6 +53,9 @@ const PhoneNumberInput = ({
         onChange={handlePhoneChange}
         enableSearch
         disableDropdown={false}
+        inputProps={{
+          placeholder: "Enter phone number", // Set your custom placeholder here
+        }}
         onFocus={() => setTouched(true)}
         inputClass="!w-full !py-6 !border-none !rounded-[12px] !bg-gray-100 !focus:outline-none !focus:ring-2 !focus:ring-gray-300"
         buttonClass="!border-none !rounded-l-[12px]"

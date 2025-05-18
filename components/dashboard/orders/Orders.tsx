@@ -6,7 +6,7 @@ import Cart from "@/assets/orderIcons/cart.png";
 import BoxTime from "@/assets/orderIcons/box-time.png";
 import Eye from "@/assets/orderIcons/eye.png";
 import Package from "@/assets/orderIcons/package.png";
-import { Search, Settings2  } from "lucide-react";
+import { Search } from "lucide-react";
 import { cn } from '@/utils/cn';
 import OrderPagination from '@/components/OrderPagination';
 import { useRouter } from 'next/navigation';
@@ -356,11 +356,11 @@ const Orders: React.FC = ({  }) => {
               onChange={(e) => setSearchQuery(e.target.value)}
               />
             </div>
-            <div id="filter-button-container" className='bg-[#FAFAFA] h-14 w-14 flex justify-center items-center'>
+            {/* <div id="filter-button-container" className='bg-[#FAFAFA] h-14 w-14 flex justify-center items-center'>
               <button id="filter-button" className="p-2 rounded-[12x]">
                 <Settings2 id="filter-icon" className='text-[#A0AEC0]' />
               </button>
-            </div>
+            </div> */}
           </div>
   
           {/* Order List */}

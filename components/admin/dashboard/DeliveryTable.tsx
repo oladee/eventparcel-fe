@@ -7,7 +7,7 @@ import { PiArrowsDownUpFill } from "react-icons/pi";
 import { GoArrowUp } from "react-icons/go";
 import { GuestOrder } from "@/app/(dashboard)/admin/admin-delivery/page";
 import { AnimatePresence, motion } from "framer-motion";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 
   interface DeliveryProps {
@@ -27,6 +27,12 @@ import { useState } from "react";
     const [isOpen, setIsOpen] = useState(false);
     const orderOptions = ["All Orders", "pending", "shipped", "delivered", "PickedUp"];
     const [selected, setSelected] = useState("All Orders");
+    const [currencySortState, setCurrencySortState] = useState<"asc" | "desc">("asc");
+    const [ordersData, setOrdersData] = useState<GuestOrder[]>(orders);
+
+     useEffect(() => {
+        setOrdersData(orders);
+      }, [orders]);  
 
     const getStatusColor = (status: string) => {
       switch (status.toLowerCase()) {
@@ -127,6 +133,61 @@ import { useState } from "react";
           URL.revokeObjectURL(url);
         }, 100);
       };
+
+      const getPageNumbers = (currentPage: any, totalPages: any) => {
+        const pageNumbers = [];
+      
+        if (totalPages <= 7) {
+          for (let i = 1; i <= totalPages; i++) pageNumbers.push(i);
+        } else {
+          if (currentPage <= 4) {
+            pageNumbers.push(1, 2, 3, 4, 5, '...', totalPages);
+          } else if (currentPage >= totalPages - 3) {
+            pageNumbers.push(1, '...', totalPages - 4, totalPages - 3, totalPages - 2, totalPages - 1, totalPages);
+          } else {
+            pageNumbers.push(
+              1,
+              '...',
+              currentPage - 1,
+              currentPage,
+              currentPage + 1,
+              '...',
+              totalPages
+            );
+          }
+        }
+      
+        return pageNumbers;
+      };
+
+      const sortOrdersByCurrency = () => {
+        const newSortState = currencySortState === "asc" ? "desc" : "asc";
+      
+        const sorted = [...ordersData].sort((a, b) => {
+          const isNGNa = a.totalAmountCurrency === "NGN" && a.homeDeliveryFee;
+          const isNGNb = b.totalAmountCurrency === "NGN" && b.homeDeliveryFee;
+      
+          const hasDeliveryA = typeof a.homeDeliveryFee === "number" && a.homeDeliveryFee > 0;
+          const hasDeliveryB = typeof b.homeDeliveryFee === "number" && b.homeDeliveryFee > 0;
+      
+          // 1. NGN with valid homeDeliveryFee goes above all
+          if (isNGNa && !isNGNb) return -1;
+          if (!isNGNa && isNGNb) return 1;
+      
+          // 2. If one has delivery fee and one doesn’t, prioritize the one that has
+          if (hasDeliveryA && !hasDeliveryB) return -1;
+          if (!hasDeliveryA && hasDeliveryB) return 1;
+      
+          // 3. Sort by delivery fee (only among items that both have or both don’t)
+          const amountA = a.homeDeliveryFee || 0;
+          const amountB = b.homeDeliveryFee || 0;
+      
+          return newSortState === "asc" ? amountA - amountB : amountB - amountA;
+        });
+      
+        setOrdersData(sorted);
+        setCurrencySortState(newSortState);
+      };
       
       
   return (
@@ -214,19 +275,19 @@ import { useState } from "react";
             <FaRegCircle className="w-5 h-5"/>
           </div>
           <div className="w-[200px] flex items-center gap-1 text-base font-medium text-[#718096]" id="orders-header">
-            Orders <PiArrowsDownUpFill />
+            Orders <PiArrowsDownUpFill   onClick={sortOrdersByCurrency} className="cursor-pointer"/>
           </div>
           <div className="w-[350px] flex items-center gap-1 text-base font-medium text-[#718096]" id="guest-header">
-            Guest <PiArrowsDownUpFill />
+            Guest <PiArrowsDownUpFill   onClick={sortOrdersByCurrency} className="cursor-pointer"/>
           </div>
           <div className="w-[200px] flex items-center gap-1 text-base font-medium text-[#718096]" id="delivery-header">
             Delivery <GoArrowUp className="text-[#0CAF60]" />
           </div>
           <div className="w-[200px] flex items-center gap-1 text-base font-medium text-[#718096]" id="carrier-header">
-            Carrier <PiArrowsDownUpFill />
+            Carrier <PiArrowsDownUpFill   onClick={sortOrdersByCurrency} className="cursor-pointer"/>
           </div>
           <div className="w-[160px] flex items-center gap-1 text-base font-medium text-[#718096]" id="status-header">
-            Status <PiArrowsDownUpFill />
+            Status <PiArrowsDownUpFill   onClick={sortOrdersByCurrency} className="cursor-pointer"/>
           </div>
           <div className="w-[60px] flex items-center justify-center shrink-0" id="actions-header">
             <BsThreeDots className="w-5 h-5 text-[#A0AEC0]"/>
@@ -244,7 +305,7 @@ import { useState } from "react";
       </div>
     )}
     
-    {orders.map((order, i) => (
+    {ordersData.map((order, i) => (
           <div
             key={i}
             className="flex items-center py-4 border-b last:border-b-0 text-sm min-w-[900px]"
@@ -316,22 +377,30 @@ import { useState } from "react";
         </div>
         <div className="flex items-center gap-1 text-sm overflow-x-auto py-2 sm:py-0 w-full justify-center sm:w-auto">
           <button
-          onClick={() => currentPage > 1 && setCurrentPage(currentPage - 1)}
-          className="text-[#A0AEC0] whitespace-nowrap">&lt;</button>
-          {Array.from({ length: totalPages || 1 }, (_, i) => i + 1).map((pageNum) => (
-            <button
-              id="tableNum"
-              key={pageNum}
-              onClick={() => setCurrentPage(pageNum)}
-              className={`w-8 h-8 rounded-[12px] p-[8px] whitespace-nowrap ${
-                pageNum === currentPage
-                  ? "bg-[#DCFCE7] text-[#16A34A]"
-                  : "text-[#A0AEC0] hover:bg-gray-100"
-              }`}
-            >
-              {pageNum}
-            </button>
-          ))}
+            onClick={() => currentPage > 1 && setCurrentPage(currentPage - 1)}
+            className="text-[#A0AEC0] whitespace-nowrap"
+          >
+            &lt;
+          </button>
+
+          {getPageNumbers(currentPage, totalPages).map((pageNum, index) =>
+            pageNum === '...' ? (
+              <span key={`ellipsis-${index}`} className="px-2 text-[#A0AEC0]">...</span>
+            ) : (
+              <button
+                key={pageNum}
+                onClick={() => setCurrentPage(pageNum)}
+                className={`w-8 h-8 rounded-[12px] p-[8px] whitespace-nowrap ${
+                  pageNum === currentPage
+                    ? "bg-[#DCFCE7] text-[#16A34A]"
+                    : "text-[#A0AEC0] hover:bg-gray-100"
+                }`}
+              >
+                {pageNum}
+              </button>
+            )
+          )}
+
           <button
             onClick={() => currentPage < (totalPages || 1) && setCurrentPage(currentPage + 1)}
             className="text-[#A0AEC0] whitespace-nowrap">&gt;</button>
