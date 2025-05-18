@@ -78,9 +78,9 @@ const Page = () => {
             </div>
           ) : (
             <div className="grid md:grid-cols-2 gap-6">
-              {coHosts.map((coHost: any) => (
+              {coHosts.map((coHost: any, index:any) => (
                 <div
-                  key={coHost._id}
+                  key={index}
                   className="flex items-center justify-between space-x-4 bg-white rounded-[12px] p-4"
                 >
                   <div className="flex items-center gap-4">
