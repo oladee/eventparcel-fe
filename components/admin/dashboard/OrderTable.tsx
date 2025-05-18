@@ -82,6 +82,7 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
     const [ordersData, setOrdersData] = useState<Order[]>(orders);
     const modalRef = useRef<HTMLDivElement>(null);
 
+
     useEffect(() => {
       setOrdersData(orders);
     }, [orders]);    
