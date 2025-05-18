@@ -36,6 +36,8 @@ const Page = () => {
     { icon: BoxTime, title: "Total Shipped", count: 0, change: "0%" },
   ]);
 
+  console.log(orders)
+
 
     useEffect(() => {
       const loggedInUserString = localStorage.getItem("loggedInUserId");
@@ -363,9 +365,11 @@ const Page = () => {
 
                         <p className="font-medium">Guest</p>
                         <p className="font-bold text-gray-900">
-                        {order?.guestName 
-                          ? order.guestName.charAt(0).toUpperCase() + order.guestName.slice(1) 
-                          : "Guest Name"}
+                        {order?.guestFirstName 
+                          ? order.guestFirstName.charAt(0).toUpperCase() + order.guestFirstName.slice(1) 
+                          : "Guest"} {order?.guestLastName 
+                            ? order.guestLastName.charAt(0).toUpperCase() + order.guestLastName.slice(1) 
+                            : "Name"}
                         </p>
 
                         <p className="font-medium">Delivery</p>
