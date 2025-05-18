@@ -173,42 +173,42 @@ const Chart: React.FC = () => {
   const [hoveredIndex, setHoveredIndex] = useState(-1);
   const router = useRouter();
 
-
-  const [hasMounted, setHasMounted] = useState(false);
-
-
-  // Mark component as mounted on client
   useEffect(() => {
-    setHasMounted(true);
-  }, []);
-
-  useEffect(() => {
-    if (!hasMounted) return;
-
-    const loggedInUserId = localStorage.getItem("loggedInUserId");
-
-    if (!loggedInUserId) {
-      router.replace("/");
-      console.log("User ID not found in localStorage. Redirecting to login page.");
-      return;
-    }
-
-    axiosInstance
-      .get(`/dashboard-data/${loggedInUserId}`)
-      .then((response) => {
+    let intervalId: NodeJS.Timeout;
+  
+    const fetchData = async () => {
+      const loggedInUserId = localStorage.getItem("loggedInUserId");
+  
+      if (!loggedInUserId) {
+        router.replace("/");
+        console.log("User ID not found in localStorage. Redirecting to login page.");
+        return;
+      }
+  
+      try {
+        const response = await axiosInstance.get(`/dashboard-data/${loggedInUserId}`);
         if (response.data.success) {
           setDashboardData(response.data.data);
+          setError("");
+          setLoading(false);
+  
+          // Clear the interval once the API call is successful
+          clearInterval(intervalId);
         } else {
           setError("Failed to fetch dashboard data");
         }
-        setLoading(false);
-      })
-      .catch((err) => {
+      } catch (err) {
         console.error(err);
         setError("An error occurred while fetching data");
-        setLoading(false);
-      });
-  }, [hasMounted, router]);
+      }
+    };
+  
+    // Set up the interval to call the API every second
+    intervalId = setInterval(fetchData, 1000);
+  
+    // Cleanup the interval when the component unmounts
+    return () => clearInterval(intervalId);
+  }, [router]);
   
 
   // --------------------- FETCH DATA ---------------------
