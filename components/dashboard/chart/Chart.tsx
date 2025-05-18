@@ -174,15 +174,12 @@ const Chart: React.FC = () => {
   const router = useRouter();
 
   useEffect(() => {
-    let intervalId: NodeJS.Timeout;
-  
     const fetchData = async () => {
       const loggedInUserId = localStorage.getItem("loggedInUserId");
-      console.log("Checking to see if the value 4 loggedInUserId is available",loggedInUserId)
+      console.log("Checking to see if the value for loggedInUserId is available", loggedInUserId);
   
       if (!loggedInUserId) {
         router.refresh();
-        // router.replace("/");
         console.log("User ID not found in localStorage. Redirecting to login page.");
         return;
       }
@@ -205,8 +202,7 @@ const Chart: React.FC = () => {
       }
     };
   
-    // Set up the interval to call the API every second
-    intervalId = setInterval(fetchData, 1000);
+    const intervalId: NodeJS.Timeout = setInterval(fetchData, 1000);
   
     // Cleanup the interval when the component unmounts
     return () => clearInterval(intervalId);
