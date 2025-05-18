@@ -178,6 +178,7 @@ const Chart: React.FC = () => {
   
     const fetchData = async () => {
       const loggedInUserId = localStorage.getItem("loggedInUserId");
+      console.log("Checking to see if the value 4 loggedInUserId is available",loggedInUserId)
   
       if (!loggedInUserId) {
         router.replace("/");
