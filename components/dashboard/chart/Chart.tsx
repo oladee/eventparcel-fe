@@ -181,7 +181,8 @@ const Chart: React.FC = () => {
       console.log("Checking to see if the value 4 loggedInUserId is available",loggedInUserId)
   
       if (!loggedInUserId) {
-        router.replace("/");
+        router.refresh();
+        // router.replace("/");
         console.log("User ID not found in localStorage. Redirecting to login page.");
         return;
       }
