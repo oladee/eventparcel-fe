@@ -31,7 +31,7 @@ const Page: React.FC = ({}) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const debouncedSearchQuery = useDebounce(searchQuery, 500);
+  const debouncedSearchQuery = useDebounce(searchQuery, 1000);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
 
   const [stats, setStats] = useState([
@@ -72,7 +72,7 @@ const Page: React.FC = ({}) => {
         const params: Record<string, any> = {
           page,
           limit,
-          query: debouncedSearchQuery
+          search: debouncedSearchQuery
         };
 
         if (activeTab && activeTab !== "All Orders") {
@@ -153,6 +153,11 @@ const Page: React.FC = ({}) => {
     };
     fetchOrders();
   }, [page, limit, debouncedSearchQuery, activeTab, router]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [searchQuery]);
+  
 
   const handleOrderClick = (order: Order) => {
     localStorage.setItem("selectedOrder", JSON.stringify(order));

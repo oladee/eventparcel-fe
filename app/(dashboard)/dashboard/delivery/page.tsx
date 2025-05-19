@@ -29,7 +29,7 @@ const Page = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  const debouncedSearchQuery = useDebounce(searchQuery, 500);
+  const debouncedSearchQuery = useDebounce(searchQuery, 1000);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);  
   const [stats, setStats] = useState([
     { icon: Package, title: "Total Delivered", count: 0, change: "0%" },
@@ -84,7 +84,7 @@ const Page = () => {
           const params: Record<string, any> = { 
             page, 
             limit, 
-            query: debouncedSearchQuery 
+            search: debouncedSearchQuery 
           };
   
           if (activeTab && activeTab !== "All Orders") {
@@ -115,6 +115,11 @@ const Page = () => {
       };
       fetchOrders();
     }, [page, limit, debouncedSearchQuery, activeTab, router]);
+
+      useEffect(() => {
+        setPage(1);
+      }, [searchQuery]);
+      
 
      useEffect(() => {
         function handleClickOutside(event: MouseEvent) {
@@ -363,9 +368,11 @@ const Page = () => {
 
                         <p className="font-medium">Guest</p>
                         <p className="font-bold text-gray-900">
-                        {order?.guestName 
-                          ? order.guestName.charAt(0).toUpperCase() + order.guestName.slice(1) 
-                          : "Guest Name"}
+                        {order?.guestFirstName 
+                          ? order.guestFirstName.charAt(0).toUpperCase() + order.guestFirstName.slice(1) 
+                          : "Guest"} {order?.guestLastName 
+                            ? order.guestLastName.charAt(0).toUpperCase() + order.guestLastName.slice(1) 
+                            : "Name"}
                         </p>
 
                         <p className="font-medium">Delivery</p>

@@ -41,9 +41,17 @@ const Page = () => {
       const fetchOrders = async () => {
         setLoading(true);
         try {
+          
+          const params: Record<string, any> = { 
+            page, 
+            limit, 
+            search: debouncedSearchQuery 
+          };
   
           const response = await axiosInstance.get(
-              `payment-history/${loggedInUserString}`);
+              `payment-history/${loggedInUserString}`,
+            { params }
+          );
 
               const safeCount = (value?: number) => {
                 return typeof value === 'number' && !isNaN(value) ? value : 0;
@@ -54,7 +62,6 @@ const Page = () => {
                 const num = Number(value);
                 return isNaN(num) ? "0.00" : `${num.toFixed(2)}`;
               };      
-              console.log("res", response.data.data)
 
               setStats([
                 { 
@@ -197,11 +204,6 @@ const Page = () => {
             onChange={(e) => setSearchQuery(e.target.value)}
             />
           </div>
-          {/* <div id="filter-button-container" className='bg-[#FAFAFA] h-14 w-14 flex justify-center items-center'>
-            <button id="filter-button" className="p-2 rounded-[12x]">
-              <Settings2 id="filter-icon" className='text-[#A0AEC0]' />
-            </button>
-          </div> */}
         </div>
 
         {/* Orders details page */}
@@ -211,94 +213,6 @@ const Page = () => {
             <span className="text-gray-500">No transactions found</span>
           </div>
         ) : (
-        //   orders?.map((order: any) => (
-        //     <div key={order?.orderNumber} className="rounded-xl py-2 w-full max-w-xs space-y-4 text-sm">
-        //     <div className="flex items-center justify-between font-medium text-[#718096] text-sm border-t pt-4">
-        //       <span>{formatDate(order?.orderId?.createdAt)}</span>
-        //       <button onClick={() => handleOrderClick(order?.orderId)} className="w-[87px] h-[20px] text-xs text-[#751423] bg-[#7514231F] px-2 py-0.5 rounded-full font-medium">
-        //         View Order
-        //       </button>
-        //     </div>
-
-        //     {/* Transaction Info */}
-        //     <div className="space-y-4 text-gray-700">
-        //       <div className="flex justify-between">
-        //         <span className='font-medium text-[#718096] text-sm'>Order Number</span>
-        //         <span className="text-[#111827] text-sm font-semibold">{order?.orderNumber}</span>
-        //       </div>
-        //       <div className="flex justify-between">
-        //         <span className='font-medium text-[#718096] text-sm'>Guest Payment</span>
-        //         <span className="text-[#111827] text-sm font-semibold">
-        //           {order?.guestPaymentCurrency === "NGN" 
-        //             ? formatCurrency(order?.guestPayment)
-        //             : formatDollarCurrency(order?.guestPayment)}
-        //         </span>
-        //       </div>
-        //       <div className="flex justify-between">
-        //         <span className='font-medium text-[#718096] text-sm'>Amount Received</span>
-        //         <span className="text-[#0CAF60] text-sm font-semibold">
-        //           {order?.amountReceivedCurrency === "NGN" 
-        //             ? formatCurrency(order?.amountReceived)
-        //             : formatDollarCurrency(order?.amountReceived)}
-        //         </span>
-        //       </div>
-
-        //       <div className="h-px bg-gray-100 my-2" />
-        //       {openBreakdownOrderId === order.orderId && (                <>
-        //       <div className="flex justify-between">
-        //         <span className='font-medium text-[#acb9ca] text-sm'>{order?.items} Item (s)</span>
-        //         <span>
-        //           {order?.amountReceivedCurrency === "NGN" 
-        //             ? formatCurrency(order?.amountReceived)
-        //             : formatDollarCurrency(order?.amountReceived)}
-        //         </span>
-        //       </div>
-        //       {order?.homeDeliveryFee && (
-        //         <div className="flex justify-between">
-        //           <span className='font-medium text-[#acb9ca] text-sm'>Home Delivery</span>
-        //           <span>
-        //             {order?.guestPaymentCurrency === "NGN" 
-        //               ? formatCurrency(order?.homeDeliveryFee)
-        //               : formatDollarCurrency(order?.homeDeliveryFee)}
-        //           </span>
-        //         </div>
-        //       )}
-        //       <div className="flex justify-between">
-        //         <span className='font-medium text-[#acb9ca] text-sm'>Tax</span>
-        //         <span>
-        //           {order?.totalAmountCurrency === "NGN" 
-        //             ? formatCurrency(order?.tax)
-        //             : formatDollarCurrency(order?.tax)}
-        //         </span>
-        //       </div>
-
-        //       <div className="h-px bg-gray-100 my-2" />
-
-        //       <div className="flex justify-between font-semibold text-black">
-        //         <span className="text-[#111827] text-sm font-semibold">Total</span>
-        //         <span className="text-[#111827] text-sm font-semibold">
-        //           {order?.totalAmountCurrency === "NGN" 
-        //             ? formatCurrency(order?.totalAmount)
-        //             : formatDollarCurrency(order?.totalAmount)}
-        //         </span>
-        //       </div>
-        //     </>)}
-        //   </div>
-
-        //   {/* Collapse Button */}
-        //   <button
-        //     onClick={() => setOpenBreakdownOrderId(prev => prev === order.orderId ? null : order.orderId)}
-        //     className="w-full h-[32px] flex items-center justify-center text-[#751423] border border-[#751423] py-1.5 rounded-[8px] font-medium"
-        //   >
-        //     {openBreakdownOrderId === order.orderId ? 'See Less' : 'See Breakdown'}
-        //     {openBreakdownOrderId === order.orderId ? (
-        //       <ChevronUp size={16} className="ml-1 text-[#A0AEC0]" />
-        //     ) : (
-        //       <ChevronDown size={16} className="ml-1 text-[#A0AEC0]" />
-        //     )}
-        //   </button>
-        // </div>
-        // ))
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 w-full">
           {orders?.map((order: any) => (
             <div
