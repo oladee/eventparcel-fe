@@ -160,7 +160,7 @@ const DisplayGoogleContactModal: React.FC<CSVContactModalProps> = ({
                 onClick={onClose}
               />
               <p id="uploadCsvDesc" className="text-sm text-[#718096] mt-2">
-                Select the contacts you'd like to invite for the event
+                Select the contacts you&apos;d like to invite for the event
               </p>
             </div>
 

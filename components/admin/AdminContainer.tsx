@@ -28,7 +28,7 @@ function AdminContainer({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     loadUserData();
-  }, []);
+  }, [loadUserData]);
 
   return (
     <main className="absolute top-0 left-0 right-0 md:pl-64 !pt-16 h-screen overflow-y-auto custom-scrollbar bg-gray-100">
