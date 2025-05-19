@@ -62,7 +62,7 @@ const AdminHeaderDashboard: React.FC<HeaderProps> = ({ toggleSidebar }) => {
     const interval = setInterval(() => {
       const loggedInUser = localStorage.getItem("loggedInUser");
       if (loggedInUser) {
-        const parsed = JSON.parse(loggedInUser);
+        const parsed = JSON.parse(loggedInUser).data;
         if (
           parsed.firstName !== userRef.current.firstName ||
           parsed.lastName !== userRef.current.lastName ||
@@ -105,6 +105,7 @@ const AdminHeaderDashboard: React.FC<HeaderProps> = ({ toggleSidebar }) => {
       );
     }
     const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
+    console.log("initials", initials)
     return (
       <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-700 font-bold">
         {initials}

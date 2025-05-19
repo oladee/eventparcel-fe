@@ -9,7 +9,7 @@ function AdminContainer({ children }: { children: React.ReactNode }) {
 
   const loadUserData = () => {
     const loggedInUser = localStorage.getItem("loggedInUser");
-    const authToken = localStorage.getItem("authToken");
+    const authToken = localStorage.getItem("authToken")
     if (loggedInUser && authToken) {
       const parsedUser = JSON.parse(loggedInUser);
       userRef.current = {
@@ -17,12 +17,12 @@ function AdminContainer({ children }: { children: React.ReactNode }) {
       };
 
       // Redirect if the user is not an admin or superAdmin
-      if (parsedUser.role !== "admin" && parsedUser.role !== "superAdmin") {
-        router.push("/");
+      if (parsedUser.data.role !== "admin" && parsedUser.data.role !== "superAdmin") {
+        router.replace("/adminLogin");
         return;
       }
     } else {
-      router.push("/");
+      router.replace("/adminLogin");
     }
   };
 
