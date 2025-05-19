@@ -45,14 +45,6 @@ const AdminHeaderDashboard: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   const loadUserData = () => {
     const loggedInUser = localStorage.getItem("loggedInUser");
     if (loggedInUser) {
-      // const parsed = JSON.parse(loggedInUser);
-      // const newUser = {
-      //   firstName: parsed.firstName || "",
-      //   lastName: parsed.lastName || "",
-      //   role: parsed.role || "",
-      //   imageUrl: parsed.imageUrl || ""
-      // };
-      // pull the real user payload from inside .data
       const { data: payload } = JSON.parse(loggedInUser) as {
         data: {
           firstName?: string;
