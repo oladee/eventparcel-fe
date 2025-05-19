@@ -45,12 +45,27 @@ const AdminHeaderDashboard: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   const loadUserData = () => {
     const loggedInUser = localStorage.getItem("loggedInUser");
     if (loggedInUser) {
-      const parsed = JSON.parse(loggedInUser);
+      // const parsed = JSON.parse(loggedInUser);
+      // const newUser = {
+      //   firstName: parsed.firstName || "",
+      //   lastName: parsed.lastName || "",
+      //   role: parsed.role || "",
+      //   imageUrl: parsed.imageUrl || ""
+      // };
+      // pull the real user payload from inside .data
+      const { data: payload } = JSON.parse(loggedInUser) as {
+        data: {
+          firstName?: string;
+          lastName?: string;
+          role?: string;
+          imageUrl?: string | null;
+        };
+      };
       const newUser = {
-        firstName: parsed.firstName || "",
-        lastName: parsed.lastName || "",
-        role: parsed.role || "",
-        imageUrl: parsed.imageUrl || ""
+        firstName: payload.firstName || "",
+        lastName: payload.lastName || "",
+        role: payload.role || "",
+        imageUrl: payload.imageUrl || ""
       };
       setUser(newUser);
       userRef.current = newUser;
@@ -85,7 +100,6 @@ const AdminHeaderDashboard: React.FC<HeaderProps> = ({ toggleSidebar }) => {
   };
 
   const handleMouseLeave = () => {
-    
     hideTimeoutRef.current = setTimeout(() => {
       setShowTooltip(false);
     }, 500); // 1 second delay
@@ -104,8 +118,10 @@ const AdminHeaderDashboard: React.FC<HeaderProps> = ({ toggleSidebar }) => {
         />
       );
     }
-    const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(0)}`.toUpperCase();
-    console.log("initials", initials)
+    const initials = `${user.firstName.charAt(0)}${user.lastName.charAt(
+      0
+    )}`.toUpperCase();
+    console.log("initials", initials);
     return (
       <div className="w-10 h-10 rounded-full bg-gray-300 flex items-center justify-center text-gray-700 font-bold">
         {initials}
@@ -151,17 +167,6 @@ const AdminHeaderDashboard: React.FC<HeaderProps> = ({ toggleSidebar }) => {
 };
 
 export default AdminHeaderDashboard;
-
-
-
-
-
-
-
-
-
-
-
 
 // // components/admin/AdminHeaderDashboard.tsx
 // "use client";
@@ -302,12 +307,6 @@ export default AdminHeaderDashboard;
 // };
 
 // export default AdminHeaderDashboard;
-
-
-
-
-
-
 
 // "use client";
 // import Image from "next/image";
@@ -469,20 +468,6 @@ export default AdminHeaderDashboard;
 // };
 
 // export default AdminHeaderDashboard;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // "use client";
 // import Image from "next/image";
