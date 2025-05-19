@@ -117,7 +117,7 @@ const DisplayGoogleContactModal: React.FC<CSVContactModalProps> = ({
   return (
     <>
       {showErrorModal && (
-        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4">
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4 z-50">
           <div className="bg-white rounded-2xl shadow-lg w-full max-w-lg p-6 mt-44">
             <div className="flex justify-between items-center border-b pb-3">
               <h2 className="text-lg font-semibold">Invalid CSV</h2>
@@ -152,7 +152,7 @@ const DisplayGoogleContactModal: React.FC<CSVContactModalProps> = ({
                 id="uploadCsvHeade"
                 className="text-lg lg:text-xl font-bold text-[#111827]"
               >
-                Upload CSV File
+               Import From Google Contact
               </h2>
               <FiX
                 className="absolute top-4 right-4 cursor-pointer text-gray-600"
@@ -160,7 +160,7 @@ const DisplayGoogleContactModal: React.FC<CSVContactModalProps> = ({
                 onClick={onClose}
               />
               <p id="uploadCsvDesc" className="text-sm text-[#718096] mt-2">
-                You can upload a csv file exported from your contact list
+                Select the contacts you'd like to invite for the event
               </p>
             </div>
 
