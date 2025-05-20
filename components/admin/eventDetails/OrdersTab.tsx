@@ -1,6 +1,6 @@
 "use client"
 import React, { useState, useMemo } from "react"
-import { FiSearch, FiCalendar, FiDownload } from "react-icons/fi"
+import { FiSearch, FiDownload } from "react-icons/fi"
 import OrderTable, { Order } from "./OrderTable"
 import { saveAs } from 'file-saver'
 
@@ -132,10 +132,10 @@ const capitalize = (text: string) =>
             className="ml-2 w-full bg-transparent border-none focus:ring-0 text-sm placeholder-[#A0AEC0] outline-none"
           />
         </div>
-        <div className="flex items-center bg-[#FAFAFA] rounded-[12px] px-4 py-4">
+        {/* <div className="flex items-center bg-[#FAFAFA] rounded-[12px] px-4 py-4">
           <FiCalendar className="text-gray-400 mr-2" />
           <span className="text-[#718096] text-sm">All dates</span>
-        </div>
+        </div> */}
         <button onClick={handleExport} className="flex items-center bg-[#FAFAFA] rounded-[12px] px-4 py-4 text-[#718096] text-sm">
           <FiDownload className="mr-2" /> Download
         </button>

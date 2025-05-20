@@ -53,7 +53,7 @@ const EventDetailsSection2: React.FC<EventDetailsProps> = ({ eventData }) => {
           <h1 className="capitalize text-2xl md:text-4xl text-[#111827] font-bold font-general">
             Events
           </h1>
-          {/* <button
+          <button
             onClick={handleCreateNewEvent}
             className="flex items-center outline-none"
           >
@@ -61,8 +61,8 @@ const EventDetailsSection2: React.FC<EventDetailsProps> = ({ eventData }) => {
             <span className="font-general font-medium text-base text-[#751423] capitalize">
               Create New
             </span>
-          </button> */}
-          {loggedInUser.role !== "cohost" && (
+          </button>
+          {/* {loggedInUser.role !== "cohost" && (
             <button
               onClick={handleCreateNewEvent}
               className="flex items-center outline-none"
@@ -72,7 +72,7 @@ const EventDetailsSection2: React.FC<EventDetailsProps> = ({ eventData }) => {
                 Create New
               </span>
             </button>
-          )}
+          )} */}
         </div>
         {eventData.map((event, i) => {
           const formattedDate = (() => {

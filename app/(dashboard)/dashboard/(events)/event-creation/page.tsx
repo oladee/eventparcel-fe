@@ -497,7 +497,7 @@ const PageContent: React.FC = () => {
       <div>{showSuccess && <EventSuccess />}</div>
       <div>{showSuccess2 && <EventSaveSuccess />}</div>
       <section className="bg-[#F9FAFB]">
-        <div className="py-8 lg:py-16 px-3 sm:px-4 mx-auto max-w-screen-md">
+        <div className="py-8 lg:py-16 px-3 sm:px-4 mx-auto max-w-screen-md ">
           <EventHeader />
           <form
             className="space-y-8 bg-white p-8 rounded-3xl shadow-md"
@@ -572,6 +572,12 @@ export default function Page() {
     </Suspense>
   );
 }
+
+
+
+
+
+
 
 // "use client";
 // import { Suspense, useState, useRef, useEffect } from "react";
