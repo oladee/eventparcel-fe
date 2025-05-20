@@ -7,7 +7,7 @@ import axios from 'axios';
 import { identifyUser, trackEvent } from '@/lib/mixpanel';
 import getBrowserType from '@/lib/getBrowserType';
 
-const SocialSignup: React.FC = () => {
+const SocialSignin: React.FC = () => {
   useEffect(() => {
     if (typeof window === 'undefined') {
       return;
@@ -21,11 +21,11 @@ const SocialSignup: React.FC = () => {
       return;
     }
     const handleAuthentication = async () => {
-      trackEvent("sign-up started", {
-        source: "sign-up page",
+      trackEvent("sign-in started", {
+        source: "sign-in page",
         sign_up_method: "Google",
         timestamp: new Date().toISOString(),
-        page_name: "sign-up Page",
+        page_name: "sign-in Page",
       });
           
       try {
@@ -34,11 +34,11 @@ const SocialSignup: React.FC = () => {
           { token } // Send token in the request body
         );
         if (response.data && response.data.data) {  
-        trackEvent("sign-up completed", {
-          source: "sign-up page",
+        trackEvent("sign-in completed", {
+          source: "sign-in page",
           sign_up_method: "Google",
           timestamp: new Date().toISOString(),
-          page_name: "sign-up Page",
+          page_name: "sign-in Page",
         });
   
         identifyUser(response.data.data.hostId, {
@@ -54,11 +54,11 @@ const SocialSignup: React.FC = () => {
           localStorage.setItem("personInfo", JSON.stringify(user));
         }
       } catch (error: any) {
-        trackEvent("sign-up failed", {
-          source: "sign-up page",
+        trackEvent("sign-in failed", {
+          source: "sign-in page",
           sign_up_method: "Google",
           timestamp: new Date().toISOString(),
-          page_name: "sign-up Page",
+          page_name: "sign-in Page",
         });
         console.error("Error during authentication:", error.message);
       }
@@ -83,79 +83,4 @@ const SocialSignup: React.FC = () => {
   );
 };
 
-export default SocialSignup;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// import { useEffect, useState } from 'react'
-// import { Facebook, Google, Apple } from '../icons/Icons'
-// import axios from 'axios';
-
-// const SocialSignup: React.FC = () => {
-//   const urlParams = new URLSearchParams(window.location.search);
-//   const [authToken, setAuthToken] = useState<string | null>(null);
-//   const token = urlParams.get("token");
-//   console.log(token);
-
-//   useEffect(() => {
-//     if (!token) {
-//       return;
-//     }
-//     setAuthToken(token);
-//     const handleAuthentication = async () => {
-//       try {
-//         const response = await axios.get(
-//           "https://api-eventparcel.onrender.com/auth/user",  authToken 
-//           // {
-//           //   headers: {
-//           //     Authorization: `Bearer ${token}`,
-//           //   },
-//           // }
-//         );
-//         if (response.data && response.data.data) {
-//           const user = response.data.data;
-//           console.log(user);
-//           localStorage.setItem("personInfo", JSON.stringify(user));
-//         }
-//       } catch (error: any) {
-//         console.error("Error during authentication:", error.message);
-//       }
-//     };
-
-//     // const timer = setTimeout(() => {
-//     //   handleAuthentication();
-//     // }, 10000);
-
-//     // return () => clearTimeout(timer);
-//     handleAuthentication();
-//   }, [token]);
-
-//   return (
-//     <div className="grid lg:grid-cols-3 gap-4">
-//       <a href='https://api-eventparcel.onrender.com/auth/google' className="authButton">
-//         <Google width={20} height={20} /> Google
-//       </a>
-//       <a href='https://api-eventparcel.onrender.com/auth/facebook' className="authButton">
-//         <Facebook width={20} height={20} /> Facebook
-//       </a>
-//       <button className="authButton">
-//         <Apple width={20} height={20} /> Apple
-//       </button>
-//     </div>
-//   )
-// }
-
-// export default SocialSignup
+export default SocialSignin;

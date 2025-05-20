@@ -18,6 +18,12 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import EventSaveSuccess from "@/components/aboutEvent/EventSaveSuccess";
 import { debounce } from "lodash";
+import { trackEvent } from "@/lib/mixpanel";
+
+export type EventDetails = {
+  event_id: string;
+  event_name: string;
+};
 
 const PickupDetails = () => {
  // =============================================
@@ -44,6 +50,8 @@ const [debouncedAddress, setDebouncedAddress] = useState("");
 // Modal and UI states
 const [showMapPickerModal, setShowMapPickerModal] = useState(false);
 const [showSuccess2, setShowSuccess2] = useState(false);
+const [eventDetails, setEventDetails] = useState<EventDetails | null>(null);
+
 
 // Form data state with initial values
 const [formData, setFormData] = useState({
@@ -100,6 +108,18 @@ const validateForm = useCallback(() => {
     deliveryTime instanceof Date;
   setIsFormValid(isValid);
 }, [formData]);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("parsedEventDetails");
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        setEventDetails(parsed);
+      } catch (error) {
+        console.error("Failed to parse event details:", error);
+      }
+    }
+  }, []);
 
 
   // Debounce the address input
@@ -285,6 +305,13 @@ const cleanObject = (obj: Record<string, any>) =>
  * Handles form submission
  * @param e - Form event
  */
+
+const pickupAddress = formData.pickupLocation;
+const parts = pickupAddress.split(',').map(part => part.trim());
+
+// Safely get the second-to-the-last item
+const pickupRegion = parts.length >= 2 ? parts[parts.length - 2] : "";
+
 const handleSubmit = async (e: React.FormEvent) => {
   e.preventDefault();
   if (!isFormValid) return;
@@ -311,8 +338,26 @@ const handleSubmit = async (e: React.FormEvent) => {
     const cleanedData = cleanObject(formattedData);
     await axiosInstance.post("/add-payment", cleanedData);
     toast.success("Payment and Delivery details submitted successfully!");
+    trackEvent("Add Pickup Information", {
+        source: "Pickup-details Page",
+        timestamp: new Date().toISOString(),
+        page_name: "add pickup page",
+        event_id: eventDetails?.event_id,
+        event_name: eventDetails?.event_name,
+        pickup_region: pickupRegion,
+        status: "Successful"
+      });
     router.push("/dashboard/events");
   } catch (error: any) {
+    trackEvent("Add Pickup Information", {
+      source: "Pickup-details Page",
+      timestamp: new Date().toISOString(),
+      page_name: "add pickup page",
+      event_id: eventDetails?.event_id,
+      event_name: eventDetails?.event_name,
+      pickup_region: pickupRegion,
+      status: "Failed"
+    });
     if (axios.isAxiosError(error)) {
       const errorMessage = error.response?.data?.message || "An error occurred. Please try again.";
       toast.error(errorMessage);

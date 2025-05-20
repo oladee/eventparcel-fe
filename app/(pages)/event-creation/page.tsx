@@ -15,6 +15,8 @@ import Cookies from "js-cookie";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import HeaderLayout from "@/components/layout/HeaderLayout";
 import { motion } from "framer-motion";
+import { identifyUser, trackEvent } from "@/lib/mixpanel";
+import getBrowserType from "@/lib/getBrowserType";
 
 // Dynamically import LocationPickerModal with SSR disabled.
 const LocationPickerModal = dynamic(
@@ -126,8 +128,6 @@ const PageContent: React.FC = () => {
     }
   }, [searchParams]);
   
-  console.log("is fill", formData)
-
 
   useEffect(() => {
     const redirect = Cookies.get("redirectAfterLogin");
@@ -305,6 +305,12 @@ const PageContent: React.FC = () => {
 
   // API call triggered on clicking Continue
   const handleContinue = async () => {
+    trackEvent("New Event Creation Started", {
+      source: "event-creation page",
+      timestamp: new Date().toISOString(),
+      page_name: "Event-creation page",
+    });
+
     const newErrors = { ...errors };
     Object.keys(formData).forEach((key) => {
       if (key !== "eventImage") {
@@ -318,7 +324,6 @@ const PageContent: React.FC = () => {
     setErrors(newErrors);
     if (Object.values(newErrors).some((error) => error !== "")) return;
 
-    setLoading(true);
     try {
       // Create FormData to match endpoint requirements
       const submissionData = new FormData();
@@ -357,8 +362,40 @@ const PageContent: React.FC = () => {
       localStorage.setItem("eventId", response.data.data._id);
       localStorage.setItem("eventDetails", JSON.stringify(response.data));
       setShowSuccess(true);
+      
+      trackEvent("New Event Creation Completed", {
+        source: "event-creation page",
+        timestamp: new Date().toISOString(),
+        page_name: "Event-creation page",
+        event_Id: response.data.data._id,
+        event_name: response.data.data.eventName,
+        add_image: response.data.data.eventImgUrl ? "Yes" : "No",
+        add_group_number: response.data.data.numberOfGroups ? "Yes" : "No",
+        status: "Successful"
+      });
+      
+      identifyUser(formData.email, {
+        userType: "host",
+        location,
+        browser_type: getBrowserType(),
+        email: formData?.email,
+        user_first_name: formData?.firstName,
+        user_last_name: formData?.lastName,
+      });
+      
+            
     } catch (error: any) {
       toast.error(error.response?.data?.message);
+            
+      trackEvent("New Event Creation Failed", {
+        source: "event-creation page",
+        timestamp: new Date().toISOString(),
+        page_name: "Event-creation page",
+        event_name: formData?.eventName,
+        add_image: formData?.eventImage ? "Yes" : "No",
+        add_group_number: formData?.numberOfGroups ? "Yes" : "No",
+        status: "Failed"
+      });
     } finally {
       setLoading(false);
     }

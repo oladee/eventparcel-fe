@@ -11,6 +11,7 @@ import axios from "axios";
 import { Group } from "@/app/interface/Group";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { trackEvent } from "@/lib/mixpanel";
 
 interface AddGroupProps {
   setIsAddGroupOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -88,6 +89,21 @@ const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode, selectedGr
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
       e.preventDefault();
+
+      if(selectedGroup) {
+        trackEvent("Edit Group Started", {
+          source: "new-group page",
+          timestamp: new Date().toISOString(),
+          page_name: "New-group page",
+        });
+      }else {
+        trackEvent("New Group Creation Started", {
+          source: "new-group page",
+          timestamp: new Date().toISOString(),
+          page_name: "New-group page",
+        });
+      }
+      
       setLoading(true)
 
     // Validate before submission
@@ -114,9 +130,33 @@ const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode, selectedGr
 
     try {
         if(selectedGroup) {
-          await axiosInstance.put(`/update-group/${selectedGroup._id}`, formDataToSend);
+          const response = await axiosInstance.put(`/update-group/${selectedGroup._id}`, formDataToSend);
+
+          trackEvent("Group Edit Completed", {
+            source: "event-creation page",
+            timestamp: new Date().toISOString(),
+            page_name: "new-group page",
+            group_Id: response.data.data._id,
+            group_name: response.data.data.groupName,
+            currency_type: response.data.data.groupCurrency,
+            group_type: response.data.data.groupPrivacy,
+            status: "Successful"
+          });
+
         }else {
-          await axiosInstance.post("/add-group", formData);
+          const response = await axiosInstance.post("/add-group", formData);
+          console.log("add group", response.data.data)
+    
+          trackEvent("New Group Creation Completed", {
+            source: "event-creation page",
+            timestamp: new Date().toISOString(),
+            page_name: "new-group page",
+            group_Id: response.data.data._id,
+            group_name: response.data.data.groupName,
+            currency_type: response.data.data.groupCurrency,
+            group_type: response.data.data.groupPrivacy,
+            status: "Successful"
+          });
         }
       
         toast.success(`Group ${selectedGroup ? ("updated") : ("created")} successfully `, {
@@ -129,12 +169,43 @@ const AddGroup: React.FC<AddGroupProps> = ({ setIsAddGroupOpen, mode, selectedGr
           theme: "light",
           
       });
+
       window.location.reload();
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const errorMessage = error.response?.data?.message || error.message || "An unknown error occurred.";
         setError(errorMessage);
-    
+
+        if(selectedGroup) {
+          const failedGroupName = formData.groupName;
+          const failedCurrency = formData.groupCurrency;
+          const failedPrivacy = formData.groupPrivacy;
+          
+          trackEvent("Group Edit Failed", {
+            source: "event-creation page",
+            timestamp: new Date().toISOString(),
+            page_name: "new-group page",
+            group_name: failedGroupName,
+            currency_type: failedCurrency,
+            group_type: failedPrivacy,
+            status: "Failed"
+          });
+        }else { 
+          const failedGroupName = formData.groupName;
+          const failedCurrency = formData.groupCurrency;
+          const failedPrivacy = formData.groupPrivacy;
+          
+          trackEvent("New Group Creation Failed", {
+            source: "event-creation page",
+            timestamp: new Date().toISOString(),
+            page_name: "new-group page",
+            group_name: failedGroupName,
+            currency_type: failedCurrency,
+            group_type: failedPrivacy,
+            status: "Failed"
+          });
+        }
+          
         // Show toast notification
         toast.error(errorMessage, {
             position: "top-right",

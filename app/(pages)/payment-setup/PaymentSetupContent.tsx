@@ -17,6 +17,7 @@ import DollarPayoutForm from "@/components/DollarPayoutForm";
 import axiosInstance from "@/lib/axiosInstance";
 import Cookies from "js-cookie";
 import EventSaveSuccess from "@/components/aboutEvent/EventSaveSuccess";
+import { trackEvent } from "@/lib/mixpanel";
 
 
 const LocationPickerModal = dynamic(
@@ -75,6 +76,7 @@ const searchParams = useSearchParams();
 const groupsString = searchParams.get("groups");
 const groups = groupsString ? JSON.parse(decodeURIComponent(groupsString)) : [];
 const firstEventId = groups.length > 0 && groups[0].event ? groups[0].event._id : "";
+const firstGroup = groups.length > 0 && groups[0].event ? groups[0] : "";
 const pathname = usePathname();
 const router = useRouter();
 
@@ -93,6 +95,8 @@ const [isSaveLoading, setIsSaveLoading] = useState(false);
 // Bank selection states
 const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
 const [selectedUSBank, setSelectedUSBank] = useState<USBank | null>(null);
+const [savedNGN, setSavedNGN] = useState(false);
+const [savedUSD, setSavedUSD] = useState(false);
 
 // Form data state
 const [formData, setFormData] = useState({
@@ -162,8 +166,6 @@ const formatTime12Hour = (date: Date): string => {
 };
 
 // Currency flags
-const savedNGN = localStorage.getItem("paymentHasNGN") === "true";
-const savedUSD = localStorage.getItem("paymentHasUSD") === "true";
 const hasNGN = groups.some((group: { groupCurrency: string; }) => group.groupCurrency === "NGN") || savedNGN;
 const hasUSD = groups.some((group: { groupCurrency: string; }) => group.groupCurrency === "USD") || savedUSD;
 
@@ -173,6 +175,13 @@ const today = new Date();
 // =============================================
 // EFFECT HOOKS
 // =============================================
+useEffect(() => {
+  const hasNGN = localStorage.getItem("paymentHasNGN") === "true";
+  const hasUSD = localStorage.getItem("paymentHasUSD") === "true";
+  setSavedNGN(hasNGN);
+  setSavedUSD(hasUSD);
+}, []);
+
 // Clean up redirect cookie on mount
 useEffect(() => {
   Cookies.remove("redirectAfterLogin");
@@ -334,6 +343,16 @@ const handleSubmit = async (e: FormEvent) => {
     if (allSelfManaged) {
       await axiosInstance.post("/add-payment", formattedData);
       toast.success("Payment details successfully submitted!");
+      trackEvent("Add Payment Information", {
+        source: "Add Payment Page",
+        timestamp: new Date().toISOString(),
+        page_name: "add payment page",
+        event_id: firstGroup.event._id,
+        event_name: firstGroup.event.eventName,
+        naira_bank_name: formData.nairaAccount.bankName,
+        dollar_bank_name: formData.dollarAccount.usBankName,
+        status: "Successful"
+      });
 
       if(authToken) {
         router.push("/dashboard/events");
@@ -342,10 +361,38 @@ const handleSubmit = async (e: FormEvent) => {
       }
 
     } else {
+      const parsedEventDetails = {
+        event_id: firstGroup.event._id,
+        event_name: firstGroup.event.eventName,
+      };
+      
+      localStorage.setItem("parsedEventDetails", JSON.stringify(parsedEventDetails));
+      
+      trackEvent("Add Payment Information", {
+        source: "Add Payment Page",
+        timestamp: new Date().toISOString(),
+        page_name: "add payment page",
+        event_id: firstGroup.event._id,
+        event_name: firstGroup.event.eventName,
+        naira_bank_name: formData.nairaAccount.bankName || null,
+        dollar_bank_name: formData.dollarAccount.usBankName || null,
+        status: "Successful"
+      });
+
       router.push(`/pickup-details?${queryString}`);
     }
   } catch (error: any) {
     console.error("Error submitting payment details:", error);
+    trackEvent("Add Payment Information Failed", {
+      source: "Add Payment Page",
+      timestamp: new Date().toISOString(),
+      page_name: "Add Payment Page",
+      event_id: firstGroup.event._id,
+      event_name: firstGroup.event.eventName,
+      naira_bank_name: formData.nairaAccount.bankName,
+      dollar_bank_name: formData.dollarAccount.usBankName,
+      status: "Failed"
+    });
 
     if (
       error.response &&

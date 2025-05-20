@@ -8,6 +8,7 @@ import ReusuableSuccess from "@/components/modals/ReusuableSuccess";
 import RightBar from "@/components/Rightbar";
 import { useRouter } from "next/navigation";
 import Container from "@/components/dashboard/Container";
+import { trackEvent } from "@/lib/mixpanel";
 
 interface EventDetailsProps {
   eventData: Array<{
@@ -135,6 +136,13 @@ const Page = () => {
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
+
+    trackEvent("Add co-host started", {
+      source: "add-cohost page",
+      timestamp: new Date().toISOString(),
+      page_name: "Add co-host Page",
+    });
+    
     if (!isFormValid) return;
 
     try {
@@ -151,9 +159,19 @@ const Page = () => {
           withCredentials: true
         }
       );
+
+      
       console.log("Response:", response.data);
       localStorage.setItem("eventId", selectedEventId);
       setShowModal(true);
+
+      trackEvent("Add co-host completed", {
+        source: "add-cohost page",
+        timestamp: new Date().toISOString(),
+        page_name: "Add co-host Page",
+        status: "Successful"
+      });
+      
     } catch (error: any) {
       console.error("Error:", error);
       if (error.isAxiosError && !error.response) {
@@ -169,6 +187,14 @@ const Page = () => {
           error.response?.data?.message || "An unexpected error occurred."
         );
       }
+
+      trackEvent("Add co-host failed", {
+        source: "add-cohost page",
+        timestamp: new Date().toISOString(),
+        page_name: "Add co-host Page",
+        status: "Failed"
+      });
+
     } finally {
       setLoading(false);
     }

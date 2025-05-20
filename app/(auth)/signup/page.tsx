@@ -13,11 +13,14 @@ import PhoneNumberInput from "@/components/PhoneNumberInput";
 import { CheckCircle, XCircle } from "lucide-react";
 import Cookies from "js-cookie"
 import HeaderLayout from "@/components/layout/HeaderLayout";
+import { trackEvent } from "@/lib/mixpanel";
 
 const Signup: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [isLoading, setIsLoading] = useState(false);
   const [touched, setTouched] = useState(false);
+  // const [location, setLocation] = useState<string | null>(null);
+
   const [formData, setFormData] = useState({
     firstName: "",
     lastName: "",
@@ -25,40 +28,49 @@ const Signup: React.FC = () => {
     phoneNumber: "",
     password: ""
   });
-
+  
   const [errors, setErrors] = useState({
     firstName: "",
     lastName: "",
     email: "",
     password: ""
   });
-
+  
   const router = useRouter();
-
+  
   useEffect(() => {
     const eventDetails = localStorage.getItem("eventDetails");
     
     if (!eventDetails) {
-        console.warn("No eventDetails found in localStorage.");
-        return;
+      console.warn("No eventDetails found in localStorage.");
+      return;
     }
-
+    
     try {
-        const parsedDetails = JSON.parse(eventDetails);
-        console.log("Parsed Event Details:", parsedDetails);
-
-        setFormData(prev => ({
-            ...prev,
-            firstName: parsedDetails.data.hostFirstName || "",
-            lastName: parsedDetails.data.hostLastName || "",
-            email: parsedDetails.data.hostEmail || ""
-        }));
+      const parsedDetails = JSON.parse(eventDetails);
+      console.log("Parsed Event Details:", parsedDetails);
+      
+      setFormData(prev => ({
+        ...prev,
+        firstName: parsedDetails.data.hostFirstName || "",
+        lastName: parsedDetails.data.hostLastName || "",
+        email: parsedDetails.data.hostEmail || ""
+      }));
     } catch (error) {
-        console.error("Error parsing eventDetails:", error);
+      console.error("Error parsing eventDetails:", error);
     }
 }, []);
 
-  // Validate input fields
+// useEffect(() => {
+//   if ("geolocation" in navigator) {
+//     navigator.geolocation.getCurrentPosition((pos) => {
+//       const { latitude, longitude } = pos.coords;
+//       setLocation(`${latitude},${longitude}`);
+//     });
+//   }
+// }, []);
+
+// Validate input fields
   const validateInput = (name: string, value: string) => {
     let errorMessage = "";
 
@@ -67,7 +79,7 @@ const Signup: React.FC = () => {
         errorMessage = "Only letters are allowed";
       }
     }
-
+    
     if (name === "email") {
       if (!/^\S+@\S+\.\S+$/.test(value)) {
         errorMessage = "Enter a valid email address";
@@ -94,17 +106,40 @@ const Signup: React.FC = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setIsLoading(true);
-  
+    
+    trackEvent("sign-up started", {
+      source: "sign-up page",
+      sign_up_method: "email_password",
+      timestamp: new Date().toISOString(),
+      page_name: "sign-up Page",
+    });
+
     try {
+      setIsLoading(true);
       const response = await axiosInstance.post('/signup', formData);
+
+      trackEvent("sign-up completed", {
+        source: "sign-up page",
+        sign_up_method: "email_password",
+        timestamp: new Date().toISOString(),
+        page_name: "sign-up Page",
+      });
+
       toast.success(response.data.message || "Signup successful!");
   
       Cookies.set("email", formData.email, { expires: 1, path: "/" }); //expire in one day
-  
+      
       // Redirect to OTP verification page
       router.push("/otp-verification");
     } catch (error: any) {
+      
+      trackEvent("sign-up failed", {
+        source: "sign-up page",
+        sign_up_method: "email_password",
+        timestamp: new Date().toISOString(),
+        page_name: "sign-up Page",
+        email: formData.email
+      });
       toast.error(error.response?.data?.message || "Signup failed. Please try again.");
     } finally {
       setIsLoading(false);

@@ -7,6 +7,7 @@ import CSVContactModal from "./CSVContactModal";
 import axiosInstance from "@/lib/axiosInstance";
 import { toast, ToastContainer } from "react-toastify";
 import { FaSpinner } from "react-icons/fa";
+import { trackEvent } from "@/lib/mixpanel";
 
 interface Contact {
   id: number;
@@ -31,6 +32,7 @@ const CsvModal: React.FC<CsvModalProps> = ({ onClose }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [isDragActive, setIsDragActive] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
+  const [eventData, setEventData] = useState<null | any>(null);
 
   // Ref for modal for accessibility focus management.
   const modalRef = useRef<HTMLDivElement>(null);
@@ -43,6 +45,18 @@ const CsvModal: React.FC<CsvModalProps> = ({ onClose }) => {
     }
     onClose();
   }, [selectedFile, onClose]);
+
+  useEffect(() => {
+    const storedData = localStorage.getItem("eventData");
+    if (storedData) {
+      try {
+        const parsed = JSON.parse(storedData);
+        setEventData(parsed);
+      } catch (error) {
+        console.error("Failed to parse eventData from localStorage", error);
+      }
+    }
+  }, []);
 
   // Close modal on Escape key press.
   useEffect(() => {
@@ -120,13 +134,31 @@ const CsvModal: React.FC<CsvModalProps> = ({ onClose }) => {
     const formData = new FormData();
     formData.append("csvData", selectedFile);
 
+    // trackEvent("Import Contact Start", {
+    //   source: "share-contact page",
+    //   event_id: eventData?._id,
+    //   event_name: eventData?.eventName,
+    //   timestamp: new Date().toISOString(),
+    //   page_name: "Share-contact Page",
+    //   route: "CSV"
+    // });
+
     try {
       setLoading(true);
       const response = await axiosInstance.post("/extract-csv", formData, {
         headers: {
           "Content-Type": "multipart/form-data",
         },
-      });
+      });  
+
+      // trackEvent("Import Contact Save", {
+      //   source: "share-contact page",
+      //   event_id: eventData?._id,
+      //   event_name: eventData?.eventName,
+      //   timestamp: new Date().toISOString(),
+      //   page_name: "Share-contact Page",
+      //   route: "CSV"
+      // });
 
       if (response.data?.data) {
         const parsedContacts: Contact[] = response.data.data.map(
@@ -145,6 +177,7 @@ const CsvModal: React.FC<CsvModalProps> = ({ onClose }) => {
             phoneValue: contact.phoneNumber,
           })
         );
+        console.log("cont", parsedContacts)
 
         setContacts(parsedContacts);
       } else {

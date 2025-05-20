@@ -8,10 +8,12 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { BiLoaderCircle } from "react-icons/bi";
 import axiosInstance from "@/lib/axiosInstance";
-import SocialSignup from "@/components/auth/SocialSignup";
 import AuthLeft from "@/components/auth/AuthLeft";
 import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
+import { trackEvent, identifyUser } from "@/lib/mixpanel";
+import getBrowserType from "@/lib/getBrowserType";
+import SocialSignin from "@/components/auth/SocialSignin";
 
 const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -20,7 +22,16 @@ const Login: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({ email: "", password: "" });
   const router = useRouter();
-  // const [localEmail, setLocalEmail] = useState("");
+  const [location, setLocation] = useState<string | null>(null);
+
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition((pos) => {
+        const { latitude, longitude } = pos.coords;
+        setLocation(`${latitude},${longitude}`);
+      });
+    }
+  }, []);
   
 
   useEffect(() => {
@@ -57,54 +68,142 @@ const Login: React.FC = () => {
     validateInput(name, value);
   };
 
+  // const handleLogin = async () => {
+  //   if (!email || !password) {
+  //     toast.error("Email and password are required!");
+  //     return;
+  //   }
+
+  //   try {
+  //     setLoading(true);
+  //     const response = await axiosInstance.post(
+  //       "/login",
+  //       { email, password },
+  //       {
+  //         withCredentials: true // Ensure cookies are sent with the request
+  //       }
+  //     );
+  //     console.log(response.data);
+
+  //     // Store the accessToken in localStorage
+  //     localStorage.setItem("authToken", response.data.accessToken);
+  //     // Save the response to localStorage as the logged-in user
+  //     localStorage.setItem("loggedInUser", JSON.stringify(response.data));
+  //     localStorage.setItem("loggedInUserEmail", response.data.email)
+  //     // localStorage.setItem("loggedInUserId", response.data.data._id)
+  //     localStorage.setItem("loggedInUserId", response.data.data.hostId)
+  //     console.log("User profile fetched successfully:", response.data.data._id);
+      
+  //     toast.success(response?.data?.message);
+
+  //     const redirectPath = Cookies.get("redirectAfterLogin");
+  //     const formData = localStorage.getItem("unsavedFormData");
+
+  //     if (redirectPath || formData) {
+  //       router.push(`${redirectPath}?resumeForm=true`);
+  //       return;
+  //     }else {
+  //       router.push("/dashboard");
+  //     }
+
+  //   } catch (error: any) {
+  //     if (
+  //       error.response?.data?.message ===
+  //       "User not verified. Please verify OTP first"
+  //     ) {
+  //       localStorage.setItem("email", email);
+  //       toast.error(
+  //         error.response?.data?.message ||
+  //           "User not verified. Please verify OTP first"
+  //       );
+  //       setTimeout(() => {
+  //         router.push("/otp-verification");
+  //       }, 3000);
+  //     } else {
+  //       toast.error(error.response?.data?.message);
+  //     }
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
+
   const handleLogin = async () => {
     if (!email || !password) {
       toast.error("Email and password are required!");
       return;
     }
-
+  
+    trackEvent("Started sign-in", {
+      source: "login page",
+      sign_in_method: "email_password",
+      timestamp: new Date().toISOString(),
+      page_name: "Login Page",
+      browser_type: getBrowserType(),
+      location,
+    });
+  
     try {
       setLoading(true);
       const response = await axiosInstance.post(
         "/login",
         { email, password },
-        {
-          withCredentials: true // Ensure cookies are sent with the request
-        }
+        { withCredentials: true }
       );
-      console.log(response.data);
-
-      // Store the accessToken in localStorage
-      localStorage.setItem("authToken", response.data.accessToken);
-      // Save the response to localStorage as the logged-in user
-      localStorage.setItem("loggedInUser", JSON.stringify(response.data));
-      localStorage.setItem("loggedInUserEmail", response.data.email)
-      // localStorage.setItem("loggedInUserId", response.data.data._id)
-      localStorage.setItem("loggedInUserId", response.data.data.hostId)
-      console.log("User profile fetched successfully:", response.data.data._id);
       
-      toast.success(response?.data?.message);
+      localStorage.setItem("authToken", response.data.accessToken);
+      localStorage.setItem("loggedInUser", JSON.stringify(response.data));
+      localStorage.setItem("loggedInUserEmail", response.data.email);
+      localStorage.setItem("loggedInUserId", response.data.data.hostId);
+  
+      identifyUser(response.data.data.hostId, {
+        userType: response.data.data.role,
+        location,
+        browser_type: getBrowserType(),
+        email: response.data.data.email,
+        user_first_name: response.data.data.firstName,
+        user_last_name: response.data.data.lastName,
+      });
 
+      trackEvent("Completed sign-in", {
+        source: "login page",
+        sign_in_method: "email_password",
+        timestamp: new Date().toISOString(),
+        page_name: "Login Page",
+        browser_type: getBrowserType(),
+        location,
+        email,
+        status: "Successful"
+      });
+  
+      toast.success(response?.data?.message);
+  
       const redirectPath = Cookies.get("redirectAfterLogin");
       const formData = localStorage.getItem("unsavedFormData");
-
+  
       if (redirectPath || formData) {
         router.push(`${redirectPath}?resumeForm=true`);
         return;
-      }else {
+      } else {
         router.push("/dashboard");
       }
-
     } catch (error: any) {
+      trackEvent("Failed sign-in", {
+        source: "login page",
+        sign_in_method: "email_password",
+        error_message: error.response?.data?.message || "Unknown error",
+        timestamp: new Date().toISOString(),
+        page_name: "Login Page",
+        browser_type: getBrowserType(),
+        location,
+        status: "Failed"
+      });
+  
       if (
         error.response?.data?.message ===
         "User not verified. Please verify OTP first"
       ) {
         localStorage.setItem("email", email);
-        toast.error(
-          error.response?.data?.message ||
-            "User not verified. Please verify OTP first"
-        );
+        toast.error(error.response?.data?.message || "User not verified. Please verify OTP first");
         setTimeout(() => {
           router.push("/otp-verification");
         }, 3000);
@@ -115,6 +214,7 @@ const Login: React.FC = () => {
       setLoading(false);
     }
   };
+  
 
   const isFormValid =
     email && password && Object.values(errors).every((err) => err === "");
@@ -232,7 +332,7 @@ const Login: React.FC = () => {
             </div>
 
             {/* Social Login Buttons */}
-            <SocialSignup />
+            <SocialSignin />
 
             {/* Signup Link */}
             <div className="text-left text-sm text-gray-500 mt-6">
