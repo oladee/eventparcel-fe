@@ -14,9 +14,10 @@ const FiltersBar: React.FC<Props> = ({ searchTerm, onSearchChange }) => (
     <div className="flex flex-col md:flex-row items-stretch md:items-center gap-4 justify-between w-full max-w-2xl ">
       <div className="flex items-center bg-white rounded-[12px] px-4 py-2">
         <span className="text-[#A0AEC0]">Show:</span>
-        <select className="ml-2 text-black font-bold border-none focus:ring-0 outline-none">
+        {/* <select className="ml-2 text-black font-bold border-none focus:ring-0 outline-none appearance-none">
           <option>All Events</option>
-        </select>
+        </select> */}
+        <p className="ml-2 text-black font-bold">All Events</p>
       </div>
 
       <div className="flex-1 flex items-center bg-white rounded-[12px] px-4 py-2">

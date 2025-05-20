@@ -574,7 +574,9 @@ const PageContent: React.FC = () => {
       {showMapPickerModal && (
         <LocationPickerModal
           onLocationSelect={(location) => {
-            setFormData({ ...formData, location });
+            // setFormData({ ...formData, location });
+            setFormData(prev => ({ ...prev, location }));
+            setErrors(prev => ({ ...prev, location: "" }));
             setShowMapPickerModal(false);
           }}
           onCancel={() => setShowMapPickerModal(false)}

@@ -54,7 +54,7 @@ export default function Page() {
 
     const fetchActivityLogs = async () => {
       try {
-        const response = await axiosInstance.get(`/get-activity-logs-dummy/${cohostId}`);
+        const response = await axiosInstance.get(`/get-activity-logs/${cohostId}`);
         if (response.data.success) {
           const logs: ActivityLogEntry[] = response.data.data;
           setActivityLogs(logs);
