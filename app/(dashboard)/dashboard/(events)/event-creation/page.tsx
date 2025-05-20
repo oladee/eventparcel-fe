@@ -61,7 +61,7 @@ const PageContent: React.FC = () => {
   // State for modals
   const [showImagePickerModal, setShowImagePickerModal] = useState(false);
   const [showMapPickerModal, setShowMapPickerModal] = useState(false);
-    const pathname = usePathname();
+  const pathname = usePathname();
 
   const [formData, setFormData] = useState<FormData>({
     eventName: "",
@@ -88,7 +88,7 @@ const PageContent: React.FC = () => {
     numberOfGroups: "",
     eventImage: ""
   });
-  
+
   useEffect(() => {
     Cookies.remove("redirectAfterLogin");
   }, []);
@@ -139,7 +139,7 @@ const PageContent: React.FC = () => {
           });
           // Save the response to localStorage as the logged-in user
           localStorage.setItem("loggedInUser", JSON.stringify(response.data));
-          localStorage.setItem("loggedInUserEmail", response.data.email)
+          localStorage.setItem("loggedInUserEmail", response.data.email);
           console.log("User profile fetched successfully:", response.data);
         } catch (error: any) {
           console.error("Error fetching user profile:", error);
@@ -158,11 +158,11 @@ const PageContent: React.FC = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { id, value } = e.target;
-  
+
     if (id === "numberOfGroups" && value.startsWith("-")) {
       return; // Prevent negative values
     }
-  
+
     setFormData({ ...formData, [id]: value });
     setErrors({ ...errors, [id]: "" });
   };
@@ -182,7 +182,7 @@ const PageContent: React.FC = () => {
       }
     } else if (id === "numberOfGroups") {
       const trimmed = value.toString().trim();
-    
+
       // If user hasn't entered anything, don't treat it as an error
       if (!trimmed) {
         return "";
@@ -197,8 +197,7 @@ const PageContent: React.FC = () => {
         return "Number must be between 1 and 99.";
       }
       return "";
-    }
-     else if (
+    } else if (
       id !== "description" &&
       (typeof value !== "string" || !value.trim())
     ) {
@@ -303,8 +302,8 @@ const PageContent: React.FC = () => {
       submissionData.append("hostLastName", formData.lastName);
       submissionData.append("hostEmail", formData.email);
       submissionData.append("numberOfGroups", formData.numberOfGroups);
-      
-      // Append isDraft as a string "false", backend converts to boolean 
+
+      // Append isDraft as a string "false", backend converts to boolean
       submissionData.append("isDraft", "false");
 
       if (formData.eventImage) {
@@ -332,14 +331,14 @@ const PageContent: React.FC = () => {
   // API call triggered on clicking Continue
   const handleSaveLater = async () => {
     const authToken = localStorage.getItem("authToken");
-  
+
     if (!authToken) {
       localStorage.setItem("unsavedFormData", JSON.stringify(formData));
-      Cookies.set("redirectAfterLogin", pathname); 
+      Cookies.set("redirectAfterLogin", pathname);
       setShowSuccess2(true);
       return;
     }
-  
+
     // Validate all fields
     const newErrors = { ...errors };
     Object.keys(formData).forEach((key) => {
@@ -352,12 +351,12 @@ const PageContent: React.FC = () => {
     });
     setErrors(newErrors);
     if (Object.values(newErrors).some((error) => error !== "")) return;
-  
+
     setLoading2(true);
     try {
       // Create FormData to match endpoint requirements
       const submissionData = new FormData();
-      
+
       // Append all standard fields
       submissionData.append("eventName", formData.eventName);
       submissionData.append("eventDescription", formData.description);
@@ -366,32 +365,32 @@ const PageContent: React.FC = () => {
         "date",
         formData.eventDate?.toISOString().split("T")[0] || ""
       );
-  
+
       // Convert eventTime if needed
       const formattedTime = formData.eventTime
         ? convertTo12Hour(formData.eventTime.toISOString().split("T")[1])
         : "";
       submissionData.append("time", formattedTime);
-  
+
       submissionData.append("eventLocation", formData.location);
       submissionData.append("hostFirstName", formData.firstName);
       submissionData.append("hostLastName", formData.lastName);
       submissionData.append("hostEmail", formData.email);
-      
-      // Append isDraft as a string "true", backend converts to boolean 
+
+      // Append isDraft as a string "true", backend converts to boolean
       submissionData.append("isDraft", "true");
-      
+
       // Append image file if it exists
       if (formData.eventImage) {
         submissionData.append("eventImgUrl", formData.eventImage);
       }
-  
+
       // Debug: Log the FormData before sending
       // console.log("Submitting form data:");
       // for (let [key, value] of submissionData.entries()) {
       //   console.log(key, value instanceof File ? value.name : value);
       // }
-  
+
       const response = await axiosInstance.post("/add-event", submissionData, {
         withCredentials: true,
         headers: {
@@ -487,7 +486,9 @@ const PageContent: React.FC = () => {
       {showMapPickerModal && (
         <LocationPickerModal
           onLocationSelect={(location) => {
-            setFormData({ ...formData, location });
+            // setFormData({ ...formData, location });
+            setFormData((prev) => ({ ...prev, location }));
+            setErrors((prev) => ({ ...prev, location: "" }));
             setShowMapPickerModal(false);
           }}
           onCancel={() => setShowMapPickerModal(false)}
@@ -544,49 +545,33 @@ const PageContent: React.FC = () => {
 
 export default function Page() {
   return (
-    <Suspense fallback={<div>
-      <div className="flex flex-col justify-center items-center min-h-screen">
-        {/* Animated Spinner */}
-        <motion.div
-          animate={{ rotate: 360 }}
-          transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
-          className="w-12 h-12 border-4 border-t-[#751423] border-gray-300 rounded-full"
-        ></motion.div>
+    <Suspense
+      fallback={
+        <div>
+          <div className="flex flex-col justify-center items-center min-h-screen">
+            {/* Animated Spinner */}
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+              className="w-12 h-12 border-4 border-t-[#751423] border-gray-300 rounded-full"
+            ></motion.div>
 
-        {/* Skeleton Effect for Loading Content */}
-        <div className="mt-6 w-[80%] max-w-md bg-white p-4 shadow-lg rounded-xl">
-          <div className="animate-pulse">
-            <div className="h-6 bg-gray-300 rounded w-3/4 mb-4"></div>
-            <div className="h-4 bg-gray-300 rounded w-full mb-2"></div>
-            <div className="h-4 bg-gray-300 rounded w-5/6"></div>
+            {/* Skeleton Effect for Loading Content */}
+            <div className="mt-6 w-[80%] max-w-md bg-white p-4 shadow-lg rounded-xl">
+              <div className="animate-pulse">
+                <div className="h-6 bg-gray-300 rounded w-3/4 mb-4"></div>
+                <div className="h-4 bg-gray-300 rounded w-full mb-2"></div>
+                <div className="h-4 bg-gray-300 rounded w-5/6"></div>
+              </div>
+            </div>
           </div>
         </div>
-      </div>
-    </div>}>
+      }
+    >
       <PageContent />
     </Suspense>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // "use client";
 // import { Suspense, useState, useRef, useEffect } from "react";
