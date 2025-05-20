@@ -128,7 +128,7 @@ const Verification = () => {
         return;
       }
 
-      const response = await axiosInstance.post("/resend-otp", {
+      const response = await axiosInstance.post("/resend-otp-forget", {
         email: myEmail
       });
 
