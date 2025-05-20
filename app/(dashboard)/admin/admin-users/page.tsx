@@ -35,10 +35,10 @@ const AdminPage: React.FC = () => {
       data = data.filter((h) => h.status === activeTab);
     }
     if (search) {
-      data = data.filter(
+      data = data?.filter(
         (h) =>
-          h.firstName.toLowerCase().includes(search.toLowerCase()) ||
-          h.email.toLowerCase().includes(search.toLowerCase())
+          h?.firstName?.toLowerCase().includes(search.toLowerCase()) ||
+          h?.email?.toLowerCase().includes(search.toLowerCase())
       );
     }
     return data;
