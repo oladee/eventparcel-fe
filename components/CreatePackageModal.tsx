@@ -744,10 +744,10 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
                             {
                                 formData?.packageSize
                                     ? {
-                                        smallBox: "small box",
-                                        mediumBox: "medium box",
-                                        largeBox: "large box",
-                                        extraLarge: "extra large",
+                                        smallBox: "Small Box",
+                                        mediumBox: "Medium Box",
+                                        largeBox: "Large Box",
+                                        extraLarge: "Extra Large",
                                     }[formData.packageSize] || "Select box size"
                                     : "Select box size"
                                 }
