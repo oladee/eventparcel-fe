@@ -14,6 +14,7 @@ import { useRouter } from "next/navigation";
 import { toast } from "react-toastify";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { trackEvent } from "@/lib/mixpanel";
 
 const AddGroup = dynamic(() => import("@/components/AddGroupCaller"), {
   ssr: false
@@ -30,6 +31,8 @@ const NewGroup: React.FC = () => {
   const router = useRouter();
   const [, setIsDialogOpen] = useState(false);
   const [loadingGroup, setLoadingGroup] = useState(false);
+  const [selectedGroupToDelete, setSelectedGroupToDelete] = useState<Group | null>(null);
+
 
   useEffect(() => {
     Cookies.remove("redirectAfterLogin");
@@ -78,6 +81,16 @@ const NewGroup: React.FC = () => {
       if (!response) throw new Error("Failed to duplicate group");
 
       await response.data.data;
+      trackEvent("Duplicate Group", {
+        source: "New-group page",
+        timestamp: new Date().toISOString(),
+        page_name: "new-group page",
+        group_Id: response.data.data._id,
+        group_name: response.data.data.groupName,
+        currency_type: response.data.data.groupCurrency,
+        group_type: response.data.data.groupPrivacy,
+        status: "Successful"
+      });
       // setGroups((prevGroups) => [...prevGroups, data]);
       window.location.reload();
     } catch (error: any) {
@@ -87,17 +100,52 @@ const NewGroup: React.FC = () => {
           error.message ||
           "An unknown error occurred."
       );
+
+      trackEvent("Duplicate Group Failed", {
+        source: "New-group page",
+        timestamp: new Date().toISOString(),
+        page_name: "new-group page",
+        status: "Failed",
+      });
+
     } finally {
       setLoadingGroup(false);
     }
   };
 
+  const handleSelectGroupToDelete = (group: Group) => {
+    setSelectedGroupToDelete(group); 
+  };
+
   const handleDeleteGroup = async (groupId: string) => {
+    console.log("del", selectedGroupToDelete)
+
+    trackEvent("Delete Group Started", {
+      source: "New-group page",
+      timestamp: new Date().toISOString(),
+      page_name: "new-group page",
+      group_Id: selectedGroupToDelete?._id,
+      group_name: selectedGroupToDelete?.groupName,
+      currency_type: selectedGroupToDelete?.groupCurrency,
+      group_type: selectedGroupToDelete?.groupPrivacy,
+    });
+    
     try {
       await axiosInstance.delete(`/delete-group/${groupId}`);
       setGroups((prevGroups) =>
         prevGroups.filter((group) => group._id !== groupId)
       );
+
+      trackEvent("Deleted Group Completed", {
+        source: "New-group page",
+        timestamp: new Date().toISOString(),
+        page_name: "new-group page",
+        group_Id: selectedGroupToDelete?._id,
+        group_name: selectedGroupToDelete?.groupName,
+        currency_type: selectedGroupToDelete?.groupCurrency,
+        group_type: selectedGroupToDelete?.groupPrivacy,
+        status: "Successful"
+      });
 
       toast.success(`Group deleted successfully `, {
         position: "top-right",
@@ -111,6 +159,18 @@ const NewGroup: React.FC = () => {
 
       setIsDialogOpen(false);
     } catch (error) {
+      
+      trackEvent("Deleted Group Failed", {
+        source: "New-group page",
+        timestamp: new Date().toISOString(),
+        page_name: "new-group page",
+        group_Id: selectedGroupToDelete?._id,
+        group_name: selectedGroupToDelete?.groupName,
+        currency_type: selectedGroupToDelete?.groupCurrency,
+        group_type: selectedGroupToDelete?.groupPrivacy,
+        status: "Failed"
+      });
+
       if (axios.isAxiosError(error)) {
         const errorMessage =
           error.response?.data?.message ||
@@ -193,6 +253,7 @@ const NewGroup: React.FC = () => {
                   handleDuplicate={handleDuplicate}
                   handleDeleteGroup={handleDeleteGroup}
                   loadingGroup={loadingGroup}
+                  onSelectGroupToDelete={handleSelectGroupToDelete}
                 />
               ))}
 
@@ -221,6 +282,7 @@ const NewGroup: React.FC = () => {
                     handleDuplicate={handleDuplicate}
                     handleDeleteGroup={handleDeleteGroup}
                     loadingGroup={loadingGroup}
+                    onSelectGroupToDelete={handleSelectGroupToDelete}
                   />
                 ))}
 

@@ -11,6 +11,7 @@ import "react-toastify/dist/ReactToastify.css";
 import { boxOptions } from "@/data/boxOption";
 import { BiChevronDown } from "react-icons/bi";
 import { cn } from "@/utils/cn";
+import { trackEvent } from "@/lib/mixpanel";
 
 
 interface PackageFormData {
@@ -40,6 +41,13 @@ interface CreatePackageModalProps {
     groupCurrency: string | undefined;
 }
 
+const packageSizeMap: Record<string, string> = {
+    "1": "smallBox",
+    "4": "mediumBox",
+    "10": "largeBox",
+    "100": "extraLargeBox",
+  };
+
 const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupCurrency, setOpenModalPackage, mode, packageData }) => {
     const [errors, setErrors] = useState<FormErrors>({});
     const [loading, setLoading] = useState(false);
@@ -57,7 +65,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
         packagePriceCurrency: groupCurrency,
         packagePrice: packageData?.packagePrice || "",
         packageQuantity: packageData?.packageQuantity || "",
-        packageSize: packageData?.packageSize || "",
+        packageSize: packageSizeMap[packageData?.packageSize ?? ""] || "",
         packageDelivery: typeof packageData?.packageDelivery === "string"
         ? (packageData.packageDelivery as string).split(",").map((item) => item.trim())
         : packageData?.packageDelivery ?? [],
@@ -262,8 +270,23 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
     formData.packageSize?.trim() &&
     formData.packagePrice?.toString().trim() &&
      Object.values(errors).every((err) => err === ""));
+     
 
     const handleSubmit = async () => {
+        if(mode === "create") {
+            trackEvent("New Package Creation Started", {
+                source: "new-group page",
+                timestamp: new Date().toISOString(),
+                page_name: "New-group page",
+            });
+        } else {
+            trackEvent("Package Edit Started", {
+                source: "new-group page",
+                timestamp: new Date().toISOString(),
+                page_name: "New-group page",
+            });
+        }
+
         if (!isFormValid) return;
     
         const formDataToSend = new FormData();
@@ -335,8 +358,22 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
             // let response;
             
             if (mode === "create") {
-                 await axiosInstance.post("/add-package", formDataToSend, {
+                const response = await axiosInstance.post("/add-package", formDataToSend, {
                     headers: { "Content-Type": "multipart/form-data" },
+                });
+
+                trackEvent("New Package Creation Completed", {
+                    source: "event-creation page",
+                    timestamp: new Date().toISOString(),
+                    page_name: "New-group page",
+                    groupId: response.data.data.eventGroup,
+                    packageId: response.data.data._id,
+                    packageName: response.data.data.packageTitle,
+                    pickupType: response.data.data.packageDelivery,
+                    weight: `${response.data.data.packageSize}kg`,
+                    amount: `${response.data.data.packagePriceCurrency === "NGN" ? "₦" :"$"}${response.data.data.packagePrice}`,
+                    pageName: "new-group page",
+                    status: "Successful",
                 });
                 
                 toast.success("Package created successfully", {
@@ -349,8 +386,23 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
                     theme: "light",
                 });
             } else if (mode === "update" && packageData?._id) {
-                 await axiosInstance.put(`/update-package/${packageData._id}`, formDataToSend, {
+                const response = await axiosInstance.put(`/update-package/${packageData._id}`, formDataToSend, {
                     headers: { "Content-Type": "multipart/form-data" },
+                });
+
+                
+                trackEvent("Package Edit Completed", {
+                    source: "event-creation page",
+                    timestamp: new Date().toISOString(),
+                    page_name: "New-group page",
+                    groupId: response.data.data.eventGroup,
+                    packageId: response.data.data._id,
+                    packageName: response.data.data.packageTitle,
+                    pickupType: response.data.data.packageDelivery,
+                    weight: `${response.data.data.packageSize}kg`,
+                    amount: `${response.data.data.packagePriceCurrency === "NGN" ? "₦" :"$"}${response.data.data.packagePrice}`,
+                    pageName: "new-group page",
+                    status: "Successful",
                 });
     
                 toast.success("Package updated successfully", {
@@ -381,6 +433,33 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
                 });
             } else {
                 console.error("Unexpected Error:", error); 
+            }
+            if (mode === "create") {
+                trackEvent("Package Creation Failed", {
+                    source: "New-group page",
+                    timestamp: new Date().toISOString(),
+                    page_name: "New-group page",
+                    groupId: formData.groupId,
+                    packageName: formData.packageTitle,
+                    pickupType: formData.packageDelivery,
+                    weight: formData.packageSize === "smallBox" ? "1kg" : formData.packageSize === "mediumBox" ? "4kg" : formData.packageSize === "largeBox" ? "10kg" : "100kg",
+                    amount: `${formData.packagePriceCurrency === "NGN" ? "₦" :"$"}${formData.packagePrice}`,
+                    pageName: "new-group page",
+                    status: "Failed",
+                });
+            } else {
+                trackEvent("Package Edit Failed", {
+                    source: "New-group page",
+                    timestamp: new Date().toISOString(),
+                    page_name: "New-group page",
+                    groupId: formData.groupId,
+                    packageName: formData.packageTitle,
+                    pickupType: formData.packageDelivery,
+                    weight: formData.packageSize === "smallBox" ? "1kg" : formData.packageSize === "mediumBox" ? "4kg" : formData.packageSize === "largeBox" ? "10kg" : "100kg",
+                    amount: `${formData.packagePriceCurrency === "NGN" ? "₦" :"$"}${formData.packagePrice}`,
+                    pageName: "new-group page",
+                    status: "Failed",
+                });
             }
         } finally {
             setLoading(false);
@@ -523,17 +602,30 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
 
                         {/* Price Input */}
                         <input
-                            type="number"
+                            type="text"
                             id="packagePrice"
-                            value={formData.packagePrice}
-                            onChange={handleChange}
+                            value={
+                                formData.packagePrice
+                                ? Number(formData.packagePrice).toLocaleString()
+                                : ""
+                            }
+                            onChange={(e) => {
+                                const rawValue = e.target.value.replace(/,/g, ""); // remove commas
+                                if (!isNaN(Number(rawValue))) {
+                                setFormData({
+                                    ...formData,
+                                    packagePrice: Number(rawValue),
+                                });
+                                }
+                            }}
                             placeholder="Enter amount"
                             className="w-full h-5 p-2 outline-none bg-transparent text-gray-900 placeholder-gray-400"
-                        />
+                            />
+
                     </div>
 
                     <div>
-                        <p className="font-medium text-sm text-[#718096]">What you will receive: <span className="text-[#751423]">{groupCurrency === "NGN" ? "₦" : "$"}{whatHostReceives}</span></p>
+                        <p className="font-medium text-sm text-[#718096]">What you will receive: <span className="text-[#751423]">{groupCurrency === "NGN" ? "₦" : "$"}{whatHostReceives.toLocaleString()}</span></p>
                     </div>
 
                     <div className="w-full h-[60px] bg-[#FFF7F2] px-3 py-2 rounded-[12px] my-2">
@@ -649,7 +741,16 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
                             onClick={() => setIsOpen(!isOpen)}
                         >
                             <span className="text-gray-400 text-sm">
-                            {formData?.packageSize || "Select box size"}
+                            {
+                                formData?.packageSize
+                                    ? {
+                                        smallBox: "Small Box",
+                                        mediumBox: "Medium Box",
+                                        largeBox: "Large Box",
+                                        extraLarge: "Extra Large",
+                                    }[formData.packageSize] || "Select box size"
+                                    : "Select box size"
+                                }
                             </span>
                             <BiChevronDown className="w-4 h-4 text-gray-500" />
                         </div>

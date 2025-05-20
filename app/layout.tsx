@@ -4,6 +4,7 @@ import { Toaster } from "react-hot-toast";
 import ProgressBarProvider from "@/components/ProgressBarProvider";
 import { Open_Sans } from "next/font/google";
 import Script from "next/script";
+import MixpanelInit from "@/components/MixpanelInit";
 
 // Load all font weights
 const openSans = Open_Sans({
@@ -34,6 +35,7 @@ export default function RootLayout({
         />
       </head>
       <body className="w-full max-w-full">
+        <MixpanelInit /> 
         <ProgressBarProvider>{children}</ProgressBarProvider>
         <Toaster position="top-right" />
       </body>

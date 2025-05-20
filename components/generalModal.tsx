@@ -14,9 +14,10 @@ type generalGroupProps = {
   handleDuplicate: (groudId: string) => void;
   handleDeleteGroup: (groupId: string) => void;
   loadingGroup: boolean;
+  onSelectGroupToDelete: (group: Group) => void; 
 };
 
-const GeneralModal: React.FC<generalGroupProps> = ({ group, handleDuplicate, handleDeleteGroup, loadingGroup }) => {
+const GeneralModal: React.FC<generalGroupProps> = ({ group, handleDuplicate, handleDeleteGroup,onSelectGroupToDelete, loadingGroup }) => {
   const [openModalPackage, setOpenModalPackage] = useState(false);
   const [modalMode, setModalMode] = useState<"create" | "update">("create");
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
@@ -31,6 +32,7 @@ const GeneralModal: React.FC<generalGroupProps> = ({ group, handleDuplicate, han
     setDeleteId(group._id);
     setDeletEndPoint("delete-group");
     setIsDialogOpen(true);
+    onSelectGroupToDelete(group)
   };
 
   const confirmDelete = () => {

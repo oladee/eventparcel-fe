@@ -16,6 +16,7 @@ import NairaPayoutForm from "@/components/NairaPayoutForm";
 import DollarPayoutForm from "@/components/DollarPayoutForm";
 import axiosInstance from "@/lib/axiosInstance";
 import Container from "@/components/dashboard/Container";
+import { trackEvent } from "@/lib/mixpanel";
 
 const LocationPickerModal = dynamic(
   () => import("@/components/aboutEvent/LocationPickerModal"),
@@ -72,6 +73,7 @@ const PaymentSetupContent = () => {
     : [];
   const firstEventId =
     groups.length > 0 && groups[0].event ? groups[0].event._id : "";
+  const firstGroup = groups.length > 0 && groups[0].event ? groups[0] : "";
   // const [isRightBarOpen, setIsRightBarOpen] = useState(false);
   const [showMapPickerModal, setShowMapPickerModal] = useState(false);
   const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
@@ -248,11 +250,51 @@ const PaymentSetupContent = () => {
       if (allSelfManaged) {
         await axiosInstance.post("/add-payment", formattedData);
         toast.success("Payment details successfully submitted!");
+
+        trackEvent("Add Payment Information", {
+          source: "Dashboard Add Payment Page",
+          timestamp: new Date().toISOString(),
+          page_name: "dashboard add payment page",
+          event_id: firstGroup.event._id,
+          event_name: firstGroup.event.eventName,
+          naira_bank_name: formData.nairaAccount.bankName,
+          dollar_bank_name: formData.dollarAccount.usBankName,
+          status: "Successful"
+        });
+
         router.push("/dashboard/events");
       } else {
+        const parsedEventDetails = {
+          event_id: firstGroup.event._id,
+          event_name: firstGroup.event.eventName,
+        };
+        
+        localStorage.setItem("parsedEventDetails", JSON.stringify(parsedEventDetails));
+        
+        trackEvent("Add Payment Information", {
+          source: "Dashboard Add Payment Page",
+          timestamp: new Date().toISOString(),
+          page_name: "dashboard add payment page",
+          event_id: firstGroup.event._id,
+          event_name: firstGroup.event.eventName,
+          naira_bank_name: formData.nairaAccount.bankName,
+          dollar_bank_name: formData.dollarAccount.usBankName,
+          status: "Successful"
+        });
         router.push(`/dashboard/pickup-details?${queryString}`);
       }
     } catch (error: any) {
+      trackEvent("Add Payment Information Failed", {
+        source: "Add Payment Page",
+        timestamp: new Date().toISOString(),
+        page_name: "Add Payment Page",
+        event_id: firstGroup.event._id,
+        event_name: firstGroup.event.eventName,
+        naira_bank_name: formData.nairaAccount.bankName,
+        dollar_bank_name: formData.dollarAccount.usBankName,
+        status: "Failed"
+      });
+
       console.error("Error submitting payment details:", error);
   
       if (

@@ -14,6 +14,7 @@ import Container from "@/components/dashboard/Container";
 import { toast, ToastContainer } from "react-toastify";
 import axios from "axios";
 import Cookies from "js-cookie";
+import { trackEvent } from "@/lib/mixpanel";
 
 
 const AddGroup = dynamic(() => import("@/components/AddGroupCaller"), {
@@ -31,6 +32,8 @@ const NewGroup: React.FC = () => {
   const router = useRouter();
   const [, setIsDialogOpen] = useState(false);
   const [loadingGroup, setLoadingGroup] = useState(false);
+  const [selectedGroupToDelete, setSelectedGroupToDelete] = useState<Group | null>(null);
+
 
   useEffect(() => {
     Cookies.remove("redirectAfterLogin");
@@ -74,28 +77,79 @@ const NewGroup: React.FC = () => {
 
    
   const handleDuplicate = async (groupId: string) => {
-    setLoadingGroup(true)
+    setLoadingGroup(true);
     try {
       const response = await axiosInstance.get(`/clone-group/${groupId}`);
-  
+
       if (!response) throw new Error("Failed to duplicate group");
-  
+
       await response.data.data;
+      trackEvent("Duplicate Group", {
+        source: "New-group page",
+        timestamp: new Date().toISOString(),
+        page_name: "new-group page",
+        group_Id: response.data.data._id,
+        group_name: response.data.data.groupName,
+        currency_type: response.data.data.groupCurrency,
+        group_type: response.data.data.groupPrivacy,
+        status: "Successful"
+      });
       // setGroups((prevGroups) => [...prevGroups, data]);
-      window.location.reload()
+      window.location.reload();
     } catch (error: any) {
       toast.error("Error duplicating group");
-      console.error(error.response?.data?.message || error.message || "An unknown error occurred.");
+      console.error(
+        error.response?.data?.message ||
+          error.message ||
+          "An unknown error occurred."
+      );
+
+      trackEvent("Duplicate Group Failed", {
+        source: "New-group page",
+        timestamp: new Date().toISOString(),
+        page_name: "new-group page",
+        status: "Failed",
+      });
+
     } finally {
-      setLoadingGroup(false)
+      setLoadingGroup(false);
     }
   };
 
-  const handleDeleteGroup = async (groupId: string) => {
 
+  const handleSelectGroupToDelete = (group: Group) => {
+    setSelectedGroupToDelete(group); 
+  };
+
+  const handleDeleteGroup = async (groupId: string) => {
+    console.log("del", selectedGroupToDelete)
+
+    trackEvent("Delete Group Started", {
+      source: "New-group page",
+      timestamp: new Date().toISOString(),
+      page_name: "new-group page",
+      group_Id: selectedGroupToDelete?._id,
+      group_name: selectedGroupToDelete?.groupName,
+      currency_type: selectedGroupToDelete?.groupCurrency,
+      group_type: selectedGroupToDelete?.groupPrivacy,
+    });
+    
     try {
       await axiosInstance.delete(`/delete-group/${groupId}`);
-      setGroups((prevGroups) => prevGroups.filter((group) => group._id !== groupId));
+      setGroups((prevGroups) =>
+        prevGroups.filter((group) => group._id !== groupId)
+      );
+
+      trackEvent("Deleted Group Completed", {
+        source: "New-group page",
+        timestamp: new Date().toISOString(),
+        page_name: "new-group page",
+        group_Id: selectedGroupToDelete?._id,
+        group_name: selectedGroupToDelete?.groupName,
+        currency_type: selectedGroupToDelete?.groupCurrency,
+        group_type: selectedGroupToDelete?.groupPrivacy,
+        status: "Successful"
+      });
 
       toast.success(`Group deleted successfully `, {
         position: "top-right",
@@ -109,6 +163,18 @@ const NewGroup: React.FC = () => {
 
       setIsDialogOpen(false);
     } catch (error) {
+      
+      trackEvent("Deleted Group Failed", {
+        source: "New-group page",
+        timestamp: new Date().toISOString(),
+        page_name: "new-group page",
+        group_Id: selectedGroupToDelete?._id,
+        group_name: selectedGroupToDelete?.groupName,
+        currency_type: selectedGroupToDelete?.groupCurrency,
+        group_type: selectedGroupToDelete?.groupPrivacy,
+        status: "Failed"
+      });
+
       if (axios.isAxiosError(error)) {
         const errorMessage =
           error.response?.data?.message ||
@@ -131,7 +197,6 @@ const NewGroup: React.FC = () => {
     }
   };
 
- 
 
   return (
     <>
@@ -176,8 +241,15 @@ const NewGroup: React.FC = () => {
             </div>
           ) : groups.length === 1 ? (
             <div className="flex flex-col md:flex-row gap-7 justify-center px-5">
-              {groups.map((group) => (
-                <GeneralModal key={group._id} group={group} handleDuplicate={handleDuplicate}  handleDeleteGroup={handleDeleteGroup} loadingGroup={loadingGroup}  />
+               {groups.map((group) => (
+                <GeneralModal
+                  key={group._id}
+                  group={group}
+                  handleDuplicate={handleDuplicate}
+                  handleDeleteGroup={handleDeleteGroup}
+                  loadingGroup={loadingGroup}
+                  onSelectGroupToDelete={handleSelectGroupToDelete}
+                />
               ))}
 
               {isAddSingleGroupOpen && (
@@ -198,9 +270,16 @@ const NewGroup: React.FC = () => {
             // Render content for when there are multiple groups
             <div className="flex flex-col sm:flex-row lg:justify-center">
               <div className=" flex flex-wrap w-full max-w-3xl space-x-2 space-y-4 pl-3 md:pl-2 xl:pl-24 -mr-6">
-                {groups.map((group) => (
-                  <GeneralModal key={group._id} group={group} handleDuplicate={handleDuplicate}  handleDeleteGroup={handleDeleteGroup} loadingGroup={loadingGroup} />
-                ))}
+              {groups.map((group) => (
+                <GeneralModal
+                  key={group._id}
+                  group={group}
+                  handleDuplicate={handleDuplicate}
+                  handleDeleteGroup={handleDeleteGroup}
+                  loadingGroup={loadingGroup}
+                  onSelectGroupToDelete={handleSelectGroupToDelete}
+                />
+              ))}
 
                 {isAddSingleGroupOpen && (
                   <AddGroup

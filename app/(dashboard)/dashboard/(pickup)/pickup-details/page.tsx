@@ -16,6 +16,8 @@ import { debounce } from "lodash";
 import Container from "@/components/dashboard/Container";
 import dynamic from "next/dynamic";
 import axios from "axios";
+import { trackEvent } from "@/lib/mixpanel";
+import { EventDetails } from "@/app/(pages)/pickup-details/PickupDetailsContent";
 
 
 const PickupDeliveryLoationPicker = dynamic(
@@ -34,6 +36,7 @@ const PickupDetails = () => {
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isSaveLoading, setIsSaveLoading] = useState(false);
   const [showMapPickerModal, setShowMapPickerModal] = useState(false);
+  const [eventDetails, setEventDetails] = useState<EventDetails | null>(null);
   const [formData, setFormData] = useState({
     nairaAccount: {
       accountNumber: "",
@@ -60,10 +63,21 @@ const PickupDetails = () => {
     deliveryTimeZone: "WAT",
   });
 
-  console.log(formData)
   useEffect(() => {
     if (typeof window !== "undefined") {
       setIsClient(true);
+    }
+  }, []);
+
+  useEffect(() => {
+    const stored = localStorage.getItem("parsedEventDetails");
+    if (stored) {
+      try {
+        const parsed = JSON.parse(stored);
+        setEventDetails(parsed);
+      } catch (error) {
+        console.error("Failed to parse event details:", error);
+      }
     }
   }, []);
 
@@ -147,33 +161,6 @@ useEffect(() => {
 }, [debouncedAddress, formData.pickupLatitude, formData.pickupLongitude]);
 
 
-
-// update the form data with the corresponding latitude and longitude when user type the address
-useEffect(() => {
-  const address = debouncedAddress?.trim();
-  
-  const isValidAddress = address && address.length >= 5;
-  const hasNoCoordinates = !formData.pickupLatitude && !formData.pickupLongitude;
-
-
-  if (isValidAddress && hasNoCoordinates) {
-    const geocoder = new google.maps.Geocoder();
-    geocoder.geocode({ address }, (results, status) => {
-      if (status === "OK" && results && results[0]) {
-        const location = results[0].geometry.location;
-        setFormData((prev) => ({
-          ...prev,
-          pickupLatitude: location.lat().toString(),
-          pickupLongitude: location.lng().toString()
-        }));
-      } else {
-        console.error("Geocode failed: " + status);
-      }
-    });
-  }
-}, [debouncedAddress, formData.pickupLatitude, formData.pickupLongitude]);
-
-
 // Retrieve formData from query parameters
 useEffect(() => {
   if(!isClient) return;
@@ -182,6 +169,7 @@ useEffect(() => {
   if (data) {
     try {
       const parsedData = JSON.parse(data);
+      setEventDetails(parsedData)
 
       setFormData((prev) => ({
         ...prev,
@@ -239,10 +227,18 @@ useEffect(() => {
   
     const isFilled = (obj: Record<string, any>) =>
       Object.values(obj).some((val) => val && val.toString().trim() !== "");
+
+    
+    const pickupAddress = formData.pickupLocation;
+    const parts = pickupAddress.split(',').map(part => part.trim());
+
+    // Safely get the second-to-the-last item
+    const pickupRegion = parts.length >= 2 ? parts[parts.length - 2] : "";
   
     const handleSubmit = async (e: React.FormEvent) => {
       e.preventDefault();
       if (!isFormValid) return;
+      console.log(eventDetails)
     
       setLoading(true);
     
@@ -277,8 +273,26 @@ useEffect(() => {
     
         await axiosInstance.post("/add-payment", cleanedData);
         toast.success("Details submitted successfully!");
+        trackEvent("Add Pickup Information", {
+            source: "Pickup-details Page",
+            timestamp: new Date().toISOString(),
+            page_name: "add pickup page",
+            event_id: eventDetails?.event_id,
+            event_name: eventDetails?.event_name,
+            pickup_region: pickupRegion,
+            status: "Successful"
+          });
         router.push("/dashboard/events");
       } catch (error: any) {
+        trackEvent("Add Pickup Information Failed", {
+          source: "Pickup-details Page",
+          timestamp: new Date().toISOString(),
+          page_name: "add pickup page",
+          event_id: eventDetails?.event_id,
+          event_name: eventDetails?.event_name,
+          pickup_region: pickupRegion,
+          status: "Failed"
+        });
         if (axios.isAxiosError(error)) {
           const errorMessage = error.response?.data?.message || "An error occurred. Please try again.";
           toast.error(errorMessage);

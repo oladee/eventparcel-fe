@@ -15,6 +15,7 @@ import Cookies from "js-cookie";
 import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import Container from "@/components/dashboard/Container";
 import { motion } from "framer-motion";
+import { trackEvent } from "@/lib/mixpanel";
 
 // Dynamically import LocationPickerModal with SSR disabled.
 const LocationPickerModal = dynamic(
@@ -267,6 +268,13 @@ const PageContent: React.FC = () => {
 
   // API call triggered on clicking Continue
   const handleContinue = async () => {
+
+    trackEvent("New Event Creation Started", {
+      source: "event-creation page",
+      timestamp: new Date().toISOString(),
+      page_name: "Event-creation page",
+    });
+    
     const newErrors = { ...errors };
     Object.keys(formData).forEach((key) => {
       if (key !== "eventImage") {
@@ -320,8 +328,30 @@ const PageContent: React.FC = () => {
       localStorage.setItem("eventId", response.data.data._id);
       localStorage.setItem("eventDetails", JSON.stringify(response.data));
       setShowSuccess(true);
+
+      trackEvent("New Event Creation Completed", {
+        source: "dashboard-event-creation page",
+        timestamp: new Date().toISOString(),
+        page_name: "Dashboard-event-creation page",
+        event_Id: response.data.data._id,
+        event_name: response.data.data.eventName,
+        add_image: response.data.data.eventImgUrl ? "Yes" : "No",
+        add_group_number: response.data.data.numberOfGroups ? "Yes" : "No",
+        status: "Successful"
+      });
+
     } catch (error: any) {
       toast.error(error.response?.data?.message);
+
+      trackEvent("New Event Creation Failed", {
+        source: "event-creation page",
+        timestamp: new Date().toISOString(),
+        page_name: "Event-creation page",
+        event_name: formData?.eventName,
+        add_image: formData?.eventImage ? "Yes" : "No",
+        add_group_number: formData?.numberOfGroups ? "Yes" : "No",
+        status: "Failed"
+      });
     } finally {
       setLoading(false);
     }

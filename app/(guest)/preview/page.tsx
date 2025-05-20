@@ -13,6 +13,8 @@ import { useCartStore } from '../../store/useCartStore';
 import { toast, ToastContainer } from "react-toastify";
 import cart from "../../../assets/orderIcons/shopping-cart.png"
 import { BiLoaderCircle } from "react-icons/bi";
+import { identifyUser, trackEvent } from "@/lib/mixpanel";
+import getBrowserType from "@/lib/getBrowserType";
 
 const ViewEvent = () => {
   const searchParams = useSearchParams();
@@ -38,6 +40,17 @@ const ViewEvent = () => {
   const cartItems = useCartStore((state) => state.items);
   const router = useRouter();
 
+  const [location, setLocation] = useState<string | null>(null);
+
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition((pos) => {
+        const { latitude, longitude } = pos.coords;
+        setLocation(`${latitude},${longitude}`);
+      });
+    }
+  }, []);
+
   useEffect(() => {
     if (!code) return;
 
@@ -45,6 +58,20 @@ const ViewEvent = () => {
       try {
         const res = await axiosInstance.get(`/invite-details?code=${code}`);
         setData(res.data.data);
+        console.log("res", res.data.data)
+        
+        identifyUser(res.data.data.event.user._id,{
+          location,
+          browser_type: getBrowserType(),
+        });
+
+        trackEvent("Invite Link Clicked", {
+          source: "preview page",
+          invite_type: res.data.data.eventGroup.groupPrivacy,
+          timestamp: new Date().toISOString(),
+          page_name: "Preview Page",      
+        });
+
       } catch (error: any) {
           setError(error.response?.data?.message);
           // toast.error(error.response?.data?.message);/
