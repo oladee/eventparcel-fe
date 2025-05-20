@@ -83,7 +83,7 @@ const CohostActionsModal: React.FC<CohostActionsModalProps> = ({
     if (!confirmed) return;
     setLoadingRemove(true);
     try {
-      await axiosInstance.delete(`/remove-cohost/${cohost._id}`);
+      await axiosInstance.delete(`/remove-cohost/${cohost._id}/${cohost.eventId}`);
       toast.success("Co-host removed successfully.");
       onClose();
     } catch (error: any) {
