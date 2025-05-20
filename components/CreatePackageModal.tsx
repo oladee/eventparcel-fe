@@ -602,17 +602,30 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
 
                         {/* Price Input */}
                         <input
-                            type="number"
+                            type="text"
                             id="packagePrice"
-                            value={formData.packagePrice}
-                            onChange={handleChange}
+                            value={
+                                formData.packagePrice
+                                ? Number(formData.packagePrice).toLocaleString()
+                                : ""
+                            }
+                            onChange={(e) => {
+                                const rawValue = e.target.value.replace(/,/g, ""); // remove commas
+                                if (!isNaN(Number(rawValue))) {
+                                setFormData({
+                                    ...formData,
+                                    packagePrice: Number(rawValue),
+                                });
+                                }
+                            }}
                             placeholder="Enter amount"
                             className="w-full h-5 p-2 outline-none bg-transparent text-gray-900 placeholder-gray-400"
-                        />
+                            />
+
                     </div>
 
                     <div>
-                        <p className="font-medium text-sm text-[#718096]">What you will receive: <span className="text-[#751423]">{groupCurrency === "NGN" ? "₦" : "$"}{whatHostReceives}</span></p>
+                        <p className="font-medium text-sm text-[#718096]">What you will receive: <span className="text-[#751423]">{groupCurrency === "NGN" ? "₦" : "$"}{whatHostReceives.toLocaleString()}</span></p>
                     </div>
 
                     <div className="w-full h-[60px] bg-[#FFF7F2] px-3 py-2 rounded-[12px] my-2">
@@ -728,7 +741,16 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
                             onClick={() => setIsOpen(!isOpen)}
                         >
                             <span className="text-gray-400 text-sm">
-                            {formData?.packageSize || "Select box size"}
+                            {
+                                formData?.packageSize
+                                    ? {
+                                        smallBox: "small box",
+                                        mediumBox: "medium box",
+                                        largeBox: "large box",
+                                        extraLarge: "extra large",
+                                    }[formData.packageSize] || "Select box size"
+                                    : "Select box size"
+                                }
                             </span>
                             <BiChevronDown className="w-4 h-4 text-gray-500" />
                         </div>
