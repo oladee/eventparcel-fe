@@ -46,6 +46,7 @@ function Container({ children }: { children: React.ReactNode }) {
         localStorage.setItem("loggedInUser", JSON.stringify(response.data));
         localStorage.setItem("loggedInUserEmail", response.data.email)
         localStorage.setItem("loggedInUserId", response.data.hostId._id)
+        console.log("loggedInUserId", response.data.hostId._id)
         console.log("User profile fetched successfully:", response.data);
       } catch (error: any) {
         console.error("Error fetching user profile:", error);
