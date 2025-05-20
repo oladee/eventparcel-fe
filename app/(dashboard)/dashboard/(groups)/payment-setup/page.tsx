@@ -383,6 +383,8 @@ const PaymentSetupContent = () => {
       {showMapPickerModal && (
         <LocationPickerModal
           onLocationSelect={() => {
+            //  setFormData((prev) => ({ ...prev, location }));
+            setErrors((prev) => ({ ...prev, location: "" }));
             setShowMapPickerModal(false);
           }}
           onCancel={() => setShowMapPickerModal(false)}

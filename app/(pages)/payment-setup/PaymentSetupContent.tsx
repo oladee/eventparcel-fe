@@ -19,7 +19,6 @@ import Cookies from "js-cookie";
 import EventSaveSuccess from "@/components/aboutEvent/EventSaveSuccess";
 import { trackEvent } from "@/lib/mixpanel";
 
-
 const LocationPickerModal = dynamic(
   () => import("@/components/aboutEvent/LocationPickerModal"),
   { ssr: false }
@@ -41,7 +40,6 @@ interface USBank {
   currency: string;
   routingNumber: string[];
 }
-
 
 const validTimeZones = [
   "UTC",
@@ -69,406 +67,424 @@ const validTimeZones = [
 ];
 
 const PaymentSetupContent = () => {
-// =============================================
-// IMPORTS AND INITIAL SETUP
-// =============================================
-const searchParams = useSearchParams();
-const groupsString = searchParams.get("groups");
-const groups = groupsString ? JSON.parse(decodeURIComponent(groupsString)) : [];
-const firstEventId = groups.length > 0 && groups[0].event ? groups[0].event._id : "";
-const firstGroup = groups.length > 0 && groups[0].event ? groups[0] : "";
-const pathname = usePathname();
-const router = useRouter();
+  // =============================================
+  // IMPORTS AND INITIAL SETUP
+  // =============================================
+  const searchParams = useSearchParams();
+  const groupsString = searchParams.get("groups");
+  const groups = groupsString
+    ? JSON.parse(decodeURIComponent(groupsString))
+    : [];
+  const firstEventId =
+    groups.length > 0 && groups[0].event ? groups[0].event._id : "";
+  const firstGroup = groups.length > 0 && groups[0].event ? groups[0] : "";
+  const pathname = usePathname();
+  const router = useRouter();
 
-// =============================================
-// STATE DECLARATIONS
-// =============================================
-// Modal and UI states
-const [showMapPickerModal, setShowMapPickerModal] = useState(false);
-const [showModal] = useState<boolean>(false);
-const [showSuccess2, setShowSuccess2] = useState(false);
+  // =============================================
+  // STATE DECLARATIONS
+  // =============================================
+  // Modal and UI states
+  const [showMapPickerModal, setShowMapPickerModal] = useState(false);
+  const [showModal] = useState<boolean>(false);
+  const [showSuccess2, setShowSuccess2] = useState(false);
 
-// Loading states
-const [loading, setLoading] = useState<boolean>(false);
-const [isSaveLoading, setIsSaveLoading] = useState(false);
+  // Loading states
+  const [loading, setLoading] = useState<boolean>(false);
+  const [isSaveLoading, setIsSaveLoading] = useState(false);
 
-// Bank selection states
-const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
-const [selectedUSBank, setSelectedUSBank] = useState<USBank | null>(null);
-const [savedNGN, setSavedNGN] = useState(false);
-const [savedUSD, setSavedUSD] = useState(false);
+  // Bank selection states
+  const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
+  const [selectedUSBank, setSelectedUSBank] = useState<USBank | null>(null);
+  const [savedNGN, setSavedNGN] = useState(false);
+  const [savedUSD, setSavedUSD] = useState(false);
 
-// Form data state
-const [formData, setFormData] = useState({
-  event: firstEventId,
-  nairaAccount: {
-    accountNumber: "",
-    accountName: "",
-    bankName: "",
-    bankCode: "",
-  },
-  dollarAccount: {
-    usAccountNumber: "",
-    routingNumber: "",
-    usBankName: "",
-    usAccountName: "",
-  },
-  isDraft: false,
-  paymentDate: new Date(),
-  paymentTime: new Date(),
-  paymentTimeZone: "WAT",
-});
-
-// Form validation states
-const [errors, setErrors] = useState<{ [key: string]: string }>({});
-const [isFormValid, setIsFormValid] = useState(false);
-
-// =============================================
-// UTILITY FUNCTIONS
-// =============================================
-/**
- * Checks if all packages in all groups are self-managed
- * @param groupList Array of groups to check
- * @returns Boolean indicating if all packages are self-managed
- */
-const isAllSelfManaged = (groupList: any[]) => {
-  if (groupList.length === 0) return false; 
-  return groupList.every((group) =>
-    group.packages.every((pkg: any) =>
-      pkg.packageDelivery.every((delivery: string) => delivery.includes("selfManaged"))
-    )
-  );
-};
-
-const allSelfManaged = isAllSelfManaged(groups);
-
-/**
- * Checks if an object has any filled values
- * @param obj Object to check
- * @returns Boolean indicating if any values are filled
- */
-const isFilled = (obj: { [key: string]: string }) =>
-  Object.values(obj).some((val) => val && typeof val === "string" && val.trim() !== "");
-
-/**
- * Formats a Date object to 12-hour time string
- * @param date Date to format
- * @returns Formatted time string (HH:MM AM/PM)
- */
-const formatTime12Hour = (date: Date): string => {
-  let hours = date.getHours();
-  const minutes = date.getMinutes();
-  const ampm = hours >= 12 ? "PM" : "AM";
-  hours = hours % 12 || 12;
-  const paddedHours = hours < 10 ? `0${hours}` : `${hours}`;
-  const paddedMinutes = minutes < 10 ? `0${minutes}` : `${minutes}`;
-  return `${paddedHours}:${paddedMinutes} ${ampm}`;
-};
-
-// Currency flags
-const hasNGN = groups.some((group: { groupCurrency: string; }) => group.groupCurrency === "NGN") || savedNGN;
-const hasUSD = groups.some((group: { groupCurrency: string; }) => group.groupCurrency === "USD") || savedUSD;
-
-// Current date reference
-const today = new Date();
-
-// =============================================
-// EFFECT HOOKS
-// =============================================
-useEffect(() => {
-  const hasNGN = localStorage.getItem("paymentHasNGN") === "true";
-  const hasUSD = localStorage.getItem("paymentHasUSD") === "true";
-  setSavedNGN(hasNGN);
-  setSavedUSD(hasUSD);
-}, []);
-
-// Clean up redirect cookie on mount
-useEffect(() => {
-  Cookies.remove("redirectAfterLogin");
-}, []);
-
-// Load saved form data from localStorage
-useEffect(() => {
-  const savedData = localStorage.getItem("paymentFormData");
-  if (savedData) {
-    setFormData(prev => ({
-      ...prev,
-      ...JSON.parse(savedData),
-      paymentDate: new Date(JSON.parse(savedData).paymentDate),
-      paymentTime: new Date(JSON.parse(savedData).paymentTime),
-    }));
-  }
-}, []);
-
-// Validate form whenever formData or errors change
-useEffect(() => {
-  const isAllFieldsFilled = Object.values(formData).every((value) => {
-    if (typeof value === "string") {
-      return value.trim() !== "";
-    } else if (value instanceof Date) {
-      return !isNaN(value.getTime());
-    }
-    return true;
+  // Form data state
+  const [formData, setFormData] = useState({
+    event: firstEventId,
+    nairaAccount: {
+      accountNumber: "",
+      accountName: "",
+      bankName: "",
+      bankCode: ""
+    },
+    dollarAccount: {
+      usAccountNumber: "",
+      routingNumber: "",
+      usBankName: "",
+      usAccountName: ""
+    },
+    isDraft: false,
+    paymentDate: new Date(),
+    paymentTime: new Date(),
+    paymentTimeZone: "WAT"
   });
-  const isAllFieldsValid = Object.values(errors).every(
-    (error) => error === ""
-  );
-  setIsFormValid(isAllFieldsFilled && isAllFieldsValid);
-}, [formData, errors]);
 
-// =============================================
-// FORM HANDLERS
-// =============================================
-/**
- * Handles date picker changes
- * @param date Selected date
- * @param field Field to update
- */
-const handleDateChange = (date: Date | null, field: string) => {
-  if (date) {
-    setFormData((prev) => ({ ...prev, [field]: date })); 
-  }
-};
+  // Form validation states
+  const [errors, setErrors] = useState<{ [key: string]: string }>({});
+  const [isFormValid, setIsFormValid] = useState(false);
 
-/**
- * Validates a form field based on its ID and value
- * @param id Field ID
- * @param value Field value
- * @returns Error message if invalid, empty string if valid
- */
-const validateField = (id: string, value: any) => {
-  const fieldName = id.split(".").pop();
+  // =============================================
+  // UTILITY FUNCTIONS
+  // =============================================
+  /**
+   * Checks if all packages in all groups are self-managed
+   * @param groupList Array of groups to check
+   * @returns Boolean indicating if all packages are self-managed
+   */
+  const isAllSelfManaged = (groupList: any[]) => {
+    if (groupList.length === 0) return false;
+    return groupList.every((group) =>
+      group.packages.every((pkg: any) =>
+        pkg.packageDelivery.every((delivery: string) =>
+          delivery.includes("selfManaged")
+        )
+      )
+    );
+  };
 
-  switch (fieldName) {
-    case "accountNumber":
-      if (!/^\d+$/.test(value)) return "Account number must be a number";
-      if (value.length !== 10) return "Account number must be 10 digits";
-      return "";
-    case "accountName":
-      if (!/^[A-Za-z\s]+$/.test(value))
-        return "Account name must only contain letters and spaces";
-      if (value.length < 3 || value.length > 50)
-        return "Account name must be between 3 and 50 characters";
-      return "";
-    case "paymentDate":
-    case "deliveryDate":
-      const selectedDate = new Date(value);
-      const currentDate = new Date();
-      selectedDate.setHours(0, 0, 0, 0);
-      currentDate.setHours(0, 0, 0, 0);
-      if (selectedDate < currentDate) return "Date cannot be in the past";
-      return "";
-    case "contactName":
-      if (!/^[A-Za-z\s]+$/.test(value))
-        return "Contact name must only contain letters and spaces";
-      if (value.length < 3 || value.length > 50)
-        return "Contact name must be between 3 and 50 characters";
-      return "";
-    default:
-      return "";
-  }
-};
+  const allSelfManaged = isAllSelfManaged(groups);
 
-/**
- * Handles form field changes
- * @param e Change event
- */
-const handleChange = (
-  e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>
-) => {
-  const { id, value } = e.target;
+  /**
+   * Checks if an object has any filled values
+   * @param obj Object to check
+   * @returns Boolean indicating if any values are filled
+   */
+  const isFilled = (obj: { [key: string]: string }) =>
+    Object.values(obj).some(
+      (val) => val && typeof val === "string" && val.trim() !== ""
+    );
 
-  if (id.includes(".")) {
-    const [parentKey, childKey] = id.split(".");
-    setFormData((prev) => ({
+  /**
+   * Formats a Date object to 12-hour time string
+   * @param date Date to format
+   * @returns Formatted time string (HH:MM AM/PM)
+   */
+  const formatTime12Hour = (date: Date): string => {
+    let hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12 || 12;
+    const paddedHours = hours < 10 ? `0${hours}` : `${hours}`;
+    const paddedMinutes = minutes < 10 ? `0${minutes}` : `${minutes}`;
+    return `${paddedHours}:${paddedMinutes} ${ampm}`;
+  };
+
+  // Currency flags
+  const hasNGN =
+    groups.some(
+      (group: { groupCurrency: string }) => group.groupCurrency === "NGN"
+    ) || savedNGN;
+  const hasUSD =
+    groups.some(
+      (group: { groupCurrency: string }) => group.groupCurrency === "USD"
+    ) || savedUSD;
+
+  // Current date reference
+  const today = new Date();
+
+  // =============================================
+  // EFFECT HOOKS
+  // =============================================
+  useEffect(() => {
+    const hasNGN = localStorage.getItem("paymentHasNGN") === "true";
+    const hasUSD = localStorage.getItem("paymentHasUSD") === "true";
+    setSavedNGN(hasNGN);
+    setSavedUSD(hasUSD);
+  }, []);
+
+  // Clean up redirect cookie on mount
+  useEffect(() => {
+    Cookies.remove("redirectAfterLogin");
+  }, []);
+
+  // Load saved form data from localStorage
+  useEffect(() => {
+    const savedData = localStorage.getItem("paymentFormData");
+    if (savedData) {
+      setFormData((prev) => ({
+        ...prev,
+        ...JSON.parse(savedData),
+        paymentDate: new Date(JSON.parse(savedData).paymentDate),
+        paymentTime: new Date(JSON.parse(savedData).paymentTime)
+      }));
+    }
+  }, []);
+
+  // Validate form whenever formData or errors change
+  useEffect(() => {
+    const isAllFieldsFilled = Object.values(formData).every((value) => {
+      if (typeof value === "string") {
+        return value.trim() !== "";
+      } else if (value instanceof Date) {
+        return !isNaN(value.getTime());
+      }
+      return true;
+    });
+    const isAllFieldsValid = Object.values(errors).every(
+      (error) => error === ""
+    );
+    setIsFormValid(isAllFieldsFilled && isAllFieldsValid);
+  }, [formData, errors]);
+
+  // =============================================
+  // FORM HANDLERS
+  // =============================================
+  /**
+   * Handles date picker changes
+   * @param date Selected date
+   * @param field Field to update
+   */
+  const handleDateChange = (date: Date | null, field: string) => {
+    if (date) {
+      setFormData((prev) => ({ ...prev, [field]: date }));
+    }
+  };
+
+  /**
+   * Validates a form field based on its ID and value
+   * @param id Field ID
+   * @param value Field value
+   * @returns Error message if invalid, empty string if valid
+   */
+  const validateField = (id: string, value: any) => {
+    const fieldName = id.split(".").pop();
+
+    switch (fieldName) {
+      case "accountNumber":
+        if (!/^\d+$/.test(value)) return "Account number must be a number";
+        if (value.length !== 10) return "Account number must be 10 digits";
+        return "";
+      case "accountName":
+        if (!/^[A-Za-z\s]+$/.test(value))
+          return "Account name must only contain letters and spaces";
+        if (value.length < 3 || value.length > 50)
+          return "Account name must be between 3 and 50 characters";
+        return "";
+      case "paymentDate":
+      case "deliveryDate":
+        const selectedDate = new Date(value);
+        const currentDate = new Date();
+        selectedDate.setHours(0, 0, 0, 0);
+        currentDate.setHours(0, 0, 0, 0);
+        if (selectedDate < currentDate) return "Date cannot be in the past";
+        return "";
+      case "contactName":
+        if (!/^[A-Za-z\s]+$/.test(value))
+          return "Contact name must only contain letters and spaces";
+        if (value.length < 3 || value.length > 50)
+          return "Contact name must be between 3 and 50 characters";
+        return "";
+      default:
+        return "";
+    }
+  };
+
+  /**
+   * Handles form field changes
+   * @param e Change event
+   */
+  const handleChange = (
+    e: React.ChangeEvent<
+      HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement
+    >
+  ) => {
+    const { id, value } = e.target;
+
+    if (id.includes(".")) {
+      const [parentKey, childKey] = id.split(".");
+      setFormData((prev) => ({
+        ...prev,
+        [parentKey]: {
+          ...(prev[parentKey as keyof typeof formData] as object),
+          [childKey]: value
+        }
+      }));
+    } else {
+      setFormData((prev) => ({ ...prev, [id]: value }));
+    }
+
+    setErrors((prev) => ({
       ...prev,
-      [parentKey]: {
-        ...(prev[parentKey as keyof typeof formData] as object),
-        [childKey]: value,
-      },
+      [id]: validateField(id, value)
     }));
-  } else {
-    setFormData((prev) => ({ ...prev, [id]: value }));
-  }
+  };
 
-  setErrors((prev) => ({
-    ...prev,
-    [id]: validateField(id, value), 
-  }));
-};
+  /**
+   * Handles form field blur events (for validation)
+   * @param e Blur event
+   */
+  const handleBlur = (
+    e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { id, value } = e.target;
+    setErrors((prev) => ({ ...prev, [id]: validateField(id, value) }));
+  };
 
-/**
- * Handles form field blur events (for validation)
- * @param e Blur event
- */
-const handleBlur = (
-  e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
-) => {
-  const { id, value } = e.target;
-  setErrors((prev) => ({ ...prev, [id]: validateField(id, value) }));
-};
+  // =============================================
+  // FORM SUBMISSION HANDLERS
+  // =============================================
+  /**
+   * Handles form submission
+   * @param e Form event
+   */
+  const handleSubmit = async (e: FormEvent) => {
+    e.preventDefault();
 
-// =============================================
-// FORM SUBMISSION HANDLERS
-// =============================================
-/**
- * Handles form submission
- * @param e Form event
- */
-const handleSubmit = async (e: FormEvent) => {
-  e.preventDefault();
+    if (!isFormValid) {
+      toast.error("Please fill out all required fields");
+      return;
+    }
 
-  if (!isFormValid) {
-    toast.error("Please fill out all required fields");
-    return;
-  }
+    setLoading(true);
 
-  setLoading(true);
+    try {
+      const { nairaAccount, dollarAccount, ...rest } = formData;
+      const authToken = localStorage.getItem("authToken");
 
-  try {
-    const { nairaAccount, dollarAccount, ...rest } = formData;
-    const authToken = localStorage.getItem("authToken");
+      const formattedData = {
+        ...rest,
+        ...(isFilled(nairaAccount) ? { nairaAccount } : {}),
+        ...(isFilled(dollarAccount) ? { dollarAccount } : {}),
+        paymentTime: formatTime12Hour(formData.paymentTime)
+      };
 
-    const formattedData = {
-      ...rest,
-      ...(isFilled(nairaAccount) ? { nairaAccount } : {}),
-      ...(isFilled(dollarAccount) ? { dollarAccount } : {}),
-      paymentTime: formatTime12Hour(formData.paymentTime),
-    };
+      const queryString = new URLSearchParams({
+        data: JSON.stringify(formattedData)
+      }).toString();
 
-    const queryString = new URLSearchParams({
-      data: JSON.stringify(formattedData),
-    }).toString();
+      if (allSelfManaged) {
+        await axiosInstance.post("/add-payment", formattedData);
+        toast.success("Payment details successfully submitted!");
+        trackEvent("Add Payment Information", {
+          source: "Add Payment Page",
+          timestamp: new Date().toISOString(),
+          page_name: "add payment page",
+          event_id: firstGroup.event._id,
+          event_name: firstGroup.event.eventName,
+          naira_bank_name: formData.nairaAccount.bankName,
+          dollar_bank_name: formData.dollarAccount.usBankName,
+          status: "Successful"
+        });
 
-    if (allSelfManaged) {
-      await axiosInstance.post("/add-payment", formattedData);
-      toast.success("Payment details successfully submitted!");
-      trackEvent("Add Payment Information", {
+        if (authToken) {
+          router.push("/dashboard/events");
+        } else {
+          router.push("/");
+        }
+      } else {
+        const parsedEventDetails = {
+          event_id: firstGroup.event._id,
+          event_name: firstGroup.event.eventName
+        };
+
+        localStorage.setItem(
+          "parsedEventDetails",
+          JSON.stringify(parsedEventDetails)
+        );
+
+        trackEvent("Add Payment Information", {
+          source: "Add Payment Page",
+          timestamp: new Date().toISOString(),
+          page_name: "add payment page",
+          event_id: firstGroup.event._id,
+          event_name: firstGroup.event.eventName,
+          naira_bank_name: formData.nairaAccount.bankName || null,
+          dollar_bank_name: formData.dollarAccount.usBankName || null,
+          status: "Successful"
+        });
+
+        router.push(`/pickup-details?${queryString}`);
+      }
+    } catch (error: any) {
+      console.error("Error submitting payment details:", error);
+      trackEvent("Add Payment Information Failed", {
         source: "Add Payment Page",
         timestamp: new Date().toISOString(),
-        page_name: "add payment page",
+        page_name: "Add Payment Page",
         event_id: firstGroup.event._id,
         event_name: firstGroup.event.eventName,
         naira_bank_name: formData.nairaAccount.bankName,
         dollar_bank_name: formData.dollarAccount.usBankName,
-        status: "Successful"
+        status: "Failed"
       });
 
-      if(authToken) {
-        router.push("/dashboard/events");
-      }else{
-        router.push("/");
+      if (
+        error.response &&
+        error.response.data &&
+        error.response.data.message
+      ) {
+        toast.error(`Error: ${error.response.data.message}`);
+      } else {
+        toast.error("Failed to submit payment details. Please try again.");
       }
-
-    } else {
-      const parsedEventDetails = {
-        event_id: firstGroup.event._id,
-        event_name: firstGroup.event.eventName,
-      };
-      
-      localStorage.setItem("parsedEventDetails", JSON.stringify(parsedEventDetails));
-      
-      trackEvent("Add Payment Information", {
-        source: "Add Payment Page",
-        timestamp: new Date().toISOString(),
-        page_name: "add payment page",
-        event_id: firstGroup.event._id,
-        event_name: firstGroup.event.eventName,
-        naira_bank_name: formData.nairaAccount.bankName || null,
-        dollar_bank_name: formData.dollarAccount.usBankName || null,
-        status: "Successful"
-      });
-
-      router.push(`/pickup-details?${queryString}`);
+    } finally {
+      setLoading(false);
     }
-  } catch (error: any) {
-    console.error("Error submitting payment details:", error);
-    trackEvent("Add Payment Information Failed", {
-      source: "Add Payment Page",
-      timestamp: new Date().toISOString(),
-      page_name: "Add Payment Page",
-      event_id: firstGroup.event._id,
-      event_name: firstGroup.event.eventName,
-      naira_bank_name: formData.nairaAccount.bankName,
-      dollar_bank_name: formData.dollarAccount.usBankName,
-      status: "Failed"
-    });
-
-    if (
-      error.response &&
-      error.response.data &&
-      error.response.data.message
-    ) {
-      toast.error(`Error: ${error.response.data.message}`);
-    } else {
-      toast.error("Failed to submit payment details. Please try again.");
-    }
-  } finally {
-    setLoading(false); 
-  }
-};
-
-/**
- * Handles saving form data for later completion
- */
-const handleSaveForLater = async () => {
-  setIsSaveLoading(true);
-
-  const persistFormState = () => {
-    localStorage.setItem("paymentFormData", JSON.stringify(formData));
-    localStorage.setItem("paymentHasNGN", JSON.stringify(hasNGN));
-    localStorage.setItem("paymentHasUSD", JSON.stringify(hasUSD));
   };
 
-  persistFormState();
+  /**
+   * Handles saving form data for later completion
+   */
+  const handleSaveForLater = async () => {
+    setIsSaveLoading(true);
 
-  const authToken = localStorage.getItem("authToken");
-
-  if (!authToken) {
-    Cookies.set("redirectAfterLogin", pathname);
-    setShowSuccess2(true); 
-    setIsSaveLoading(false);
-    return;
-  }
-
-  try {
-    const { nairaAccount, dollarAccount, ...rest } = formData;
-
-    const fullFormData = {
-      ...rest,
-      ...(isFilled(nairaAccount) ? { nairaAccount } : {}),
-      ...(isFilled(dollarAccount) ? { dollarAccount } : {}),
-      paymentTime: formatTime12Hour(formData.paymentTime),
-      isDraft: true
+    const persistFormState = () => {
+      localStorage.setItem("paymentFormData", JSON.stringify(formData));
+      localStorage.setItem("paymentHasNGN", JSON.stringify(hasNGN));
+      localStorage.setItem("paymentHasUSD", JSON.stringify(hasUSD));
     };
 
-    await axiosInstance.post(`/payment-save-for-later`, fullFormData);
+    persistFormState();
 
-    toast.success("Saved! Continue from your dashboard.");
+    const authToken = localStorage.getItem("authToken");
 
-    localStorage.removeItem("paymentFormData");
-    localStorage.removeItem("paymentHasNGN");
-    localStorage.removeItem("paymentHasUSD");
+    if (!authToken) {
+      Cookies.set("redirectAfterLogin", pathname);
+      setShowSuccess2(true);
+      setIsSaveLoading(false);
+      return;
+    }
 
-    router.push("/dashboard/events");
-  } catch (error: any) {
-    localStorage.removeItem("paymentFormData");
-    localStorage.removeItem("paymentHasNGN");
-    localStorage.removeItem("paymentHasUSD");    
-    toast.error(error.response?.data?.message || "Failed to save event");
-  } finally {
-    setIsSaveLoading(false);
-  }
-};
+    try {
+      const { nairaAccount, dollarAccount, ...rest } = formData;
+
+      const fullFormData = {
+        ...rest,
+        ...(isFilled(nairaAccount) ? { nairaAccount } : {}),
+        ...(isFilled(dollarAccount) ? { dollarAccount } : {}),
+        paymentTime: formatTime12Hour(formData.paymentTime),
+        isDraft: true
+      };
+
+      await axiosInstance.post(`/payment-save-for-later`, fullFormData);
+
+      toast.success("Saved! Continue from your dashboard.");
+
+      localStorage.removeItem("paymentFormData");
+      localStorage.removeItem("paymentHasNGN");
+      localStorage.removeItem("paymentHasUSD");
+
+      router.push("/dashboard/events");
+    } catch (error: any) {
+      localStorage.removeItem("paymentFormData");
+      localStorage.removeItem("paymentHasNGN");
+      localStorage.removeItem("paymentHasUSD");
+      toast.error(error.response?.data?.message || "Failed to save event");
+    } finally {
+      setIsSaveLoading(false);
+    }
+  };
 
   return (
     <HeaderLayout>
       <ToastContainer />
       {showMapPickerModal && (
         <LocationPickerModal
-        onLocationSelect={() => {
-          setShowMapPickerModal(false);
-        }}
+          onLocationSelect={() => {
+            setErrors((prev) => ({ ...prev, location: "" }));
+            setShowMapPickerModal(false);
+          }}
           onCancel={() => setShowMapPickerModal(false)}
         />
       )}
@@ -482,7 +498,10 @@ const handleSaveForLater = async () => {
             >
               Payment Setup
             </h2>
-            <div id="payment_deliveryDesc" className="flex justify-center items-center gap-3">
+            <div
+              id="payment_deliveryDesc"
+              className="flex justify-center items-center gap-3"
+            >
               <div className="flex flex-col w-full">
                 <span className="flex justify-start w-full whitespace-nowrap h-6 font-general font-medium text-sm text-[#718096]">
                   Let&apos;s setup your payout process and payment
@@ -522,39 +541,38 @@ const handleSaveForLater = async () => {
 
               {/* NAIRA PAYOUT */}
               <div className=" rounded-[10px]">
-              {hasNGN && (
-                <div className="border border-[#CBD5E0] mb-7 p-4 rounded-[10px]">
-                  <NairaPayoutForm
-                    formData={formData}
-                    errors={errors}
-                    handleChange={handleChange}
-                    handleBlur={handleBlur}
-                    selectedBank={selectedBank}
-                    setSelectedBank={setSelectedBank}
-                    setFormData={setFormData}
-                    setErrors={setErrors}
-                  />
-                </div>
-              )}
-
+                {hasNGN && (
+                  <div className="border border-[#CBD5E0] mb-7 p-4 rounded-[10px]">
+                    <NairaPayoutForm
+                      formData={formData}
+                      errors={errors}
+                      handleChange={handleChange}
+                      handleBlur={handleBlur}
+                      selectedBank={selectedBank}
+                      setSelectedBank={setSelectedBank}
+                      setFormData={setFormData}
+                      setErrors={setErrors}
+                    />
+                  </div>
+                )}
 
                 {/* DOLLAR PAYOUT */}
                 {hasUSD && (
-                <div className="border border-[#CBD5E0] p-4 rounded-[10px]">
-                  <DollarPayoutForm
-                    formData={formData}
-                    errors={errors}
-                    handleChange={handleChange}
-                    handleBlur={handleBlur}
-                    selectedUSBank={selectedUSBank}
-                    setSelectedUSBank={setSelectedUSBank}
-                    setFormData={setFormData}
-                    setErrors={setErrors}
-                  />
-                </div> 
-                )}        
+                  <div className="border border-[#CBD5E0] p-4 rounded-[10px]">
+                    <DollarPayoutForm
+                      formData={formData}
+                      errors={errors}
+                      handleChange={handleChange}
+                      handleBlur={handleBlur}
+                      selectedUSBank={selectedUSBank}
+                      setSelectedUSBank={setSelectedUSBank}
+                      setFormData={setFormData}
+                      setErrors={setErrors}
+                    />
+                  </div>
+                )}
               </div>
-              </div>
+            </div>
             <div className="mt-8">
               <div className="mb-5">
                 <h2
@@ -581,14 +599,16 @@ const handleSaveForLater = async () => {
                   <div className="relative">
                     <PiCalendarMinus className="absolute left-3 top-1/2 transform -translate-y-1/2 z-10 text-[#111827]" />
                     <div className="w-full bg-slate-50">
-                    <DatePicker
-                      selected={formData.paymentDate}
-                      minDate={today}
-                      id="paymentDate"
-                      onChange={(date) => handleDateChange(date, "paymentDate")}
-                      dateFormat="yyyy-MM-dd"
-                      className="pl-10 px-3 py-2 z-20 input-field outline-primary w-full rounded-[5px] bg-slate-50"
-                      popperClassName="custom-datepicker"
+                      <DatePicker
+                        selected={formData.paymentDate}
+                        minDate={today}
+                        id="paymentDate"
+                        onChange={(date) =>
+                          handleDateChange(date, "paymentDate")
+                        }
+                        dateFormat="yyyy-MM-dd"
+                        className="pl-10 px-3 py-2 z-20 input-field outline-primary w-full rounded-[5px] bg-slate-50"
+                        popperClassName="custom-datepicker"
                       />
                     </div>
                   </div>
@@ -610,9 +630,11 @@ const handleSaveForLater = async () => {
                     <div className="relative">
                       <AiOutlineClockCircle className="absolute left-3 top-1/2 transform -translate-y-1/2 text-[#111827] z-10" />
                       <DatePicker
-                        selected={formData.paymentTime} 
+                        selected={formData.paymentTime}
                         id="paymentTime"
-                        onChange={(date) => handleDateChange(date, "paymentTime")}
+                        onChange={(date) =>
+                          handleDateChange(date, "paymentTime")
+                        }
                         showTimeSelect
                         showTimeSelectOnly
                         timeIntervals={15}
@@ -640,33 +662,32 @@ const handleSaveForLater = async () => {
               </div>
             </div>
 
-             <div className="bg-[#FFFF] py-4 flex justify-center fixed z-10 left-0 bottom-0 w-full">
-                <div className="max-w-3xl flex gap-4 items-center justify-center sm:justify-end w-full px-4">
+            <div className="bg-[#FFFF] py-4 flex justify-center fixed z-10 left-0 bottom-0 w-full">
+              <div className="max-w-3xl flex gap-4 items-center justify-center sm:justify-end w-full px-4">
                 <button
                   id="save"
                   type="button"
                   className="p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827]"
                   onClick={() => handleSaveForLater()}
-                  >
-                    {isSaveLoading ? "saving..." : "Save for later"}
+                >
+                  {isSaveLoading ? "saving..." : "Save for later"}
                 </button>
-                  <button
-                    type="submit"
-                    disabled={!isFormValid}
-                    className={`bg-primary w-[142.24px] text-white py-3 px-8 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center font-extrabold font-manrope ${
-                      !isFormValid ? "opacity-50 cursor-not-allowed" : ""
-                    }`}
-                  >
-                    {loading ? (
-                      <BiLoaderCircle className="animate-spin mr-2" size={22} />
-                    ) : (
-                      "Continue"
-                    )}
-                  </button>
-                </div>
+                <button
+                  type="submit"
+                  disabled={!isFormValid}
+                  className={`bg-primary w-[142.24px] text-white py-3 px-8 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center font-extrabold font-manrope ${
+                    !isFormValid ? "opacity-50 cursor-not-allowed" : ""
+                  }`}
+                >
+                  {loading ? (
+                    <BiLoaderCircle className="animate-spin mr-2" size={22} />
+                  ) : (
+                    "Continue"
+                  )}
+                </button>
               </div>
+            </div>
           </form>
-
         </div>
       </section>
       {showModal && (

@@ -421,6 +421,7 @@ const handleSubmit = async (e: FormEvent) => {
       {showMapPickerModal && (
         <LocationPickerModal
           onLocationSelect={() => {
+            setErrors((prev) => ({ ...prev, location: "" }));
             setShowMapPickerModal(false);
           }}
           onCancel={() => setShowMapPickerModal(false)}
