@@ -11,7 +11,7 @@ import CreatePackageModal from "@/components/CreatePackageModal";
 import { useRouter } from "next-nprogress-bar";
 import { toast, ToastContainer } from "react-toastify";
 import AddGroup from "@/components/AddGroupCaller";
-import { isNull } from "node:util";
+// import { isNull } from "node:util";
 
 interface PackagesSectionProps {
   eventData: {

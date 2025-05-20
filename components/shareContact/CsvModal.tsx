@@ -7,6 +7,7 @@ import CSVContactModal from "./CSVContactModal";
 import axiosInstance from "@/lib/axiosInstance";
 import { toast, ToastContainer } from "react-toastify";
 import { FaSpinner } from "react-icons/fa";
+import { trackEvent } from "@/lib/mixpanel";
 // import { trackEvent } from "@/lib/mixpanel";
 
 interface Contact {
@@ -32,7 +33,7 @@ const CsvModal: React.FC<CsvModalProps> = ({ onClose }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [isDragActive, setIsDragActive] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const [, setEventData] = useState<null | any>(null);
+  const [eventData, setEventData] = useState<null | any>(null);
 
   // Ref for modal for accessibility focus management.
   const modalRef = useRef<HTMLDivElement>(null);
@@ -134,14 +135,14 @@ const CsvModal: React.FC<CsvModalProps> = ({ onClose }) => {
     const formData = new FormData();
     formData.append("csvData", selectedFile);
 
-    // trackEvent("Import Contact Start", {
-    //   source: "share-contact page",
-    //   event_id: eventData?._id,
-    //   event_name: eventData?.eventName,
-    //   timestamp: new Date().toISOString(),
-    //   page_name: "Share-contact Page",
-    //   route: "CSV"
-    // });
+    trackEvent("Import Contact Start", {
+      source: "share-contact page",
+      event_id: eventData?._id,
+      event_name: eventData?.eventName,
+      timestamp: new Date().toISOString(),
+      page_name: "Share-contact Page",
+      route: "CSV"
+    });
 
     try {
       setLoading(true);
@@ -151,15 +152,7 @@ const CsvModal: React.FC<CsvModalProps> = ({ onClose }) => {
         },
       });  
 
-      // trackEvent("Import Contact Save", {
-      //   source: "share-contact page",
-      //   event_id: eventData?._id,
-      //   event_name: eventData?.eventName,
-      //   timestamp: new Date().toISOString(),
-      //   page_name: "Share-contact Page",
-      //   route: "CSV"
-      // });
-
+ 
       if (response.data?.data) {
         const parsedContacts: Contact[] = response.data.data.map(
           (contact: any, index: number) => ({
@@ -178,6 +171,16 @@ const CsvModal: React.FC<CsvModalProps> = ({ onClose }) => {
           })
         );
         console.log("cont", parsedContacts)
+        trackEvent("Import Contact Save", {
+          source: "share-contact page",
+          event_id: eventData?._id,
+          event_name: eventData?.eventName,
+          timestamp: new Date().toISOString(),
+          page_name: "Share-contact Page",
+          route: "CSV",
+          count: parsedContacts.length,
+        });
+  
 
         setContacts(parsedContacts);
       } else {
