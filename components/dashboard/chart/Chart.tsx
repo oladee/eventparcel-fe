@@ -16,8 +16,8 @@ import {
 } from "recharts";
 import dynamic from "next/dynamic";
 import { useRouter } from "next/navigation";
-import EmptyStateWithAction from "../EmptyState";
-import Container from "../Container";
+// import EmptyStateWithAction from "../EmptyState";
+// import Container from "../Container";
 
 
 const SkeletonLoader = dynamic(
@@ -266,14 +266,14 @@ const Chart: React.FC = () => {
           sales: item.sales
         }));
 
-  const isEmptyData = chartData.every((item) => item.sales === 0);
-  if (isEmptyData) {
-    return (
-      <Container>
-        <EmptyStateWithAction />
-      </Container>
-    );
-  }
+  // const isEmptyData = chartData.every((item) => item.sales === 0);
+  // if (isEmptyData) {
+  //   return (
+  //     <Container>
+  //       <EmptyStateWithAction />
+  //     </Container>
+  //   );
+  // }
 
   // A small multiplier for the top range in the chart so that bars and line don't touch the top
   const maxSales = Math.max(...chartData.map((item) => item.sales)) * 1.1;
