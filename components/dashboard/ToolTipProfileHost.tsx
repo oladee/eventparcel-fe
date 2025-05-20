@@ -13,7 +13,7 @@ const ToolTipProfileHost: React.FC = () => {
   };
 
   const handleChangePassword = () => {
-    router.push("/admin/admin-changePassword"); // Navigate to change password page
+    router.push("/dashboard/changePassword"); // Navigate to change password page
   };
 
   return (

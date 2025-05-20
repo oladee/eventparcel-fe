@@ -72,7 +72,6 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
   };
 
 
-
   return (
     <>
       <ToastContainer />

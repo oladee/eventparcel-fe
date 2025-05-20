@@ -3,10 +3,10 @@
 
 import React, { useState, useEffect } from "react";
 import { FiEye, FiEyeOff } from "react-icons/fi";
-import AdminContainer from "@/components/admin/AdminContainer";
 import axiosInstance from "@/lib/adminAxiosInterceptor/axiosInstance";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import Container from "@/components/dashboard/Container";
 
 const ChangePass: React.FC = () => {
   // form fields
@@ -70,7 +70,7 @@ const ChangePass: React.FC = () => {
   };
 
   return (
-    <AdminContainer>
+    <Container>
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="w-full min-h-[calc(100vh-4rem)] flex items-center justify-center px-4 py-8">
         <form
@@ -183,7 +183,7 @@ const ChangePass: React.FC = () => {
           </button>
         </form>
       </div>
-    </AdminContainer>
+    </Container>
   );
 };
 
