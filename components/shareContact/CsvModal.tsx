@@ -171,6 +171,15 @@ const CsvModal: React.FC<CsvModalProps> = ({ onClose }) => {
           })
         );
         console.log("cont", parsedContacts)
+        const isNigerianNumber = (phone: string | number) => {
+          const cleaned = String(phone).replace(/\D/g, ""); // remove non-numeric chars
+          return cleaned.startsWith("234") || cleaned.startsWith("0");
+        };
+
+        const hasNonNigerianNumber = parsedContacts.some(
+          (contact) => !isNigerianNumber(contact.phoneValue)
+        );
+        
         trackEvent("Import Contact Save", {
           source: "share-contact page",
           event_id: eventData?._id,
@@ -179,6 +188,7 @@ const CsvModal: React.FC<CsvModalProps> = ({ onClose }) => {
           page_name: "Share-contact Page",
           route: "CSV",
           count: parsedContacts.length,
+          non_ngn_country_code: hasNonNigerianNumber ? "Yes" : "No",
         });
   
 

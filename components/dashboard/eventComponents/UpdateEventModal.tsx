@@ -115,7 +115,7 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
         lastName: hostLastName,
         email: hostEmail,
         description: eventDescription,
-        numberOfGroups: numberOfGroups.toString(),
+        numberOfGroups: numberOfGroups?.toString() ?? "0",
         eventImage: null
       });
 

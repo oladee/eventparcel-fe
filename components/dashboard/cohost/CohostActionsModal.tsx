@@ -7,7 +7,6 @@ import { toast } from "react-toastify";
 import { motion, AnimatePresence } from "framer-motion";
 import FocusLock from "react-focus-lock";
 import { useRouter } from "next-nprogress-bar";
-
 interface CohostActionsModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -16,12 +15,15 @@ interface CohostActionsModalProps {
     eventId: string;
     status: boolean;
   };
+  onRemove: (deletedCohostId: string) => void; 
 }
+
 
 const CohostActionsModal: React.FC<CohostActionsModalProps> = ({
   isOpen,
   onClose,
   cohost,
+  onRemove
 }) => {
   const router = useRouter();
   const [loadingToggle, setLoadingToggle] = useState(false);
@@ -85,6 +87,7 @@ const CohostActionsModal: React.FC<CohostActionsModalProps> = ({
     try {
       await axiosInstance.put(`/remove-cohost/${cohost._id}/${cohost.eventId}`);
       toast.success("Co-host removed successfully.");
+      onRemove(cohost._id); 
       onClose();
     } catch (error: any) {
       console.error("Error removing cohost:", error);

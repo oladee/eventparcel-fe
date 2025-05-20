@@ -63,6 +63,10 @@ const Page = () => {
     }
   }, [router]);
 
+  const removeCohost = (deletedCohostId: string) => {
+    setCoHosts((prev) => prev.filter((c) => c._id !== deletedCohostId));
+  };
+
   return (
     <Container>
       <ToastContainer />
@@ -158,6 +162,7 @@ const Page = () => {
             setSelectedCohost(null);
           }}
           cohost={selectedCohost}
+          onRemove={removeCohost}
         />
       )}
     </Container>
