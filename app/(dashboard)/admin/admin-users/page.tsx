@@ -53,7 +53,7 @@ const AdminPage: React.FC = () => {
       Router.push("/");
       return;
     }
-    setRole(user.role);
+    setRole(user.data.role);
   }, [Router]);
 
   useEffect(() => {

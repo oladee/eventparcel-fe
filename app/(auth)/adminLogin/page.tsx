@@ -1,7 +1,7 @@
 "use client";
 import Image from "next/image";
 import { HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
-// import { useRouter } from "next-nprogress-bar";
+import { useRouter as Route } from "next-nprogress-bar";
 import { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -16,6 +16,7 @@ const Page: React.FC = () => {
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({ email: "", password: "" });
   const router = useRouter();
+  const route = Route();
   // const [localEmail, setLocalEmail] = useState("");
 
   useEffect(() => {
@@ -78,7 +79,7 @@ const Page: React.FC = () => {
 
       toast.success(response?.data?.message);
 
-      router.replace("/admin");
+      route.replace("/admin");
       // router.push("/event-creation");
     } catch (error: any) {
       if (
