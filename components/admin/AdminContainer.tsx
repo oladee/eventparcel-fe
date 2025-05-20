@@ -7,6 +7,9 @@ function AdminContainer({ children }: { children: React.ReactNode }) {
   const router = useRouter();
   const userRef = useRef<{ role: string } | null>(null);
 
+
+
+  useEffect(() => {
   const loadUserData = () => {
     const loggedInUser = localStorage.getItem("loggedInUser");
     const authToken = localStorage.getItem("authToken")
@@ -26,9 +29,8 @@ function AdminContainer({ children }: { children: React.ReactNode }) {
     }
   };
 
-  useEffect(() => {
     loadUserData();
-  }, [loadUserData]);
+  }, [router]);
 
   return (
     <main className="absolute top-0 left-0 right-0 md:pl-64 !pt-16 h-screen overflow-y-auto custom-scrollbar bg-gray-100">

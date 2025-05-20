@@ -81,7 +81,7 @@ const ViewEvent = () => {
     };
 
     fetchData();
-  }, [code]);
+  }, [code, location]);
 
   // Don't render anything until data is loaded
   if (loading) {

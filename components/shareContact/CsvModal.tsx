@@ -7,7 +7,7 @@ import CSVContactModal from "./CSVContactModal";
 import axiosInstance from "@/lib/axiosInstance";
 import { toast, ToastContainer } from "react-toastify";
 import { FaSpinner } from "react-icons/fa";
-import { trackEvent } from "@/lib/mixpanel";
+// import { trackEvent } from "@/lib/mixpanel";
 
 interface Contact {
   id: number;
@@ -32,7 +32,7 @@ const CsvModal: React.FC<CsvModalProps> = ({ onClose }) => {
   const [loading, setLoading] = useState<boolean>(false);
   const [isDragActive, setIsDragActive] = useState<boolean>(false);
   const [errorMessage, setErrorMessage] = useState<string>("");
-  const [eventData, setEventData] = useState<null | any>(null);
+  const [, setEventData] = useState<null | any>(null);
 
   // Ref for modal for accessibility focus management.
   const modalRef = useRef<HTMLDivElement>(null);
