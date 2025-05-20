@@ -10,6 +10,8 @@ import { Group, Package } from "@/app/interface/Group";
 import CreatePackageModal from "@/components/CreatePackageModal";
 import { useRouter } from "next-nprogress-bar";
 import { toast, ToastContainer } from "react-toastify";
+import AddGroup from "@/components/AddGroupCaller";
+// import { isNull } from "node:util";
 
 interface PackagesSectionProps {
   eventData: {
@@ -24,6 +26,7 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [group1, setGroup1] = useState<Group | null>(null);
   const [modalMode, setModalMode] = useState<"create" | "update">("create");
+  const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
   // New state to keep track of the selected group for sharing (if needed for modal)
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const router = useRouter();
@@ -62,15 +65,14 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
     router.push(`/dashboard/groups/${group._id}`);
   };
 
-  const handleAddGroupClick = () => {
-    // localStorage.setItem("eventId", eventId);
-    router.push("/dashboard/create-group");
-  };
+  // const handleAddGroupClick = () => {
+  //   // localStorage.setItem("eventId", eventId);
+  //   router.push("/dashboard/create-group");
+  // };
 
   const handleDisabledAction = () => {
     toast.warning("This action is not allowed on a disabled group.");
   };
-
 
   return (
     <>
@@ -81,7 +83,11 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
         </h1>
 
         <button
-          onClick={handleAddGroupClick}
+          // onClick={handleAddGroupClick}
+          onClick={() => {
+            //  localStorage.setItem("eventId", eventId)
+            setIsAddGroupOpen(true);
+          }}
           className="flex items-center outline-none"
         >
           <Image src="/images/plus.png" alt="plus" width={32} height={32} />
@@ -275,6 +281,15 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
         </div> */}
       </div>
 
+      {isAddGroupOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-5 z-50">
+          <AddGroup
+            mode="noGroup"
+            setIsAddGroupOpen={setIsAddGroupOpen}
+            selectedGroup={null}
+          />
+        </div>
+      )}
       {openModalPackage && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black bg-opacity-50">
           <CreatePackageModal
