@@ -9,6 +9,7 @@ import Image from "next/image";
 import { motion } from "framer-motion";
 import { useRouter } from 'next/navigation';
 import { AiOutlineArrowLeft } from "react-icons/ai";
+import AddGroup from "@/components/AddGroupCaller";
 
 
 const Page: React.FC = () => {
@@ -16,6 +17,8 @@ const Page: React.FC = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
+    const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
+  
 
   useEffect(() => {
     const id = window.location.pathname.split("/").pop(); // Extract eventId from the URL
@@ -110,13 +113,25 @@ const Page: React.FC = () => {
         <div className="flex justify-center">
           <div
             className="flex w-full max-w-2xl h-[100px] mt-5 rounded-2xl flex-col border-[2px] border-dashed justify-center items-center ml-[5px] bg-[#FFFFFF66] cursor-pointer"
-            onClick={handleAddGroupClick}
+            // onClick={handleAddGroupClick}
+             onClick={() => {
+            setIsAddGroupOpen(true);
+          }}
           >
             <Image src="/images/plus.png" alt="plus" width={32} height={32} />
             <span className="font-general font-semibold text-sm text-[#751423]">
               Add Groups
             </span>
           </div>
+        </div>
+      )}
+        {isAddGroupOpen && (
+        <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-5 z-50">
+          <AddGroup
+            mode="noGroup"
+            setIsAddGroupOpen={setIsAddGroupOpen}
+            selectedGroup={null}
+          />
         </div>
       )}
     </Container>
