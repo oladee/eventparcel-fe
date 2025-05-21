@@ -234,7 +234,8 @@ const InvitedContactsPage: React.FC = () => {
         {/* Footer Buttons */}
         <div className="flex justify-end p-4  gap-4 mt-6 bg-white">
           <button
-            onClick={() => setSelectedIds(new Set())}
+            // onClick={() => setSelectedIds(new Set())}
+            onClick={() => router.back()}
             className="p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827]"
           >
             Cancel
