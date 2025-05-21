@@ -315,7 +315,16 @@ const CompleteCohost: React.FC = () => {
                 "Complete profile"
               )}
             </button>
-
+          <div className="text-left text-sm text-gray-500 mt-6">
+              Already have an account?{" "}
+              <a
+                href="#"
+                className="text-primary font-bold"
+                onClick={() => router.push("/")}
+              >
+                Sign In
+              </a>
+            </div>
           </form>
         </div>
 
