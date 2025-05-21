@@ -32,7 +32,7 @@ const ViewEvent = () => {
 
   // Cart store functions
   const items = useCartStore((state) => state.items);
-  const addToCart = useCartStore((state) => state.addToCart);
+  // const addToCart = useCartStore((state) => state.addToCart);
   const increaseQuantity = useCartStore((state) => state.increaseQuantity);
   const decreaseQuantity = useCartStore((state) => state.decreaseQuantity);
   const total = useCartStore((state) => state.total);

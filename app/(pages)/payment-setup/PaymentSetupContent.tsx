@@ -362,19 +362,19 @@ const PaymentSetupContent = () => {
    * Handles form submission
    * @param e Form event
    */
-  const to24HourFormat = (time12h: string) => {
-    const [time, modifier] = time12h.split(" ");
-    let [hours, minutes] = time.split(":").map(Number);
+  // const to24HourFormat = (time12h: string) => {
+  //   const [time, modifier] = time12h.split(" ");
+  //   let [hours, minutes] = time.split(":").map(Number);
   
-    if (modifier.toLowerCase() === "pm" && hours !== 12) {
-      hours += 12;
-    }
-    if (modifier.toLowerCase() === "am" && hours === 12) {
-      hours = 0;
-    }
+  //   if (modifier.toLowerCase() === "pm" && hours !== 12) {
+  //     hours += 12;
+  //   }
+  //   if (modifier.toLowerCase() === "am" && hours === 12) {
+  //     hours = 0;
+  //   }
   
-    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
-  };
+  //   return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+  // };
   
   const checkEventDateTime = () => {
     if (!eventDate || !formData?.paymentDate) return true;
