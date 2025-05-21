@@ -7,18 +7,17 @@ import EventDetailsSection from "@/components/dashboard/eventComponents/EventDet
 import axiosInstance from "@/lib/axiosInstance";
 import Image from "next/image";
 import { motion } from "framer-motion";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 import { AiOutlineArrowLeft } from "react-icons/ai";
-import AddGroup from "@/components/AddGroupCaller";
-
+// import AddGroup from "@/components/AddGroupCaller";
+import AddGroup2 from "@/components/AddGroupCaller2";
 
 const Page: React.FC = () => {
   const [eventData, setEventData] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
-    const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
-  
+  const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
 
   useEffect(() => {
     const id = window.location.pathname.split("/").pop(); // Extract eventId from the URL
@@ -114,9 +113,17 @@ const Page: React.FC = () => {
           <div
             className="flex w-full max-w-2xl h-[100px] mt-5 rounded-2xl flex-col border-[2px] border-dashed justify-center items-center ml-[5px] bg-[#FFFFFF66] cursor-pointer"
             // onClick={handleAddGroupClick}
-             onClick={() => {
-            setIsAddGroupOpen(true);
-          }}
+            onClick={() => {
+              localStorage.setItem("eventId", eventData._id);
+              localStorage.setItem("groupLength", eventData.eventGroups.length);
+              localStorage.setItem("isNairaAccount", eventData.isNairaAccount);
+              localStorage.setItem(
+                "isDollarAccount",
+                eventData.isDollarAccount
+              );
+
+              setIsAddGroupOpen(true);
+            }}
           >
             <Image src="/images/plus.png" alt="plus" width={32} height={32} />
             <span className="font-general font-semibold text-sm text-[#751423]">
@@ -125,12 +132,13 @@ const Page: React.FC = () => {
           </div>
         </div>
       )}
-        {isAddGroupOpen && (
+      {isAddGroupOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-5 z-50">
-          <AddGroup
+          <AddGroup2
             mode="noGroup"
             setIsAddGroupOpen={setIsAddGroupOpen}
             selectedGroup={null}
+            isShared={eventData?.isShared}
           />
         </div>
       )}
@@ -139,5 +147,3 @@ const Page: React.FC = () => {
 };
 
 export default Page;
-
-
