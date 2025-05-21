@@ -10,11 +10,16 @@ import { Group, Package } from "@/app/interface/Group";
 import CreatePackageModal from "@/components/CreatePackageModal";
 import { useRouter } from "next-nprogress-bar";
 import { toast, ToastContainer } from "react-toastify";
-import AddGroup from "@/components/AddGroupCaller";
+// import AddGroup from "@/components/AddGroupCaller";
+import AddGroup2 from "@/components/AddGroupCaller2";
 // import { isNull } from "node:util";
 
 interface PackagesSectionProps {
   eventData: {
+    _id: string;
+    eventImgUrl: string;
+    isDollarAccount?: any;
+    isNairaAccount?: any;
     eventGroups: Group[];
     isShared?: boolean;
   };
@@ -86,6 +91,10 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
           // onClick={handleAddGroupClick}
           onClick={() => {
             //  localStorage.setItem("eventId", eventId)
+            localStorage.setItem("eventId", eventData._id);
+            localStorage.setItem("groupLength", eventData?.eventGroups.length.toString());
+            localStorage.setItem("isNairaAccount", eventData.isNairaAccount);
+            localStorage.setItem("isDollarAccount", eventData.isDollarAccount);
             setIsAddGroupOpen(true);
           }}
           className="flex items-center outline-none"
@@ -283,10 +292,11 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
 
       {isAddGroupOpen && (
         <div className="fixed inset-0 flex items-center justify-center bg-black bg-opacity-5 z-50">
-          <AddGroup
+          <AddGroup2
             mode="noGroup"
             setIsAddGroupOpen={setIsAddGroupOpen}
             selectedGroup={null}
+            isShared={eventData?.isShared}
           />
         </div>
       )}
