@@ -8,6 +8,9 @@ import AuthLeft from "@/components/auth/AuthLeft";
 import { useRouter } from "next/navigation";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import ResetSuccess from "@/components/auth/resetSuccess";
+import { identifyUser, trackEvent } from "@/lib/mixpanel";
+import getBrowserType from "@/lib/getBrowserType";
+import HeaderLayout from "@/components/layout/HeaderLayout";
 
 const ResetPassword: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -21,6 +24,8 @@ const ResetPassword: React.FC = () => {
   const [showPassword, setShowPassword] = useState<boolean>(false); 
   const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false); 
   const [onSuccess, setOnSuccess] = useState<boolean>(false);
+  const [location, setLocation] = useState<string | null>(null);
+  
 
   const requirements = [
     { label: "At least 8 characters", regex: /.{8,}/ },
@@ -38,6 +43,15 @@ const ResetPassword: React.FC = () => {
     }
     setEmail(storedEmail);
   }, [router]);
+
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition((pos) => {
+        const { latitude, longitude } = pos.coords;
+        setLocation(`${latitude},${longitude}`);
+      });
+    }
+  }, []);
 
   const validatePassword = (password: string) => {
     const validationResults = requirements.map((req) => req.regex.test(password));
@@ -80,10 +94,33 @@ const ResetPassword: React.FC = () => {
         confirmPassword,
       });
       toast.success(response?.data?.message || "Password reset successful.");
+
+      identifyUser(email, {
+          userType: "admin",
+          location,
+          browser_type: getBrowserType(),
+          user_email: email,
+        });
+  
+        trackEvent("Reset Password Clicked", {
+          source: "admin reset password page",
+          sign_in_method: "email_password",
+          timestamp: new Date().toISOString(),
+          page_name: "Admin Reset Password Page",
+          status: "Successful"
+        });
+
       setOnSuccess(true);
       setTimeout(() => router.push("/adminLogin"), 3000);
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Something went wrong.");
+      trackEvent("Reset Password Clicked", {
+        source: "admin reset password page",
+        sign_in_method: "email_password",
+        timestamp: new Date().toISOString(),
+        page_name: "Admin Reset Password Page",
+        status: "Failed"
+      });
     } finally {
       setLoading(false);
     }
@@ -95,6 +132,7 @@ const ResetPassword: React.FC = () => {
     passwordValidation.every(Boolean);
 
     return (
+      <HeaderLayout>
       <div>
         <main className="grid lg:grid-cols-2 min-h-screen mt-8 md:mt-4 lg:mt-0">
           {/* Left Side - Reset Password Form */}
@@ -140,8 +178,8 @@ const ResetPassword: React.FC = () => {
                   <ul className="list-disc pl-5">
                     {requirements.map((req, index) => (
                       <li
-                        key={index}
-                        className={passwordValidation[index] ? "text-green-500" : "text-red-500"}
+                      key={index}
+                      className={passwordValidation[index] ? "text-green-500" : "text-red-500"}
                       >
                         {req.label}
                       </li>
@@ -169,7 +207,7 @@ const ResetPassword: React.FC = () => {
                   className="absolute right-3 top-7 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
                   aria-label={showConfirmPassword ? "Hide password" : "Show password"}
-                >
+                  >
                   {showConfirmPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
                 </button>
                 {errors.confirmPassword && (
@@ -186,7 +224,7 @@ const ResetPassword: React.FC = () => {
                 }`}
                 onClick={handleResetPassword}
                 disabled={!isFormValid || loading}
-              >
+                >
                 {loading ? "Processing..." : "Reset Password"}
               </button>
             </div>
@@ -197,6 +235,7 @@ const ResetPassword: React.FC = () => {
         </main>
         <ToastContainer />
       </div>
+    </HeaderLayout>
     );
 };
 

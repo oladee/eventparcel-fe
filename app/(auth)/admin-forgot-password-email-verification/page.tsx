@@ -10,6 +10,8 @@ import axiosInstance from "@/lib/axiosInstance";
 import axios from "axios";
 import { z } from "zod";
 import HeaderLayout from "@/components/layout/HeaderLayout";
+import { identifyUser, trackEvent } from "@/lib/mixpanel";
+import getBrowserType from "@/lib/getBrowserType";
 // import ResetSuccess from "@/components/auth/resetSuccess";
 
 const otpSchema = z
@@ -32,13 +34,14 @@ const Verification = () => {
   const [myEmail, setMyEmail] = useState<string | null>(null);
   const [countdown, setCountdown] = useState<number>(60);
   const [isLoading, setIsLoading] = useState(true);
+  const [location, setLocation] = useState<string | null>(null);
 
   useEffect(() => {
     if (typeof window !== "undefined") {
         const email = localStorage.getItem("forgotPasswordEmail") || "";
 
       if (!email) {
-        router.push("/signup");
+        router.push("/adminLogin");
         return;
       }
 
@@ -53,6 +56,15 @@ const Verification = () => {
 
     return () => clearInterval(timer);
   }, [router]);
+
+    useEffect(() => {
+      if ("geolocation" in navigator) {
+        navigator.geolocation.getCurrentPosition((pos) => {
+          const { latitude, longitude } = pos.coords;
+          setLocation(`${latitude},${longitude}`);
+        });
+      }
+    }, []);
 
   if (isLoading) {
     return (
@@ -103,6 +115,21 @@ const Verification = () => {
       });
 
       setOnSuccess(true);
+
+      identifyUser(myEmail, {
+        userType: "admin",
+        location,
+        browser_type: getBrowserType(),
+        user_email: myEmail,
+      });
+
+      trackEvent("Reset Link Clicked", {
+        source: "admin forgot password email verification page",
+        sign_in_method: "email_password",
+        timestamp: new Date().toISOString(),
+        page_name: "Admin Forgot Password Email Verification Page",
+        status: "Successful"
+      });
 
       setTimeout(() => {
         router.push("/admin-reset-password");

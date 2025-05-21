@@ -9,7 +9,9 @@ import { BiLoaderCircle } from "react-icons/bi";
 import axiosInstance from "@/lib/axiosInstance";
 import axios from "axios";
 import { z } from "zod";
-import HeaderLayout from "@/components/layout/HeaderLayout";
+import { identifyUser, trackEvent } from "@/lib/mixpanel";
+import getBrowserType from "@/lib/getBrowserType";
+import Container from "@/components/dashboard/Container";
 // import ResetSuccess from "@/components/auth/resetSuccess";
 
 const otpSchema = z
@@ -32,27 +34,37 @@ const Verification = () => {
   const [myEmail, setMyEmail] = useState<string | null>(null);
   const [countdown, setCountdown] = useState<number>(60);
   const [isLoading, setIsLoading] = useState(true);
-
+  const [location, setLocation] = useState<string | null>(null);
+  
   useEffect(() => {
     if (typeof window !== "undefined") {
         const email = localStorage.getItem("forgotPasswordEmail") || "";
-
+        
       if (!email) {
         router.push("/signup");
         return;
       }
-
+      
       setMyEmail(email);
       setIsLoading(false);
     }
     inputRefs.current[0]?.focus();
-
+    
     const timer = setInterval(() => {
       setCountdown((prev) => (prev > 0 ? prev - 1 : 0));
     }, 1000);
-
+    
     return () => clearInterval(timer);
   }, [router]);
+  
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition((pos) => {
+        const { latitude, longitude } = pos.coords;
+        setLocation(`${latitude},${longitude}`);
+      });
+    }
+  }, []);
 
   if (isLoading) {
     return (
@@ -104,6 +116,21 @@ const Verification = () => {
 
       setOnSuccess(true);
 
+      identifyUser(myEmail, {
+        userType: "admin",
+        location,
+        browser_type: getBrowserType(),
+        user_email: myEmail,
+      });
+
+      trackEvent("Reset Link Clicked", {
+        source: "forgot password email verification page",
+        sign_in_method: "email_password",
+        timestamp: new Date().toISOString(),
+        page_name: "Forgot Password Email Verification Page",
+        status: "Successful"
+      });
+
       setTimeout(() => {
         router.push("/reset-password");
       }, 3000);
@@ -112,6 +139,13 @@ const Verification = () => {
       if (axios.isAxiosError(error)) {
         toast.error(error.response?.data?.message || "OTP verification failed");
       }
+      trackEvent("Reset Link Clicked", {
+        source: "forgot password email verification page",
+        sign_in_method: "email_password",
+        timestamp: new Date().toISOString(),
+        page_name: "Forgot Password Email Verification Page",
+        status: "Failed"
+      });
     } finally {
       setLoading(false);
     }
@@ -148,7 +182,7 @@ const Verification = () => {
     }
   };
   return (
-    <HeaderLayout>
+    <Container>
       <ToastContainer role="alert" />
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#F9FAFB] px-4">
         {!onSuccess && (
@@ -243,7 +277,7 @@ const Verification = () => {
 
         {/* {onSuccess && <ResetSuccess />} */}
       </div>
-    </HeaderLayout>
+    </Container>
   );
 };
 

@@ -1,18 +1,30 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next-nprogress-bar";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { BiLoaderCircle } from "react-icons/bi";
 import axiosInstance from "@/lib/axiosInstance";
 import AuthLeft from "@/components/auth/AuthLeft";
+import { identifyUser, trackEvent } from "@/lib/mixpanel";
+import getBrowserType from "@/lib/getBrowserType";
 
 const Page = () => {
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
   const [errors, setErrors] = useState({ email: "" });
   const router = useRouter();
+  const [userLocation, setUserLocation] = useState<string | null>(null);
+  
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition((pos) => {
+        const { latitude, longitude } = pos.coords;
+        setUserLocation(`${latitude},${longitude}`);
+      });
+    }
+  }, []);
 
   // Handle input change and validation
   const handleChange = (name: string, value: string) => {
@@ -46,6 +58,19 @@ const Page = () => {
           withCredentials: true,
         }
       );
+
+        identifyUser(email, {
+          userType: "host/cohost",
+          location: userLocation,
+          browser_type: getBrowserType(),
+        });
+  
+        trackEvent("Admin Clicked Forgot Password", {
+          source: "admin forgout password page",
+          sign_in_method: "email_password",
+          timestamp: new Date().toISOString(),
+          page_name: "Admin Forgot Password Page",
+        });
         
       // Set email to localStorage with key "forgotPasswordEmail"
       localStorage.setItem("forgotPasswordEmail", email);
