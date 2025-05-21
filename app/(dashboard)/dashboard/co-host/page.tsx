@@ -10,6 +10,7 @@ import Image from "next/image";
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import CohostActionsModal from "@/components/dashboard/cohost/CohostActionsModal";
+import { trackEvent } from "@/lib/mixpanel";
 
 const Page = () => {
   const [isRightBarOpen, setIsRightBarOpen] = useState(false);
@@ -48,6 +49,12 @@ const Page = () => {
           );
           if (response.data.success) {
             setCoHosts(response.data.data);
+
+             trackEvent("View Co-hosts", {
+              source: "co-host page",
+              timestamp: new Date().toISOString(),
+              page_name: "Co-host Page",
+            });
           } else {
             toast.error(response.data.message);
           }

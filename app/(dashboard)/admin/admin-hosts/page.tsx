@@ -9,6 +9,8 @@ import { ToastContainer, toast } from "react-toastify"
 import 'react-toastify/dist/ReactToastify.css'
 import { BiLoaderCircle } from "react-icons/bi"
 import { saveAs } from 'file-saver'
+import { usePathname } from "next/navigation"
+import { trackEvent } from "@/lib/mixpanel"
 
 const HostsSkeleton: React.FC = () => (
   <div className="bg-white rounded-2xl overflow-hidden">
@@ -51,6 +53,7 @@ const HostsPage: React.FC = () => {
   const [page, setPage]               = useState(1)
   const [limit, setLimit]             = useState(10)
   const [totalHosts, setTotalHosts]   = useState(0)
+  const pathname = usePathname();
 
   useEffect(() => {
     setLoading(true)
@@ -93,13 +96,36 @@ const HostsPage: React.FC = () => {
   const pageCount = Math.max(1, Math.ceil(totalHosts / limit))
 
   const handleExport = () => {
-    const csv = [
-      ['Name','Email','Sales','Last Login','Status'],
-      ...hosts.map(h => [h.name, h.email, h.sales, h.lastLogin, h.status])
-    ].map(r => r.join(',')).join('\n')
-    const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' })
-    saveAs(blob, 'hosts.csv')
-  }
+    try {
+      const csv = [
+        ['Name', 'Email', 'Sales', 'Last Login', 'Status'],
+        ...hosts.map(h => [h.name, h.email, h.sales, h.lastLogin, h.status])
+      ]
+        .map(r => r.join(','))
+        .join('\n');
+  
+      const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
+      saveAs(blob, 'hosts.csv');
+
+      trackEvent("Export Data", {
+      source: `${pathname} page`,
+      timestamp: new Date().toISOString(),
+      page_name: `${pathname} Page`,
+      route: pathname,
+      status: "Successful"
+    });
+    } catch (error) {
+      console.error(error);
+      trackEvent("Export Data", {
+        source: `${pathname} page`,
+        timestamp: new Date().toISOString(),
+        page_name: `${pathname} Page`,
+        route: pathname,
+        status: "Failed"
+      });
+    }
+  };
+  
 
   const handleStatusUpdate = (id: string, newStatus: string) => {
     const cap = newStatus.charAt(0).toUpperCase() + newStatus.slice(1)

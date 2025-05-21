@@ -75,6 +75,7 @@ const PageContent: React.FC = () => {
   // State for modals
   const [showImagePickerModal, setShowImagePickerModal] = useState(false);
   const [showMapPickerModal, setShowMapPickerModal] = useState(false);
+  const [userLocation, setUserLocation] = useState<string | null>(null);
   const pathname = usePathname();
 
   const [formData, setFormData] = useState<FormData>({
@@ -174,6 +175,15 @@ const PageContent: React.FC = () => {
       }
     }
   }, [searchParams]);
+
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition((pos) => {
+        const { latitude, longitude } = pos.coords;
+        setUserLocation(`${latitude},${longitude}`);
+      });
+    }
+  }, []);
 
   useEffect(() => {
     // Check for authToken in localStorage
@@ -387,12 +397,15 @@ const PageContent: React.FC = () => {
 
       identifyUser(formData.email, {
         userType: "host",
-        location,
+        location: userLocation,
         browser_type: getBrowserType(),
         email: formData?.email,
         user_first_name: formData?.firstName,
         user_last_name: formData?.lastName
       });
+      
+      
+            
     } catch (error: any) {
       toast.error(error.response?.data?.message);
 

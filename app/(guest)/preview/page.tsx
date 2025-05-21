@@ -130,33 +130,71 @@ const ViewEvent = () => {
 
   const handleCheckout = () => {
     setLoadDeliveryDetails(true);
+  
     if (cartItems.length === 0) {
       toast.error('Your cart is empty!');
       return;
     }
-
+  
     try {
+      // Track checkout event
+      const { currency } = useCartStore.getState();
+      const currentCurrency = currency() || "NGN";
+  
+      const totalPackageCount = cartItems.length; // or sum quantities if you want total units
+  
+      trackEvent("Checkout Started", {
+        source: "preview page",
+        event_id: eventData?._id,
+        event_name: eventData?.name,
+        package_count: totalPackageCount,
+        currency: currentCurrency,
+        timestamp: new Date().toISOString(),
+        page_name: "Preview Page",
+      });
+  
+      // Prepare data for routing
       const minimalEventData = {
         eventId: eventData?._id,
         eventGroupId: eventGroupData?._id
       };
-      
-      // Create query string with cartItems serialized as a JSON string
+  
       const query = new URLSearchParams({ 
         cartItems: JSON.stringify(cartItems),
         eventData: JSON.stringify(minimalEventData)
       }).toString();
-      
-      
-      // Navigate to the delivery-details page with the query
+  
       router.push(`/delivery-details?${query}`);
-    }catch (error) {
-      console.error(error)
+    } catch (error) {
+      console.error(error);
     } finally {
       setLoadDeliveryDetails(false);
     }
   };
+  
 
+  const addToCartHandler = (pkg: any) => {
+    const { items, addToCart, currency } = useCartStore.getState();
+  
+    addToCart({ ...pkg, quantity: 1 });
+  
+    const updatedPackageCount = items.find(i => i._id === pkg._id)
+      ? items.length
+      : items.length + 1;
+  
+    const currentCurrency = currency() || pkg.packagePriceCurrency || "NGN";
+  
+    trackEvent("Added To Cart", {
+      source: "preview page",
+      event_id: data?.eventGroup?.event?._id,
+      event_name: data?.eventGroup?.event?.name,
+      package_count: updatedPackageCount,
+      currency: currentCurrency,
+      timestamp: new Date().toISOString(),
+      page_name: "Preview Page",
+    });
+  };
+  
   return (
     <HeaderLayout>
       <ToastContainer position="top-right" autoClose={5000} />
@@ -305,7 +343,7 @@ const ViewEvent = () => {
                       onClick={() => {
                         console.log("clicked add to cart")
                         setCartOpen(true)
-                        addToCart({ ...pkg, quantity: 1 })
+                        addToCartHandler(pkg); 
                       }}
                       
                       >
@@ -380,7 +418,7 @@ const ViewEvent = () => {
                       className="text-sm w-[137px] font-semibold text-[#751423] hover:text-[#FFFF] hover:bg-[#751423] border border-[#751423] px-3 py-1 mt-2 rounded-[8px]"
                       onClick={() => {
                         setCartOpen(true)
-                        addToCart({ ...pkg, quantity: 1 })
+                        addToCartHandler(pkg); 
                       }}
                     >
                         Add to Cart

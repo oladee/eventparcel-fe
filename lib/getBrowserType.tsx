@@ -1,10 +1,16 @@
-  const GetBrowserType = () => {
-    const ua = navigator.userAgent;
-    if (/chrome/i.test(ua)) return "Chrome";
-    if (/firefox/i.test(ua)) return "Firefox";
-    if (/safari/i.test(ua)) return "Safari";
-    if (/edge/i.test(ua)) return "Edge";
-    return "Other";
-  };
+const GetBrowserType = () => {
+  const ua = navigator.userAgent;
+
+  if (ua.includes("Edg")) return "Edge";
+  if (ua.includes("OPR") || ua.includes("Opera")) return "Opera";
+  if (ua.includes("Brave")) return "Brave";
+  if (ua.includes("Chrome") && !ua.includes("Edg") && !ua.includes("OPR"))
+    return "Chrome";
+  if (ua.includes("Firefox")) return "Firefox";
+  if (ua.includes("Safari") && !ua.includes("Chrome")) return "Safari";
+
+  return "Other";
+};
+;
   
   export default GetBrowserType;

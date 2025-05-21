@@ -15,6 +15,7 @@ import { toast, ToastContainer } from 'react-toastify';
 import OrderPagination from '@/components/OrderPagination';
 import { cn } from '@/utils/cn';
 import { motion } from 'framer-motion';
+import { trackEvent } from '@/lib/mixpanel';
 
 const tabs = ["All Orders", "Shipped", "Completed"];
 
@@ -97,6 +98,12 @@ const Page = () => {
               { hostId: loggedInUserString },
               { params }
             );
+
+            trackEvent("View Deliveries", {
+                source: "deliveries page",
+                timestamp: new Date().toISOString(),
+                page_name: "Deliveries Page",
+              });
             
           // Ensure response data exists before setting state
           if (response.data && response.data.data) {

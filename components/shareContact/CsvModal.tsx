@@ -8,7 +8,8 @@ import axiosInstance from "@/lib/axiosInstance";
 import { toast, ToastContainer } from "react-toastify";
 import { FaSpinner } from "react-icons/fa";
 import { trackEvent } from "@/lib/mixpanel";
-// import { trackEvent } from "@/lib/mixpanel";
+import BigNumber from 'bignumber.js';
+
 
 interface Contact {
   id: number;
@@ -170,12 +171,57 @@ const CsvModal: React.FC<CsvModalProps> = ({ onClose }) => {
             phoneValue: contact.phoneNumber,
           })
         );
-        console.log("cont", parsedContacts)
-        const isNigerianNumber = (phone: string | number) => {
-          const cleaned = String(phone).replace(/\D/g, ""); // remove non-numeric chars
-          return cleaned.startsWith("234") || cleaned.startsWith("0");
-        };
 
+        const isNigerianNumber = (phone: string | number): boolean => {
+          let raw = String(phone).trim();
+        
+          // Convert from scientific notation if necessary
+          if (/e\+/i.test(raw)) {
+            try {
+              // Store the converted value and use it
+              raw = new BigNumber(raw).toFixed(0);
+            } catch {
+              return false;
+            }
+          }
+        
+          // Remove any non-digit characters
+          const cleaned = raw.replace(/\D/g, "");
+        
+          // Check international format first (234...)
+          if (cleaned.startsWith("234")) {
+            const withoutPrefix = cleaned.slice(3);
+            return withoutPrefix.length === 10 && 
+                   withoutPrefix.startsWith('0') && 
+                   isValidNigerianPrefix(withoutPrefix.slice(1, 4));
+          }
+        
+          // Check local format (0...)
+          if (cleaned.startsWith("0") && cleaned.length === 11) {
+            return isValidNigerianPrefix(cleaned.slice(1, 4));
+          }
+        
+          // Check without prefix (10 digits)
+          if (cleaned.length === 10) {
+            return isValidNigerianPrefix(cleaned.slice(0, 3));
+          }
+        
+          return false;
+        };
+        
+        // Helper function for prefix validation
+        const isValidNigerianPrefix = (prefix: string): boolean => {
+          const nigerianPrefixes = new Set([
+            "701", "703", "704", "705", "706", "707", "708", "709",
+            "802", "803", "804", "805", "806", "807", "808", "809",
+            "810", "811", "812", "813", "814", "815", "816", "817", "818", "819",
+            "909", "908", "901", "902", "903", "904", "905", "906", "907",
+            "915", "913", "912", "911"
+          ]);
+          return nigerianPrefixes.has(prefix);
+        };
+        
+        // Usage
         const hasNonNigerianNumber = parsedContacts.some(
           (contact) => !isNigerianNumber(contact.phoneValue)
         );

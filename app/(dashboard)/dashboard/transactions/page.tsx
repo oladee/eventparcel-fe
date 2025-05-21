@@ -12,6 +12,7 @@ import useDebounce from '@/hooks/useDebounce';
 import axiosInstance from '@/lib/axiosInstance';
 import OrderPagination from '@/components/OrderPagination';
 import { motion } from 'framer-motion';
+import { trackEvent } from '@/lib/mixpanel';
 
 const Page = () => {
   const [orders, setOrders] = useState<any>(null);
@@ -52,6 +53,12 @@ const Page = () => {
               `payment-history/${loggedInUserString}`,
             { params }
           );
+
+          trackEvent("View Transactions", {
+            source: "transactions page",
+            timestamp: new Date().toISOString(),
+            page_name: "Transactions Page",
+          });
 
               const safeCount = (value?: number) => {
                 return typeof value === 'number' && !isNaN(value) ? value : 0;

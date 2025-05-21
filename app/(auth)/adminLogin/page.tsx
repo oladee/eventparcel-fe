@@ -8,6 +8,8 @@ import "react-toastify/dist/ReactToastify.css";
 import axiosInstance from "@/lib/axiosInstance";
 import { BiLoaderCircle } from "react-icons/bi";
 import { useRouter } from "next/navigation";
+import { identifyUser, trackEvent } from "@/lib/mixpanel";
+import getBrowserType from "@/lib/getBrowserType";
 
 const Page: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
@@ -58,6 +60,15 @@ const Page: React.FC = () => {
       toast.error("Email and password are required!");
       return;
     }
+    
+    trackEvent("Admin Started sign-in", {
+      source: "admin login page",
+      sign_in_method: "email_password",
+      timestamp: new Date().toISOString(),
+      page_name: "Admin Login Page",
+      browser_type: getBrowserType(),
+      location,
+    });
 
     try {
       setLoading(true);
@@ -78,6 +89,28 @@ const Page: React.FC = () => {
       localStorage.setItem("loggedInUserId", response.data.data._id);
 
       toast.success(response?.data?.message);
+        
+      identifyUser(response.data.data.hostId, {
+        userType: response.data.data.role,
+        location,
+        browser_type: getBrowserType(),
+        email: response.data.data.email,
+        user_first_name: response.data.data.firstName,
+        user_last_name: response.data.data.lastName,
+        role: response.data.data.role,
+      });
+
+        trackEvent("Admin Completed sign-in", {
+          source: "admin login page",
+          sign_in_method: "email_password",
+          timestamp: new Date().toISOString(),
+          page_name: "Admin Login Page",
+          browser_type: getBrowserType(),
+          location,
+          email,
+          role: response.data.data.role,
+          status: "Successful"
+        });
 
       route.replace("/admin");
       // router.push("/event-creation");
@@ -97,6 +130,17 @@ const Page: React.FC = () => {
       } else {
         toast.error(error.response?.data?.message);
       }
+
+      trackEvent("Admin Failed sign-in", {
+        source: "admin login page",
+        sign_in_method: "email_password",
+        error_message: error.response?.data?.message || "Unknown error",
+        timestamp: new Date().toISOString(),
+        page_name: "Admin Login Page",
+        browser_type: getBrowserType(),
+        location,
+        status: "Failed"
+      });
     } finally {
       setLoading(false);
     }

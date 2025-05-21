@@ -6,6 +6,8 @@ import { PiArrowsDownUpFill } from "react-icons/pi";
 import { BiChevronDown, BiChevronUp } from "react-icons/bi";
 import React, { useEffect, useState } from "react";
 import { Order } from "@/app/interface/Order";
+import { trackEvent } from "@/lib/mixpanel";
+import { usePathname } from "next/navigation";
 
 interface OrderSummaryItem {
   amountReceived: number;
@@ -36,7 +38,7 @@ interface TransactionProps {
 
 const TransactionTable: React.FC<TransactionProps> = ({orders, currentPage, setCurrentPage,searchTerm, totalPages, setLimit, limit, setSearchTerm}) => {
   console.log(orders)
-  
+  const pathname = usePathname();
   const [openBreakdownOrderId, setOpenBreakdownOrderId] = useState<string | null>(null);
   const [currencySortState, setCurrencySortState] = useState<"asc" | "desc">("asc");
   const [ordersData, setOrdersData] = useState<OrderSummaryItem[]>(orders);
@@ -131,23 +133,42 @@ const TransactionTable: React.FC<TransactionProps> = ({orders, currentPage, setC
     
         csvRows.push(values.join(','));
       }
-    
-      // Prepend BOM to ensure UTF-8 encoding is preserved
-      const BOM = '\uFEFF';
-      const blob = new Blob([BOM + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
-    
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = filename;
-      a.style.display = 'none';
-      document.body.appendChild(a);
-      a.click();
-    
-      setTimeout(() => {
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
-      }, 100);
+
+      try {
+            // Prepend BOM to ensure UTF-8 encoding is preserved
+        const BOM = '\uFEFF';
+        const blob = new Blob([BOM + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+      
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = filename;
+        a.style.display = 'none';
+        document.body.appendChild(a);
+        a.click();
+      
+        setTimeout(() => {
+          document.body.removeChild(a);
+          URL.revokeObjectURL(url);
+        }, 100);
+
+        trackEvent("Export Data", {
+          source: `${pathname} page`,
+          timestamp: new Date().toISOString(),
+          page_name: `${pathname} Page`,
+          route: pathname,
+          status: "Successful"
+        });
+      }catch(error) {
+        console.error(error);
+        trackEvent("Export Data", {
+          source: `${pathname} page`,
+          timestamp: new Date().toISOString(),
+          page_name: `${pathname} Page`,
+          route: pathname,
+          status: "Failed"
+        });
+      }
     };
 
     

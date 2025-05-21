@@ -121,6 +121,16 @@ const validateForm = useCallback(() => {
   setIsFormValid(isValid);
 }, [formData]);
 
+useEffect(() => {
+  const handler = setTimeout(() => {
+    if (formData.pickupLocation.trim() !== "") {
+      setErrors(prev => ({ ...prev, pickupLocation: "" }));
+    }
+  }, 500);
+  
+  return () => clearTimeout(handler);
+}, [formData.pickupLocation]);
+
   // Debounce the address input
   useEffect(() => {
     const handler = debounce(() => {

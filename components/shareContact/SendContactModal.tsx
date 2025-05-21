@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PiCaretRightBold } from "react-icons/pi";
 import { LuMessagesSquare } from "react-icons/lu";
 import { AiOutlineClose } from "react-icons/ai";
@@ -12,6 +12,7 @@ import {
   sendInviteWhatsApp,
   sendInviteBoth,
 } from "@/api/invites";
+import { trackEvent } from "@/lib/mixpanel";
 
 interface EventOptionsModalProps {
   isOpen: boolean;
@@ -34,6 +35,20 @@ const SendContactModal: React.FC<EventOptionsModalProps> = ({
   const [isLoadingSMS, setIsLoadingSMS] = useState(false);
   const [isLoadingWA, setIsLoadingWA] = useState(false);
   const [isLoadingBoth, setIsLoadingBoth] = useState(false);
+  const [eventData, setEventData] = useState<null | any>(null);
+
+  useEffect(() => {
+      const storedData = localStorage.getItem("eventData");
+      if (storedData) {
+        try {
+          const parsed = JSON.parse(storedData);
+          setEventData(parsed);
+        } catch (error) {
+          console.error("Failed to parse eventData from localStorage", error);
+        }
+      }
+    }, []);
+  
 
   const handleSendSMS = async () => {
     setIsLoadingSMS(true);
@@ -42,9 +57,27 @@ const SendContactModal: React.FC<EventOptionsModalProps> = ({
       const data = await sendInviteSMS(eventGroupId, contacts);
       toast.success(data.message || "Invitations sent via SMS");
       console.log(data.message);
+       trackEvent("Share Invite", {
+          source: "share-contact page",
+          event_id: eventData?._id,
+          event_name: eventData?.eventName,
+          timestamp: new Date().toISOString(),
+          page_name: "Share-contact Page",
+          route: "SMS",
+          status: "Successful"
+        });
     } catch (error: any) {
       console.error(error.response.data.message);
       toast.error(error.response.data.message);
+      trackEvent("Share Invite Failed", {
+        source: "share-contact page",
+        event_id: eventData?._id,
+        event_name: eventData?.eventName,
+        timestamp: new Date().toISOString(),
+        page_name: "Share-contact Page",
+        route: "SMS",
+        status: "Failed"
+      });
     } finally {
       setIsLoadingSMS(false);
     }
@@ -56,9 +89,27 @@ const SendContactModal: React.FC<EventOptionsModalProps> = ({
       const data = await sendInviteWhatsApp(eventGroupId, phoneNumbers);
       toast.success(data.message || "Invitations sent via WhatsApp");
       console.log(data.message);
+      trackEvent("Share Invite", {
+        source: "share-contact page",
+        event_id: eventData?._id,
+        event_name: eventData?.eventName,
+        timestamp: new Date().toISOString(),
+        page_name: "Share-contact Page",
+        route: "Whatsapp",
+        status: "Successful"
+      });
     } catch (error: any) {
       console.error(error);
       toast.error(error.response.data.message);
+      trackEvent("Share Invite Failed", {
+        source: "share-contact page",
+        event_id: eventData?._id,
+        event_name: eventData?.eventName,
+        timestamp: new Date().toISOString(),
+        page_name: "Share-contact Page",
+        route: "Whatsapp",
+        status: "Failed"
+      });
     } finally {
       setIsLoadingWA(false);
     }
@@ -69,9 +120,27 @@ const SendContactModal: React.FC<EventOptionsModalProps> = ({
     try {
       const data = await sendInviteBoth(eventGroupId, phoneNumbers);
       toast.success(data.message || "Invitations sent via WhatsApp/SMS");
+      trackEvent("Share Invite", {
+        source: "share-contact page",
+        event_id: eventData?._id,
+        event_name: eventData?.eventName,
+        timestamp: new Date().toISOString(),
+        page_name: "Share-contact Page",
+        route: "Both",
+        status: "Successful"
+      });
     } catch (error: any) {
       console.error(error);
       toast.error(error.response.data.message);
+      trackEvent("Share Invite Failed", {
+        source: "share-contact page",
+        event_id: eventData?._id,
+        event_name: eventData?.eventName,
+        timestamp: new Date().toISOString(),
+        page_name: "Share-contact Page",
+        route: "Both",
+        status: "Failed"
+      });
     } finally {
       setIsLoadingBoth(false);
     }
