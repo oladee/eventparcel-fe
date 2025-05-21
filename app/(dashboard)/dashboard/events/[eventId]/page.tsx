@@ -53,9 +53,9 @@ const Page: React.FC = () => {
     };
   }, [router]);
 
-  const handleAddGroupClick = () => {
-    router.push("/dashboard/create-group");
-  };
+  // const handleAddGroupClick = () => {
+  //   router.push("/dashboard/create-group");
+  // };
 
   if (loading) {
     return (
