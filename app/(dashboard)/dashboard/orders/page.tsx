@@ -485,11 +485,11 @@ const Page: React.FC = ({}) => {
                           >
                             <Image
                               src={
-                                item.packageId?.packageImgUrls?.[0] ||
+                                item?.packageImgUrls?.[0] ||
                                 "/fallback-image.png"
                               }
                               alt={
-                                item.packageId?.packageTitle || "Order Image"
+                                item?.packageTitle || "Order Image"
                               }
                               width={42}
                               height={42}
@@ -498,18 +498,18 @@ const Page: React.FC = ({}) => {
 
                             <div className="flex-1">
                               <p className="font-semibold text-sm text-[#111827]">
-                                {item.packageId?.packageTitle
-                                  ? item.packageId.packageTitle
+                                {item?.packageTitle
+                                  ? item.packageTitle
                                       .charAt(0)
                                       .toUpperCase() +
-                                    item.packageId.packageTitle.slice(1)
+                                    item?.packageTitle.slice(1)
                                   : "No Title"}
                               </p>
                               <p className="text-[#718096] font-normal text-sm">
-                                {item.packageId?.packagePriceCurrency === "NGN"
+                                {item?.packagePriceCurrency === "NGN"
                                   ? "₦"
                                   : "$"}
-                                {item.packageId?.packagePrice?.toLocaleString() ||
+                                {item?.packagePrice?.toLocaleString() ||
                                   "N/A"}
                               </p>
                             </div>

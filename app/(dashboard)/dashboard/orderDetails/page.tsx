@@ -200,13 +200,13 @@ const Page = () => {
                         {orders?.orderStatus === "pending" && (
                             <p 
                             id="mark-pickedup-text" 
-                            onClick={() => handleStatusChange("pickedUp")} 
+                            onClick={() => handleStatusChange("pickedup")} 
                             className="font-manrope font-extrabold text-sm text-[#111827] cursor-pointer"
                             >
                             Mark as Picked Up
                             </p>
                         )}
-                        {orders?.orderStatus === "pickedUp" && (
+                        {orders?.orderStatus === "pickedup" && (
                             <p 
                             id="order-completed-text"  
                             className="font-manrope font-extrabold text-sm text-gray-400 cursor-not-allowed"
