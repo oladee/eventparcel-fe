@@ -17,6 +17,7 @@ import { Order, OrderDashboardResponse } from "@/app/interface/Order";
 import useUpdateOrderStatus from "@/hooks/useUpdateOrderStatus";
 import { toast, ToastContainer } from "react-toastify";
 import { motion } from "framer-motion";
+import { trackEvent } from "@/lib/mixpanel";
 
 const tabs = ["All Orders", "Pending", "Shipped", "Completed"];
 
@@ -86,6 +87,14 @@ const Page: React.FC = ({}) => {
           { hostId: loggedInUserString },
           { params }
         );
+
+        console.log("orders",response.data.data)
+
+          trackEvent("View Orders", {
+            source: "orders page",
+            timestamp: new Date().toISOString(),
+            page_name: "Orders Page",
+          });
 
         const safeParse = (value?: string | number) => {
           const num = Number(value);

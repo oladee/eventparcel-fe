@@ -8,6 +8,8 @@ import { GoArrowUp } from "react-icons/go";
 import { GuestOrder } from "@/app/(dashboard)/admin/admin-delivery/page";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import { trackEvent } from "@/lib/mixpanel";
 
 
   interface DeliveryProps {
@@ -24,6 +26,7 @@ import { useEffect, useState } from "react";
   }
 
   const DeliveryTable: React.FC<DeliveryProps> = ({orders, currentPage, setOrderStatus, orderStatus, setCurrentPage,searchTerm, totalPages, setLimit, limit, setSearchTerm}) => {
+    const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
     const orderOptions = ["All Orders", "pending", "shipped", "delivered", "PickedUp"];
     const [selected, setSelected] = useState("All Orders");
@@ -116,22 +119,42 @@ import { useEffect, useState } from "react";
       
           csvRows.push(values.join(','));
         }
-      
-        const BOM = '\uFEFF';
-        const blob = new Blob([BOM + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
-      
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = filename;
-        a.style.display = 'none';
-        document.body.appendChild(a);
-        a.click();
-      
-        setTimeout(() => {
-          document.body.removeChild(a);
-          URL.revokeObjectURL(url);
-        }, 100);
+
+        try {
+          const BOM = '\uFEFF';
+          const blob = new Blob([BOM + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+        
+          const url = URL.createObjectURL(blob);
+          const a = document.createElement('a');
+          a.href = url;
+          a.download = filename;
+          a.style.display = 'none';
+          document.body.appendChild(a);
+          a.click();
+        
+          setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+          }, 100);
+
+          trackEvent("Export Data", {
+            source: `${pathname} page`,
+            timestamp: new Date().toISOString(),
+            page_name: `${pathname} Page`,
+            route: pathname,
+            status: "Successful"
+          });
+
+        }catch(error) {
+          console.error(error);
+          trackEvent("Export Data", {
+            source: `${pathname} page`,
+            timestamp: new Date().toISOString(),
+            page_name: `${pathname} Page`,
+            route: pathname,
+            status: "Failed"
+          });
+        }
       };
 
       const getPageNumbers = (currentPage: any, totalPages: any) => {

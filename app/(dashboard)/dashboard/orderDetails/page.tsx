@@ -162,19 +162,60 @@ const Page = () => {
 
                     
                     <div id="mark-shipped-button" className='border border-[#111827] w-[311px] h-[48px] flex justify-center items-center rounded-[12px] mt-6'>
-                    {orders?.orderStatus === "pending" ? (
-                        <p id="mark-shipped-text" onClick={() => handleStatusChange("shipped")} className="font-manrope font-extrabold text-sm text-[#111827]">
+                    {/* Home Delivery Flow */}
+                    {orders?.deliveryType === "homeDelivery" && (
+                        <>
+                        {orders?.orderStatus === "pending" && (
+                            <p 
+                            id="mark-shipped-text" 
+                            onClick={() => handleStatusChange("shipped")} 
+                            className="font-manrope font-extrabold text-sm text-[#111827] cursor-pointer"
+                            >
                             Mark as Shipped
-                        </p>
-                        ) : orders?.orderStatus === "shipped" ? (
-                        <p id="mark-shipped-text" onClick={() => handleStatusChange("delivered")} className="font-manrope font-extrabold text-sm text-[#111827]">
+                            </p>
+                        )}
+                        {orders?.orderStatus === "shipped" && (
+                            <p 
+                            id="mark-delivered-text" 
+                            onClick={() => handleStatusChange("delivered")} 
+                            className="font-manrope font-extrabold text-sm text-[#111827] cursor-pointer"
+                            >
                             Mark as Delivered
-                        </p>
-                        ) : orders?.orderStatus === "delivered" || orders?.orderStatus === "pickedup" ? (
-                        <p id="order-completed-text"  className="font-manrope font-extrabold text-sm text-gray-400 cursor-not-allowed">
+                            </p>
+                        )}
+                        {(orders?.orderStatus === "delivered" || orders?.orderStatus === "pickedUp") && (
+                            <p 
+                            id="order-completed-text"  
+                            className="font-manrope font-extrabold text-sm text-gray-400 cursor-not-allowed"
+                            >
                             Order Completed
-                        </p>
-                        ) : null}
+                            </p>
+                        )}
+                        </>
+                    )}
+
+                    {/* Pickup Flow */}
+                    {orders?.deliveryType === "pickUp" && (
+                        <>
+                        {orders?.orderStatus === "pending" && (
+                            <p 
+                            id="mark-pickedup-text" 
+                            onClick={() => handleStatusChange("pickedUp")} 
+                            className="font-manrope font-extrabold text-sm text-[#111827] cursor-pointer"
+                            >
+                            Mark as Picked Up
+                            </p>
+                        )}
+                        {orders?.orderStatus === "pickedUp" && (
+                            <p 
+                            id="order-completed-text"  
+                            className="font-manrope font-extrabold text-sm text-gray-400 cursor-not-allowed"
+                            >
+                            Order Completed
+                            </p>
+                        )}
+                        </>
+                    )}
                     </div>
                 </div>
 

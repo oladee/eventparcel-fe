@@ -1,13 +1,20 @@
 "use client";
 
 import React from "react";
-import { useRouter } from "next/navigation"; // Import useRouter for navigation
+import { useParams, usePathname, useRouter } from "next/navigation"; // Import useRouter for navigation
 import { FiLogOut } from "react-icons/fi";
+import { trackEvent } from "@/lib/mixpanel";
 
 const ToolTipProfileHost: React.FC = () => {
   const router = useRouter(); // Initialize useRouter
+  const pathname = usePathname();
 
   const handleLogout = () => {
+    trackEvent("Logout", {
+      source: `${pathname} page`,
+      timestamp: new Date().toISOString(),
+      page_name: `${pathname} page`,
+    });
     localStorage.clear(); // Clear localStorage
     router.replace("/"); // Navigate to /login
   };

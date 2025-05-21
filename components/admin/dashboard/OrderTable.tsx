@@ -4,12 +4,13 @@ import { BsThreeDots } from "react-icons/bs";
 import { FaRegCircle } from "react-icons/fa6";
 import { PiArrowsDownUpFill } from "react-icons/pi";
 import { GoArrowUp } from "react-icons/go";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { AnimatePresence, motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
 import { toast, ToastContainer } from "react-toastify";
 import axiosInstance from "@/lib/adminAxiosInterceptor/axiosInstance";
+import { trackEvent } from "@/lib/mixpanel";
 
   interface EventGroup {
     _id: string;
@@ -74,6 +75,7 @@ import axiosInstance from "@/lib/adminAxiosInterceptor/axiosInstance";
 
 const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPage,searchTerm, totalPages, setLimit, limit, setSearchTerm, setOrderStatus, orderStatus}) => {
     const Router = useRouter();
+    const pathname = usePathname();
     const [selected, setSelected] = useState("All Orders");
     const [isOpen, setIsOpen] = useState(false);
     const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
@@ -189,23 +191,42 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
   
       csvRows.push(values.join(','));
     }
-  
-    // Prepend BOM to ensure UTF-8 encoding is preserved
-    const BOM = '\uFEFF';
-    const blob = new Blob([BOM + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
-  
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    a.style.display = 'none';
-    document.body.appendChild(a);
-    a.click();
-  
-    setTimeout(() => {
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
-    }, 100);  
+    
+    try{
+      // Prepend BOM to ensure UTF-8 encoding is preserved
+      const BOM = '\uFEFF';
+      const blob = new Blob([BOM + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+    
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.style.display = 'none';
+      document.body.appendChild(a);
+      a.click();
+    
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 100);  
+
+       trackEvent("Export Data", {
+          source: `${pathname} page`,
+          timestamp: new Date().toISOString(),
+          page_name: `${pathname} Page`,
+          route: pathname,
+          status: "Successful"
+        });
+    }catch(error) {
+      console.error(error);
+      trackEvent("Export Data", {
+        source: `${pathname} page`,
+        timestamp: new Date().toISOString(),
+        page_name: `${pathname} Page`,
+        route: pathname,
+        status: "Failed"
+      });
+    }
   };
 
   const handleStatusUpdate = async (orderId: string, newStatus: string) => {

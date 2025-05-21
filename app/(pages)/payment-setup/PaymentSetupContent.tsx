@@ -123,6 +123,9 @@ const PaymentSetupContent = () => {
   // Form validation states
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
   const [isFormValid, setIsFormValid] = useState(false);
+  const [eventDate, setEventDate] = useState<string | null>(null);
+  const [eventTime, setEventTime] = useState<string | null>(null);
+
 
   // =============================================
   // UTILITY FUNCTIONS
@@ -186,17 +189,48 @@ const PaymentSetupContent = () => {
   // =============================================
   // EFFECT HOOKS
   // =============================================
-  useEffect(() => {
-    const hasNGN = localStorage.getItem("paymentHasNGN") === "true";
-    const hasUSD = localStorage.getItem("paymentHasUSD") === "true";
-    setSavedNGN(hasNGN);
-    setSavedUSD(hasUSD);
-  }, []);
+    useEffect(() => {
+      const hasNGN = localStorage.getItem("paymentHasNGN") === "true";
+      const hasUSD = localStorage.getItem("paymentHasUSD") === "true";
+      setSavedNGN(hasNGN);
+      setSavedUSD(hasUSD);
+    }, []);
 
-  // Clean up redirect cookie on mount
-  useEffect(() => {
-    Cookies.remove("redirectAfterLogin");
-  }, []);
+    // Clean up redirect cookie on mount
+    useEffect(() => {
+      Cookies.remove("redirectAfterLogin");
+    }, []);
+
+    
+    useEffect(() => {
+      const storedEventDetails = localStorage.getItem("eventDetails");
+      
+      if (storedEventDetails) {
+        try {
+          const parsedDetail = JSON.parse(storedEventDetails);
+  
+          setEventDate(parsedDetail?.data.date);
+          setEventTime(parsedDetail?.data.time);
+        } catch (error) {
+          console.error("Failed to parse event details:", error);
+        }
+      }
+    }, []);
+
+    // useEffect(() => {
+    //   const checkEventDate = () => {
+    //     if(eventDate && formData?.paymentDate) {
+    //       if(new Date(eventDate) < new Date(formData?.paymentDate)) {
+    //         toast.error("Payment Deadline cannot be after event date!!");
+    //       }
+    //     }
+    //   };
+
+    //   checkEventDate();
+    // },[formData?.paymentDate, formData.paymentTime]);
+  
+    // console.log("date", eventDate)
+    // console.log("time", eventTime)
 
   // Load saved form data from localStorage
   useEffect(() => {
@@ -328,12 +362,83 @@ const PaymentSetupContent = () => {
    * Handles form submission
    * @param e Form event
    */
+  const to24HourFormat = (time12h: string) => {
+    const [time, modifier] = time12h.split(" ");
+    let [hours, minutes] = time.split(":").map(Number);
+  
+    if (modifier.toLowerCase() === "pm" && hours !== 12) {
+      hours += 12;
+    }
+    if (modifier.toLowerCase() === "am" && hours === 12) {
+      hours = 0;
+    }
+  
+    return `${String(hours).padStart(2, "0")}:${String(minutes).padStart(2, "0")}`;
+  };
+  
+  const checkEventDateTime = () => {
+    if (!eventDate || !formData?.paymentDate) return true;
+  
+    const formatDateToYMD = (dateInput: Date | string): string => {
+      const date = new Date(dateInput);
+      if (isNaN(date.getTime())) return "0000-00-00";
+      return date.toISOString().split('T')[0];
+    };
+  
+    const eventDateStr = formatDateToYMD(eventDate);
+    const paymentDateStr = formatDateToYMD(formData.paymentDate);
+  
+    const eventDay = new Date(eventDateStr);
+    const paymentDay = new Date(paymentDateStr);
+  
+    if (paymentDay > eventDay) {
+      toast.error("Payment date cannot be after the event date!");
+      return false;
+    }
+  
+    if (
+      paymentDay.getTime() === eventDay.getTime() &&
+      formData.paymentTime &&
+      eventTime
+    ) {
+      const createDateTime = (dateStr: string, time: Date | string): Date | null => {
+        const timeStr = typeof time === "string"
+          ? time
+          : time.toTimeString().split(' ')[0].slice(0, 5);
+  
+        const [hours, minutes] = timeStr.split(':').map(Number);
+        const date = new Date(dateStr);
+        date.setHours(hours, minutes || 0, 0, 0);
+        return isNaN(date.getTime()) ? null : date;
+      };
+  
+      const paymentDateTime = createDateTime(paymentDateStr, formData.paymentTime);
+      const eventDateTime = createDateTime(eventDateStr, eventTime);
+  
+      if (!paymentDateTime || !eventDateTime) return true;
+  
+      if (paymentDateTime > eventDateTime) {
+        toast.error("Payment time cannot be after the event time!");
+        return false;
+      }
+    }
+  
+    return true;
+  };
+  
+  
+  
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
 
     if (!isFormValid) {
       toast.error("Please fill out all required fields");
       return;
+    }
+      
+    if (!checkEventDateTime()) {
+      setLoading(false);
+      return; 
     }
 
     setLoading(true);

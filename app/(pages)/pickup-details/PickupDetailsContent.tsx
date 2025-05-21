@@ -52,7 +52,6 @@ const [showMapPickerModal, setShowMapPickerModal] = useState(false);
 const [showSuccess2, setShowSuccess2] = useState(false);
 const [eventDetails, setEventDetails] = useState<EventDetails | null>(null);
 
-
 // Form data state with initial values
 const [formData, setFormData] = useState({
   nairaAccount: {
@@ -111,9 +110,11 @@ const validateForm = useCallback(() => {
 
   useEffect(() => {
     const stored = localStorage.getItem("parsedEventDetails");
+    
     if (stored) {
       try {
         const parsed = JSON.parse(stored);
+
         setEventDetails(parsed);
       } catch (error) {
         console.error("Failed to parse event details:", error);
@@ -189,6 +190,16 @@ const isFilled = (obj: Record<string, any>) =>
 // =============================================
 // EFFECT HOOKS
 // =============================================
+
+useEffect(() => {
+  const handler = setTimeout(() => {
+    if (formData.pickupLocation.trim() !== "") {
+      setErrors(prev => ({ ...prev, pickupLocation: "" }));
+    }
+  }, 500);
+  
+  return () => clearTimeout(handler);
+}, [formData.pickupLocation]);
 
 // Clean up redirect cookie on mount
 useEffect(() => {
