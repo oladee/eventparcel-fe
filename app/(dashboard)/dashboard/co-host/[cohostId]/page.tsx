@@ -247,6 +247,7 @@ export default function Page() {
         <CohostActionsModal
           isOpen={isModalOpen}
           onClose={() => setIsModalOpen(false)}
+          onRemove={() => setIsModalOpen(false)}
           cohost={{
             _id: cohostId,
             eventId: "placeholderEventId",

@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { useParams, usePathname, useRouter } from "next/navigation"; // Import useRouter for navigation
+import {  usePathname, useRouter } from "next/navigation"; // Import useRouter for navigation
 import { FiLogOut } from "react-icons/fi";
 import { trackEvent } from "@/lib/mixpanel";
 

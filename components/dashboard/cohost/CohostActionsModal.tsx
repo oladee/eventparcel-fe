@@ -95,7 +95,7 @@ const CohostActionsModal: React.FC<CohostActionsModalProps> = ({
     } finally {
       setLoadingRemove(false);
     }
-  }, [cohost._id, onClose, cohost.eventId]);
+  }, [cohost._id, onClose, cohost.eventId, onRemove]);
 
   // Render into a portal so that the modal overlays the rest of the app.
   if (typeof window === "undefined") return null;

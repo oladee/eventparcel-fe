@@ -1,5 +1,8 @@
+"use client";
+
 import React from "react";
-import Login from "./(auth)/Login";
+import dynamic from "next/dynamic";
+const Login = dynamic(() => import("./(auth)/Login"), { ssr: false });
 import HeaderLayout from "@/components/layout/HeaderLayout";
 
 const Home = () => {

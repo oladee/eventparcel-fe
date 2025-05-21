@@ -18,7 +18,8 @@ const EventSuccess: React.FC = () => {
     } else {
       // before routing to "/", we need to save the current page (to cookies) and it should expire in 5 minutes
       Cookies.set("redirectAfterLogin", "co-host", { expires: 1 / 288 });
-      router.push("/add-cohost");
+      // router.push("/add-cohost");
+      router.push("/signup");
     }
   };
 

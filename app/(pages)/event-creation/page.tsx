@@ -3,8 +3,7 @@ import { Suspense, useState, useRef, useEffect } from "react";
 import EventSuccess from "@/components/EventSuccess";
 import ImagePickerModal from "@/components/aboutEvent/ImagePickerModal";
 import EventHeader from "@/components/aboutEvent/EventHeader";
-import EventFormFields from "@/components/aboutEvent/EventFormFields";
-import PersonalDetails from "@/components/aboutEvent/PersonalDetails";
+// import EventFormFields from "@/components/aboutEvent/EventFormFields";
 import dynamic from "next/dynamic";
 import axiosInstance from "@/lib/axiosInstance";
 import FormButtons2 from "@/components/aboutEvent/FormButtons2";
@@ -18,6 +17,19 @@ import { motion } from "framer-motion";
 import { identifyUser, trackEvent } from "@/lib/mixpanel";
 import getBrowserType from "@/lib/getBrowserType";
 
+const EventFormFields = dynamic(
+  () => import("@/components/aboutEvent/EventFormFields"),
+  {
+    ssr: false
+  }
+);
+
+const PersonalDetails = dynamic(
+  () => import("@/components/aboutEvent/PersonalDetails"),
+  {
+    ssr: false
+  }
+);
 // Dynamically import LocationPickerModal with SSR disabled.
 const LocationPickerModal = dynamic(
   () => import("@/components/aboutEvent/LocationPickerModal"),
@@ -66,7 +78,6 @@ const PageContent: React.FC = () => {
   const [userLocation, setUserLocation] = useState<string | null>(null);
   const pathname = usePathname();
 
-
   const [formData, setFormData] = useState<FormData>({
     eventName: "",
     eventDate: new Date(),
@@ -102,24 +113,28 @@ const PageContent: React.FC = () => {
     if (resume === "true") {
       const storedData = localStorage.getItem("unsavedFormData");
       const imageData = localStorage.getItem("eventImageBase64");
-  
+
       if (storedData) {
         try {
           const parsedData = JSON.parse(storedData);
-  
+
           const hydratedData = {
             ...parsedData,
-            eventDate: parsedData.eventDate ? new Date(parsedData.eventDate) : null,
-            eventTime: parsedData.eventTime ? new Date(parsedData.eventTime) : null,
-            eventImage: null, // Don't try to restore the file directly
+            eventDate: parsedData.eventDate
+              ? new Date(parsedData.eventDate)
+              : null,
+            eventTime: parsedData.eventTime
+              ? new Date(parsedData.eventTime)
+              : null,
+            eventImage: null // Don't try to restore the file directly
           };
-  
+
           setFormData(hydratedData);
-  
+
           if (imageData) {
-            setSelectedImage(imageData); 
+            setSelectedImage(imageData);
           }
-  
+
           localStorage.removeItem("unsavedFormData");
           localStorage.removeItem("eventImageBase64");
         } catch (err) {
@@ -128,7 +143,6 @@ const PageContent: React.FC = () => {
       }
     }
   }, [searchParams]);
-  
 
   useEffect(() => {
     const redirect = Cookies.get("redirectAfterLogin");
@@ -203,15 +217,14 @@ const PageContent: React.FC = () => {
     e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
   ) => {
     const { id, value } = e.target;
-  
+
     if (id === "numberOfGroups" && value.startsWith("-")) {
       return; // Prevent negative values
     }
-  
+
     setFormData({ ...formData, [id]: value });
     setErrors({ ...errors, [id]: "" });
   };
-
 
   const validateField = (id: string, value: any): string => {
     // Skip personal details validations if user is authenticated
@@ -221,14 +234,14 @@ const PageContent: React.FC = () => {
     ) {
       return "";
     }
-  
+
     if (id === "eventDate" || id === "eventTime") {
       if (!(value instanceof Date) || isNaN(value.getTime())) {
         return "This field is required.";
       }
     } else if (id === "numberOfGroups") {
       const trimmed = value.toString().trim();
-    
+
       // If user hasn't entered anything, don't treat it as an error
       if (!trimmed) {
         return "";
@@ -243,47 +256,45 @@ const PageContent: React.FC = () => {
         return "Number must be between 1 and 99.";
       }
       return "";
-    }
-     else if (
+    } else if (
       id !== "description" &&
       (typeof value !== "string" || !value.trim())
     ) {
       return "This field is required.";
     }
-  
+
     if (
       id === "email" &&
       !/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(value)
     ) {
       return "Enter a valid email address.";
     }
-  
+
     if (
       (id === "firstName" || id === "lastName") &&
       /[^a-zA-Z\s]/.test(value)
     ) {
       return "Name cannot include numbers or special characters.";
     }
-  
+
     if (id === "description" && value.trim() && value.length < 5) {
       return "Description must be at least 5 characters.";
     }
-  
+
     if (id === "description" && value.length > 300) {
       return "Description must have a maximum of 300 characters.";
     }
-  
+
     if (id === "eventName" && value.length < 5) {
       return "Event name must be at least 5 characters.";
     }
-  
+
     if (id === "eventName" && value.length > 60) {
       return "Event name must not exceed 60 characters.";
     }
-  
+
     return "";
   };
-  
 
   const handleBlur = (
     e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -318,7 +329,7 @@ const PageContent: React.FC = () => {
     trackEvent("New Event Creation Started", {
       source: "event-creation page",
       timestamp: new Date().toISOString(),
-      page_name: "Event-creation page",
+      page_name: "Event-creation page"
     });
 
     const newErrors = { ...errors };
@@ -356,7 +367,7 @@ const PageContent: React.FC = () => {
       submissionData.append("hostEmail", formData.email);
       submissionData.append("numberOfGroups", formData.numberOfGroups);
 
-      // Append isDraft as a string "false", backend converts to boolean 
+      // Append isDraft as a string "false", backend converts to boolean
       submissionData.append("isDraft", "false");
       if (formData.eventImage) {
         submissionData.append("eventImgUrl", formData.eventImage);
@@ -372,7 +383,7 @@ const PageContent: React.FC = () => {
       localStorage.setItem("eventId", response.data.data._id);
       localStorage.setItem("eventDetails", JSON.stringify(response.data));
       setShowSuccess(true);
-      
+
       trackEvent("New Event Creation Completed", {
         source: "event-creation page",
         timestamp: new Date().toISOString(),
@@ -383,21 +394,19 @@ const PageContent: React.FC = () => {
         add_group_number: response.data.data.numberOfGroups ? "Yes" : "No",
         status: "Successful"
       });
-      
+
       identifyUser(formData.email, {
         userType: "host",
         location: userLocation,
         browser_type: getBrowserType(),
         email: formData?.email,
         user_first_name: formData?.firstName,
-        user_last_name: formData?.lastName,
+        user_last_name: formData?.lastName
       });
-      
-      
-            
+               
     } catch (error: any) {
       toast.error(error.response?.data?.message);
-            
+
       trackEvent("New Event Creation Failed", {
         source: "event-creation page",
         timestamp: new Date().toISOString(),
@@ -412,19 +421,19 @@ const PageContent: React.FC = () => {
     }
   };
 
-  console.log(formData)
+  console.log(formData);
 
   // API call triggered on clicking Continue
   const handleSaveLater = async () => {
     const authToken = localStorage.getItem("authToken");
-  
+
     if (!authToken) {
       localStorage.setItem("unsavedFormData", JSON.stringify(formData));
-      Cookies.set("redirectAfterLogin", pathname); 
+      Cookies.set("redirectAfterLogin", pathname);
       setShowSuccess2(true);
       return;
     }
-  
+
     // Validate all fields
     const newErrors = { ...errors };
     Object.keys(formData).forEach((key) => {
@@ -437,12 +446,12 @@ const PageContent: React.FC = () => {
     });
     setErrors(newErrors);
     if (Object.values(newErrors).some((error) => error !== "")) return;
-  
+
     setLoading2(true);
     try {
       // Create FormData to match endpoint requirements
       const submissionData = new FormData();
-      
+
       // Append all standard fields
       submissionData.append("eventName", formData.eventName);
       submissionData.append("eventDescription", formData.description);
@@ -451,32 +460,32 @@ const PageContent: React.FC = () => {
         "date",
         formData.eventDate?.toISOString().split("T")[0] || ""
       );
-  
+
       // Convert eventTime if needed
       const formattedTime = formData.eventTime
         ? convertTo12Hour(formData.eventTime.toISOString().split("T")[1])
         : "";
       submissionData.append("time", formattedTime);
-  
+
       submissionData.append("eventLocation", formData.location);
       submissionData.append("hostFirstName", formData.firstName);
       submissionData.append("hostLastName", formData.lastName);
       submissionData.append("hostEmail", formData.email);
-      
-      // Append isDraft as a string "true", backend converts to boolean 
+
+      // Append isDraft as a string "true", backend converts to boolean
       submissionData.append("isDraft", "true");
-      
+
       // Append image file if it exists
       if (formData.eventImage) {
         submissionData.append("eventImgUrl", formData.eventImage);
       }
-  
+
       // Debug: Log the FormData before sending
       console.log("Submitting form data:");
       // for (const [key, value] of submissionData.entries()) {
       //   console.log(key, value instanceof File ? value.name : value);
       // }
-  
+
       const response = await axiosInstance.post("/add-event", submissionData, {
         withCredentials: true,
         headers: {
@@ -521,12 +530,12 @@ const PageContent: React.FC = () => {
     if (e.target.files && e.target.files[0]) {
       const file = e.target.files[0];
       const imageUrl = URL.createObjectURL(file);
-  
+
       // Save image preview URL in state
       setSelectedImage(imageUrl);
       setFormData({ ...formData, eventImage: file });
       setErrors({ ...errors, eventImage: "" });
-  
+
       // Save to localStorage as base64 for restoration
       const reader = new FileReader();
       reader.onloadend = () => {
@@ -537,8 +546,6 @@ const PageContent: React.FC = () => {
       reader.readAsDataURL(file); // Convert to base64
     }
   };
-  
-  
 
   const handleDragOver = (e: React.DragEvent<HTMLDivElement>) => {
     e.preventDefault();
@@ -565,13 +572,21 @@ const PageContent: React.FC = () => {
     setShowMapPickerModal(true);
   };
 
-  const isFormValid =
+  // const isFormValid =
+  //   (isAuthenticated ||
+  //     (formData.firstName && formData.lastName && formData.email)) &&
+  //   formData.location &&
+  //   formData.eventName &&
+  //   formData.eventTime &&
+  //   Object.values(errors).every((err) => err === "");
+  const isFormValid = Boolean(
   (isAuthenticated ||
     (formData.firstName && formData.lastName && formData.email)) &&
-  formData.location &&
-  formData.eventName &&
-  formData.eventTime &&
-  Object.values(errors).every((err) => err === "");
+    formData.location &&
+    formData.eventName &&
+    formData.eventTime &&
+    Object.values(errors).every((err) => err === "")
+);
 
   return (
     <HeaderLayout>
@@ -586,8 +601,8 @@ const PageContent: React.FC = () => {
         <LocationPickerModal
           onLocationSelect={(location) => {
             // setFormData({ ...formData, location });
-            setFormData(prev => ({ ...prev, location }));
-            setErrors(prev => ({ ...prev, location: "" }));
+            setFormData((prev) => ({ ...prev, location }));
+            setErrors((prev) => ({ ...prev, location: "" }));
             setShowMapPickerModal(false);
           }}
           onCancel={() => setShowMapPickerModal(false)}
@@ -595,7 +610,7 @@ const PageContent: React.FC = () => {
       )}
       <div>{showSuccess && <EventSuccess />}</div>
       <div>{showSuccess2 && <EventSaveSuccess />}</div>
-      <section className="bg-[#F9FAFB] mt-14 md:mt-10">
+      <section className="bg-[#F9FAFB] mt-14 md:mt-10 mb-11">
         <div className="py-8 lg:py-16 px-3 sm:px-4 mx-auto max-w-screen-md">
           <EventHeader />
           <form
@@ -671,19 +686,6 @@ export default function Page() {
     </Suspense>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // "use client";
 // import { Suspense, useState, useRef, useEffect } from "react";
@@ -842,7 +844,6 @@ export default function Page() {
 //     setErrors({ ...errors, [e.target.id]: "" });
 //   };
 
-
 //   const validateField = (id: string, value: any): string => {
 //     // Skip personal details validations if user is authenticated
 //     if (
@@ -851,7 +852,7 @@ export default function Page() {
 //     ) {
 //       return "";
 //     }
-  
+
 //     if (id === "eventDate" || id === "eventTime") {
 //       if (!(value instanceof Date) || isNaN(value.getTime())) {
 //         return "This field is required.";
@@ -878,40 +879,39 @@ export default function Page() {
 //     ) {
 //       return "This field is required.";
 //     }
-  
+
 //     if (
 //       id === "email" &&
 //       !/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(value)
 //     ) {
 //       return "Enter a valid email address.";
 //     }
-  
+
 //     if (
 //       (id === "firstName" || id === "lastName") &&
 //       /[^a-zA-Z\s]/.test(value)
 //     ) {
 //       return "Name cannot include numbers or special characters.";
 //     }
-  
+
 //     if (id === "description" && value.trim() && value.length < 5) {
 //       return "Description must be at least 5 characters.";
 //     }
-  
+
 //     if (id === "description" && value.length > 300) {
 //       return "Description must have a maximum of 300 characters.";
 //     }
-  
+
 //     if (id === "eventName" && value.length < 5) {
 //       return "Event name must be at least 5 characters.";
 //     }
-  
+
 //     if (id === "eventName" && value.length > 60) {
 //       return "Event name must not exceed 60 characters.";
 //     }
-  
+
 //     return "";
 //   };
-  
 
 //   const handleBlur = (
 //     e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>
@@ -1220,4 +1220,3 @@ export default function Page() {
 //     </Suspense>
 //   );
 // }
-

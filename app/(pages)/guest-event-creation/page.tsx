@@ -64,7 +64,7 @@ const PageContent: React.FC = () => {
   // State for modals
   const [showImagePickerModal, setShowImagePickerModal] = useState(false);
   const [showMapPickerModal, setShowMapPickerModal] = useState(false);
-  const [userLocation, setUserLocation] = useState<string | null>(null);
+  const [, setUserLocation] = useState<string | null>(null);
   const pathname = usePathname();
 
 

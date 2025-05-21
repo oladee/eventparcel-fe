@@ -526,7 +526,7 @@ const PageContent: React.FC = () => {
       )}
       <div>{showSuccess && <EventSuccess />}</div>
       <div>{showSuccess2 && <EventSaveSuccess />}</div>
-      <section className="bg-[#F9FAFB]">
+      <section className="bg-[#F9FAFB] mb-11">
         <div className="py-8 lg:py-16 px-3 sm:px-4 mx-auto max-w-screen-md ">
           <EventHeader />
           <form
