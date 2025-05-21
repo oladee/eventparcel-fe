@@ -206,7 +206,7 @@ const Page = () => {
                             Mark as Picked Up
                             </p>
                         )}
-                        {orders?.orderStatus === "pickedUp" && (
+                        {orders?.orderStatus === "pickedUp" || orders?.orderStatus === "pickedup" && (
                             <p 
                             id="order-completed-text"  
                             className="font-manrope font-extrabold text-sm text-gray-400 cursor-not-allowed"
