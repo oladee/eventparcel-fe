@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import GroupHeader from "./addGroup/GroupHeader";
 import GroupFormFields from "./addGroup/GroupFormFields";
 import GroupPrivacySelector from "./addGroup/GroupPrivacySelector";
@@ -30,6 +30,7 @@ const AddGroup2: React.FC<AddGroupProps> = ({
   const [loading, setLoading] = useState(false);
   const [, setError] = useState(false);
   const router = useRouter();
+  const [eventData, setEventData] = useState<null | any>(null);
   const [formData, setFormData] = useState({
     eventId: eventId,
     groupName: selectedGroup?.groupName || "",
@@ -47,6 +48,18 @@ const AddGroup2: React.FC<AddGroupProps> = ({
     groupName: false,
     groupDescription: false
   });
+
+    useEffect(() => {
+      const storedData = localStorage.getItem("eventData");
+      if (storedData) {
+        try {
+          const parsed = JSON.parse(storedData);
+          setEventData(parsed);
+        } catch (error) {
+          console.error("Failed to parse eventData from localStorage", error);
+        }
+      }
+    }, []);
 
   const validateField = (id: string, value: string) => {
     if (id === "groupName") {
@@ -151,7 +164,7 @@ const AddGroup2: React.FC<AddGroupProps> = ({
           `/update-group/${selectedGroup._id}`,
           formDataToSend
         );
-
+      
         trackEvent("Group Edit Completed", {
           source: "event-creation page",
           timestamp: new Date().toISOString(),
@@ -164,8 +177,7 @@ const AddGroup2: React.FC<AddGroupProps> = ({
         });
       } else {
         const response = await axiosInstance.post("/add-group", formData);
-        console.log("add group", response.data.data);
-
+      
         trackEvent("New Group Creation Completed", {
           source: "event-creation page",
           timestamp: new Date().toISOString(),
@@ -176,14 +188,33 @@ const AddGroup2: React.FC<AddGroupProps> = ({
           group_type: response.data.data.groupPrivacy,
           status: "Successful"
         });
+      
         if (isShared) {
-        window.location.reload();
-      }else{
-        router.push("/dashboard/editPaymentDetails");
+          window.location.reload();
+        } else {
+          // Get current currency flags from localStorage
+          const currentIsNaira = localStorage.getItem("isNairaAccount") === 'true';
+          const currentIsDollar = localStorage.getItem("isDollarAccount") === 'true';
+          
+          // Determine new currency type from form data
+          const newCurrencyType = formData.groupCurrency;
+          
+          // Update flags based on new currency type
+          const updatedFlags = {
+            isNaira: currentIsNaira || newCurrencyType === 'NGN',
+            isDollar: currentIsDollar || newCurrencyType === 'USD'
+          };
+      
+          // Store all data in localStorage
+          localStorage.setItem("eventId", eventData._id);
+          localStorage.setItem("groupLength", eventData.eventGroups.length);
+          localStorage.setItem("isNairaAccount", String(updatedFlags.isNaira));
+          localStorage.setItem("isDollarAccount", String(updatedFlags.isDollar));
+          
+          router.push("/dashboard/editPaymentDetails");
+        }
       }
       
-      }
-
       toast.success(
         `Group ${selectedGroup ? "updated" : "created"} successfully `,
         {
@@ -196,9 +227,6 @@ const AddGroup2: React.FC<AddGroupProps> = ({
           theme: "light"
         }
       );
-
-      
-
     } catch (error) {
       if (axios.isAxiosError(error)) {
         const errorMessage =
