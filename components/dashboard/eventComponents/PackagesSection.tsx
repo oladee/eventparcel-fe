@@ -323,4 +323,3 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
 };
 
 export default PackagesSection;
-
