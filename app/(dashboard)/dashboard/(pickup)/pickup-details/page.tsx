@@ -277,6 +277,10 @@ useEffect(() => {
             formData.paymentTime instanceof Date
               ? formatTime12Hour(formData.paymentTime)
               : "",
+          paymentDate:
+            formData.paymentDate instanceof Date
+              ? formData.paymentDate.toISOString().split("T")[0]
+              : "",
         };
     
         const cleanedData = cleanObject(formattedData);
