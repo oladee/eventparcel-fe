@@ -165,6 +165,16 @@ useEffect(() => {
 
   fetchDeliveryData();
 }, [firstEventId]);
+
+useEffect(() => {
+  const handler = setTimeout(() => {
+    if (formData.pickupLocation.trim() !== "") {
+      setErrors(prev => ({ ...prev, pickupLocation: "" }));
+    }
+  }, 500);
+  
+  return () => clearTimeout(handler);
+}, [formData.pickupLocation]);
   
 
   
