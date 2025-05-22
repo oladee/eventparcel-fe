@@ -11,6 +11,7 @@ import DiscountOptionsModal from '@/components/dashboard/eventComponents/Discoun
 import { trackEvent } from '@/lib/mixpanel';
 
 interface Discount {
+  isShared: any;
   _id: string;
   discountCode: string;
   discountTitle: string;
@@ -51,6 +52,7 @@ const Page = () => {
 
     try {
       const response = await axiosInstance.get(`/get-all-discounts/${hostId}`);
+      console.log(response.data)
       if (response.data.success) {
         setDiscountData(response.data.data);
       }
@@ -197,19 +199,32 @@ const Page = () => {
           {discountData.map((discount) => (
             <div key={discount._id} id={discount._id} className="bg-[#FFFFFF] rounded-[20px] shadow-sm border p-4 space-y-2">
               <div className="flex items-center justify-between">
-                <span
-                  className={`px-3 py-1 text-xs font-medium rounded-full border 
-                    ${discount?.discountStatus === "active" ? "bg-[#2B9EA01F] text-[#2B9EA0] border-[#2B9EA0]" : "bg-[#F2D1D1] text-[#D9534F] border-[#D9534F]"}`}
-                >
-                  {discount?.discountStatus === "active" ? 'Active' : 'Inactive'}
-                </span>
+                <div className='flex gap-3'>
+                  <span
+                    className={`px-3 py-1 text-xs font-medium rounded-full border 
+                      ${discount?.discountStatus === "active" ? "bg-[#2B9EA01F] text-[#2B9EA0] border-[#2B9EA0]" : "bg-[#F2D1D1] text-[#D9534F] border-[#D9534F]"}`}
+                      >
+                    {discount?.discountStatus === "active" ? 'Active' : 'Inactive'}
+                  </span>
+
+                  {discount?.isShared && (  
+                  <div>
+                    <span
+                      className={`px-3 py-1 text-xs font-medium rounded-full border 
+                        ${discount?.discountStatus === "active" ? "bg-[#2B9EA01F] text-[#2B9EA0] border-[#2B9EA0]" : "bg-[#F2D1D1] text-[#D9534F] border-[#D9534F]"}`}
+                    >
+                      Shared
+                    </span>
+                  </div>
+                  )}
+                </div>
                 <button
                   onClick={() => {
                     setSelectedDiscount(discount); 
                     setIsModalOpen(true); 
                   }}
                   className="text-[#A0AEC0] text-2xl font-bold"
-                >
+                  >
                   ⋯
                 </button>
               </div>
