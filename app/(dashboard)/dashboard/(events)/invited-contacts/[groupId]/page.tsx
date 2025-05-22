@@ -155,7 +155,7 @@ const extractedContacts = useMemo(() => {
   selectedIds, 
   eventData?._id, 
   eventData?.eventName, 
-  hasNonNigerianContacts  // Now stable due to useCallback
+  hasNonNigerianContacts  
 ]);
 
   // const extractedContacts = useMemo(() => {
