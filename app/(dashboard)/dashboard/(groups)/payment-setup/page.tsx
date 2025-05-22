@@ -239,46 +239,165 @@ const PaymentSetupContent = () => {
     return `${paddedHours}:${paddedMinutes} ${ampm}`;
   };
 
-   const checkEventDateTime = () => {
+  //  const checkEventDateTime = () => {
+    //   if (!eventDate || !formData?.paymentDate) return true;
+    
+    //   const formatDateToYMD = (dateInput: Date | string): string => {
+    //     const date = new Date(dateInput);
+    //     if (isNaN(date.getTime())) return "0000-00-00";
+    //     return date.toISOString().split('T')[0];
+    //   };
+    
+    //   const eventDateStr = formatDateToYMD(eventDate);
+    //   const paymentDateStr = formatDateToYMD(formData.paymentDate);
+    
+    //   const eventDay = new Date(eventDateStr);
+    //   const paymentDay = new Date(paymentDateStr);
+    
+    //   if (paymentDay > eventDay) {
+    //     toast.error("Payment date cannot be after the event date!");
+    //     return false;
+    //   }
+    
+    //   if (
+    //     paymentDay.getTime() === eventDay.getTime() &&
+    //     formData.paymentTime &&
+    //     eventTime
+    //   ) {
+    //     const createDateTime = (dateStr: string, time: Date | string): Date | null => {
+    //       const timeStr = typeof time === "string"
+    //         ? time
+    //         : time.toTimeString().split(' ')[0].slice(0, 5);
+    
+    //       const [hours, minutes] = timeStr.split(':').map(Number);
+    //       const date = new Date(dateStr);
+    //       date.setHours(hours, minutes || 0, 0, 0);
+    //       return isNaN(date.getTime()) ? null : date;
+    //     };
+    
+    //     const paymentDateTime = createDateTime(paymentDateStr, formData.paymentTime);
+    //     const eventDateTime = createDateTime(eventDateStr, eventTime);
+    
+    //     if (!paymentDateTime || !eventDateTime) return true;
+    
+    //     if (paymentDateTime > eventDateTime) {
+    //       toast.error("Payment time cannot be after the event time!");
+    //       return false;
+    //     }
+    //   }
+    
+    //   return true;
+    // };
+
+    const checkEventDateTime = () => {
+      // First check if we have the required dates
       if (!eventDate || !formData?.paymentDate) return true;
     
-      const formatDateToYMD = (dateInput: Date | string): string => {
-        const date = new Date(dateInput);
-        if (isNaN(date.getTime())) return "0000-00-00";
-        return date.toISOString().split('T')[0];
+      // Mobile-friendly date parser
+      const parseDate = (dateInput: Date | string): Date | null => {
+        // If already a Date object and valid
+        if (dateInput instanceof Date && !isNaN(dateInput.getTime())) {
+          return dateInput;
+        }
+        
+        // Handle string input (for mobile compatibility)
+        if (typeof dateInput === 'string') {
+          // Try ISO format first
+          const isoDate = new Date(dateInput);
+          if (!isNaN(isoDate.getTime())) return isoDate;
+          
+          // Try splitting date parts (common mobile date string format)
+          const parts = dateInput.split(/[-/]/);
+          if (parts.length === 3) {
+            // Try different formats (YYYY-MM-DD, MM/DD/YYYY, etc.)
+            const formats = [
+              `${parts[0]}-${parts[1]}-${parts[2]}`, // YYYY-MM-DD
+              `${parts[2]}-${parts[0]}-${parts[1]}`, // MM-DD-YYYY
+              `${parts[2]}-${parts[1]}-${parts[0]}`  // DD-MM-YYYY
+            ];
+            
+            for (const format of formats) {
+              const testDate = new Date(format);
+              if (!isNaN(testDate.getTime())) return testDate;
+            }
+          }
+        }
+        
+        return null;
       };
     
-      const eventDateStr = formatDateToYMD(eventDate);
-      const paymentDateStr = formatDateToYMD(formData.paymentDate);
+      // Parse dates with mobile compatibility
+      const parsedEventDate = parseDate(eventDate);
+      const parsedPaymentDate = parseDate(formData.paymentDate);
     
-      const eventDay = new Date(eventDateStr);
-      const paymentDay = new Date(paymentDateStr);
+      if (!parsedEventDate || !parsedPaymentDate) {
+        console.error('Invalid date format detected');
+        return true; // or false depending on your requirements
+      }
     
+      // Compare dates (ignoring time)
+      const eventDay = new Date(parsedEventDate.setHours(0, 0, 0, 0));
+      const paymentDay = new Date(parsedPaymentDate.setHours(0, 0, 0, 0));
+    
+      // Debug logs for mobile testing
+      console.log('Event Date:', eventDay);
+      console.log('Payment Date:', paymentDay);
+    
+      // 1. Check if payment is after event DATE
       if (paymentDay > eventDay) {
         toast.error("Payment date cannot be after the event date!");
         return false;
       }
     
+      // 2. Only check times if same day AND both times exist
       if (
         paymentDay.getTime() === eventDay.getTime() &&
         formData.paymentTime &&
         eventTime
       ) {
-        const createDateTime = (dateStr: string, time: Date | string): Date | null => {
-          const timeStr = typeof time === "string"
-            ? time
-            : time.toTimeString().split(' ')[0].slice(0, 5);
-    
-          const [hours, minutes] = timeStr.split(':').map(Number);
-          const date = new Date(dateStr);
-          date.setHours(hours, minutes || 0, 0, 0);
-          return isNaN(date.getTime()) ? null : date;
+        // Mobile-friendly time parser
+        const parseTime = (timeInput: Date | string): string => {
+          if (timeInput instanceof Date) {
+            return timeInput.toTimeString().split(' ')[0].slice(0, 5); // HH:mm
+          }
+          
+          // Handle string time formats
+          if (typeof timeInput === 'string') {
+            // Check for HH:mm format
+            if (/^\d{1,2}:\d{2}$/.test(timeInput)) {
+              const [hours, minutes] = timeInput.split(':');
+              return `${hours.padStart(2, '0')}:${minutes.padEnd(2, '0')}`;
+            }
+            
+            // Check for HH:mm AM/PM format
+            if (/^\d{1,2}:\d{2}\s?[AP]M$/i.test(timeInput)) {
+              const [time, period] = timeInput.split(/(?=[AP]M)/i);
+              let [hours, minutes] = time.split(':');
+              hours = period.toLowerCase() === 'pm' 
+                ? `${(parseInt(hours) % 12) + 12}`
+                : hours.padStart(2, '0');
+              return `${hours}:${minutes}`;
+            }
+          }
+          
+          return '00:00'; // Default fallback
         };
     
-        const paymentDateTime = createDateTime(paymentDateStr, formData.paymentTime);
-        const eventDateTime = createDateTime(eventDateStr, eventTime);
+        // Create full datetime objects
+        const paymentTimeStr = parseTime(formData.paymentTime);
+        const eventTimeStr = parseTime(eventTime);
     
-        if (!paymentDateTime || !eventDateTime) return true;
+        const paymentDateTime = new Date(paymentDay);
+        const [paymentHours, paymentMinutes] = paymentTimeStr.split(':').map(Number);
+        paymentDateTime.setHours(paymentHours, paymentMinutes);
+    
+        const eventDateTime = new Date(eventDay);
+        const [eventHours, eventMinutes] = eventTimeStr.split(':').map(Number);
+        eventDateTime.setHours(eventHours, eventMinutes);
+    
+        // More debug logs
+        console.log('Payment DateTime:', paymentDateTime);
+        console.log('Event DateTime:', eventDateTime);
     
         if (paymentDateTime > eventDateTime) {
           toast.error("Payment time cannot be after the event time!");
@@ -297,7 +416,7 @@ const PaymentSetupContent = () => {
       toast.error("Please fill out all required fields");
       return;
     }
-    
+
     if (!checkEventDateTime()) {
       setLoading(false);
       return; 
