@@ -326,7 +326,7 @@ const Page = () => {
                             <div id="event-image-container" className="relative w-24 h-24 rounded-xl overflow-hidden flex-shrink-0">
                                 <Image
                                     id="event-image"
-                                    src={orders?.eventId?.eventImgUrl || "/images/placeholder_eventCover3.jpg"}
+                                    src={orders?.event?.eventImgUrl || "/images/placeholder_eventCover3.jpg"}
                                     alt="Event Cover"
                                     className="w-full h-full rounded-[12px]"
                                     width={100} 
@@ -336,9 +336,9 @@ const Page = () => {
                                     style={{width: "80px", height: "80px"}}
                                 />
                             </div>
-                            <p onClick={() => handleViewOneEvent(orders?.eventId?._id)} id="event-title" className="text-gray-700 font-general cursor-pointer font-bold text-[16px]">
-                            {orders?.eventId?.eventName
-                                ? orders.eventId.eventName
+                            <p onClick={() => handleViewOneEvent(orders?.event?._id)} id="event-title" className="text-gray-700 font-general cursor-pointer font-bold text-[16px]">
+                            {orders?.event?.eventName
+                                ? orders.event.eventName
                                     .split(" ")
                                     .map((word: string) => word.charAt(0).toUpperCase() + word.slice(1))
                                     .join(" ")
@@ -351,11 +351,11 @@ const Page = () => {
                                 <div className="flex items-center gap-2 text-sm font-semibold">
                                     <MdOutlineCalendarToday id="calendar-icon" size={18} />
                                     <span id="date-text">
-                                        {formatDate(orders.eventId.date)} at {orders.eventId.time} WAT
+                                        {formatDate(orders.event.date)} at {orders.event.time} WAT
                                     </span>
                                 </div>
                                 <p id="event-location" className="text-sm mt-1 text-gray-500">
-                                    {orders.eventId.eventLocation}
+                                    {orders.event.eventLocation}
                                 </p>
                             </div>
                         </div>

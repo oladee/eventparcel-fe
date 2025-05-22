@@ -122,7 +122,7 @@ const Page = () => {
     
       const handleOrderClick = (order: Order) => {
         localStorage.setItem("selectedOrder", JSON.stringify(order));
-        router.push(`/dashboard/orderDetails`);
+        router.push(`/dashboard/transactionsOrderDetails`);
       };
 
       const formatDate = (dateString: string) => {

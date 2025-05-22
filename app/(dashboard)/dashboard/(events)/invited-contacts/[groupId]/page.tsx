@@ -1,7 +1,7 @@
 "use client";
 
 import Container from "@/components/dashboard/Container";
-import React, { useState, useEffect, useMemo } from "react";
+import React, { useState, useEffect, useMemo, useCallback } from "react";
 import { FiSearch, FiX } from "react-icons/fi";
 import { ToastContainer } from "react-toastify";
 import axiosInstance from "@/lib/axiosInstance";
@@ -104,35 +104,28 @@ const InvitedContactsPage: React.FC = () => {
     );
   }, [invitedContacts, debouncedSearch]);
 
-  // Helper function to validate Nigerian prefixes
-const isValidNigerianPrefix = (prefix: string): boolean => {
-  const validPrefixes = [
-    '701', '702', '703', '704', '705', '706', '707', '708', '709', // MTN
-    '801', '802', '803', '804', '805', '806', '807', '808', '809', // 9mobile
-    '901', '902', '903', '904', '905', '906', '907', '908', '909', // Airtel
-    '811', '812', '813', '814', '815', '816', '817', '818', '819', // Glo
-    '911', '912', '913', '914', '915', '916', '917', '918', '919'  // Glo
-  ];
-  return validPrefixes.includes(prefix);
-};
+  // Helper function to validate Nigerian prefixesimport { useCallback, useMemo } from 'react';
+const isValidNigerianPrefix = useCallback((prefix: string): boolean => {
+  const nigerianPrefixes = ['701', '702', '703', '704', '705', '706', '707', '708', '709', 
+                          '801', '802', '803', '804', '805', '806', '807', '808', '809',
+                          '810', '811', '812', '813', '814', '815', '816', '817', '818', '819',
+                          '909', '908', '901', '902', '903', '904', '905', '906', '907'];
+  return nigerianPrefixes.includes(prefix);
+}, []);
 
-// Function to check for non-Nigerian contacts
-const hasNonNigerianContacts = (contacts: Array<{ phoneNumber: string }>): boolean => {
+// Memoized contact validation
+const hasNonNigerianContacts = useCallback((contacts: Array<{ phoneNumber: string }>): boolean => {
   return contacts.some(contact => {
     const cleanedNumber = contact.phoneNumber.replace(/\D/g, "");
     
-    // Check for Nigerian numbers
     const isNigerian = 
-      // International format (+234 or 234)
       (cleanedNumber.startsWith('234') && cleanedNumber.length === 13) ||
-      // Local format (0...)
       (cleanedNumber.startsWith('0') && cleanedNumber.length === 11) ||
-      // Compact format (without 0, e.g., 801...)
       (cleanedNumber.length === 10 && isValidNigerianPrefix(cleanedNumber.substring(0, 3)));
     
     return !isNigerian;
   });
-};
+}, [isValidNigerianPrefix]);
 
 // Main component logic
 const extractedContacts = useMemo(() => {
@@ -157,7 +150,13 @@ const extractedContacts = useMemo(() => {
   });
 
   return contacts;
-}, [invitedContacts, selectedIds, eventData?._id, eventData?.eventName]);
+}, [
+  invitedContacts, 
+  selectedIds, 
+  eventData?._id, 
+  eventData?.eventName, 
+  hasNonNigerianContacts  // Now stable due to useCallback
+]);
 
   // const extractedContacts = useMemo(() => {
   //   return invitedContacts

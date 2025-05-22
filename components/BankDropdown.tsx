@@ -57,7 +57,7 @@ const BankDropdown: React.FC<BankDropdownProps> = ({
         tabIndex={0}
       >
           {selectedBank && (
-            <>
+            <div className="flex items-center">
               <Image
                 src={selectedBank.url}
                 alt={selectedBank.name}
@@ -67,7 +67,7 @@ const BankDropdown: React.FC<BankDropdownProps> = ({
               />
               <span>{displayName}</span>
               <span className="ml-auto">({selectedBank.code})</span>
-            </>
+            </div>
           )}
           {!selectedBank && <span>{displayName}</span>}
       </div>

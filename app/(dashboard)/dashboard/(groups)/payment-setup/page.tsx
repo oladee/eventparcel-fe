@@ -368,14 +368,16 @@ const PaymentSetupContent = () => {
               const [hours, minutes] = timeInput.split(':');
               return `${hours.padStart(2, '0')}:${minutes.padEnd(2, '0')}`;
             }
-            
-            // Check for HH:mm AM/PM format
+          // Check for HH:mm AM/PM format
             if (/^\d{1,2}:\d{2}\s?[AP]M$/i.test(timeInput)) {
               const [time, period] = timeInput.split(/(?=[AP]M)/i);
-              let [hours, minutes] = time.split(':');
+              let hours = time.split(':')[0];
+              const minutes = time.split(':')[1]; 
+              
               hours = period.toLowerCase() === 'pm' 
                 ? `${(parseInt(hours) % 12) + 12}`
                 : hours.padStart(2, '0');
+              
               return `${hours}:${minutes}`;
             }
           }

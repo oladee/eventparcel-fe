@@ -218,7 +218,7 @@ const ShareContact: React.FC = () => {
         ? prev.filter((c) => c !== contact)
         : [...prev, contact]
     );
-  }, []);
+  }, [eventData._id, eventData?.eventName]);
 
   const handleImportContacts = () => {
     // Toggle the option modal to show the SendContactModal.
