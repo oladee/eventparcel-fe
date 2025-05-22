@@ -12,6 +12,7 @@ import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { trackEvent } from "@/lib/mixpanel";
 import { useRouter } from "next-nprogress-bar";
+import { FiX } from "react-icons/fi";
 
 interface AddGroupProps {
   setIsAddGroupOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -49,17 +50,17 @@ const AddGroup2: React.FC<AddGroupProps> = ({
     groupDescription: false
   });
 
-    useEffect(() => {
-      const storedData = localStorage.getItem("eventData");
-      if (storedData) {
-        try {
-          const parsed = JSON.parse(storedData);
-          setEventData(parsed);
-        } catch (error) {
-          console.error("Failed to parse eventData from localStorage", error);
-        }
+  useEffect(() => {
+    const storedData = localStorage.getItem("eventData");
+    if (storedData) {
+      try {
+        const parsed = JSON.parse(storedData);
+        setEventData(parsed);
+      } catch (error) {
+        console.error("Failed to parse eventData from localStorage", error);
       }
-    }, []);
+    }
+  }, []);
 
   const validateField = (id: string, value: string) => {
     if (id === "groupName") {
@@ -164,7 +165,7 @@ const AddGroup2: React.FC<AddGroupProps> = ({
           `/update-group/${selectedGroup._id}`,
           formDataToSend
         );
-      
+
         trackEvent("Group Edit Completed", {
           source: "event-creation page",
           timestamp: new Date().toISOString(),
@@ -177,7 +178,7 @@ const AddGroup2: React.FC<AddGroupProps> = ({
         });
       } else {
         const response = await axiosInstance.post("/add-group", formData);
-      
+
         trackEvent("New Group Creation Completed", {
           source: "event-creation page",
           timestamp: new Date().toISOString(),
@@ -188,33 +189,38 @@ const AddGroup2: React.FC<AddGroupProps> = ({
           group_type: response.data.data.groupPrivacy,
           status: "Successful"
         });
-      
+
         if (isShared) {
           window.location.reload();
         } else {
           // Get current currency flags from localStorage
-          const currentIsNaira = localStorage.getItem("isNairaAccount") === 'true';
-          const currentIsDollar = localStorage.getItem("isDollarAccount") === 'true';
-          
+          const currentIsNaira =
+            localStorage.getItem("isNairaAccount") === "true";
+          const currentIsDollar =
+            localStorage.getItem("isDollarAccount") === "true";
+
           // Determine new currency type from form data
           const newCurrencyType = formData.groupCurrency;
-          
+
           // Update flags based on new currency type
           const updatedFlags = {
-            isNaira: currentIsNaira || newCurrencyType === 'NGN',
-            isDollar: currentIsDollar || newCurrencyType === 'USD'
+            isNaira: currentIsNaira || newCurrencyType === "NGN",
+            isDollar: currentIsDollar || newCurrencyType === "USD"
           };
-      
+
           // Store all data in localStorage
           localStorage.setItem("eventId", eventData._id);
           localStorage.setItem("groupLength", eventData.eventGroups.length);
           localStorage.setItem("isNairaAccount", String(updatedFlags.isNaira));
-          localStorage.setItem("isDollarAccount", String(updatedFlags.isDollar));
-          
+          localStorage.setItem(
+            "isDollarAccount",
+            String(updatedFlags.isDollar)
+          );
+
           router.push("/dashboard/editPaymentDetails");
         }
       }
-      
+
       toast.success(
         `Group ${selectedGroup ? "updated" : "created"} successfully `,
         {
@@ -293,20 +299,21 @@ const AddGroup2: React.FC<AddGroupProps> = ({
 
   return (
     <>
-      {/* Overlay for mobile view */}
-      {true && (
-        <div
-          className="fixed inset-0 bg-black opacity-95 md:hidden z-30"
-          // onClick={() => setIsOpen(false)}
-          onClick={() => window.location.reload()}
-          aria-hidden="true"
-        ></div>
-      )}
       <ToastContainer />
+
+      {/* Overlay for mobile view */}
+      <div
+        className="fixed inset-0 bg-black opacity-5 z-30 cursor-pointer"
+        // onClick={() => setIsOpen(false)}
+        onClick={() => setIsAddGroupOpen(false)}
+        aria-hidden="true"
+      ></div>
+
       <form
-        className="w-[320px] h-[545px] space-y-4 bg-[#FFFFFF] px-5 py-6 rounded-3xl"
+        className="w-[320px] h-[545px] space-y-4 bg-[#FFFFFF] px-5 py-6 rounded-3xl relative"
         onSubmit={handleSubmit}
       >
+        <FiX size={24}  onClick={() => setIsAddGroupOpen(false)} className="absolute top-3 right-3 text-black-300 " />
         <GroupHeader mode={mode} onClose={() => setIsAddGroupOpen(false)} />
         <GroupFormFields
           formData={formData}
