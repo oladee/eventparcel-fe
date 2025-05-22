@@ -16,6 +16,7 @@ import { useSearchParams } from "next/navigation";
 import DisplayGoogleContactModal, {
   Contact as DisplayContact,
 } from "@/components/shareContact/DisplayGoogleContactModal";
+import { trackEvent } from "@/lib/mixpanel";
 
 // Types
 type ContactProperty = "name" | "email" | "tel";
@@ -96,6 +97,20 @@ const ShareContact: React.FC = () => {
   const [popupLoading, setPopupLoading] = useState(false);
   const [, setPopupError] = useState<string>("");
   const [popupModalOpen, setPopupModalOpen] = useState(false);
+  const [eventData, setEventData] = useState<any>(null);
+
+  useEffect(() => {
+    // This code runs only on the client side
+    const storedData = localStorage.getItem('eventData');
+    if (storedData) {
+      try {
+        const parsedData = JSON.parse(storedData);
+        setEventData(parsedData);
+      } catch (error) {
+        console.error('Failed to parse eventData:', error);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (popUpParam === "true") {
@@ -190,6 +205,14 @@ const ShareContact: React.FC = () => {
   }, []);
 
   const handleContactSelect = useCallback((contact: Contact) => {
+      trackEvent("Import Contact Start", {
+        source: "share-contact page",
+        event_id: eventData?._id,
+        event_name: eventData?.eventName,
+        timestamp: new Date().toISOString(),
+        page_name: "Share-contact Page",
+        route: "Google"
+      });
     setSelectedContacts((prev) =>
       prev.includes(contact)
         ? prev.filter((c) => c !== contact)

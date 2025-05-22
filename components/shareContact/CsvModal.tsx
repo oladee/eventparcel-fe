@@ -237,7 +237,6 @@ const CsvModal: React.FC<CsvModalProps> = ({ onClose }) => {
           non_ngn_country_code: hasNonNigerianNumber ? "Yes" : "No",
         });
   
-
         setContacts(parsedContacts);
       } else {
         toast.error("Unexpected response from the server.");

@@ -12,6 +12,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import DeleteConfirmationDialog from "@/components/modals/DeleteConfirmationDialog";
+import { trackEvent } from "@/lib/mixpanel";
 
 interface GroupOptionsModalProps {
   isOpen: boolean;
@@ -78,8 +79,29 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
   const handleDelete = async () => {
     if (!group?._id) return;
 
+        trackEvent("Delete Group Started", {
+          source: "dashboard events page",
+          timestamp: new Date().toISOString(),
+          page_name: "dashboard events page",
+          group_Id: group?._id,
+          group_name: group?.groupName,
+          currency_type: group?.groupCurrency,
+          group_type: group?.groupPrivacy,
+        });
+
     try {
       await axiosInstance.delete(`/delete-group/${group._id}`);
+
+      trackEvent("Delete Group Completed", {
+        source: "dashboard events page",
+        timestamp: new Date().toISOString(),
+        page_name: "dashboard events page",
+        group_Id: group?._id,
+        group_name: group?.groupName,
+        currency_type: group?.groupCurrency,
+        group_type: group?.groupPrivacy,
+        status: "Sucessfull"
+      });
 
       toast.success(`Group deleted successfully`);
 
@@ -95,6 +117,16 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
 
         // Show toast notification
         toast.error(errorMessage);
+        trackEvent("Delete Group Failed", {
+          source: "dashboard events page",
+          timestamp: new Date().toISOString(),
+          page_name: "dashboard events page",
+          group_Id: group?._id,
+          group_name: group?.groupName,
+          currency_type: group?.groupCurrency,
+          group_type: group?.groupPrivacy,
+          status: "Failed"
+        });
       } else {
         console.error("Unexpected Error:", error);
       }
@@ -103,6 +135,16 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
 
   const handleDisableGroup = async () => {
     if (!group?._id) return;
+
+    trackEvent("Disable Group Started", {
+      source: "dashboard events page",
+      timestamp: new Date().toISOString(),
+      page_name: "dashboard events page",
+      group_Id: group?._id,
+      group_name: group?.groupName,
+      currency_type: group?.groupCurrency,
+      group_type: group?.groupPrivacy,
+    });
 
     try {
       const isCurrentlyDisabled = group.isDisabled;
@@ -116,6 +158,18 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
       toast.success(
         `Group ${isCurrentlyDisabled ? "enabled" : "disabled"} successfully`
       );
+      
+      trackEvent("Disable Group Completed", {
+        source: "dashboard events page",
+        timestamp: new Date().toISOString(),
+        page_name: "dashboard events page",
+        group_Id: group?._id,
+        group_name: group?.groupName,
+        currency_type: group?.groupCurrency,
+        group_type: group?.groupPrivacy,
+        status: "Sucessfull"
+      });
+
       setTimeout(() => {
         window.dispatchEvent(new Event("refreshEvents"));
         onClose();
@@ -131,6 +185,16 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
       } else {
         toast.error("Failed to update group status. Please try again.");
       }
+      trackEvent("Disable Group Completed", {
+        source: "dashboard events page",
+        timestamp: new Date().toISOString(),
+        page_name: "dashboard events page",
+        group_Id: group?._id,
+        group_name: group?.groupName,
+        currency_type: group?.groupCurrency,
+        group_type: group?.groupPrivacy,
+        status: "Failed"
+      });
     } finally {
       setLoading(false);
       setLoadingMessage("");

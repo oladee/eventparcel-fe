@@ -8,6 +8,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { BiLoaderCircle } from "react-icons/bi";
+import { trackEvent } from "@/lib/mixpanel";
 
 function PaymentDetailsCard() {
   const searchParams = useSearchParams();
@@ -97,6 +98,36 @@ function PaymentDetailsCard() {
     grandTotal -= discountResponse.discountAmount;
   }
 
+  // const handleSubmit = async (e: React.FormEvent) => {
+  //   e.preventDefault();
+  //   setIsSubmittingPayment(true);
+    
+  //   try {
+  //     const payload: any = {};
+  //     if (discountCode) {
+  //       payload.discountCode = discountCode;
+  //     }
+
+  //     const res = await axiosInstance.post(`/checkout-contd/${parsedCartItems?.data?._id}`, payload);
+
+  //       trackEvent("Purchase Initiated", {
+  //         source: "guest payment page",
+  //         event_id: res?.data?.data?.updatedOrder?.eventId,
+  //         timestamp: new Date().toISOString(),
+  //         page_name: "Guest Payment Page",
+  //         transaction_id: res.data.data.reference,
+  //         payment_partner: res.data.data.paymentPartner,
+  //         delivery_type: res?.data?.data?.updatedOrder?.eventId?.deliveryType,
+  //       });
+
+  //     Router.push(res.data.data.paymentUrl);
+  //   } catch (error: any) {
+  //     toast.error(error.response?.data?.message || "Payment failed");
+  //   } finally {
+  //     setIsSubmittingPayment(false);
+  //   }
+  // };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmittingPayment(true);
@@ -106,10 +137,46 @@ function PaymentDetailsCard() {
       if (discountCode) {
         payload.discountCode = discountCode;
       }
-
+  
       const res = await axiosInstance.post(`/checkout-contd/${parsedCartItems?.data?._id}`, payload);
+      
+      // Success tracking data
+      const successEvent = {
+        eventName: "Purchase Initiated",
+        data: {
+          source: "guest payment page",
+          event_id: res?.data?.data?.updatedOrder?.eventId,
+          timestamp: new Date().toISOString(),
+          page_name: "Guest Payment Page",
+          transaction_id: res.data.data.reference,
+          payment_partner: res.data.data.paymentPartner,
+          delivery_type: res?.data?.data?.updatedOrder?.deliveryType,
+          status: "success"
+        }
+      };
+  
+      // Store in localStorage
+      localStorage.setItem('lastSuccessfulEvent', JSON.stringify(successEvent));
+      trackEvent(successEvent.eventName, successEvent.data);
+  
       Router.push(res.data.data.paymentUrl);
     } catch (error: any) {
+      // Error tracking data
+      const errorEvent = {
+        eventName: "Purchase Failed",
+        data: {
+          source: "guest payment page",
+          timestamp: new Date().toISOString(),
+          page_name: "Guest Payment Page",
+          error_message: error.response?.data?.message || "Payment failed",
+          status: "failed"
+        }
+      };
+  
+      // Store in localStorage
+      localStorage.setItem('lastFailedEvent', JSON.stringify(errorEvent));
+      trackEvent(errorEvent.eventName, errorEvent.data);
+  
       toast.error(error.response?.data?.message || "Payment failed");
     } finally {
       setIsSubmittingPayment(false);

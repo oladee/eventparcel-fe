@@ -15,6 +15,7 @@ import NairaPayoutForm from "@/components/NairaPayoutForm";
 import DollarPayoutForm from "@/components/DollarPayoutForm";
 import axiosInstance from "@/lib/axiosInstance";
 import Container from "@/components/dashboard/Container";
+import { trackEvent } from "@/lib/mixpanel";
 
 const LocationPickerModal = dynamic(
   () => import("@/components/aboutEvent/LocationPickerModal"),
@@ -338,12 +339,21 @@ const handleBlur = (
 const handleSubmit = async (e: FormEvent) => {
   e.preventDefault();
 
+  
   if (!isFormValid) {
     toast.error("Please fill out all required fields");
     return;
   }
-
+  
   const storedEventId = localStorage.getItem('eventId');
+
+  trackEvent("Edit Payment Details - Started", {
+    source: "dashboard event page",
+    timestamp: new Date().toISOString(),
+    page_name: "dashboard event page",
+    event_id: storedEventId,
+  });
+
   if (!storedEventId && !firstEventId) {
     setIsLoadingPaymentData(false);
     return;
@@ -382,8 +392,28 @@ const handleSubmit = async (e: FormEvent) => {
 
     await axiosInstance.put(`/update/${storedEventId}`, formattedData);
     toast.success("Payment details successfully submitted!");
+
+  trackEvent("Edit Payment Details - Started", {
+      source: "dashboard event page",
+      timestamp: new Date().toISOString(),
+      page_name: "dashboard event page",
+      nairaAccount: formData?.nairaAccount?.accountName,
+      dollarAccount: formData?.dollarAccount?.usBankName,
+      event_id: storedEventId,
+      status: "Successfull"
+    });
+
   } catch(error: any) {
     toast.error(error.response?.data?.message || "Please try again.");
+    trackEvent("Edit Payment Details - Failed", {
+      source: "dashboard event page",
+      timestamp: new Date().toISOString(),
+      page_name: "dashboard event page",
+      nairaAccount: formData?.nairaAccount?.accountName,
+      dollarAccount: formData?.dollarAccount?.usBankName,
+      event_id: storedEventId,
+      status: "Failed"
+    });
   } finally {
     setLoading(false);
   }

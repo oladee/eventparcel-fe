@@ -7,6 +7,7 @@ import logo from "../../../public/images/logo4.png";
 import { useRouter } from 'next/navigation';
 import { useCartStore } from '@/app/store/useCartStore';
 import { useEffect } from 'react';
+import { trackEvent } from '@/lib/mixpanel';
 
 export default function ConfirmationCards() {
   const Router = useRouter();
@@ -15,6 +16,12 @@ export default function ConfirmationCards() {
   useEffect(() => {
     clearCart();
   }, [clearCart]);
+
+  useEffect(() => {
+    const successEvent = JSON.parse(localStorage.getItem('lastSuccessfulEvent') || '{}');
+     trackEvent("Purchase Successful", successEvent.data);
+
+  }, []);
 
   return (
     <HeaderLayout>

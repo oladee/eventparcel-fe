@@ -10,6 +10,7 @@ import { convertTo12Hour } from "@/utils/timeUtils";
 import Container from "../Container";
 import FormButtons3 from "./FormButton3";
 import EventFormFields2 from "./EventFormFields2";
+import { trackEvent } from "@/lib/mixpanel";
 
 interface UpdateEventModalProps {
   isOpen: boolean;
@@ -239,6 +240,14 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
   };
 
   const handleSubmit = async (isSaveLater: boolean = false) => {
+      trackEvent("Edit An Event - Started", {
+        source: "dashboard event page",
+        timestamp: new Date().toISOString(),
+        page_name: "dashboard event page",
+        event_id: eventData?._id,
+        event_name: formData.eventName,
+      });
+      
     const newErrors = { ...errors };
     Object.keys(formData).forEach((key) => {
       if (key !== "eventImage") {
@@ -282,11 +291,28 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
       localStorage.setItem("eventData", JSON.stringify(response.data));
       window.dispatchEvent(new Event("refreshEvents"));
       toast.success("Event updated successfully!");
+
+      trackEvent("Edit An Event - End", {
+        source: "dashboard event page",
+        timestamp: new Date().toISOString(),
+        page_name: "dashboard event page",
+        event_id: eventData?._id,
+        event_name: formData.eventName,
+        status: "Successfull"
+      });
       setTimeout(() => {
         onClose();
       }, 3000);
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Failed to update event");
+      trackEvent("Edit An Event - End", {
+        source: "dashboard event page",
+        timestamp: new Date().toISOString(),
+        page_name: "dashboard event page",
+        event_id: eventData?._id,
+        event_name: formData.eventName,
+        status: "Failed"
+      });
     } finally {
       isSaveLater ? setLoading2(false) : setLoading(false);
     }

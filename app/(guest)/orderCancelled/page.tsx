@@ -1,9 +1,17 @@
 "use client"
 import HeaderLayout from '@/components/layout/HeaderLayout'
+import { trackEvent } from '@/lib/mixpanel';
 import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
 
 export default function FailurePage() {
   const Router = useRouter();
+
+    useEffect(() => {
+      const errorEvent = JSON.parse(localStorage.getItem('lastFailedEvent') || '{}');
+      trackEvent("Purchase Failed", errorEvent.data);
+    
+    }, []);
 
   return (
     <HeaderLayout>

@@ -141,9 +141,9 @@ const NewGroup: React.FC = () => {
       );
 
       trackEvent("Deleted Group Completed", {
-        source: "New-group page",
+        source: "create-group page",
         timestamp: new Date().toISOString(),
-        page_name: "new-group page",
+        page_name: "create-group page",
         group_Id: selectedGroupToDelete?._id,
         group_name: selectedGroupToDelete?.groupName,
         currency_type: selectedGroupToDelete?.groupCurrency,
@@ -165,9 +165,9 @@ const NewGroup: React.FC = () => {
     } catch (error) {
       
       trackEvent("Deleted Group Failed", {
-        source: "New-group page",
+        source: "create-group page",
         timestamp: new Date().toISOString(),
-        page_name: "new-group page",
+        page_name: "create-group page",
         group_Id: selectedGroupToDelete?._id,
         group_name: selectedGroupToDelete?.groupName,
         currency_type: selectedGroupToDelete?.groupCurrency,

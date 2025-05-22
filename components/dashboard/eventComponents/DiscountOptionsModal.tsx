@@ -7,6 +7,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import { useRouter } from "next/navigation";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
+import { trackEvent } from "@/lib/mixpanel";
 
 interface DiscountOptionsModalProps {
   isOpen: boolean;
@@ -60,6 +61,13 @@ const DiscountOptionsModal = ({ isOpen, onClose, discountData }: DiscountOptions
       return;
     }
 
+    trackEvent("Disable/Delete Discount Started", {
+      source: "dashboard discount page",
+      timestamp: new Date().toISOString(),
+      page_name: "dashboard discount page",
+      discount_id: discountData?._id
+    });
+
     try {
       const isCurrentlyDisabled = discountData.discountStatus;
 
@@ -81,6 +89,18 @@ const DiscountOptionsModal = ({ isOpen, onClose, discountData }: DiscountOptions
         payload
       );
 
+      trackEvent("Disable/Delete Discount End", {
+        source: "dashboard discount page",
+        timestamp: new Date().toISOString(),
+        page_name: "dashboard discount page",
+        discount_id: discountData?._id,
+        discount_title: discountData.discountTitle,
+        discount_value: discountData.discountValue,
+        discount_value_type: discountData.discountValueType,
+        discount_code: discountData.discountCode,
+        status: "Successfull"
+      });
+
       // Trigger a refresh of the discounts list
       window.dispatchEvent(new Event("refreshDiscounts"));
       toast.success(response.data.message);
@@ -88,6 +108,18 @@ const DiscountOptionsModal = ({ isOpen, onClose, discountData }: DiscountOptions
     } catch (error: any) {
       const errMsg = error?.response?.data?.message || "Failed to update discount status. Please try again.";
       toast.error(errMsg);
+      
+      trackEvent("Disable/Delete Discount Failed", {
+        source: "dashboard discount page",
+        timestamp: new Date().toISOString(),
+        page_name: "dashboard discount page",
+        discount_id: discountData?._id,
+        discount_title: discountData.discountTitle,
+        discount_value: discountData.discountValue,
+        discount_value_type: discountData.discountValueType,
+        discount_code: discountData.discountCode,
+        status: "Failed"
+      });
     } finally {
       setLoading(false);
       setLoadingMessage("");

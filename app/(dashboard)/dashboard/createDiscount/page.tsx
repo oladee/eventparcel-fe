@@ -8,6 +8,7 @@ import { useRouter } from "next-nprogress-bar";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { BiLoaderCircle } from 'react-icons/bi';
+import { trackEvent } from '@/lib/mixpanel';
 
 const currencyOptions = [
   { label: 'Nigerian Naira (₦)', value: '₦' },
@@ -119,6 +120,13 @@ const Page = () => {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+
+    trackEvent("Create Discount Started", {
+      source: "dashboard create discount page",
+      timestamp: new Date().toISOString(),
+      page_name: "dashboard create discount page",
+      event_id: selectedEvent._id
+    });
   
     if (!selectedEvent || !discountTitle || !discountValue || !discountCode) {
       toast.error('Please fill all required fields.');
@@ -141,6 +149,19 @@ const Page = () => {
     try {
       setLoading(true);
       const res = await axiosInstance.post('/add-discount', payload);
+
+      trackEvent("Create Discount Started", {
+        source: "dashboard create discount page",
+        timestamp: new Date().toISOString(),
+        page_name: "dashboard create discount page",
+        event_id: selectedEvent._id,
+        discount_id: res.data.data._id,
+        discount_name: discountTitle,
+        discount_type: discountValueType,
+        value: Number(discountValue),
+        status: "Successfull"
+      });
+
       if (res.data.success) {
         toast.success('Discount created successfully!');
         router.push("/dashboard/discounts");
@@ -149,6 +170,16 @@ const Page = () => {
       }
     } catch (error: any) {
       console.error(error);
+      trackEvent("Create Discount Failed", {
+        source: "dashboard create discount page",
+        timestamp: new Date().toISOString(),
+        page_name: "dashboard create discount page",
+        event_id: selectedEvent._id,
+        discount_name: discountTitle,
+        discount_type: discountValueType,
+        value: Number(discountValue),
+        status: "Failed"
+      });
       toast.error(error.response?.data?.message || 'Server error');
     } finally {
       setLoading(false);

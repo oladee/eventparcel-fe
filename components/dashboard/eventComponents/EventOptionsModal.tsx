@@ -12,6 +12,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import { ToastContainer, toast } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { useRouter } from "next-nprogress-bar";
+import { trackEvent } from "@/lib/mixpanel";
 
 interface EventOptionsModalProps {
   isOpen: boolean;
@@ -70,6 +71,14 @@ const EventOptionsModal: React.FC<EventOptionsModalProps> = ({
   const handleDisableEvent = async () => {
     if (!eventData?._id) return;
 
+    trackEvent("Disable An Event - Started", {
+      source: "dashboard event page",
+      timestamp: new Date().toISOString(),
+      page_name: "dashboard event page",
+      event_id: eventData?._id,
+      event_name: eventData?.eventName,
+    });
+    
     try {
       const isCurrentlyDisabled = eventData.isDisabled;
       setLoading(true);
@@ -81,6 +90,15 @@ const EventOptionsModal: React.FC<EventOptionsModalProps> = ({
           isDisabled: !isCurrentlyDisabled // Toggle the isDisabled state
         }
       );
+
+      trackEvent("Disable An Event - End", {
+        source: "dashboard event page",
+        timestamp: new Date().toISOString(),
+        page_name: "dashboard event page",
+        event_id: eventData?._id,
+        event_name: eventData?.eventName,
+        status: "Successfull"
+      });
 
       console.log("Event disabled/enabled successfully");
       window.dispatchEvent(new Event("refreshEvents"));
@@ -98,6 +116,14 @@ const EventOptionsModal: React.FC<EventOptionsModalProps> = ({
       } else {
         toast.error("Failed to update event status. Please try again.");
       }
+      trackEvent("Disable An Event - End", {
+        source: "dashboard event page",
+        timestamp: new Date().toISOString(),
+        page_name: "dashboard event page",
+        event_id: eventData?._id,
+        event_name: eventData?.eventName,
+        status: "Failed"
+      });
     } finally {
       setLoading(false);
       setLoadingMessage("");

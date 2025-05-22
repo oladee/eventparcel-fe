@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { useRouter } from 'next/navigation';
 import axiosInstance from '@/lib/axiosInstance';
 import DiscountOptionsModal from '@/components/dashboard/eventComponents/DiscountOptionsModal';
+import { trackEvent } from '@/lib/mixpanel';
 
 interface Discount {
   _id: string;
@@ -70,12 +71,20 @@ const Page = () => {
 
   const handleShareDiscountCode = async (discount: Discount) => {
   
+    trackEvent("Share Discount Started", {
+      source: "dashboard discount page",
+      timestamp: new Date().toISOString(),
+      page_name: "dashboard discount page",
+      discount_id: discount?._id
+    });
+
     const discountCode = discount.discountCode;
   
     if (!discountCode) {
       console.log("No discount code found in selectedDiscount");
       return;
     }
+
   
     if (navigator.share) {
       try {
@@ -90,7 +99,31 @@ const Page = () => {
       // Fallback: copy the link to clipboard
       navigator.clipboard.writeText(discountCode);
       alert("Discount code copied to clipboard!");
+
+      trackEvent("Share Discount End", {
+        source: "dashboard discount page",
+        timestamp: new Date().toISOString(),
+        page_name: "dashboard discount page",
+        discount_id: discount?._id,
+        discount_title: discount.discountTitle,
+        discount_value: discount.discountValue,
+        discount_value_type: discount.discountValueType,
+        discount_code: discount.discountCode,
+        status: "Successfull"
+      });
+
     } else {
+      trackEvent("Share Discount End", {
+        source: "dashboard discount page",
+        timestamp: new Date().toISOString(),
+        page_name: "dashboard discount page",
+        discount_id: discount?._id,
+        discount_title: discount.discountTitle,
+        discount_value: discount.discountValue,
+        discount_value_type: discount.discountValueType,
+        discount_code: discount.discountCode,
+        status: "Failed"
+      });
       alert("Sharing not supported on this browser.");
     }
   };

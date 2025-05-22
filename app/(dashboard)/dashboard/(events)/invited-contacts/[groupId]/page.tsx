@@ -8,6 +8,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import "react-toastify/dist/ReactToastify.css";
 import SendContactModal from "@/components/shareContact/SendContactModal";
 import { useRouter } from "next/navigation";
+import { trackEvent } from "@/lib/mixpanel";
 
 // Define the type for an invited contact coming from the backend.
 interface InvitedContact {
@@ -51,6 +52,7 @@ const InvitedContactsPage: React.FC = () => {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [optionModal, setOptionModal] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [eventData, setEventData] = useState<null | any>(null);
 
   useEffect(() => {
     const pathParts = window.location.pathname.split("/");
@@ -61,6 +63,18 @@ const InvitedContactsPage: React.FC = () => {
       setGroupId(id);
     }
   }, [router]);
+
+  useEffect(() => {
+    const storedData = localStorage.getItem("eventData");
+    if (storedData) {
+      try {
+        const parsed = JSON.parse(storedData);
+        setEventData(parsed);
+      } catch (error) {
+        console.error("Failed to parse eventData from localStorage", error);
+      }
+    }
+  }, []);
 
   useEffect(() => {
     if (!groupId) return;
@@ -90,14 +104,69 @@ const InvitedContactsPage: React.FC = () => {
     );
   }, [invitedContacts, debouncedSearch]);
 
-  const extractedContacts = useMemo(() => {
-    return invitedContacts
-      .filter((contact) => selectedIds.has(contact._id))
-      .map((contact) => ({
-        guestName: contact.guestName,
-        phoneNumber: contact.phoneNumber.replace(/\D/g, "")
-      }));
-  }, [invitedContacts, selectedIds]);
+  // Helper function to validate Nigerian prefixes
+const isValidNigerianPrefix = (prefix: string): boolean => {
+  const validPrefixes = [
+    '701', '702', '703', '704', '705', '706', '707', '708', '709', // MTN
+    '801', '802', '803', '804', '805', '806', '807', '808', '809', // 9mobile
+    '901', '902', '903', '904', '905', '906', '907', '908', '909', // Airtel
+    '811', '812', '813', '814', '815', '816', '817', '818', '819', // Glo
+    '911', '912', '913', '914', '915', '916', '917', '918', '919'  // Glo
+  ];
+  return validPrefixes.includes(prefix);
+};
+
+// Function to check for non-Nigerian contacts
+const hasNonNigerianContacts = (contacts: Array<{ phoneNumber: string }>): boolean => {
+  return contacts.some(contact => {
+    const cleanedNumber = contact.phoneNumber.replace(/\D/g, "");
+    
+    // Check for Nigerian numbers
+    const isNigerian = 
+      // International format (+234 or 234)
+      (cleanedNumber.startsWith('234') && cleanedNumber.length === 13) ||
+      // Local format (0...)
+      (cleanedNumber.startsWith('0') && cleanedNumber.length === 11) ||
+      // Compact format (without 0, e.g., 801...)
+      (cleanedNumber.length === 10 && isValidNigerianPrefix(cleanedNumber.substring(0, 3)));
+    
+    return !isNigerian;
+  });
+};
+
+// Main component logic
+const extractedContacts = useMemo(() => {
+  const contacts = invitedContacts
+    .filter((contact) => selectedIds.has(contact._id))
+    .map((contact) => ({
+      guestName: contact.guestName,
+      phoneNumber: contact.phoneNumber.replace(/\D/g, "")
+    }));
+
+  const containsForeignNumbers = hasNonNigerianContacts(contacts);
+
+  trackEvent("Import Contact Save", {
+    source: "share-contact page",
+    event_id: eventData?._id,
+    event_name: eventData?.eventName,
+    timestamp: new Date().toISOString(),
+    page_name: "Share-contact Page",
+    route: "Google",
+    count: contacts.length,
+    non_ngn_country_code: containsForeignNumbers ? "Yes" : "No",
+  });
+
+  return contacts;
+}, [invitedContacts, selectedIds, eventData?._id, eventData?.eventName]);
+
+  // const extractedContacts = useMemo(() => {
+  //   return invitedContacts
+  //     .filter((contact) => selectedIds.has(contact._id))
+  //     .map((contact) => ({
+  //       guestName: contact.guestName,
+  //       phoneNumber: contact.phoneNumber.replace(/\D/g, "")
+  //     }));
+  // }, [invitedContacts, selectedIds]);
 
   const extractedPhoneNumbers = useMemo(() => {
     return invitedContacts
