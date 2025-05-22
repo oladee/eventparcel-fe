@@ -157,7 +157,7 @@ const extractedContacts = useMemo(() => {
   });
 
   return contacts;
-}, [invitedContacts, selectedIds, eventData?._id, eventData?.eventName]);
+}, [invitedContacts, selectedIds, eventData?._id, eventData?.eventName, hasNonNigerianContacts]);
 
   // const extractedContacts = useMemo(() => {
   //   return invitedContacts
