@@ -182,7 +182,7 @@ const Verification = () => {
     }
   };
   return (
-    <Container>
+    <>
       <ToastContainer role="alert" />
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#F9FAFB] px-4">
         {!onSuccess && (
@@ -277,7 +277,7 @@ const Verification = () => {
 
         {/* {onSuccess && <ResetSuccess />} */}
       </div>
-    </Container>
+    </>
   );
 };
 
