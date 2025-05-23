@@ -59,9 +59,10 @@ const CohostActionsModal: React.FC<CohostActionsModalProps> = ({
   }, [onClose]);
 
   const handleViewActivityLog = useCallback(() => {
-    router.push(`/dashboard/co-host/${cohost._id}`);
+    // router.push(`/dashboard/co-host/${cohost._id}`);
+    router.push(`/dashboard/co-host/${cohost._id}?eventId=${cohost.eventId}`);
     onClose();
-  }, [cohost._id, onClose, router]);
+  }, [cohost._id, onClose, router, cohost.eventId]);
 
   const handleToggleStatus = useCallback(async () => {
     setLoadingToggle(true);
