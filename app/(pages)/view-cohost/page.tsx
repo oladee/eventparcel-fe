@@ -35,15 +35,17 @@ const Page = () => {
 
   useEffect(() => {
     if (typeof window !== "undefined") {
-      const storedEventId = localStorage.getItem("eventId");
-      if (!storedEventId) {
+      // const storedEventId = localStorage.getItem("eventId");
+      const loggedInUserString = localStorage.getItem("loggedInUserId");
+
+      if (!loggedInUserString) {
         router.replace("/event-creation");
         return;
       }
       
       const fetchCoHosts = async () => {
         try {
-          const response = await axiosInstance.get(`/view-cohosts/${storedEventId}`);
+          const response = await axiosInstance.get(`/view-cohosts-for-host/${loggedInUserString}`);
           if (response.data.success) {
             setCoHosts(response.data.data);
           } else {
@@ -60,6 +62,35 @@ const Page = () => {
       fetchCoHosts();
     }
   }, [router]);
+
+  
+  // useEffect(() => {
+  //   if (typeof window !== "undefined") {
+  //     const storedEventId = localStorage.getItem("eventId");
+  //     if (!storedEventId) {
+  //       router.replace("/event-creation");
+  //       return;
+  //     }
+      
+  //     const fetchCoHosts = async () => {
+  //       try {
+  //         const response = await axiosInstance.get(`/view-cohosts/${storedEventId}`);
+  //         if (response.data.success) {
+  //           setCoHosts(response.data.data);
+  //         } else {
+  //           toast.error(response.data.message);
+  //         }
+  //       } catch (error: any) {
+  //         console.error("Error fetching co-hosts:", error);
+  //         toast.error("Failed to fetch co-hosts.");
+  //       } finally {
+  //         setLoading(false);
+  //       }
+  //     };
+
+  //     fetchCoHosts();
+  //   }
+  // }, [router]);
 
   return (
     <HeaderLayout>
