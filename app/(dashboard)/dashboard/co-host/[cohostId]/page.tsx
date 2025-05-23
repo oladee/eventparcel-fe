@@ -165,14 +165,14 @@ export default function Page() {
     return dayjs(timestamp).format("HH:mm");
   };
 
-  // Button text for different entity types
-  const getViewButtonText = (entityType: string) => {
-    if (!entityType) return "View";
-    const lower = entityType.toLowerCase();
-    if (lower.includes("event")) return "View Event";
-    if (lower.includes("group")) return "View Group";
-    return "View Group";
-  };
+  // // Button text for different entity types
+  // const getViewButtonText = (entityType: string) => {
+  //   if (!entityType) return "View";
+  //   const lower = entityType.toLowerCase();
+  //   if (lower.includes("event")) return "View Event";
+  //   if (lower.includes("group")) return "View Group";
+  //   return "View Group";
+  // };
 
   // Prepare grouped logs
   const groupedLogs = groupLogsByDate(activityLogs);
