@@ -8,6 +8,7 @@ import { BiLoaderCircle } from "react-icons/bi";
 import { toast, ToastContainer } from "react-toastify";
 import Container from "@/components/dashboard/Container";
 import CohostActionsModal from "@/components/dashboard/cohost/CohostActionsModal";
+import { useRouter as Route } from "next-nprogress-bar";
 
 // Define interfaces for user & log entry
 // interface ActivityUser {
@@ -76,6 +77,7 @@ const actionColors = ["#C22B2F", "#F7B500", "#0CAF60"];
 
 export default function Page() {
   const router = useRouter();
+  const route = Route();
 
   // // Convert possible string | string[] to string:
   // const rawCohostId = params?.cohostId;
@@ -293,7 +295,7 @@ export default function Page() {
                                 <button
                                   onClick={() => {
                                     if (log.actionType === "Event") {
-                                      router.push(
+                                      route.push(
                                         `/dashboard/events/${log.event._id}`
                                       );
                                     } else if (log.actionType === "Group") {
@@ -301,7 +303,7 @@ export default function Page() {
                                         log.meta?.eventGroupID ||
                                         log.group?._id;
                                       if (groupId) {
-                                        router.push(
+                                        route.push(
                                           `/dashboard/groups/${groupId}`
                                         );
                                       } else {

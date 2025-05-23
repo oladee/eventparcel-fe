@@ -11,7 +11,7 @@ import { Group } from "@/app/interface/Group";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { trackEvent } from "@/lib/mixpanel";
-import { useRouter } from "next/router";
+import { useRouter } from "next/navigation";
 
 interface AddGroupProps {
   setIsAddGroupOpen: React.Dispatch<React.SetStateAction<boolean>>;
