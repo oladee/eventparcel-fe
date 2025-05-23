@@ -235,12 +235,12 @@ const Page = () => {
                   Discount Value:{" "}
                   <span className="font-bold text-base">
                     {discount.discountValueType === 'percentage'
-                      ? `${discount.discountValue}%`
+                      ? `${Number(discount.discountValue).toLocaleString()}%`
                       : discount.discountValueType === 'NGN'
-                      ? `₦${discount.discountValue}`
+                      ? `₦${Number(discount.discountValue).toLocaleString('en-NG')}`
                       : discount.discountValueType === 'USD'
-                      ? `$${discount.discountValue}`
-                      : discount.discountValue}
+                      ? `$${Number(discount.discountValue).toLocaleString('en-US')}`
+                      : Number(discount.discountValue).toLocaleString()}
                   </span>
                 </p>
               </div>

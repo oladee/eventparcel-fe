@@ -39,7 +39,7 @@ const Page = () => {
       const loggedInUserString = localStorage.getItem("loggedInUserId");
 
       if (!loggedInUserString) {
-        router.replace("/event-creation");
+        router.replace("/");
         return;
       }
       
