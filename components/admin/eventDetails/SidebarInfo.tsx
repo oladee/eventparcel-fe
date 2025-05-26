@@ -159,7 +159,7 @@ const SidebarInfo: React.FC<SidebarInfoProps> = ({ host, payout, deliveryStat })
           </div>
         </div>
         <div className="flex items-start gap-3 mt-2 text-[#A0AEC0] font-medium border-t border-[#EEEFF2] pt-3">
-          <GrLocation size={24} /> <p className="text-sm text-[#718096]">
+          <GrLocation size={34} /> <p className="text-sm text-[#718096]">
           {payout?.pickupLocation
               ? payout.pickupLocation
                   .split(" ")
