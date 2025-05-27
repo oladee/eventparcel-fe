@@ -310,7 +310,7 @@ const AddGroup2: React.FC<AddGroupProps> = ({
       ></div>
 
       <form
-        className="w-[320px] h-[545px] space-y-4 bg-[#FFFFFF] px-5 py-6 rounded-3xl relative"
+        className="w-[320px] h-[545px] space-y-4 bg-[#FFFFFF] px-5 py-6 rounded-3xl relative !z-50"
         onSubmit={handleSubmit}
       >
         <FiX size={24}  onClick={() => setIsAddGroupOpen(false)} className="absolute top-3 right-3 text-black-300 " />
