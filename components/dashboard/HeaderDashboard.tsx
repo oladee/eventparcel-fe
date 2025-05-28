@@ -1,6 +1,6 @@
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
-import { FiMenu, FiBell } from "react-icons/fi";
+import { FiMenu } from "react-icons/fi";
 import ToolTipProfileHost from "./ToolTipProfileHost";
 
 interface HeaderProps {
@@ -145,10 +145,10 @@ const HeaderDashboard: React.FC<HeaderProps> = ({ toggleSidebar }) => {
         </div> */}
 
         {/* Notification */}
-        <button className="relative outline-none">
+        {/* <button className="relative outline-none">
           <FiBell size={20} />
           <span className="absolute top-0 right-0 inline-block w-2 h-2 bg-red-500 rounded-full"></span>
-        </button>
+        </button> */}
 
         {/* Separator */}
         <div className="h-[30px] bg-[#EEEFF2] w-px"></div>
