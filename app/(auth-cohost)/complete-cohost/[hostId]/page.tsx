@@ -183,7 +183,7 @@ const CompleteCohost: React.FC = () => {
                   value={formData.firstName}
                   // onChange={(e) => handleChange("firstName", e.target.value)}
                   required
-                  readOnly
+                  // readOnly
                   aria-required="true"
                   aria-describedby="firstNameError"
                 />
@@ -206,7 +206,7 @@ const CompleteCohost: React.FC = () => {
                   className="authInput capitalize"
                   value={formData.lastName}
                   // onChange={(e) => handleChange("lastName", e.target.value)}
-                  readOnly
+                  // readOnly
                   required
                   aria-required="true"
                   aria-describedby="lastNameError"
