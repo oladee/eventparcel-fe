@@ -179,7 +179,7 @@ const CompleteCohost: React.FC = () => {
                   type="text"
                   id="firstName"
                   placeholder="First name"
-                  className="authInput"
+                  className="authInput capitalize"
                   value={formData.firstName}
                   // onChange={(e) => handleChange("firstName", e.target.value)}
                   required
@@ -203,7 +203,7 @@ const CompleteCohost: React.FC = () => {
                   type="text"
                   placeholder="Last name"
                   id="Last name"
-                  className="authInput"
+                  className="authInput capitalize"
                   value={formData.lastName}
                   // onChange={(e) => handleChange("lastName", e.target.value)}
                   readOnly
