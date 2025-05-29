@@ -17,14 +17,14 @@ const HostSidebarInfo: React.FC<Props> = ({ host, pickup }) => (
     <div className="bg-white rounded-2xl p-4">
       <h4 className="text-xl font-bold text-[#111827]">Host Details</h4>
       <div className="mt-3 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-[#8C62FF] flex items-center justify-center font-semibold text-white capitalize">
+        <div className="w-10 h-10 rounded-full bg-[#8C62FF] flex items-center justify-center font-semibold text-white">
           {host.hostName
             .split(" ")
             .map((n) => n[0])
             .join("")}
         </div>
         <div>
-          <p className="font-semibold text-black-100">{host.hostName}</p>
+          <p className="font-semibold text-black-100 capitalize">{host.hostName}</p>
           <p className="text-[#718096] text-sm">{host.location}</p>
         </div>
       </div>
