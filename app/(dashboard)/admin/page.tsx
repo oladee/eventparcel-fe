@@ -32,6 +32,7 @@ const PageSkeleton: React.FC = () => (
 interface CurrencySales {
   totalAmount: number
   growthRate: number
+  // growthRateDaily: number
   monthlySales: { month: string; sales: number }[]
   dailySales: { day: string; sales: number }[]
 }

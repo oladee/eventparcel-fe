@@ -1,5 +1,4 @@
- "use client";
-
+"use client";
 
 import React, { useState, useEffect } from "react";
 import { FaCalendarAlt } from "react-icons/fa";
@@ -13,14 +12,14 @@ import {
   YAxis,
   Tooltip,
   ResponsiveContainer,
-  TooltipProps,
+  TooltipProps
 } from "recharts";
 import dynamic from "next/dynamic";
 
 const SkeletonLoader = dynamic(
   () => import("@/components/admin/dashboard//SkeletonLoader"),
   {
-    ssr: false, // Disable server-side rendering
+    ssr: false // Disable server-side rendering
   }
 );
 
@@ -45,6 +44,7 @@ interface SalesData {
 interface CurrencySales {
   totalAmount: number;
   growthRate: number;
+  growthRateDaily: number;
   monthlySales: MonthlySale[];
   dailySales: DailySale[];
 }
@@ -65,7 +65,7 @@ interface DashboardResponse {
 const CustomTooltip: React.FC<TooltipProps<number, string>> = ({
   active,
   payload,
-  label,
+  label
 }) => {
   if (active && payload && payload.length) {
     const { netSales, sales } = payload[0].payload as SalesData;
@@ -102,7 +102,7 @@ const CustomBackgroundBar: React.FC<CustomBarProps> = ({
   onBarHover,
   onBarLeave,
   viewBox,
-  fillColor,
+  fillColor
 }) => {
   // Use the chart's viewBox for chart area dimensions.
   const chartY = viewBox?.y ?? 0;
@@ -155,9 +155,9 @@ const CustomBackgroundBar: React.FC<CustomBarProps> = ({
 // --------------------- CHART COMPONENT ---------------------
 const LineChartSection: React.FC = () => {
   // State for dashboard data from API
-  const [dashboardData, setDashboardData] = useState<DashboardResponse["data"] | null>(
-    null
-  );
+  const [dashboardData, setDashboardData] = useState<
+    DashboardResponse["data"] | null
+  >(null);
   // Loading and error states
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
@@ -191,7 +191,7 @@ const LineChartSection: React.FC = () => {
 
   // --------------------- RENDER STATES ---------------------
   if (loading) {
-    return <SkeletonLoader />;    
+    return <SkeletonLoader />;
   }
 
   if (error || !dashboardData) {
@@ -209,11 +209,11 @@ const LineChartSection: React.FC = () => {
     viewType === "monthly"
       ? currentSalesData.monthlySales.map((item) => ({
           month: item.month,
-          sales: item.sales,
+          sales: item.sales
         }))
       : currentSalesData.dailySales.map((item) => ({
           month: item.day, // Reuse the "month" key for labeling
-          sales: item.sales,
+          sales: item.sales
         }));
 
   // A small multiplier for the top range in the chart so that bars and line don't touch the top
@@ -277,14 +277,29 @@ const LineChartSection: React.FC = () => {
                   currency === "naira" ? "text-primary" : "text-[#718096]"
                 }`}
               >
-                ₦{(dashboardData.overallSales.naira.totalAmount / 1e6).toFixed(2)}M
+                ₦
+                {(dashboardData.overallSales.naira.totalAmount / 1e6).toFixed(
+                  2
+                )}
+                M
               </p>
               {currency === "naira" && (
                 <span className="hidden md:flex items-center text-[10px] md:text-xs font-medium text-white bg-primary px-2 py-2 rounded-full">
                   <GrLineChart className="mr-1" />
-                  {Math.abs(dashboardData.overallSales.naira.growthRate)}%
+                  {Math.abs(
+                    viewType === "monthly"
+                      ? dashboardData.overallSales.naira.growthRate
+                      : dashboardData.overallSales.naira.growthRateDaily
+                  ).toFixed(2)}
+                  %
                 </span>
               )}
+              {/* {currency === "naira" && (
+                <span className="hidden md:flex items-center text-[10px] md:text-xs font-medium text-white bg-primary px-2 py-2 rounded-full">
+                  <GrLineChart className="mr-1" />
+                  {Math.abs(dashboardData.overallSales.naira.growthRate)}%
+                </span>
+              )} */}
             </div>
 
             {/* Separator */}
@@ -302,17 +317,28 @@ const LineChartSection: React.FC = () => {
               >
                 $
                 {dashboardData.overallSales.dollar.totalAmount >= 1000
-                  ? `${(dashboardData.overallSales.dollar.totalAmount / 1000).toFixed(
-                      2
-                    )}k`
+                  ? `${(
+                      dashboardData.overallSales.dollar.totalAmount / 1000
+                    ).toFixed(2)}k`
                   : dashboardData.overallSales.dollar.totalAmount}
               </p>
               {currency === "dollar" && (
                 <span className="hidden md:flex items-center text-[10px] md:text-xs font-medium text-white bg-[#F7B500] px-2 py-2 rounded-full">
                   <GrLineChart className="mr-1" />
-                  {Math.abs(dashboardData.overallSales.dollar.growthRate)}%
+                  {Math.abs(
+                    viewType === "monthly"
+                      ? dashboardData.overallSales.dollar.growthRate
+                      : dashboardData.overallSales.dollar.growthRateDaily
+                  ).toFixed(2)}
+                  %
                 </span>
               )}
+              {/* {currency === "dollar" && (
+                <span className="hidden md:flex items-center text-[10px] md:text-xs font-medium text-white bg-[#F7B500] px-2 py-2 rounded-full">
+                  <GrLineChart className="mr-1" />
+                  {Math.abs(dashboardData.overallSales.dollar.growthRate)}%
+                </span>
+              )} */}
             </div>
           </div>
         </div>
@@ -329,8 +355,6 @@ const LineChartSection: React.FC = () => {
           </button>
         </div>
       </div>
-
-    
 
       {/* Chart Container */}
       <div className="w-full relative">
