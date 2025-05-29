@@ -32,26 +32,28 @@ const Page = () => {
   const [fetchingCode, setFetchingCode] = useState(false);
   const router = useRouter();
   const symbolDropdownRef = useRef<HTMLDivElement>(null);
-
+  const [error, setError] = useState("");
+  
   useEffect(() => {
     const authToken = localStorage.getItem("authToken");
     const loggedInUserString = localStorage.getItem("loggedInUser");
     const loggedInUser = loggedInUserString ? JSON.parse(loggedInUserString) : null;
-
+    
+    
     setHostId(loggedInUser?._id);
-
+    
     if (!authToken) {
       router.replace("/");
       return;
     }
-
+    
     const fetchEventData = async () => {
       const authToken = localStorage.getItem("authToken");
       if (!authToken) {
         router.replace("/");
         return;
       }
-    
+      
       try {
         setFetchingEvents(true);
         const response = await axiosInstance.get("/view-events", {
@@ -73,20 +75,20 @@ const Page = () => {
 
     fetchEventData();
   }, [router]);
-
+  
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
       if (symbolDropdownRef.current && !symbolDropdownRef.current.contains(event.target as Node)) {
         setIsSymbolDropdownOpen(false);
       }
     };
-
+    
     document.addEventListener('mousedown', handleClickOutside);
     return () => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
-
+  
   useEffect(() => {
     const fetchDiscountCode = async () => {
       if (!selectedEvent) {
@@ -110,33 +112,33 @@ const Page = () => {
         setFetchingCode(false);
       }
     };
-
+    
     fetchDiscountCode();
   }, [selectedEvent]);
-
+  
   const filteredEvents = eventData.filter((event) =>
     event.eventName.toLowerCase().includes(searchEvent.toLowerCase())
-  );
+);
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    trackEvent("Create Discount Started", {
-      source: "dashboard create discount page",
-      timestamp: new Date().toISOString(),
-      page_name: "dashboard create discount page",
-      event_id: selectedEvent._id
-    });
+const handleSubmit = async (e: React.FormEvent) => {
+  e.preventDefault();
   
-    if (!selectedEvent || !discountTitle || !discountValue || !discountCode) {
-      toast.error('Please fill all required fields.');
+  trackEvent("Create Discount Started", {
+    source: "dashboard create discount page",
+    timestamp: new Date().toISOString(),
+    page_name: "dashboard create discount page",
+    event_id: selectedEvent._id
+  });
+  
+  if (!selectedEvent || !discountTitle || !discountValue || !discountCode) {
+    toast.error('Please fill all required fields.');
       return;
     }
   
     let discountValueType = 'NGN';
     if (symbol === '$') discountValueType = 'USD';
     if (symbol === '%') discountValueType = 'percentage';
-  
+    
     const payload = {
       event: selectedEvent._id,
       hostId,
@@ -145,11 +147,11 @@ const Page = () => {
       discountValueType,
       discountCode
     };
-  
+    
     try {
       setLoading(true);
       const res = await axiosInstance.post('/add-discount', payload);
-
+      
       trackEvent("Create Discount Started", {
         source: "dashboard create discount page",
         timestamp: new Date().toISOString(),
@@ -161,7 +163,7 @@ const Page = () => {
         value: Number(discountValue),
         status: "Successfull"
       });
-
+      
       if (res.data.success) {
         toast.success('Discount created successfully!');
         router.push("/dashboard/discounts");
@@ -185,6 +187,20 @@ const Page = () => {
       setLoading(false);
     }
   };
+  
+  const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const value = e.target.value;
+    setDiscountTitle(value);
+  
+    if (value.length < 3) {
+      setError("Title must be at least 3 characters");
+    } else if (value.length > 25) {
+      setError("Title must not exceed 25 characters");
+    } else {
+      setError("");
+    }
+  };
+  
   
   return (
     <Container>
@@ -260,14 +276,15 @@ const Page = () => {
                 id="discount-title-input"
                 type="text"
                 required
-                minLength={3}
-                maxLength={25}
                 value={discountTitle}
-                onChange={(e) => setDiscountTitle(e.target.value)}
+                onChange={handleTitleChange}
                 placeholder="Enter discount title"
                 className="w-full h-[56px] bg-[#FAFAFA] text-sm font-medium text-gray-700 rounded-[12px] px-4 py-3 focus:outline-none"
             />
-          </div>
+              {error && (
+                <p className="text-red-500 text-sm font-medium">{error}</p>
+              )}
+              </div>
 
           {/* Discount Value */}
           <div id="discount-value-section" className="space-y-1">
@@ -338,15 +355,33 @@ const Page = () => {
           </div>
 
           <button
-            id="submit-discount-button"
             type="submit"
-            disabled={loading || fetchingCode || !selectedEvent}
-            className="w-[160px] h-[48px] mt-3 bg-[#751423] text-white text-sm font-medium rounded-[12px] px-4 py-3 hover:bg-[#631818] transition flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed"
+            disabled={
+              !selectedEvent ||
+              !discountTitle ||
+              !discountValue ||
+              !discountCode ||
+              error !== "" ||
+              loading
+            }
+            className={`w-full py-3 text-white font-semibold rounded-[12px] ${
+              !selectedEvent ||
+              !discountTitle ||
+              !discountValue ||
+              !discountCode ||
+              error !== "" ||
+              loading
+                ? 'bg-gray-300 cursor-not-allowed'
+                : 'bg-primary hover:bg-primary/90'
+            }`}
           >
             {loading ? (
-              <BiLoaderCircle className="animate-spin mr-2" size={22} />
+              <span className="flex justify-center items-center gap-2">
+                <BiLoaderCircle className="animate-spin" size={20} />
+                Creating Discount...
+              </span>
             ) : (
-              "Create Discount"
+              'Create Discount'
             )}
           </button>
         </form>     
