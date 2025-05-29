@@ -26,7 +26,10 @@ interface PackagesSectionProps {
   isPickupAvailable: boolean;
 }
 
-const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData, isPickupAvailable }) => {
+const PackagesSection: React.FC<PackagesSectionProps> = ({
+  eventData,
+  isPickupAvailable
+}) => {
   const [openModalPackage, setOpenModalPackage] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -93,7 +96,10 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData, isPickupAv
           onClick={() => {
             //  localStorage.setItem("eventId", eventId)
             localStorage.setItem("eventId", eventData._id);
-            localStorage.setItem("groupLength", eventData?.eventGroups.length.toString());
+            localStorage.setItem(
+              "groupLength",
+              eventData?.eventGroups.length.toString()
+            );
             localStorage.setItem("isNairaAccount", eventData.isNairaAccount);
             localStorage.setItem("isDollarAccount", eventData.isDollarAccount);
             setIsAddGroupOpen(true);
@@ -248,23 +254,15 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData, isPickupAv
                   Contacts
                 </button>
               )}
-              {/* <button
-                onClick={() => handleInvitedContacts(group._id)}
-                className="text-gray-500 text-sm font-medium outline-none"
-              >
-                Contacts: <span className="text-gray-900 font-bold">0</span>
-              </button> */}
-              {/* <button
-                // onClick={handleSendInviteClick}
-                onClick={() => handleSendInviteClick(group._id)}
-                className="text-primary flex items-center gap-1 font-medium outline-none"
-              >
-                <IoIosSend size={18} /> Send Invite
-              </button> */}
+
               <button
                 onClick={() => {
-                  if (group.isDisabled && isPickupAvailable) {
+                  if (group.isDisabled) {
                     handleDisabledAction();
+                  } else if (!isPickupAvailable) {
+                    toast.warning(
+                      "You can't send invites to an event without pickup details."
+                    );
                   } else {
                     handleSendInviteClick(group._id);
                   }
@@ -275,6 +273,21 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData, isPickupAv
               >
                 <IoIosSend size={18} /> Send Invite
               </button>
+              
+              {/* <button
+                onClick={() => {
+                  if (group.isDisabled) {
+                    handleDisabledAction();
+                  } else {
+                    handleSendInviteClick(group._id);
+                  }
+                }}
+                className={`text-primary flex items-center gap-1 font-medium outline-none ${
+                  group.isDisabled ? "opacity-50 cursor-not-allowed" : ""
+                }`}
+              >
+                <IoIosSend size={18} /> Send Invite
+              </button> */}
             </div>
           </div>
         ))}
