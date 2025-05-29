@@ -62,7 +62,12 @@ const EventOptionsModal: React.FC<EventOptionsModalProps> = ({
       // Optionally, refresh or update the event list:
       // router.refresh();
       window.dispatchEvent(new Event("refreshEvents"));
-    } catch (error) {
+    } catch (error:any) {
+      // it the status code is equal to 409 then throw an error
+      if (error.response && error.response.status === 409) {
+        toast.error("You cannot delete this event because it has been shared.");
+        return;
+      }
       console.error("Error deleting event:", error);
       alert("Failed to delete event. Please try again later.");
     }
