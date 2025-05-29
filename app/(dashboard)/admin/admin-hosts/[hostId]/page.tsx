@@ -1,7 +1,7 @@
 // app/(dashboard)/admin/admin-hosts/[hostId]/page.tsx
 "use client";
 
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import AdminContainer from "@/components/admin/AdminContainer";
 import Tabs from "@/components/admin/eventDetails/Tabs";
