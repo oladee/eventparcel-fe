@@ -17,7 +17,7 @@ const HostSidebarInfo: React.FC<Props> = ({ host, pickup }) => (
     <div className="bg-white rounded-2xl p-4">
       <h4 className="text-xl font-bold text-[#111827]">Host Details</h4>
       <div className="mt-3 flex items-center gap-3">
-        <div className="w-10 h-10 rounded-full bg-[#8C62FF] flex items-center justify-center font-semibold text-white">
+        <div className="w-10 h-10 rounded-full bg-[#8C62FF] flex items-center justify-center font-semibold text-white capitalize">
           {host.hostName
             .split(" ")
             .map((n) => n[0])
@@ -42,7 +42,7 @@ const HostSidebarInfo: React.FC<Props> = ({ host, pickup }) => (
     <div className="bg-white rounded-2xl p-4">
       <h4 className="text-lg font-bold text-[#111827]">Pickup Details</h4>
       <div className="border-t border-[#EEEFF2] mt-3 pt-3 space-y-2">
-        <p className="font-semibold">{pickup.contactName}</p>
+        <p className="font-semibold capitalize">{pickup.contactName}</p>
         <p className="text-[#718096] text-sm">{pickup.location}</p>
         <div className="flex items-center gap-3 text-[#718096] text-sm font-medium">
           <HiOutlineEnvelope size={20} /> {pickup.email}
