@@ -213,7 +213,7 @@ const GeneralModal: React.FC<generalGroupProps> = ({ group, handleDuplicate, han
                 Delete
               </span>
             </div> 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 cursor-pointer">
             {loadingGroup ? (
                <svg
                className="animate-spin h-4 w-4 text-gray-400"

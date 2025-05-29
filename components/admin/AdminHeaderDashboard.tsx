@@ -54,10 +54,10 @@ const AdminHeaderDashboard: React.FC<HeaderProps> = ({ toggleSidebar }) => {
         };
       };
       const newUser = {
-        firstName: payload.firstName || "",
-        lastName: payload.lastName || "",
-        role: payload.role || "",
-        imageUrl: payload.imageUrl || ""
+        firstName: payload?.firstName || "",
+        lastName: payload?.lastName || "",
+        role: payload?.role || "",
+        imageUrl: payload?.imageUrl || ""
       };
       setUser(newUser);
       userRef.current = newUser;

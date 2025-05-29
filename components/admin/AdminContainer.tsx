@@ -20,7 +20,7 @@ function AdminContainer({ children }: { children: React.ReactNode }) {
       };
 
       // Redirect if the user is not an admin or superAdmin
-      if (parsedUser.data.role !== "admin" && parsedUser.data.role !== "superAdmin") {
+      if (parsedUser?.data?.role !== "admin" && parsedUser?.data?.role !== "superAdmin") {
         router.replace("/adminLogin");
         return;
       }

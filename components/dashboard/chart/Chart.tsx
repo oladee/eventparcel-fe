@@ -19,7 +19,6 @@ import { useRouter } from "next/navigation";
 // import EmptyStateWithAction from "../EmptyState";
 // import Container from "../Container";
 
-
 const SkeletonLoader = dynamic(
   () => import("@/components/dashboard/loadingStates/SkeletonLoader"),
   {
@@ -48,6 +47,7 @@ interface SalesData {
 interface CurrencySales {
   totalAmount: number;
   growthRate: number;
+  growthRateDaily: number;
   monthlySales: MonthlySale[];
   dailySales: DailySale[];
 }
@@ -177,21 +177,28 @@ const Chart: React.FC = () => {
   useEffect(() => {
     const fetchData = async () => {
       const loggedInUserId = localStorage.getItem("loggedInUserId");
-      console.log("Checking to see if the value for loggedInUserId is available", loggedInUserId);
-  
+      console.log(
+        "Checking to see if the value for loggedInUserId is available",
+        loggedInUserId
+      );
+
       if (!loggedInUserId) {
         router.refresh();
-        console.log("User ID not found in localStorage. Redirecting to login page.");
+        console.log(
+          "User ID not found in localStorage. Redirecting to login page."
+        );
         return;
       }
-  
+
       try {
-        const response = await axiosInstance.get(`/dashboard-data/${loggedInUserId}`);
+        const response = await axiosInstance.get(
+          `/dashboard-data/${loggedInUserId}`
+        );
         if (response.data.success) {
           setDashboardData(response.data.data);
           setError("");
           setLoading(false);
-  
+
           // Clear the interval once the API call is successful
           clearInterval(intervalId);
         } else {
@@ -202,13 +209,12 @@ const Chart: React.FC = () => {
         setError("An error occurred while fetching data");
       }
     };
-  
+
     const intervalId: NodeJS.Timeout = setInterval(fetchData, 1000);
-  
+
     // Cleanup the interval when the component unmounts
     return () => clearInterval(intervalId);
   }, [router]);
-  
 
   // --------------------- FETCH DATA ---------------------
 
@@ -345,13 +351,23 @@ const Chart: React.FC = () => {
               {currency === "naira" && (
                 <span className="hidden md:flex items-center text-[10px] md:text-xs font-medium text-white bg-primary px-2 py-2 rounded-full">
                   <GrLineChart className="mr-1" />
-                  {/* {Math.abs(dashboardData.overallSales.naira.growthRate)}% */}
+                  {Math.abs(
+                    viewType === "monthly"
+                      ? dashboardData.overallSales.naira.growthRate
+                      : dashboardData.overallSales.naira.growthRateDaily
+                  ).toFixed(2)}
+                  %
+                </span>
+              )}
+              {/* {currency === "naira" && (
+                <span className="hidden md:flex items-center text-[10px] md:text-xs font-medium text-white bg-primary px-2 py-2 rounded-full">
+                  <GrLineChart className="mr-1" />
                   {Math.abs(
                     dashboardData.overallSales.naira.growthRate
                   ).toFixed(2)}
                   %
                 </span>
-              )}
+              )} */}
             </div>
 
             {/* Separator */}
@@ -367,12 +383,6 @@ const Chart: React.FC = () => {
                   currency === "dollar" ? "text-[#F7B500]" : "text-gray-400"
                 }`}
               >
-                {/* $
-                {dashboardData.overallSales.dollar.totalAmount >= 1000
-                  ? `${(
-                      dashboardData.overallSales.dollar.totalAmount / 1000
-                    ).toFixed(2)}k`
-                  : dashboardData.overallSales.dollar.totalAmount} */}
                 $
                 {dashboardData.overallSales.dollar.totalAmount.toLocaleString()}
               </p>
@@ -380,11 +390,22 @@ const Chart: React.FC = () => {
                 <span className="hidden md:flex items-center text-[10px] md:text-xs font-medium text-white bg-[#F7B500] px-2 py-2 rounded-full">
                   <GrLineChart className="mr-1" />
                   {Math.abs(
-                    dashboardData.overallSales.dollar.growthRate
+                    viewType === "monthly"
+                      ? dashboardData.overallSales.dollar.growthRate
+                      : dashboardData.overallSales.dollar.growthRateDaily
                   ).toFixed(2)}
                   %
                 </span>
               )}
+              {/* {currency === "dollar" && (
+                <span className="hidden md:flex items-center text-[10px] md:text-xs font-medium text-white bg-[#F7B500] px-2 py-2 rounded-full">
+                  <GrLineChart className="mr-1" />
+                  {Math.abs(
+                    dashboardData.overallSales.dollar.growthRate
+                  ).toFixed(2)}
+                  %
+                </span>
+              )} */}
             </div>
           </div>
         </div>
@@ -450,24 +471,6 @@ const Chart: React.FC = () => {
 };
 
 export default Chart;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // "use client";
 
@@ -643,9 +646,6 @@ export default Chart;
 //   // Track which bar (index) is currently hovered
 //   const [hoveredIndex, setHoveredIndex] = useState(-1);
 //   const router = useRouter();
-
-
-  
 
 //   // --------------------- FETCH DATA ---------------------
 
@@ -887,6 +887,3 @@ export default Chart;
 // };
 
 // export default Chart;
-
-
-
