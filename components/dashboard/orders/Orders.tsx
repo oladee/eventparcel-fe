@@ -441,14 +441,23 @@ const Orders: React.FC = ({  }) => {
 
                         <p className="font-medium">Guest</p>
                         <p className="font-bold text-gray-900">
-                        {order?.guestName 
-                          ? order.guestName.charAt(0).toUpperCase() + order.guestName.slice(1) 
-                          : "Guest Name"}
+                        {order?.guestFirstName
+                              ? order.guestFirstName.charAt(0).toUpperCase() +
+                                order.guestFirstName.slice(1)
+                              : "No"}{" "}
+                            {order?.guestLastName
+                              ? order.guestLastName.charAt(0).toUpperCase() +
+                                order.guestLastName.slice(1)
+                              : "Name"}
                         </p>
 
                         <p className="font-medium">Delivery</p>
                         <p className="font-bold text-gray-900">
-                          {order?.items[0]?.deliveryMethod || "N/A"}
+                        {order?.items[0]?.deliveryMethod
+                          ? order.items[0].deliveryMethod === "homeDelivery"
+                            ? "Home Delivery"
+                            : "Pick Up"
+                          : "N/A"}
                         </p>
 
                         <p className="font-medium">Total Price</p>

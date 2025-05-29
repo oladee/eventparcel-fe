@@ -80,18 +80,15 @@ function PaymentDetailsCard() {
 
   const subtotal = itemTotal.reduce((acc: number, item: any) => acc + item.totalPrice, 0);
   const currencySymbol = parsedCartItems?.data?.items?.[0]?.packagePriceCurrency || "NGN";
-  const tax = (7.5 / 100) * subtotal;
   const isHomeDelivery = parsedCartItems?.data?.deliveryType === "homeDelivery";
-  const deliveryFee = isHomeDelivery
-  ? (currencySymbol === "NGN" ? 3000 : 1.87)
-  : 0;
+  const tax = parsedCartItems?.data?.tax ?? 0;
+  const deliveryFee = parsedCartItems?.data?.homeDeliveryFee ?? 0;
   let grandTotal;
   if(!isHomeDelivery) {
     grandTotal = subtotal + tax;
   }else {
     grandTotal = subtotal + tax + deliveryFee;
   }
-
   
   // Apply discount if valid
   if (discountResponse?.discountAmount) {
