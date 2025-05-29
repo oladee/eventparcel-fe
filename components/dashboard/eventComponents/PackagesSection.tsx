@@ -263,7 +263,7 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData, isPickupAv
               </button> */}
               <button
                 onClick={() => {
-                  if (group.isDisabled || isPickupAvailable) {
+                  if (group.isDisabled && isPickupAvailable) {
                     handleDisabledAction();
                   } else {
                     handleSendInviteClick(group._id);
