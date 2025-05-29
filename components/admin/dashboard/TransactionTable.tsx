@@ -274,8 +274,7 @@ const TransactionTable: React.FC<TransactionProps> = ({orders, currentPage, setC
     setOrdersData(sorted);
     setCurrencySortState(newSortState);
   };
-  
-    
+      
   return (
     <div className="w-full gap-4 pt-3 rounded-xl" id="orders-container">
   <div className="flex flex-col md:flex-row md:flex-wrap justify-between items-center gap-4 md:gap-0" id="orders-controls">
@@ -442,7 +441,7 @@ const TransactionTable: React.FC<TransactionProps> = ({orders, currentPage, setC
                     <div className="flex-1 flex flex-col justify-between border-r border-gray-300 max-sm:border-r-0 max-sm:pb-2" id={`breakdown-left-${order.orderNumber}`}>
                       <div className="flex justify-between max-sm:gap-2">
                         <span className="text-gray-500 text-sm">{order.items} item(s)</span>
-                        <span className="text-gray-500 text-sm text-left xl:pr-16 2xl:pr-28 max-sm:pr-2">{order.totalAmountCurrency === "NGN" ? "₦" : "$"}{order.totalAmount.toLocaleString()}</span>
+                        <span className="text-gray-500 text-sm text-left xl:pr-16 2xl:pr-28 max-sm:pr-2">{order.totalAmountCurrency === "NGN" ? "₦" : "$"}{order.amountReceived.toLocaleString()}</span>
                       </div>
                       <div className="flex justify-between max-sm:gap-2">
                         {order.orderId.deliveryType === "homeDelivery" && (

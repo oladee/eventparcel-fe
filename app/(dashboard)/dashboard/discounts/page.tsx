@@ -218,15 +218,17 @@ const Page = () => {
                   </div>
                   )}
                 </div>
-                <button
-                  onClick={() => {
-                    setSelectedDiscount(discount); 
-                    setIsModalOpen(true); 
-                  }}
-                  className="text-[#A0AEC0] text-2xl font-bold"
-                  >
-                  ⋯
-                </button>
+                {!discount?.isShared && (
+                  <button
+                    onClick={() => {
+                      setSelectedDiscount(discount); 
+                      setIsModalOpen(true); 
+                    }}
+                    className="text-[#A0AEC0] text-2xl font-bold"
+                    >
+                    ⋯
+                  </button>
+              )}
               </div>
 
               <div className="w-full flex flex-col gap-2">

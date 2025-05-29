@@ -245,7 +245,7 @@ const GeneralModal: React.FC<generalGroupProps> = ({ group, handleDuplicate, han
             )}
               <span
                 id="copy"
-                className="font-general font-medium text-sm text-[#718096] "
+                className="font-general font-medium text-sm text-[#718096] cursor-pointer"
                 onClick={() => handleDuplicate(group._id)}
               >
                 {
