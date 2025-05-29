@@ -11,7 +11,7 @@ import axios from "axios";
 import { z } from "zod";
 import { identifyUser, trackEvent } from "@/lib/mixpanel";
 import getBrowserType from "@/lib/getBrowserType";
-import Container from "@/components/dashboard/Container";
+// import Container from "@/components/dashboard/Container";
 // import ResetSuccess from "@/components/auth/resetSuccess";
 
 const otpSchema = z

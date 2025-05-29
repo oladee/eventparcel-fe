@@ -1,6 +1,6 @@
 import Image from "next/image";
 import React, { useEffect, useRef, useState } from "react";
-import { FiMenu, FiBell } from "react-icons/fi";
+import { FiMenu } from "react-icons/fi";
 import ToolTipProfileHost from "./ToolTipProfileHost";
 
 interface HeaderProps {
