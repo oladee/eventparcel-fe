@@ -15,10 +15,11 @@ interface Props {
     totalDelivered: Metric;
     pendingOrders: Metric;
   };
+   onRefresh?: () => void;
 }
 
 
-const OverviewHeader: React.FC<Props> = () => {
+const OverviewHeader: React.FC<Props> = ({onRefresh}) => {
   // const {
   //   totalOrders: { overall: orders, growthRate: ordersGrowth },
   //   totalDelivered: { overall: delivered, growthRate: deliveredGrowth },
@@ -49,7 +50,7 @@ const OverviewHeader: React.FC<Props> = () => {
               year: "numeric",
             })}
           </span>
-          <button className="outline-none">
+          <button className="outline-none" onClick={onRefresh}>
             <FiRefreshCw size={14} />
           </button>
         </div>

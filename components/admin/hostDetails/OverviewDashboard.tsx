@@ -9,11 +9,12 @@ import { OverviewData } from "@/types/host";
 
 interface Props {
   overview: OverviewData;
+  onRefresh: () => void
 }
 
-const OverviewDashboard: React.FC<Props> = ({ overview }) => (
+const OverviewDashboard: React.FC<Props> = ({ overview, onRefresh }) => (
   <div className="space-y-6 bg-white p-4 rounded-2xl">
-    <OverviewHeader summary={overview.ordersSummary} />
+    <OverviewHeader summary={overview.ordersSummary} onRefresh={onRefresh}  />
     <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
       <StatsCardGroup invites={overview.invitesSummary} />
       <div className="lg:col-span-2">

@@ -14,8 +14,7 @@ import { BiLoaderCircle } from "react-icons/bi";
 import { OverviewData, HostDetails, PickupDetails } from "@/types/host";
 import GroupsTabs from "@/components/admin/hostDetails/GroupTabs";
 import OrdersTab from "@/components/admin/hostDetails/OrdersTab";
-import axiosInstance from '@/lib/adminAxiosInterceptor/axiosInstance'
-
+import axiosInstance from "@/lib/adminAxiosInterceptor/axiosInstance";
 
 interface EventGroup {
   _id: string;
@@ -75,17 +74,40 @@ const HostDetailPage: React.FC = () => {
   const [data, setData] = useState<HostPageData | null>(null);
   const [activeTab, setActiveTab] = useState<"Groups" | "Orders">("Groups");
 
-  useEffect(() => {
+  // useEffect(() => {
+  //   if (!hostId) {
+  //     router.replace("/admin/admin-hosts");
+  //     return;
+  //   }
+  //   axiosInstance
+  //     .get(`/admin-host/${hostId}`)
+  //     .then((res) => {
+  //       if (res.data.success) {
+  //         setData(res.data.data);
+  //         console.log(res.data.message);
+  //       } else {
+  //         throw new Error(res.data.message);
+  //       }
+  //     })
+  //     .catch((e: any) => {
+  //       setError(e.message || "Failed to load host");
+  //       toast.error(e.message);
+  //     })
+  //     .finally(() => setLoading(false));
+  // }, [hostId, router]);
+
+  const fetchHostData = React.useCallback(() => {
     if (!hostId) {
       router.replace("/admin/admin-hosts");
       return;
     }
+    setLoading(true);
+    setError(null);
     axiosInstance
       .get(`/admin-host/${hostId}`)
       .then((res) => {
         if (res.data.success) {
           setData(res.data.data);
-          console.log(res.data.message);
         } else {
           throw new Error(res.data.message);
         }
@@ -96,6 +118,10 @@ const HostDetailPage: React.FC = () => {
       })
       .finally(() => setLoading(false));
   }, [hostId, router]);
+
+  React.useEffect(() => {
+    fetchHostData();
+  }, [fetchHostData]);
 
   if (loading) {
     return (
@@ -126,7 +152,10 @@ const HostDetailPage: React.FC = () => {
         {/* left/main */}
         <div className="lg:col-span-2 lg:h-[143vh] no-scrollbar overflow-y-scroll">
           {/* Pass your overview data into the dashboard */}
-          <OverviewDashboard overview={data.overview} />
+          <OverviewDashboard
+            overview={data.overview}
+            onRefresh={fetchHostData}
+          />
 
           <div className="mt-6">
             <Tabs active={activeTab} onChange={setActiveTab} />
@@ -151,48 +180,6 @@ const HostDetailPage: React.FC = () => {
 
 export default HostDetailPage;
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 // // app/(dashboard)/admin/admin-hosts/[hostId]/page.tsx
 // "use client";
 
@@ -210,7 +197,6 @@ export default HostDetailPage;
 // import GroupsTabs from "@/components/admin/hostDetails/GroupTabs";
 // import OrdersTab from "@/components/admin/hostDetails/OrdersTab";
 // import axiosInstance from '@/lib/adminAxiosInterceptor/axiosInstance'
-
 
 // // interface WeeklySummary {
 // //   week: string;
@@ -236,7 +222,6 @@ export default HostDetailPage;
 // //   monthlySales: SalesSeries[];
 // //   dailySales: { day: string; sales: number }[];
 // // }
-
 
 // interface EventGroup {
 //   _id: string;
