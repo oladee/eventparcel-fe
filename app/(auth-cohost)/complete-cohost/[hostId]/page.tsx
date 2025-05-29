@@ -72,7 +72,6 @@ const CompleteCohost: React.FC = () => {
 
 
 
-
   // Validate input fields
   const validateInput = (name: string, value: string) => {
     let errorMessage = "";
