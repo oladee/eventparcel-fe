@@ -65,7 +65,7 @@ const EventOptionsModal: React.FC<EventOptionsModalProps> = ({
     } catch (error:any) {
       // it the status code is equal to 409 then throw an error
       if (error.response && error.response.status === 409) {
-        toast.error("You cannot delete this event because it has been shared.");
+        toast.error("You can't delete event with active guests!");
         return;
       }
       console.error("Error deleting event:", error);
