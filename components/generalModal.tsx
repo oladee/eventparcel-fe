@@ -213,7 +213,7 @@ const GeneralModal: React.FC<generalGroupProps> = ({ group, handleDuplicate, han
                 Delete
               </span>
             </div> 
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-1 cursor-pointer">
             {loadingGroup ? (
                <svg
                className="animate-spin h-4 w-4 text-gray-400"
@@ -245,7 +245,7 @@ const GeneralModal: React.FC<generalGroupProps> = ({ group, handleDuplicate, han
             )}
               <span
                 id="copy"
-                className="font-general font-medium text-sm text-[#718096]"
+                className="font-general font-medium text-sm text-[#718096] "
                 onClick={() => handleDuplicate(group._id)}
               >
                 {
