@@ -1,56 +1,59 @@
-"use client"
-import React, { useState, useMemo } from "react"
-import { FiSearch, FiDownload } from "react-icons/fi"
-import OrderTable, { Order } from "./OrderTable"
+"use client";
+import React, { useState, useMemo } from "react";
+import { FiSearch, FiDownload } from "react-icons/fi";
+import OrderTable, { Order } from "./OrderTable";
 
 // now accepts any string status
 export interface EventOrder {
-  orderId: string
-  createdAt: string
-  guestFirstName: string
-  guestLastName: string
-  guestEmail: string
-  totalAmount: number
-  totalAmountCurrency: string
-  orderStatus: string
+  orderId: string;
+  createdAt: string;
+  guestFirstName: string;
+  guestLastName: string;
+  guestEmail: string;
+  totalAmount: number;
+  totalAmountCurrency: string;
+  orderStatus: string;
 }
 
-const statusTabs = ["All Orders", "pending", "shipped", "delivered"] as const
-type Status = typeof statusTabs[number]
+const statusTabs = ["All Orders", "pending", "shipped", "delivered"] as const;
+type Status = (typeof statusTabs)[number];
 
 interface OrdersTabProps {
-  orders: EventOrder[]
+  orders: EventOrder[];
 }
 
 const OrdersTab: React.FC<OrdersTabProps> = ({ orders }) => {
-  const [activeTab, setActiveTab] = useState<Status>("All Orders")
-  const [search, setSearch] = useState("")
+  const [activeTab, setActiveTab] = useState<Status>("All Orders");
+  const [search, setSearch] = useState("");
 
   const tableOrders: Order[] = useMemo(() => {
     return orders
-      .filter(o => {
+      .filter((o) => {
         // if a specific status is selected, only show matching
-        if (activeTab !== "All Orders" && o.orderStatus.toLowerCase() !== activeTab)
-          return false
+        if (
+          activeTab !== "All Orders" &&
+          o.orderStatus.toLowerCase() !== activeTab
+        )
+          return false;
 
         if (search) {
-          const name = `${o.guestFirstName} ${o.guestLastName}`.toLowerCase()
+          const name = `${o.guestFirstName} ${o.guestLastName}`.toLowerCase();
           if (
             !o.orderId.includes(search) &&
             !name.includes(search.toLowerCase())
           ) {
-            return false
+            return false;
           }
         }
 
-        return true
+        return true;
       })
-      .map(o => ({
+      .map((o) => ({
         id: o.orderId,
         date: new Date(o.createdAt).toLocaleDateString("en-GB", {
           day: "2-digit",
           month: "short",
-          year: "numeric",
+          year: "numeric"
         }),
         guest: `${o.guestFirstName} ${o.guestLastName}`,
         email: o.guestEmail,
@@ -58,16 +61,50 @@ const OrdersTab: React.FC<OrdersTabProps> = ({ orders }) => {
           o.totalAmountCurrency === "NGN"
             ? `₦${o.totalAmount.toLocaleString()}`
             : `$${o.totalAmount.toLocaleString()}`,
-        status: o.orderStatus,
-      }))
-  }, [activeTab, search, orders])
+        status: o.orderStatus
+      }));
+  }, [activeTab, search, orders]);
+
+  const handleDownloadCSV = () => {
+    if (!tableOrders.length) return;
+
+    // Define CSV headers
+    const headers = ["Order ID", "Date", "Guest", "Email", "Amount", "Status"];
+    // Map orders to CSV rows
+    const rows = tableOrders.map((o) => [
+      o.id,
+      o.date,
+      o.guest,
+      o.email,
+      o.amount,
+      o.status
+    ]);
+    // Combine headers and rows
+    const csvContent = [headers, ...rows]
+      .map((row) =>
+        row.map((field) => `"${String(field).replace(/"/g, '""')}"`).join(",")
+      )
+      .join("\r\n");
+
+    // Create a blob and trigger download
+    const blob = new Blob([csvContent], { type: "text/csv;charset=utf-8;" });
+    const url = URL.createObjectURL(blob);
+
+    const link = document.createElement("a");
+    link.href = url;
+    link.setAttribute("download", "orders.csv");
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    URL.revokeObjectURL(url);
+  };
 
   return (
     <div className="space-y-4 bg-white rounded-2xl py-4 overflow-x-auto">
       {/* Status Tabs */}
       <div className="border-b">
         <nav className="flex space-x-8 px-2">
-          {statusTabs.map(tab => (
+          {statusTabs.map((tab) => (
             <button
               key={tab}
               onClick={() => setActiveTab(tab)}
@@ -77,7 +114,9 @@ const OrdersTab: React.FC<OrdersTabProps> = ({ orders }) => {
                   : "text-[#718096]"
               }`}
             >
-              {tab === "All Orders" ? tab : tab.charAt(0).toUpperCase() + tab.slice(1)}
+              {tab === "All Orders"
+                ? tab
+                : tab.charAt(0).toUpperCase() + tab.slice(1)}
             </button>
           ))}
         </nav>
@@ -90,7 +129,7 @@ const OrdersTab: React.FC<OrdersTabProps> = ({ orders }) => {
           <input
             type="text"
             value={search}
-            onChange={e => setSearch(e.target.value)}
+            onChange={(e) => setSearch(e.target.value)}
             placeholder="Search by ID or guest..."
             className="ml-2 w-full bg-transparent border-none focus:ring-0 text-sm placeholder-[#A0AEC0] outline-none"
           />
@@ -99,7 +138,10 @@ const OrdersTab: React.FC<OrdersTabProps> = ({ orders }) => {
           <FiCalendar className="text-gray-400 mr-2" />
           <span className="text-[#718096] text-sm">All dates</span>
         </div> */}
-        <button className="flex items-center bg-[#FAFAFA] rounded-[12px] px-4 py-4 text-[#718096] text-sm">
+        <button
+          onClick={handleDownloadCSV}
+          className="flex items-center bg-[#FAFAFA] rounded-[12px] px-4 py-4 text-[#718096] text-sm"
+        >
           <FiDownload className="mr-2" /> Download
         </button>
       </div>
@@ -107,25 +149,10 @@ const OrdersTab: React.FC<OrdersTabProps> = ({ orders }) => {
       {/* Table */}
       <OrderTable orders={tableOrders} />
     </div>
-  )
-}
+  );
+};
 
-export default OrdersTab
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+export default OrdersTab;
 
 // // components/admin/eventDetails/OrdersTab.tsx
 // "use client";
@@ -239,31 +266,6 @@ export default OrdersTab
 // };
 
 // export default OrdersTab;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // "use client"
 // import React, { useState, useMemo } from "react"
@@ -379,4 +381,3 @@ export default OrdersTab
 // }
 
 // export default OrdersTab
-

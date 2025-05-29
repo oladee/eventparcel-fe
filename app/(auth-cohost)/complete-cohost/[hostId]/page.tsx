@@ -72,7 +72,6 @@ const CompleteCohost: React.FC = () => {
 
 
 
-
   // Validate input fields
   const validateInput = (name: string, value: string) => {
     let errorMessage = "";
@@ -181,7 +180,7 @@ const CompleteCohost: React.FC = () => {
                   placeholder="First name"
                   className="authInput capitalize"
                   value={formData.firstName}
-                  // onChange={(e) => handleChange("firstName", e.target.value)}
+                  onChange={(e) => handleChange("firstName", e.target.value)}
                   required
                   // readOnly
                   aria-required="true"
@@ -205,7 +204,7 @@ const CompleteCohost: React.FC = () => {
                   id="Last name"
                   className="authInput capitalize"
                   value={formData.lastName}
-                  // onChange={(e) => handleChange("lastName", e.target.value)}
+                  onChange={(e) => handleChange("lastName", e.target.value)}
                   // readOnly
                   required
                   aria-required="true"
@@ -357,9 +356,19 @@ export default CompleteCohost;
 
 
 
+
+
+
+
+
+
+
+
+
+
 // "use client";
 
-// import { useState } from "react";
+// import { useEffect, useState } from "react";
 // import { Eye, EyeOff } from "lucide-react";
 // import "react-phone-input-2/lib/style.css";
 // import { useRouter } from "next-nprogress-bar";
@@ -372,11 +381,13 @@ export default CompleteCohost;
 // import Cookies from "js-cookie";
 // // import SocialSignup from "@/components/auth/SocialSignup";
 // import HeaderLayout from "@/components/layout/HeaderLayout";
+// import { useSearchParams } from "next/navigation";
 
-// const AddCoHost: React.FC = () => {
+// const CompleteCohost: React.FC = () => {
 //   const [showPassword, setShowPassword] = useState(false);
 //   const [isLoading, setIsLoading] = useState(false);
 //   const [touched, setTouched] = useState(false);
+//   const [cohostId,setCohostId] = useState("")
 //   const [formData, setFormData] = useState({
 //     firstName: "",
 //     lastName: "",
@@ -393,6 +404,42 @@ export default CompleteCohost;
 //   });
 
 //   const router = useRouter();
+//   const searchParams = useSearchParams(); 
+
+//   useEffect(() => {
+//     const id = window.location.pathname.split("/").pop();
+//     if (!id) {
+//       router.replace("/");
+//       return;
+//     }
+//  setCohostId(id)
+
+//     const fetchUserData = async () => {
+//       try {
+//         const response = await axiosInstance.get(`/view-user/${id}`);
+//         const { firstName, lastName, email } = response.data.data;
+
+
+//         setFormData((prev) => ({
+//           ...prev,
+//           firstName,
+//           lastName,
+//           email
+//         }));
+//       } catch (error: any) {
+//         toast.error(
+//           error.response?.data?.message || "Failed to fetch user data."
+//         );
+//       }
+//     };
+
+//     fetchUserData();
+//   }, [searchParams, router]);
+
+
+
+
+
 
 //   // Validate input fields
 //   const validateInput = (name: string, value: string) => {
@@ -433,13 +480,14 @@ export default CompleteCohost;
 //     setIsLoading(true);
 
 //     try {
-//       const response = await axiosInstance.post("/signup", formData);
+//       const response = await axiosInstance.put(`/update-user/${cohostId}`, formData);
 //       toast.success(response.data.message || "Signup successful!");
 
 //       Cookies.set("cohost-email", formData.email, { expires: 1, path: "/" }); //expire in one day
 
 //       // Redirect to OTP verification page
-//       router.push("/verify-cohost");
+//       // router.push("/verify-cohost");
+//       router.push("/");
 //     } catch (error: any) {
 //       toast.error(
 //         error.response?.data?.message || "Signup failed. Please try again."
@@ -462,7 +510,7 @@ export default CompleteCohost;
 //     formData.firstName &&
 //     formData.lastName &&
 //     formData.email &&
-//     formData.phoneNumber &&
+//     // formData.phoneNumber &&
 //     formData.password &&
 //     validatePassword(formData.password) &&
 //     Object.values(errors).every((err) => err === "");
@@ -499,10 +547,11 @@ export default CompleteCohost;
 //                   type="text"
 //                   id="firstName"
 //                   placeholder="First name"
-//                   className="authInput"
+//                   className="authInput capitalize"
 //                   value={formData.firstName}
-//                   onChange={(e) => handleChange("firstName", e.target.value)}
+//                   // onChange={(e) => handleChange("firstName", e.target.value)}
 //                   required
+//                   // readOnly
 //                   aria-required="true"
 //                   aria-describedby="firstNameError"
 //                 />
@@ -522,9 +571,10 @@ export default CompleteCohost;
 //                   type="text"
 //                   placeholder="Last name"
 //                   id="Last name"
-//                   className="authInput"
+//                   className="authInput capitalize"
 //                   value={formData.lastName}
-//                   onChange={(e) => handleChange("lastName", e.target.value)}
+//                   // onChange={(e) => handleChange("lastName", e.target.value)}
+//                   // readOnly
 //                   required
 //                   aria-required="true"
 //                   aria-describedby="lastNameError"
@@ -542,8 +592,9 @@ export default CompleteCohost;
 //                 placeholder="Email"
 //                 className="authInput"
 //                 value={formData.email}
-//                 onChange={(e) => handleChange("email", e.target.value)}
-//                 required
+//                 // onChange={(e) => handleChange("email", e.target.value)}
+//                   readOnly
+//                   required
 //                 aria-required="true"
 //                 aria-describedby="email-desc"
 //               />
@@ -629,16 +680,10 @@ export default CompleteCohost;
 //                   aria-hidden="true"
 //                 />
 //               ) : (
-//                 "Sign up with email"
+//                 "Complete profile"
 //               )}
 //             </button>
-
-//             {/* <div className="text-center text-gray-500 text-sm mb-4">
-//               Or sign up with
-//             </div> */}
-//             {/* <SocialSignup /> */}
-
-//             {/* <div className="text-left text-sm text-gray-500 mt-6">
+//           <div className="text-left text-sm text-gray-500 mt-6">
 //               Already have an account?{" "}
 //               <a
 //                 href="#"
@@ -647,7 +692,7 @@ export default CompleteCohost;
 //               >
 //                 Sign In
 //               </a>
-//             </div> */}
+//             </div>
 //           </form>
 //         </div>
 
@@ -658,4 +703,4 @@ export default CompleteCohost;
 //   );
 // };
 
-// export default AddCoHost;
+// export default CompleteCohost;

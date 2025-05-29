@@ -24,7 +24,7 @@ const HostSidebarInfo: React.FC<Props> = ({ host, pickup }) => (
             .join("")}
         </div>
         <div>
-          <p className="font-semibold text-black-100">{host.hostName}</p>
+          <p className="font-semibold text-black-100 capitalize">{host.hostName}</p>
           <p className="text-[#718096] text-sm">{host.location}</p>
         </div>
       </div>
@@ -42,7 +42,7 @@ const HostSidebarInfo: React.FC<Props> = ({ host, pickup }) => (
     <div className="bg-white rounded-2xl p-4">
       <h4 className="text-lg font-bold text-[#111827]">Pickup Details</h4>
       <div className="border-t border-[#EEEFF2] mt-3 pt-3 space-y-2">
-        <p className="font-semibold">{pickup.contactName}</p>
+        <p className="font-semibold capitalize">{pickup.contactName}</p>
         <p className="text-[#718096] text-sm">{pickup.location}</p>
         <div className="flex items-center gap-3 text-[#718096] text-sm font-medium">
           <HiOutlineEnvelope size={20} /> {pickup.email}

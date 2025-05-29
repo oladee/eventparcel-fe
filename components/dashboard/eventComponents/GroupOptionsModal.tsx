@@ -18,6 +18,7 @@ interface GroupOptionsModalProps {
   isOpen: boolean;
   onClose: () => void;
   group: Group | null;
+  isPickupAvailable?: boolean;
   // eventData: {
   //   isShared?: boolean;
   // };
@@ -27,6 +28,7 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
   isOpen,
   onClose,
   group,
+  isPickupAvailable,
   // eventData
 }) => {
   const modalRef = useRef<HTMLDivElement>(null);
@@ -269,7 +271,7 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
               </div>
             )}
 
-            {!group?.isDisabled && (
+            {!group?.isDisabled && isPickupAvailable && (
               <div
                 className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
                 onClick={handleShareGroupLink}

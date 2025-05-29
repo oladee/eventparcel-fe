@@ -122,7 +122,7 @@ const DashboardPage: React.FC = () => {
           </div>
           <RecentEventsSection events={data.recentEvents} />
         </div>
-      </div>
+      </div>  
     </AdminContainer>
   )
 }

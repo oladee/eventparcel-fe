@@ -41,7 +41,7 @@ const AccountSection: React.FC<{
   return (
     <>
       <div className="mt-2 border-t border-[#EEEFF2] pt-3">
-        <p className="font-semibold text-black-100">{account.accountName}</p>
+        <p className="font-semibold text-black-100 capitalize">{account.accountName}</p>
         <p className="text-[#718096] text-sm font-medium">{type}</p>
       </div>
       <div className="mt-4 border-t pt-3 text-sm">
@@ -82,11 +82,11 @@ const SidebarInfo: React.FC<SidebarInfoProps> = ({ host, payout, deliveryStat })
           <FiMoreHorizontal className="text-[#A0AEC0]" size={20} />
         </div>
         <div className="mt-2 pt-3 flex items-center border-t border-[#EEEFF2]">
-          <div className="w-8 h-8 rounded-full bg-[#DEA087] flex items-center justify-center text-xs font-semibold text-white">
+          <div className="w-8 h-8 rounded-full bg-[#DEA087] flex items-center justify-center text-xs font-semibold text-white capitalize">
             {host.hostFirstName[0]}{host.hostLastName[0]}
           </div>
           <div className="ml-3">
-            <p className="font-semibold text-black-100 text-sm">{host.hostFirstName} {host.hostLastName}</p>
+            <p className="font-semibold text-black-100 text-sm capitalize">{host.hostFirstName} {host.hostLastName}</p>
             <p className="text-[#718096] text-xs">{host.hostEmail}</p>
           </div>
         </div>
