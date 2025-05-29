@@ -654,7 +654,7 @@ function DeliveryDetailsForm() {
                   <div className="w-[311px] h-[60px] bg-[#FFF7F2] px-3 py-2 rounded-[12px]">
                     <span className="font-general font-medium text-[13px] text-[#718096]">
                       <span className="font-semibold text-[#111827] h-[36px]">
-                        P.S
+                        P.S {" "}
                       </span>
                       {/* : The pickup location is{" "}
                       <span className="font-semibold text-[#111827]">
