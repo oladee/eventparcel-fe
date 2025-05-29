@@ -18,6 +18,7 @@ const Page: React.FC = () => {
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   const [isAddGroupOpen, setIsAddGroupOpen] = useState(false);
+  const [isPickupAvailable, setIsPickupAvailable] = useState<boolean>(false);
 
   useEffect(() => {
     const id = window.location.pathname.split("/").pop(); // Extract eventId from the URL
@@ -44,6 +45,25 @@ const Page: React.FC = () => {
     };
 
     fetchEventData();
+
+    fetchEventData();
+
+    // Fetch payment data and check for pickup location
+    const fetchPaymentData = async () => {
+      try {
+        const paymentRes = await axiosInstance.get(`/view-a-payment/${id}`);
+        // Check if pickup location is available in the response
+        if (paymentRes.data?.data?.pickupLocation) {
+          setIsPickupAvailable(true);
+        } else {
+          setIsPickupAvailable(false);
+        }
+      } catch {
+        setIsPickupAvailable(false);
+      }
+    };
+
+    fetchPaymentData();
 
     window.addEventListener("refreshEvents", fetchEventData);
 
@@ -107,7 +127,7 @@ const Page: React.FC = () => {
     <Container>
       <EventDetailsSection eventData={eventData} />
       {eventData?.eventGroups?.length > 0 ? (
-        <PackagesSection eventData={eventData} />
+        <PackagesSection eventData={eventData} isPickupAvailable={isPickupAvailable} />
       ) : (
         <div className="flex justify-center">
           <div

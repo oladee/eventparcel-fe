@@ -23,9 +23,10 @@ interface PackagesSectionProps {
     eventGroups: Group[];
     isShared?: boolean;
   };
+  isPickupAvailable: boolean;
 }
 
-const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
+const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData, isPickupAvailable }) => {
   const [openModalPackage, setOpenModalPackage] = useState(false);
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -262,7 +263,7 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
               </button> */}
               <button
                 onClick={() => {
-                  if (group.isDisabled) {
+                  if (group.isDisabled || isPickupAvailable) {
                     handleDisabledAction();
                   } else {
                     handleSendInviteClick(group._id);
@@ -316,6 +317,7 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({ eventData }) => {
         isOpen={isModalOpen}
         onClose={toggleModal}
         group={selectedGroup}
+        isPickupAvailable={isPickupAvailable}
         // eventData={eventData}
       />
     </>
