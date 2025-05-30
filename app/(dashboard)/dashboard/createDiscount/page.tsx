@@ -1,30 +1,30 @@
-"use client"
+"use client";
 
-import Container from '@/components/dashboard/Container';
-import React, { useEffect, useState, useRef } from 'react';
-import { ChevronDown } from 'lucide-react';
-import axiosInstance from '@/lib/axiosInstance';
+import Container from "@/components/dashboard/Container";
+import React, { useEffect, useState, useRef } from "react";
+import { ChevronDown } from "lucide-react";
+import axiosInstance from "@/lib/axiosInstance";
 import { useRouter } from "next-nprogress-bar";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import { BiLoaderCircle } from 'react-icons/bi';
-import { trackEvent } from '@/lib/mixpanel';
+import { BiLoaderCircle } from "react-icons/bi";
+import { trackEvent } from "@/lib/mixpanel";
 
 const currencyOptions = [
-  { label: 'Nigerian Naira (₦)', value: '₦' },
-  { label: 'US Dollar ($)', value: '$' },
-  { label: 'Percentage (%)', value: '%' },
+  { label: "Nigerian Naira (₦)", value: "₦" },
+  { label: "US Dollar ($)", value: "$" },
+  { label: "Percentage (%)", value: "%" }
 ];
 
 const Page = () => {
-  const [symbol, setSymbol] = useState('₦');
+  const [symbol, setSymbol] = useState("₦");
   const [eventData, setEventData] = useState<any[]>([]);
   const [selectedEvent, setSelectedEvent] = useState<any>(null);
   const [isEventDropdownOpen, setIsEventDropdownOpen] = useState(false);
   const [isSymbolDropdownOpen, setIsSymbolDropdownOpen] = useState(false);
-  const [discountTitle, setDiscountTitle] = useState('');
-  const [discountValue, setDiscountValue] = useState<number | ''>('');
-  const [discountCode, setDiscountCode] = useState('');
+  const [discountTitle, setDiscountTitle] = useState("");
+  const [discountValue, setDiscountValue] = useState<number | "">("");
+  const [discountCode, setDiscountCode] = useState("");
   const [searchEvent, setSearchEvent] = useState("");
   const [hostId, setHostId] = useState("");
   const [loading, setLoading] = useState(false);
@@ -33,27 +33,28 @@ const Page = () => {
   const router = useRouter();
   const symbolDropdownRef = useRef<HTMLDivElement>(null);
   const [error, setError] = useState("");
-  
+
   useEffect(() => {
     const authToken = localStorage.getItem("authToken");
     const loggedInUserString = localStorage.getItem("loggedInUser");
-    const loggedInUser = loggedInUserString ? JSON.parse(loggedInUserString) : null;
-    
-    
+    const loggedInUser = loggedInUserString
+      ? JSON.parse(loggedInUserString)
+      : null;
+
     setHostId(loggedInUser?._id);
-    
+
     if (!authToken) {
       router.replace("/");
       return;
     }
-    
+
     const fetchEventData = async () => {
       const authToken = localStorage.getItem("authToken");
       if (!authToken) {
         router.replace("/");
         return;
       }
-      
+
       try {
         setFetchingEvents(true);
         const response = await axiosInstance.get("/view-events", {
@@ -75,70 +76,73 @@ const Page = () => {
 
     fetchEventData();
   }, [router]);
-  
+
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (symbolDropdownRef.current && !symbolDropdownRef.current.contains(event.target as Node)) {
+      if (
+        symbolDropdownRef.current &&
+        !symbolDropdownRef.current.contains(event.target as Node)
+      ) {
         setIsSymbolDropdownOpen(false);
       }
     };
-    
-    document.addEventListener('mousedown', handleClickOutside);
+
+    document.addEventListener("mousedown", handleClickOutside);
     return () => {
-      document.removeEventListener('mousedown', handleClickOutside);
+      document.removeEventListener("mousedown", handleClickOutside);
     };
   }, []);
-  
+
   useEffect(() => {
     const fetchDiscountCode = async () => {
       if (!selectedEvent) {
-        setDiscountCode('');
+        setDiscountCode("");
         return;
       }
-      
+
       setFetchingCode(true);
       try {
         const response = await axiosInstance.get("/discount-code");
         if (response.data.success) {
-          setDiscountCode(response.data.data || '');
+          setDiscountCode(response.data.data || "");
         } else {
-          setDiscountCode('');
+          setDiscountCode("");
         }
       } catch (error) {
         console.error("Error fetching discount code:", error);
         toast.error("Failed to generate discount code");
-        setDiscountCode('');
+        setDiscountCode("");
       } finally {
         setFetchingCode(false);
       }
     };
-    
+
     fetchDiscountCode();
   }, [selectedEvent]);
-  
+
   const filteredEvents = eventData.filter((event) =>
     event.eventName.toLowerCase().includes(searchEvent.toLowerCase())
-);
+  );
 
-const handleSubmit = async (e: React.FormEvent) => {
-  e.preventDefault();
-  
-  trackEvent("Create Discount Started", {
-    source: "dashboard create discount page",
-    timestamp: new Date().toISOString(),
-    page_name: "dashboard create discount page",
-    event_id: selectedEvent._id
-  });
-  
-  if (!selectedEvent || !discountTitle || !discountValue || !discountCode) {
-    toast.error('Please fill all required fields.');
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+
+    trackEvent("Create Discount Started", {
+      source: "dashboard create discount page",
+      timestamp: new Date().toISOString(),
+      page_name: "dashboard create discount page",
+      event_id: selectedEvent._id
+    });
+
+    if (!selectedEvent || !discountTitle || !discountValue || !discountCode) {
+      toast.error("Please fill all required fields.");
       return;
     }
-  
-    let discountValueType = 'NGN';
-    if (symbol === '$') discountValueType = 'USD';
-    if (symbol === '%') discountValueType = 'percentage';
-    
+
+    let discountValueType = "NGN";
+    if (symbol === "$") discountValueType = "USD";
+    if (symbol === "%") discountValueType = "percentage";
+
     const payload = {
       event: selectedEvent._id,
       hostId,
@@ -147,11 +151,11 @@ const handleSubmit = async (e: React.FormEvent) => {
       discountValueType,
       discountCode
     };
-    
+
     try {
       setLoading(true);
-      const res = await axiosInstance.post('/add-discount', payload);
-      
+      const res = await axiosInstance.post("/add-discount", payload);
+
       trackEvent("Create Discount Started", {
         source: "dashboard create discount page",
         timestamp: new Date().toISOString(),
@@ -163,12 +167,12 @@ const handleSubmit = async (e: React.FormEvent) => {
         value: Number(discountValue),
         status: "Successfull"
       });
-      
+
       if (res.data.success) {
-        toast.success('Discount created successfully!');
+        toast.success("Discount created successfully!");
         router.push("/dashboard/discounts");
       } else {
-        toast.error(res.data.message || 'Something went wrong!');
+        toast.error(res.data.message || "Something went wrong!");
       }
     } catch (error: any) {
       console.error(error);
@@ -182,16 +186,16 @@ const handleSubmit = async (e: React.FormEvent) => {
         value: Number(discountValue),
         status: "Failed"
       });
-      toast.error(error.response?.data?.message || 'Server error');
+      toast.error(error.response?.data?.message || "Server error");
     } finally {
       setLoading(false);
     }
   };
-  
+
   const handleTitleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     setDiscountTitle(value);
-  
+
     if (value.length < 3) {
       setError("Title must be at least 3 characters");
     } else if (value.length > 25) {
@@ -200,37 +204,60 @@ const handleSubmit = async (e: React.FormEvent) => {
       setError("");
     }
   };
-  
-  
+
   return (
     <Container>
       <div id="discount-container" className="w-full space-y-6">
         {/* Header */}
         <div id="discount-header" className="w-[343px] flex flex-col gap-2">
-          <h2 id="discount-title" className="font-general text-2xl font-bold text-[#111827]">Create Discounts</h2>
-          <p id="discount-description" className="text-sm font-medium text-[#718096]">
-            Treat your guests to something special! Set a custom discount by value or percentage
+          <h2
+            id="discount-title"
+            className="font-general text-2xl font-bold text-[#111827]"
+          >
+            Create Discounts
+          </h2>
+          <p
+            id="discount-description"
+            className="text-sm font-medium text-[#718096]"
+          >
+            Treat your guests to something special! Set a custom discount by
+            value or percentage
           </p>
         </div>
 
         {/* Form */}
-        <form id="discount-form" onSubmit={handleSubmit} className="w-[343px] flex flex-col gap-6 bg-white rounded-[20px] p-6 pb-8">
+        <form
+          id="discount-form"
+          onSubmit={handleSubmit}
+          className="w-[343px] flex flex-col gap-6 bg-white rounded-[20px] p-6 pb-8"
+        >
           {/* Event Dropdown */}
           <div id="event-section" className="space-y-1">
-            <label id="event-label" className="text-base font-semibold text-[#111827]">Event</label>
+            <label
+              id="event-label"
+              className="text-base font-semibold text-[#111827]"
+            >
+              Event
+            </label>
             <div className="relative">
               <div
                 id="event-dropdown-trigger"
                 className="w-full h-[56px] bg-[#FAFAFA] rounded-[12px] px-4 py-3 flex items-center justify-between cursor-pointer"
                 onClick={() => setIsEventDropdownOpen(!isEventDropdownOpen)}
               >
-                <span id="selected-event" className="text-sm font-medium text-gray-700">
+                <span
+                  id="selected-event"
+                  className="text-sm font-medium text-gray-700"
+                >
                   {selectedEvent ? selectedEvent.eventName : "Select event"}
                 </span>
                 <ChevronDown className="text-gray-500" />
               </div>
               {isEventDropdownOpen && (
-                <div id="event-dropdown" className="absolute z-10 mt-2 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-lg">
+                <div
+                  id="event-dropdown"
+                  className="absolute z-10 mt-2 w-full bg-white border rounded max-h-60 overflow-y-auto shadow-lg"
+                >
                   <input
                     id="event-search"
                     type="text"
@@ -260,8 +287,13 @@ const handleSubmit = async (e: React.FormEvent) => {
                       </div>
                     ))
                   ) : (
-                    <div id="no-event-message" className="p-3 text-center text-sm">
-                      {eventData.length === 0 ? "No events found" : "No matching events found"}
+                    <div
+                      id="no-event-message"
+                      className="p-3 text-center text-sm"
+                    >
+                      {eventData.length === 0
+                        ? "No events found"
+                        : "No matching events found"}
                     </div>
                   )}
                 </div>
@@ -271,38 +303,58 @@ const handleSubmit = async (e: React.FormEvent) => {
 
           {/* Discount Title */}
           <div id="discount-title-section" className="space-y-1">
-            <label id="discount-title-label" className="text-base font-semibold text-[#111827]">Discount Title</label>
+            <label
+              id="discount-title-label"
+              className="text-base font-semibold text-[#111827]"
+            >
+              Discount Title
+            </label>
             <input
-                id="discount-title-input"
-                type="text"
-                required
-                value={discountTitle}
-                onChange={handleTitleChange}
-                placeholder="Enter discount title"
-                className="w-full h-[56px] bg-[#FAFAFA] text-sm font-medium text-gray-700 rounded-[12px] px-4 py-3 focus:outline-none"
+              id="discount-title-input"
+              type="text"
+              required
+              value={discountTitle}
+              onChange={handleTitleChange}
+              placeholder="Enter discount title"
+              // maxLength={25}
+              className="w-full h-[56px] bg-[#FAFAFA] text-sm font-medium text-gray-700 rounded-[12px] px-4 py-3 focus:outline-none"
             />
-              {error && (
-                <p className="text-red-500 text-sm font-medium">{error}</p>
-              )}
-              </div>
+            {error && (
+              <p className="text-red-500 text-sm font-medium">{error}</p>
+            )}
+          </div>
 
           {/* Discount Value */}
           <div id="discount-value-section" className="space-y-1">
-            <label id="discount-value-label" className="text-base font-semibold text-[#111827]">Discount Value</label>
+            <label
+              id="discount-value-label"
+              className="text-base font-semibold text-[#111827]"
+            >
+              Discount Value
+            </label>
             <div className="flex items-center bg-[#F9FAFB] rounded-[12px] relative">
               {/* Symbol Selector */}
-              <div 
+              <div
                 id="symbol-selector"
                 className="flex items-center w-[86px] h-[56px] justify-between px-5 py-3 bg-[#FAFAFA] text-sm font-medium text-gray-700 cursor-pointer relative"
                 onClick={() => setIsSymbolDropdownOpen(!isSymbolDropdownOpen)}
                 ref={symbolDropdownRef}
               >
-                <span id="selected-symbol" className="font-bold text-xl">{symbol}</span>
-                <ChevronDown className={`w-5 h-5 text-gray-500 transition-transform ${isSymbolDropdownOpen ? 'rotate-180' : ''}`} />
+                <span id="selected-symbol" className="font-bold text-xl">
+                  {symbol}
+                </span>
+                <ChevronDown
+                  className={`w-5 h-5 text-gray-500 transition-transform ${
+                    isSymbolDropdownOpen ? "rotate-180" : ""
+                  }`}
+                />
 
                 {/* Dropdown - Moved outside the overflow-hidden container */}
                 {isSymbolDropdownOpen && (
-                  <div id="symbol-dropdown" className="absolute top-full left-0 mt-1 w-[303px] z-[1000] bg-white border border-gray-200 rounded-md shadow-lg">
+                  <div
+                    id="symbol-dropdown"
+                    className="absolute top-full left-0 mt-1 w-[303px] z-[1000] bg-white border border-gray-200 rounded-md shadow-lg"
+                  >
                     {currencyOptions.map((option) => (
                       <div
                         id={`symbol-option-${option.value}`}
@@ -327,28 +379,44 @@ const handleSubmit = async (e: React.FormEvent) => {
                 type="number"
                 required
                 value={discountValue}
-                onChange={(e) => setDiscountValue(e.target.value === '' ? '' : Number(e.target.value))}
+                onChange={(e) =>
+                  setDiscountValue(
+                    e.target.value === "" ? "" : Number(e.target.value)
+                  )
+                }
                 placeholder="Add discount value"
                 className="flex-1 px-4 py-3 text-sm font-medium bg-[#FAFAFA] text-gray-700 focus:outline-none"
-             />
+              />
             </div>
           </div>
 
           {/* Discount Code */}
           <div id="discount-code-section" className="space-y-1">
-            <label id="discount-code-label" className="text-base font-semibold text-[#111827]">Discount Code</label>
+            <label
+              id="discount-code-label"
+              className="text-base font-semibold text-[#111827]"
+            >
+              Discount Code
+            </label>
             <div className="relative">
               <input
                 id="discount-code-input"
                 type="text"
                 value={discountCode}
                 readOnly
-                placeholder={fetchingCode ? "Generating code..." : "Discount code will appear here"}
+                placeholder={
+                  fetchingCode
+                    ? "Generating code..."
+                    : "Discount code will appear here"
+                }
                 className="w-full h-[56px] bg-[#FAFAFA] text-sm font-medium text-gray-700 rounded-[12px] px-4 py-3 focus:outline-none"
               />
               {fetchingCode && (
                 <div className="absolute inset-y-0 right-0 flex items-center pr-3">
-                  <BiLoaderCircle className="animate-spin text-gray-400" size={20} />
+                  <BiLoaderCircle
+                    className="animate-spin text-gray-400"
+                    size={20}
+                  />
                 </div>
               )}
             </div>
@@ -371,8 +439,8 @@ const handleSubmit = async (e: React.FormEvent) => {
               !discountCode ||
               error !== "" ||
               loading
-                ? 'bg-gray-300 cursor-not-allowed'
-                : 'bg-primary hover:bg-primary/90'
+                ? "bg-gray-300 cursor-not-allowed"
+                : "bg-primary hover:bg-primary/90"
             }`}
           >
             {loading ? (
@@ -381,12 +449,12 @@ const handleSubmit = async (e: React.FormEvent) => {
                 Creating Discount...
               </span>
             ) : (
-              'Create Discount'
+              "Create Discount"
             )}
           </button>
-        </form>     
-      {/* Toast Notifications */}
-      <ToastContainer aria-live="polite" />
+        </form>
+        {/* Toast Notifications */}
+        <ToastContainer aria-live="polite" />
       </div>
     </Container>
   );
