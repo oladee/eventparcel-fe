@@ -69,6 +69,8 @@ function PaymentDetailsCard() {
     };
   }, [discountCode, eventId, parsedCartItems?.data?.items]);
 
+  console.log("discountResponse", discountResponse)
+
   // Calculate totals
   const itemTotal = parsedCartItems?.data?.items?.map((item: any) => {
     const totalItemPrice = item.packagePrice * item.quantity;
@@ -81,9 +83,16 @@ function PaymentDetailsCard() {
   const subtotal = itemTotal.reduce((acc: number, item: any) => acc + item.totalPrice, 0);
   const currencySymbol = parsedCartItems?.data?.items?.[0]?.packagePriceCurrency || "NGN";
   const isHomeDelivery = parsedCartItems?.data?.deliveryType === "homeDelivery";
-  const tax = parsedCartItems?.data?.tax ?? 0;
+  let tax;
+  if (discountResponse) {
+    tax = (discountResponse?.finalAmount * 7.5) / 100; 
+  } else {
+    tax = parsedCartItems?.data?.tax ?? 0;
+  }
   const deliveryFee = parsedCartItems?.data?.homeDeliveryFee ?? 0;
+
   let grandTotal;
+
   if(!isHomeDelivery) {
     grandTotal = subtotal + tax;
   }else {
@@ -94,36 +103,6 @@ function PaymentDetailsCard() {
   if (discountResponse?.discountAmount) {
     grandTotal -= discountResponse.discountAmount;
   }
-
-  // const handleSubmit = async (e: React.FormEvent) => {
-  //   e.preventDefault();
-  //   setIsSubmittingPayment(true);
-    
-  //   try {
-  //     const payload: any = {};
-  //     if (discountCode) {
-  //       payload.discountCode = discountCode;
-  //     }
-
-  //     const res = await axiosInstance.post(`/checkout-contd/${parsedCartItems?.data?._id}`, payload);
-
-  //       trackEvent("Purchase Initiated", {
-  //         source: "guest payment page",
-  //         event_id: res?.data?.data?.updatedOrder?.eventId,
-  //         timestamp: new Date().toISOString(),
-  //         page_name: "Guest Payment Page",
-  //         transaction_id: res.data.data.reference,
-  //         payment_partner: res.data.data.paymentPartner,
-  //         delivery_type: res?.data?.data?.updatedOrder?.eventId?.deliveryType,
-  //       });
-
-  //     Router.push(res.data.data.paymentUrl);
-  //   } catch (error: any) {
-  //     toast.error(error.response?.data?.message || "Payment failed");
-  //   } finally {
-  //     setIsSubmittingPayment(false);
-  //   }
-  // };
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
