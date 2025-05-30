@@ -99,7 +99,7 @@ const HostsTable: React.FC<Props> = ({ hosts, onStatusUpdate }) => {
                   {h.name.split(" ").map(n => n[0]).join("")}
                 </div>
                 <div>
-                  <p className="font-semibold text-black-100 text-sm">{h.name}</p>
+                  <p className="font-semibold text-black-100 text-sm capitalize">{h.name}</p>
                   <p className="text-gray-400 text-xs">{h.email}</p>
                 </div>
               </td>
