@@ -6,7 +6,6 @@ import { FiMenu } from "react-icons/fi";
 import { usePathname } from "next/navigation";
 import ToolTipProfile from "@/components/admin/ToolTipProfile";
 
-
 interface HeaderProps {
   toggleSidebar: () => void;
 }
