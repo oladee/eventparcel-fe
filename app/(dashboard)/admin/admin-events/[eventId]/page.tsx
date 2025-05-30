@@ -227,7 +227,7 @@ const EventDetailPage: React.FC = () => {
           <OverviewHeader
             imageUrl={data.eventImgUrl}
             name={data.eventName}
-            description={data.eventDescription}
+            description={data.eventDescription} 
             date={data.date}
             time={data.time}
             location={data.eventLocation}
