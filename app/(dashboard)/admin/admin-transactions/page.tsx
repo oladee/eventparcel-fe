@@ -27,6 +27,7 @@ export interface CurrencySalesData {
   deliveryFee: number;
   deliveryFeeChange: number;
   netSales: number;
+  netPayout: number;
   netSalesChange: number;
   overallSales: number;
   serviceFee: number;

@@ -50,8 +50,8 @@ const OrdersStatCardGroup: React.FC<OrdersStatCardGroupProps> = ({ orderSummary 
         />
       ),
       label: "Net Payout",
-      naira: formatCurrency(orderSummary?.NGN?.netSales || 0),
-      dollar: formatDollarCurrency(orderSummary?.USD?.netSales || 0),
+      naira: formatCurrency(orderSummary?.NGN?.netPayout || 0),
+      dollar: formatDollarCurrency(orderSummary?.USD?.netPayout || 0),
       subtext: "in Dollars",
     },
     {

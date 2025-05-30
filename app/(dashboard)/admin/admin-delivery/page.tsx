@@ -44,8 +44,8 @@ const Page = () => {
     const [orderData, setOrderData] = useState<GuestOrder[]>([]);
     const [totalPages, setTotalPages ] = useState();
     const [search, setSearch] = useState("");
-    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
     const [orderStatus, setOrderStatus] = useState("");
+    const [debouncedSearchTerm, setDebouncedSearchTerm] = useState("");
 
     const debouncedSearch = useMemo(
       () =>
@@ -55,12 +55,13 @@ const Page = () => {
         []
     );
   
+    // Effect to call debounced function when search changes
     useEffect(() => {
       debouncedSearch(search);
       return () => {
         debouncedSearch.cancel();
       }
-    },[search, debouncedSearch]);
+    },[search]);
     
     useEffect(() => {
       const fetchOrders = async() => {

@@ -69,7 +69,6 @@ function PaymentDetailsCard() {
     };
   }, [discountCode, eventId, parsedCartItems?.data?.items]);
 
-  console.log("discountResponse", discountResponse)
 
   // Calculate totals
   const itemTotal = parsedCartItems?.data?.items?.map((item: any) => {
