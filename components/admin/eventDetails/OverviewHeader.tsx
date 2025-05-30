@@ -37,7 +37,7 @@ const OverviewHeader: React.FC<OverviewHeaderProps> = ({
   const hasBothPayouts = netPayout && netPayoutDollar;
   const hasOnlyNaira1 = netPayout && !netPayoutDollar;
   const hasOnlyDollar1 = !netPayout && netPayoutDollar;
-  
+
 
   return (
     <div className="bg-white p-4 rounded-2xl mb-4">
@@ -163,6 +163,23 @@ const OverviewHeader: React.FC<OverviewHeaderProps> = ({
 };
 
 export default OverviewHeader;
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 // "use client"
 // import React from "react"
