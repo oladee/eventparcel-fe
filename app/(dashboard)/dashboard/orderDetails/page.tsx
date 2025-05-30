@@ -9,6 +9,7 @@ import { MdOutlineCalendarToday } from "react-icons/md";
 import useUpdateOrderStatus from '@/hooks/useUpdateOrderStatus';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
+import { Circle } from 'lucide-react';
 
 const Page = () => {
     const [orders, setOrders] = useState<any>(null);
@@ -84,6 +85,45 @@ const Page = () => {
       
 
       const itemTotalAmount = (orders?.totalAmount || 0) - (orders?.tax || 0) - (orders?.homeDeliveryFee || 0);
+
+      const getStatusClass = (status: string) => {
+        switch (status.toLowerCase()) {
+          case 'paid':
+            return 'text-green-600';
+          case 'pending':
+            return 'text-yellow-500';
+          case 'failed':
+            return 'text-red-600';
+          default:
+            return 'text-gray-500';
+        }
+      };
+
+      const getBgStatusClass = (status: string) => {
+        switch (status.toLowerCase()) {
+          case 'paid':
+            return 'bg-green-100';  
+          case 'pending':
+            return 'bg-yellow-100';  
+          case 'failed':
+            return 'bg-red-100';    
+          default:
+            return 'bg-gray-100';    
+        }
+      };
+      
+      
+      const capitalizeFirstLetter = (text: string) =>
+        text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
+    
+
+    const NairaCircleIcon = () => (
+    <div className="relative w-6 h-6">
+        <Circle className={`${getStatusClass(orders?.paymentStatus || '')} w-full h-full`} />
+        <span className={`absolute inset-0 flex items-center justify-center text-sm font-bold ${getStatusClass(orders?.paymentStatus || '')}`}>₦</span>
+    </div>
+    );
+
           
     if (!orders) {
         return (
@@ -280,10 +320,15 @@ const Page = () => {
 
                 <div id="payment-info-card" className='bg-[#FFFFFF] rounded-[16px] p-5 mt-5 flex flex-col gap-5'>
                     <div id="payment-status" className='flex items-center gap-3 -mb-6'>
-                        <div id="payment-icon-container" className='bg-green-50 p-2 rounded-[20px]'>
-                            <CircleDollarSign id="payment-icon" className='h-[24px] w-[24px] text-green-600'/>
+                        <div id="payment-icon-container" className={`${getBgStatusClass(orders?.paymentStatus || '')} p-2 rounded-[20px]`}>
+                            {orders?.totalAmountCurrency === "NGN" ? <NairaCircleIcon /> : <CircleDollarSign id="payment-icon" className={`h-[24px] w-[24px] ${getStatusClass(orders?.paymentStatus || '')}`}/>}
                         </div>
-                        <span id="payment-status-text" className='text-green-600 font-general font-semibold text-base'>Paid</span>
+                        <span
+                            id="payment-status-text"
+                            className={`${getStatusClass(orders?.paymentStatus || '')} font-general font-semibold text-base`}
+                            >
+                            {capitalizeFirstLetter(orders?.paymentStatus || '')}
+                        </span>
                     </div>
                     <div id="payment-divider" className="border-t border-[#EEEFF2] my-3"></div>
                     
