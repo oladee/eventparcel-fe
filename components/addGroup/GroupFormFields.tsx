@@ -8,6 +8,7 @@ interface GroupFormFieldsProps {
   handleBlur: (e: React.FocusEvent<HTMLInputElement | HTMLTextAreaElement>) => void;
 }
 
+
 const GroupFormFields: React.FC<GroupFormFieldsProps> = ({
   formData,
   errors,
