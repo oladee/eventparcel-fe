@@ -231,6 +231,7 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({
                           setModalMode("update");
                           setSelectedPackage(pkg);
                           setOpenModalPackage(true);
+                          setGroup1(group);
                         }
                       }}
                       size={20}

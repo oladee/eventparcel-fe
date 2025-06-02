@@ -75,7 +75,6 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
         publicIdsToReplace: [],
     });
 
-    console.log("pack",packageData)
 
     useEffect(() => {
         if (typeof window !== "undefined") {
