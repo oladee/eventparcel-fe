@@ -35,7 +35,7 @@ const HostSidebarInfo: React.FC<Props> = ({ host, pickup }) => (
           <HiOutlineEnvelope size={20} /> {host.email}
         </div>
         <div className="flex items-center gap-3 text-[#718096] text-sm font-medium">
-          <PiPhoneBold size={20} /> {host.phoneNumber}
+          <PiPhoneBold size={20} />   {host.phoneNumber ? host.phoneNumber : "Not provided"}
         </div>
       </div>
     </div>
