@@ -209,7 +209,9 @@ const Page = () => {
     }
   };
 
-  function formatCurrencyShort(amount: number): string {
+  function formatCurrencyShort(amount?: number): string {
+    if (typeof amount !== 'number') return '0';
+  
     if (amount >= 1_000_000) {
       return (amount / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
     }
