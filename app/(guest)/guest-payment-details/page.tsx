@@ -126,6 +126,9 @@ function PaymentDetailsCard() {
           transaction_id: res.data.data.reference,
           payment_partner: res.data.data.paymentPartner,
           delivery_type: res?.data?.data?.updatedOrder?.deliveryType,
+          guest_firstname: res?.data?.data?.updatedOrder?.guestFirstName,
+          guest_lasttname: res?.data?.data?.updatedOrder?.guestLastName,
+          guest_email: res?.data?.data?.updatedOrder?.guestEmail,
           status: "success"
         }
       };
