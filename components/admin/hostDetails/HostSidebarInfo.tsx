@@ -25,7 +25,7 @@ const HostSidebarInfo: React.FC<Props> = ({ host, pickup }) => (
         </div>
         <div>
           <p className="font-semibold text-black-100 capitalize">{host.hostName}</p>
-          <p className="text-[#718096] text-sm">{host.location}</p>
+          {/* <p className="text-[#718096] text-sm">{host.location}</p> */}
         </div>
       </div>
       <div className="border-t border-[#EEEFF2] mt-4 pt-3 space-y-2">
