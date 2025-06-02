@@ -136,8 +136,8 @@ const validateField = (id: string, value: any): string => {
       }
       const numValue = Number(trimmed);
       // Enforce range 1–99
-      if (numValue < 1 || numValue > 99) {
-        return "Number must be between 1 and 99.";
+      if (numValue < 0 || numValue > 99) {
+        return "Number must be between 0 and 99.";
       }
       return "";
     } else if (
