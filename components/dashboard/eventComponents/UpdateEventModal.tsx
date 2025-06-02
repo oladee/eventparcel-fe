@@ -89,7 +89,7 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
       setSelectedImage(eventImgUrl);
     }
   }, [eventData]);
-  
+
 
   const parseTimeString = (timeString: string): Date => {
     try {
@@ -125,7 +125,7 @@ const validateField = (id: string, value: any): string => {
         return "This field is required.";
       }
     } else if (id === "numberOfGroups") {
-      const trimmed = value.toString().trim();
+      const trimmed = value?.toString().trim();
 
       // If user hasn't entered anything, don't treat it as an error
       if (!trimmed) {
