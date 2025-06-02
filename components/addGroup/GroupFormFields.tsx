@@ -1,5 +1,6 @@
 import React, { useState } from "react";
 
+
 interface GroupFormFieldsProps {
   formData: { groupName: string; groupDescription: string; groupCurrency: string };
   errors: { groupName: string; groupDescription: string };
