@@ -72,6 +72,7 @@ const Page = () => {
       try {
         const response = await axiosInstance.get(`/view-group/${id}`);
         setGroup(response.data.data); 
+        console.log("res", response.data.data)
       } catch (error: any) {
         setError(error);
         toast.error('Failed to fetch group data');

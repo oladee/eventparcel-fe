@@ -76,6 +76,23 @@ const Page: React.FC = () => {
   //   router.push("/dashboard/create-group");
   // };
 
+  // useEffect(() => {
+  //   const id = window.location.pathname.split("/").pop(); // Extract eventId from the URL
+  //   if (!id) {
+  //     router.replace("/dashboard/events");
+  //     return;
+  //   }
+  //   const checkWhichPaymentDetails = async () => {
+  //       try{
+  //         const response = await axiosInstance.get(`/view-a-payment/${id}`);
+  //         console.log("res", response.data.data)
+  //       }catch(err) {
+  //         console.log(error);
+  //       }
+  //   };
+  //   checkWhichPaymentDetails();
+  // }, []);
+
   if (loading) {
     return (
       <Container>

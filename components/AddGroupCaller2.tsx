@@ -194,31 +194,37 @@ const AddGroup2: React.FC<AddGroupProps> = ({
           window.location.reload();
         } else {
           // Get current currency flags from localStorage
-          const currentIsNaira =
-            localStorage.getItem("isNairaAccount") === "true";
-          const currentIsDollar =
-            localStorage.getItem("isDollarAccount") === "true";
-
+          const currentIsNaira = localStorage.getItem("isNairaAccount") === "true";
+          const currentIsDollar = localStorage.getItem("isDollarAccount") === "true";
+        
           // Determine new currency type from form data
           const newCurrencyType = formData.groupCurrency;
-
+        
+          // If existing currency matches new one, reload
+          if (
+            (currentIsNaira && newCurrencyType === "NGN") ||
+            (currentIsDollar && newCurrencyType === "USD")
+          ) {
+            window.location.reload();
+            return;
+          }
+        
           // Update flags based on new currency type
           const updatedFlags = {
             isNaira: currentIsNaira || newCurrencyType === "NGN",
             isDollar: currentIsDollar || newCurrencyType === "USD"
           };
-
+        
           // Store all data in localStorage
           localStorage.setItem("eventId", eventData._id);
           localStorage.setItem("groupLength", eventData.eventGroups.length);
           localStorage.setItem("isNairaAccount", String(updatedFlags.isNaira));
-          localStorage.setItem(
-            "isDollarAccount",
-            String(updatedFlags.isDollar)
-          );
-
+          localStorage.setItem("isDollarAccount", String(updatedFlags.isDollar));
+        
+          // Redirect to payment page
           router.push("/dashboard/editPaymentDetails");
         }
+        
       }
 
       toast.success(
