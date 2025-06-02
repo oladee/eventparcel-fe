@@ -10,24 +10,7 @@ import CohostActionsModal from "@/components/dashboard/cohost/CohostActionsModal
 import { useRouter as Route } from "next-nprogress-bar";
 import HeaderLayout from "@/components/layout/HeaderLayout";
 
-// Define interfaces for user & log entry
-// interface ActivityUser {
-//   firstName: string;
-//   lastName: string;
-//   email: string;
-//   role: string;
-// }
 
-// interface ActivityLogEntry {
-//   timestamp: string;
-//   user: ActivityUser;
-//   event: string;
-//   action: string;
-//   entity: string;
-//   actionType: "Event" | "Group";
-//   entityType: string;
-//   meta: Record<string, any>;
-// }
 
 interface ActivityUser {
   firstName: string;

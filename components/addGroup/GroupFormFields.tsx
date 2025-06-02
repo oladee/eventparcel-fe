@@ -38,7 +38,7 @@ const GroupFormFields: React.FC<GroupFormFieldsProps> = ({
         value={formData.groupName}
         onChange={handleChange}
         onBlur={handleBlur}
-        className={`h-14 bg-gray-50 outline-primary rounded-xl text-gray-900 text-sm w-full p-2.5 ${
+        className={`h-14 bg-gray-50 outline-primary rounded-xl text-gray-900 text-sm w-full p-2.5 capitalize ${
           touched.groupName && errors.groupName ? "border-red-500" : "border-gray-300"
         }`}
         placeholder="Group name"
