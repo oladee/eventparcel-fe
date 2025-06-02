@@ -241,19 +241,6 @@ const AdminUsersTable: React.FC<{ admins: AdminInterface[] }> = ({ admins }) => 
                         )}
 
                         {a.status === "inactive" && (
-                          <>
-                            <li>
-                              <button
-                                onClick={() => handleUpdateStatus(a._id, "active")}
-                                className="w-full flex items-center gap-2 text-left px-4 py-2 text-sm text-green-600 hover:bg-gray-100"
-                              >
-                                {loadingButton?.id === a._id && loadingButton?.action === "active" ? (
-                                  <span className="w-4 h-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin" />
-                                ) : (
-                                  "Activate Admin"
-                                )}
-                              </button>
-                            </li>
                             <li>
                               <button
                                 onClick={() => handleUpdateStatus(a._id, "disabled")}
@@ -266,7 +253,6 @@ const AdminUsersTable: React.FC<{ admins: AdminInterface[] }> = ({ admins }) => 
                                 )}
                               </button>
                             </li>
-                          </>
                         )}
 
                         {a.status === "disabled" && (
