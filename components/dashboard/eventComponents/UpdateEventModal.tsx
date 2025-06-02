@@ -89,6 +89,7 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
       setSelectedImage(eventImgUrl);
     }
   }, [eventData]);
+  
 
   const parseTimeString = (timeString: string): Date => {
     try {
