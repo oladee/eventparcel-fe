@@ -9,8 +9,9 @@ import { useRouter } from "next/navigation";
 import axiosInstance from "@/lib/adminAxiosInterceptor/axiosInstance";
 import { motion } from "framer-motion";
 
-const statusTabs: ("All Users" | "active" | "disabled")[] = [
+const statusTabs: ("All Users" | "active" | "inactive" | "disabled")[] = [
   "All Users",
+  "inactive",
   "active",
   "disabled"
 ];
@@ -19,7 +20,7 @@ const AdminPage: React.FC = () => {
   const Router = useRouter();
 
   const [newUser, setNewUser] = useState(false);
-  const [activeTab, setActiveTab] = useState<"All Users" | "active" | "disabled">("All Users");
+  const [activeTab, setActiveTab] = useState<"All Users" | "active" | "inactive" | "disabled">("All Users");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(6);
