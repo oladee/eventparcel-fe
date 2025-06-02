@@ -61,7 +61,7 @@ const Page = () => {
       return () => {
         debouncedSearch.cancel();
       }
-    },[search]);
+    },[search, debouncedSearch]);
     
     useEffect(() => {
       const fetchOrders = async() => {
