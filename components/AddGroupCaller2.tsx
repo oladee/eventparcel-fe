@@ -150,7 +150,7 @@ const AddGroup2: React.FC<AddGroupProps> = ({
 
     const formDataToSend = new FormData();
 
-    formDataToSend.append("groupName", formData.groupName);
+    formDataToSend.append("groupName", formData.groupName.trim());
     formDataToSend.append("groupDescription", formData.groupDescription);
     formDataToSend.append("groupPrivacy", formData.groupPrivacy.toLowerCase());
     formDataToSend.append("groupCurrency", formData.groupCurrency);
