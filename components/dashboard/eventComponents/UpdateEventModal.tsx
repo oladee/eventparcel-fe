@@ -110,7 +110,7 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
     }
   };
 
-const validateField = (id: string, value: any): string => {
+  const validateField = (id: string, value: any): string => {
     // Skip personal details validations if user is authenticated
     if (
       isAuthenticated &&
@@ -124,7 +124,7 @@ const validateField = (id: string, value: any): string => {
         return "This field is required.";
       }
     } else if (id === "numberOfGroups") {
-      const trimmed = value.toString().trim();
+      const trimmed = value?.toString().trim();
 
       // If user hasn't entered anything, don't treat it as an error
       if (!trimmed) {
@@ -219,14 +219,14 @@ const validateField = (id: string, value: any): string => {
   };
 
   const handleSubmit = async (isSaveLater: boolean = false) => {
-      trackEvent("Edit An Event - Started", {
-        source: "dashboard event page",
-        timestamp: new Date().toISOString(),
-        page_name: "dashboard event page",
-        event_id: eventData?._id,
-        event_name: formData.eventName,
-      });
-      
+    trackEvent("Edit An Event - Started", {
+      source: "dashboard event page",
+      timestamp: new Date().toISOString(),
+      page_name: "dashboard event page",
+      event_id: eventData?._id,
+      event_name: formData.eventName
+    });
+
     const newErrors = { ...errors };
     Object.keys(formData).forEach((key) => {
       if (key !== "eventImage") {
@@ -255,7 +255,10 @@ const validateField = (id: string, value: any): string => {
     submissionData.append("hostFirstName", formData.firstName);
     submissionData.append("hostLastName", formData.lastName);
     submissionData.append("hostEmail", formData.email);
-    submissionData.append("numberOfGroups", formData.numberOfGroups);
+    // submissionData.append("numberOfGroups", formData.numberOfGroups);
+    if (formData.numberOfGroups && formData.numberOfGroups.trim() !== "") {
+      submissionData.append("numberOfGroups", formData.numberOfGroups);
+    }
     if (formData.eventImage) {
       submissionData.append("eventImgUrl", formData.eventImage);
     }
@@ -378,30 +381,6 @@ const validateField = (id: string, value: any): string => {
 };
 
 export default UpdateEventModal;
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 // "use client";
 
@@ -618,7 +597,7 @@ export default UpdateEventModal;
 //         event_id: eventData?._id,
 //         event_name: formData.eventName,
 //       });
-      
+
 //     const newErrors = { ...errors };
 //     Object.keys(formData).forEach((key) => {
 //       if (key !== "eventImage") {
@@ -769,4 +748,3 @@ export default UpdateEventModal;
 // };
 
 // export default UpdateEventModal;
-

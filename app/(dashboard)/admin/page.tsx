@@ -98,6 +98,18 @@ const DashboardPage: React.FC = () => {
 
   if (!data) return <div className="p-4 text-gray-600">No data available</div>
 
+    function formatCurrencyShort(amount?: number): string {
+    if (typeof amount !== 'number') return '0';
+  
+    if (amount >= 1_000_000) {
+      return (amount / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
+    }
+    if (amount >= 1_000) {
+      return (amount / 1_000).toFixed(1).replace(/\.0$/, '') + 'K';
+    }
+    return amount.toString();
+  }
+
   return (
     <AdminContainer>
       <ToastContainer position="top-right" autoClose={3000} />
@@ -107,7 +119,7 @@ const DashboardPage: React.FC = () => {
           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:col-span-2">
             <StatCardGroup stats={[
               { label: 'Total Order', value: data.totalOrder.value.toLocaleString(), delta: `${data.totalOrder.growth}%` },
-              { label: 'Service Fee', value: `₦${data.totalServiceFees.value.toLocaleString()}`, delta: `${data.totalServiceFees.growth}%` },
+              { label: 'Service Fee', value: `₦${formatCurrencyShort(data.totalServiceFees.value)}`, delta: `${data.totalServiceFees.growth}%` },
               { label: 'Total Events', value: data.totalEvents.value.toLocaleString(), delta: `${data.totalEvents.growth}%` },
               { label: 'Total Host', value: data.totalHosts.value.toLocaleString(), delta: `${data.totalHosts.growth}%` }
             ]} />
@@ -128,9 +140,6 @@ const DashboardPage: React.FC = () => {
 }
 
 export default DashboardPage
-
-
-
 
 
 
@@ -251,6 +260,18 @@ export default DashboardPage
 
 //   if (!data) return <div className="p-4 text-gray-600">No data available</div>
 
+//     function formatCurrencyShort(amount?: number): string {
+//     if (typeof amount !== 'number') return '0';
+  
+//     if (amount >= 1_000_000) {
+//       return (amount / 1_000_000).toFixed(1).replace(/\.0$/, '') + 'M';
+//     }
+//     if (amount >= 1_000) {
+//       return (amount / 1_000).toFixed(1).replace(/\.0$/, '') + 'K';
+//     }
+//     return amount.toString();
+//   }
+
 //   return (
 //     <AdminContainer>
 //       <ToastContainer position="top-right" autoClose={3000} />
@@ -260,7 +281,7 @@ export default DashboardPage
 //           <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 lg:col-span-2">
 //             <StatCardGroup stats={[
 //               { label: 'Total Order', value: data.totalOrder.value.toLocaleString(), delta: `${data.totalOrder.growth}%` },
-//               { label: 'Service Fee', value: `₦${(data.totalServiceFees.value / 1e6).toFixed(2)}`, delta: `${data.totalServiceFees.growth}%` },
+//               { label: 'Service Fee', value: `₦${data.totalServiceFees.value.toLocaleString()}`, delta: `${data.totalServiceFees.growth}%` },
 //               { label: 'Total Events', value: data.totalEvents.value.toLocaleString(), delta: `${data.totalEvents.growth}%` },
 //               { label: 'Total Host', value: data.totalHosts.value.toLocaleString(), delta: `${data.totalHosts.growth}%` }
 //             ]} />
@@ -281,6 +302,3 @@ export default DashboardPage
 // }
 
 // export default DashboardPage
-
-
-
