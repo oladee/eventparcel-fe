@@ -9,10 +9,9 @@ import { useRouter } from "next/navigation";
 import axiosInstance from "@/lib/adminAxiosInterceptor/axiosInstance";
 import { motion } from "framer-motion";
 
-const statusTabs: ("All Users" | "active" | "suspended" | "disabled")[] = [
+const statusTabs: ("All Users" | "active" | "disabled")[] = [
   "All Users",
   "active",
-  "suspended",
   "disabled"
 ];
 
@@ -20,7 +19,7 @@ const AdminPage: React.FC = () => {
   const Router = useRouter();
 
   const [newUser, setNewUser] = useState(false);
-  const [activeTab, setActiveTab] = useState<"All Users" | "active" | "suspended" | "disabled">("All Users");
+  const [activeTab, setActiveTab] = useState<"All Users" | "active" | "disabled">("All Users");
   const [search, setSearch] = useState("");
   const [page, setPage] = useState(1);
   const [pageSize, setPageSize] = useState(6);
@@ -130,7 +129,7 @@ const AdminPage: React.FC = () => {
               <select
                 className="ml-2 text-black font-bold border-none focus:ring-0 outline-none"
                 value={activeTab}
-                onChange={(e) => setActiveTab(e.target.value as "All Users" | "active" | "suspended" | "disabled")}
+                onChange={(e) => setActiveTab(e.target.value as "All Users" | "active" | "disabled")}
               >
                 {statusTabs.map((tab) => (
                   <option key={tab} value={tab}>

@@ -17,6 +17,7 @@ import toast from 'react-hot-toast';
 import useUpdateOrderStatus from '@/hooks/useUpdateOrderStatus';
 import OrderPagination from '@/components/OrderPagination';
 import { motion } from 'framer-motion';
+import { ToastContainer } from 'react-toastify';
 
 
 interface Order {
@@ -72,7 +73,6 @@ const Page = () => {
       try {
         const response = await axiosInstance.get(`/view-group/${id}`);
         setGroup(response.data.data); 
-        console.log("res", response.data.data)
       } catch (error: any) {
         setError(error);
         toast.error('Failed to fetch group data');
@@ -123,6 +123,7 @@ const Page = () => {
           { eventGroupId: id },
           { params }
         );
+
   
         // Ensure response data exists before setting state
         if (response.data && response.data.data) {
@@ -142,8 +143,6 @@ const Page = () => {
   
     fetchOrders();
   }, [page, limit, debouncedSearchQuery, activeTab, id]);
-  
-  
 
   useEffect(() => {
     function handleClickOutside(event: MouseEvent) {
@@ -175,32 +174,36 @@ const Page = () => {
 
   const handleStatusChange = async (status: string) => {
     try {
-      if (!selectedOrder?._id) {
+      if (!selectedOrder?.orderId) {
         toast.error("Invalid order. Please try again.");
         return;
       }
 
-      await updateOrderStatus(
+      const response = await updateOrderStatus(
         selectedOrder._id,
-        selectedOrder.paymentStatus ?? "unknown",
-        status.toLowerCase()
+        selectedOrder.paymentStatus ?? "Unknown",
+        status
       );
 
-      setOrders((prevOrders) => {
-        if (!prevOrders) return prevOrders;
+      // Only update UI if status update is successful
+      if (response?.success) {
+        setOrders((prevOrders) => {
+          if (!prevOrders) return prevOrders;
 
-        return {
-          ...prevOrders,
-          orders: prevOrders.orders.map((order) =>
-            order._id === selectedOrder._id
-              ? { ...order, orderStatus: status.toLowerCase() }
-              : order
-          ),
-        };
-      });
-
-    } catch (error) {
-      console.error("Error updating order status:", error);
+          return {
+            ...prevOrders,
+            orders: prevOrders.orders.map((order) =>
+              order.orderId === selectedOrder.orderId
+                ? { ...order, orderStatus: status }
+                : order
+            )
+          };
+        });
+      } else {
+        // toast.error("Failed to update status. Please try again.");
+      }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message);
     } finally {
       setIsStatusModal(false);
     }
@@ -266,6 +269,7 @@ const Page = () => {
 
   return (
     <Container>
+      <ToastContainer />
       <div id="orders-page-container" className="min-h-screen mt-2">
         <div>
           <div className="bg-white rounded-2xl p-6">
@@ -301,12 +305,12 @@ const Page = () => {
 
             <div className="flex items-center space-x-6 py-4 text-sm text-gray-500 font-medium">
               <div className="flex flex-col items-start">
-                <span className="font-semibold text-[20px] text-[#111827] mb-2">{group?.groupCurrency === "NGN" ? "₦" : "$"}{formatCurrencyShort(group?.summary[0]?.overallSales || 0)}</span>
+                <span className="font-semibold text-[20px] text-[#111827] mb-2">{group?.groupCurrency === "NGN" ? "₦" : "$"}{formatCurrencyShort(orders?.orderSummary?.ordersSummary?.overallSales)}</span>
                 <span className='font-general'>Overall sales</span>
               </div>
               <div className="h-6 w-px bg-gray-300"></div>
               <div className="flex flex-col items-start">
-                <span className="text-black font-bold text-lg">{group?.summary[0]?.packagesSold || 0}</span>
+                <span className="text-black font-bold text-lg">{orders?.orderSummary?.ordersSummary?.packageSold}</span>
                 <span>Sold</span>
               </div>
               <div className="h-6 w-px bg-gray-300"></div>

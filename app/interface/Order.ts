@@ -177,6 +177,7 @@ export interface OrderDashboardResponse {
   totalPages: number;
   totalOrders: number;
   orders: Order[];
+  orderSummary: any;
   summary: {
     orders: OrderAnalytics;
     invites: InviteAnalytics;

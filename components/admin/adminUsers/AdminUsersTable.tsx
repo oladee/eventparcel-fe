@@ -15,13 +15,12 @@ export type AdminInterface = {
   email: string;
   role: string;
   lastLogin: string;
-  status: "active" | "disabled" | "suspended" | "inactive";
+  status: "active" | "disabled" | "inactive";
 };
 
 const statusClasses: Record<AdminInterface["status"], string> = {
   active: "bg-[#2B9EA01F] text-[#2B9EA0] border border-[#2B9EA0]",
   disabled: "bg-[#FE964A1F] text-[#DE4222] border border-[#DE4222]",
-  suspended: "bg-[#DE42221F] text-[#FE964A] border border-[#FE964A]",
   inactive: "bg-[#A0AEC01F] text-[#A0AEC0] border border-[#A0AEC0]",
 };
 
@@ -41,7 +40,7 @@ const AdminUsersTable: React.FC<{ admins: AdminInterface[] }> = ({ admins }) => 
         router.push("/");
         return;
       }
-      setRole(user.role);
+      setRole(user.data.role);
     }, [router]);
 
   useEffect(() => {
@@ -217,7 +216,7 @@ const AdminUsersTable: React.FC<{ admins: AdminInterface[] }> = ({ admins }) => 
                     </td>
                     <td className="p-4 text-right relative">
                     <button disabled={role !== "superAdmin"} onClick={() => toggleMenu(a._id)}>
-                      <FiMoreHorizontal className="text-gray-400" />
+                      <FiMoreHorizontal className="text-gray-400 cursor-pointer" />
                     </button>
                     {menuOpenId === a._id && (
                       <div
@@ -227,19 +226,6 @@ const AdminUsersTable: React.FC<{ admins: AdminInterface[] }> = ({ admins }) => 
                     <ul className="py-1">
                     <ul className="py-1">
                         {a.status === "active" && (
-                          <>
-                            <li>
-                              <button
-                                onClick={() => handleUpdateStatus(a._id, "suspended")}
-                                className="w-full flex items-center gap-2 text-left px-4 py-2 text-sm text-orange-600 hover:bg-gray-100"
-                              >
-                                {loadingButton?.id === a._id && loadingButton?.action === "suspended" ? (
-                                  <span className="w-4 h-4 border-2 border-orange-600 border-t-transparent rounded-full animate-spin" />
-                                ) : (
-                                  "Suspend Admin"
-                                )}
-                              </button>
-                            </li>
                             <li>
                               <button
                                 onClick={() => handleUpdateStatus(a._id, "disabled")}
@@ -252,36 +238,6 @@ const AdminUsersTable: React.FC<{ admins: AdminInterface[] }> = ({ admins }) => 
                                 )}
                               </button>
                             </li>
-                          </>
-                        )}
-
-                        {a.status === "suspended" && (
-                          <>
-                            <li>
-                              <button
-                                onClick={() => handleUpdateStatus(a._id, "active")}
-                                className="w-full flex items-center gap-2 text-left px-4 py-2 text-sm text-green-600 hover:bg-gray-100"
-                              >
-                                {loadingButton?.id === a._id && loadingButton?.action === "active" ? (
-                                  <span className="w-4 h-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin" />
-                                ) : (
-                                  "Activate Admin"
-                                )}
-                              </button>
-                            </li>
-                            <li>
-                              <button
-                                onClick={() => handleUpdateStatus(a._id, "disabled")}
-                                className="w-full flex items-center gap-2 text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
-                              >
-                                {loadingButton?.id === a._id && loadingButton?.action === "disabled" ? (
-                                  <span className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
-                                ) : (
-                                  "Disable Admin"
-                                )}
-                              </button>
-                            </li>
-                          </>
                         )}
 
                         {a.status === "inactive" && (
@@ -295,18 +251,6 @@ const AdminUsersTable: React.FC<{ admins: AdminInterface[] }> = ({ admins }) => 
                                   <span className="w-4 h-4 border-2 border-green-600 border-t-transparent rounded-full animate-spin" />
                                 ) : (
                                   "Activate Admin"
-                                )}
-                              </button>
-                            </li>
-                            <li>
-                              <button
-                                onClick={() => handleUpdateStatus(a._id, "suspended")}
-                                className="w-full flex items-center gap-2 text-left px-4 py-2 text-sm text-orange-600 hover:bg-gray-100"
-                              >
-                                {loadingButton?.id === a._id && loadingButton?.action === "suspended" ? (
-                                  <span className="w-4 h-4 border-2 border-orange-600 border-t-transparent rounded-full animate-spin" />
-                                ) : (
-                                  "Suspend Admin"
                                 )}
                               </button>
                             </li>
@@ -326,7 +270,6 @@ const AdminUsersTable: React.FC<{ admins: AdminInterface[] }> = ({ admins }) => 
                         )}
 
                         {a.status === "disabled" && (
-                          <>
                             <li>
                               <button
                                 onClick={() => handleUpdateStatus(a._id, "active")}
@@ -339,19 +282,6 @@ const AdminUsersTable: React.FC<{ admins: AdminInterface[] }> = ({ admins }) => 
                                 )}
                               </button>
                             </li>
-                            <li>
-                              <button
-                                onClick={() => handleUpdateStatus(a._id, "suspended")}
-                                className="w-full flex items-center gap-2 text-left px-4 py-2 text-sm text-orange-600 hover:bg-gray-100"
-                              >
-                                {loadingButton?.id === a._id && loadingButton?.action === "suspended" ? (
-                                  <span className="w-4 h-4 border-2 border-orange-600 border-t-transparent rounded-full animate-spin" />
-                                ) : (
-                                  "Suspend Admin"
-                                )}
-                              </button>
-                            </li>
-                          </>
                         )}
                       </ul>
                     </ul>

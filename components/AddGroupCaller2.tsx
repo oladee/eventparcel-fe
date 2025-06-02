@@ -220,11 +220,11 @@ const AddGroup2: React.FC<AddGroupProps> = ({
           localStorage.setItem("groupLength", eventData.eventGroups.length);
           localStorage.setItem("isNairaAccount", String(updatedFlags.isNaira));
           localStorage.setItem("isDollarAccount", String(updatedFlags.isDollar));
+          localStorage.setItem("groupLength", "1");
         
           // Redirect to payment page
           router.push("/dashboard/editPaymentDetails");
         }
-        
       }
 
       toast.success(

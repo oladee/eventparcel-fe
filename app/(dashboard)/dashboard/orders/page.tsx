@@ -88,8 +88,6 @@ const Page: React.FC = ({}) => {
           { params }
         );
 
-        console.log("orders",response.data.data)
-
           trackEvent("View Orders", {
             source: "orders page",
             timestamp: new Date().toISOString(),
