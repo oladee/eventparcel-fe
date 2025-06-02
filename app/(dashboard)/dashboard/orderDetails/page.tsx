@@ -84,8 +84,11 @@ const Page = () => {
       };
       
 
-      const itemTotalAmount = (orders?.totalAmount || 0) - (orders?.tax || 0) - (orders?.homeDeliveryFee || 0);
-
+      const itemTotalAmount = Math.max(
+        (orders?.totalAmount || 0) - (orders?.tax || 0) - (orders?.homeDeliveryFee || 0),
+        0
+      );
+      
       const getStatusClass = (status: string) => {
         switch (status.toLowerCase()) {
           case 'paid':
