@@ -14,7 +14,7 @@ export type Host = {
   location: string;
   sales: string;
   lastLogin: string;
-  status: "Active" | "Inactive" | "Unverified" | "Suspended" | "Disabled";
+  status: "Active" | "Inactive" | "Unverified"  | "Disabled";
 };
 
 const statusClasses: Record<Host["status"], string> = {
@@ -22,7 +22,7 @@ const statusClasses: Record<Host["status"], string> = {
   Inactive:   "bg-[#FE964A1F] text-[#FE964A]  border border-[#FE964A]",
   Unverified: "bg-[#DE42221F] text-[#DE4222] border border-[#DE4222]",
   Disabled:   "bg-[#FE964A1F] text-[#FE4222] border border-[#DE4222]",
-  Suspended:  "bg-[#DE42221F] text-[#FE964A]  border border-[#FE964A]",
+  // Suspended:  "bg-[#DE42221F] text-[#FE964A]  border border-[#FE964A]",
 };
 
 interface Props {
@@ -128,7 +128,7 @@ const HostsTable: React.FC<Props> = ({ hosts, onStatusUpdate }) => {
                       </li>
                       {h.status === "Active" && (
                         <>
-                          <li>
+                          {/* <li>
                             <button
                               onClick={() => handleUpdate(h.id, "Suspended")}
                               className="w-full flex items-center gap-2 px-4 py-2 text-sm text-orange-600 hover:bg-gray-100"
@@ -137,7 +137,7 @@ const HostsTable: React.FC<Props> = ({ hosts, onStatusUpdate }) => {
                                 ? <span className="w-4 h-4 border-2 border-orange-600 border-t-transparent rounded-full animate-spin"/>
                                 : "Suspend Host"}
                             </button>
-                          </li>
+                          </li> */}
                           <li>
                             <button
                               onClick={() => handleUpdate(h.id, "Disabled")}
@@ -150,7 +150,7 @@ const HostsTable: React.FC<Props> = ({ hosts, onStatusUpdate }) => {
                           </li>
                         </>
                       )}
-                            {h.status === "Suspended" && (
+                            {/* {h.status === "Suspended" && (
                         <>
                           <li>
                             <button
@@ -173,7 +173,7 @@ const HostsTable: React.FC<Props> = ({ hosts, onStatusUpdate }) => {
                             </button>
                           </li>
                         </>
-                      )}
+                      )} */}
                       {h.status === "Inactive" && (
                         <>
                           <li>
@@ -188,10 +188,10 @@ const HostsTable: React.FC<Props> = ({ hosts, onStatusUpdate }) => {
                           </li>
                           <li>
                             <button
-                              onClick={() => handleUpdate(h.id, "Suspended")}
+                              onClick={() => handleUpdate(h.id, "Disabled")}
                               className="w-full flex items-center gap-2 text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
                             >
-                              {loadingButton?.id === h.id && loadingButton?.action === "Suspended"
+                              {loadingButton?.id === h.id && loadingButton?.action === "Disabled"
                                 ? <span className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
                                 : "Suspend Host"}
                             </button>
@@ -212,10 +212,10 @@ const HostsTable: React.FC<Props> = ({ hosts, onStatusUpdate }) => {
                           </li>
                           <li>
                             <button
-                              onClick={() => handleUpdate(h.id, "Suspended")}
+                              onClick={() => handleUpdate(h.id, "Disabled")}
                               className="w-full flex items-center gap-2 text-left px-4 py-2 text-sm text-red-600 hover:bg-gray-100"
                             >
-                              {loadingButton?.id === h.id && loadingButton?.action === "Suspended"
+                              {loadingButton?.id === h.id && loadingButton?.action === "Disabled"
                                 ? <span className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
                                 : "Suspend Host"}
                             </button>
