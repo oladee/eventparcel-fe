@@ -35,7 +35,7 @@ const HostSidebarInfo: React.FC<Props> = ({ host, pickup }) => (
           <HiOutlineEnvelope size={20} /> {host.email}
         </div>
         <div className="flex items-center gap-3 text-[#718096] text-sm font-medium">
-          <PiPhoneBold size={20} /> {host.phoneNumber}
+          <PiPhoneBold size={20} />   {host.phoneNumber ? host.phoneNumber : "Not provided"}
         </div>
       </div>
     </div>
@@ -45,7 +45,7 @@ const HostSidebarInfo: React.FC<Props> = ({ host, pickup }) => (
       <h4 className="text-lg font-bold text-[#111827]">Pickup Details</h4>
       <div className="border-t border-[#EEEFF2] mt-3 pt-3 space-y-2">
         <p className="font-semibold capitalize">{pickup.contactName}</p>
-        <p className="text-[#718096] text-sm">{pickup.location}</p>
+        {/* <p className="text-[#718096] text-sm">{pickup.location}</p> */}
         {pickup.email && (
           <div className="flex items-center gap-3 text-[#718096] text-sm font-medium">
             <HiOutlineEnvelope size={20} /> {pickup.email}

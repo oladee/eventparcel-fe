@@ -56,40 +56,6 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
     eventImage: ""
   });
 
-  //   useEffect(() => {
-  //     const authToken = localStorage.getItem("authToken");
-  //     setIsAuthenticated(!!authToken);
-
-  //     if (eventData) {
-  //       const {
-  //         eventName = "",
-  //         date = new Date().toISOString(),
-  //         time = "12:00 PM",
-  //         eventLocation = "",
-  //         hostFirstName = "",
-  //         hostLastName = "",
-  //         hostEmail = "",
-  //         eventDescription = "",
-  //         numberOfGroups = "1",
-  //         eventImgUrl = null
-  //       } = eventData;
-
-  //       setFormData({
-  //         eventName,
-  //         eventDate: new Date(date),
-  //         eventTime: parseTimeString(time),
-  //         location: eventLocation,
-  //         firstName: hostFirstName,
-  //         lastName: hostLastName,
-  //         email: hostEmail,
-  //         description: eventDescription,
-  //         numberOfGroups: numberOfGroups.toString(),
-  //         eventImage: null
-  //       });
-  //       setSelectedImage(eventImgUrl);
-  //     }
-  //   }, [eventData]);
-
   useEffect(() => {
     const authToken = localStorage.getItem("authToken");
     setIsAuthenticated(!!authToken);
@@ -144,7 +110,8 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
     }
   };
 
-  const validateField = (id: string, value: any): string => {
+const validateField = (id: string, value: any): string => {
+    // Skip personal details validations if user is authenticated
     if (
       isAuthenticated &&
       (id === "firstName" || id === "lastName" || id === "email")
@@ -157,13 +124,22 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
         return "This field is required.";
       }
     } else if (id === "numberOfGroups") {
-      if (!value.trim() || isNaN(Number(value))) {
+      const trimmed = value.toString().trim();
+
+      // If user hasn't entered anything, don't treat it as an error
+      if (!trimmed) {
+        return "";
+      }
+      // Must be digits only
+      if (!/^\d+$/.test(trimmed)) {
         return "Enter a valid number.";
       }
-      const numValue = Number(value);
+      const numValue = Number(trimmed);
+      // Enforce range 1–99
       if (numValue < 1 || numValue > 99) {
         return "Number must be between 1 and 99.";
       }
+      return "";
     } else if (
       id !== "description" &&
       (typeof value !== "string" || !value.trim())
@@ -173,7 +149,6 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
 
     if (
       id === "email" &&
-      value &&
       !/^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(value)
     ) {
       return "Enter a valid email address.";
@@ -186,16 +161,20 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
       return "Name cannot include numbers or special characters.";
     }
 
-    if (id === "description") {
-      if (value.trim() && value.length < 5)
-        return "Description must be at least 5 characters.";
-      if (value.length > 300)
-        return "Description must have a maximum of 300 characters.";
+    if (id === "description" && value.trim() && value.length < 5) {
+      return "Description must be at least 5 characters.";
     }
 
-    if (id === "eventName") {
-      if (value.length < 5) return "Event name must be at least 5 characters.";
-      if (value.length > 60) return "Event name must not exceed 60 characters.";
+    if (id === "description" && value.length > 300) {
+      return "Description must have a maximum of 300 characters.";
+    }
+
+    if (id === "eventName" && value.length < 5) {
+      return "Event name must be at least 5 characters.";
+    }
+
+    if (id === "eventName" && value.length > 60) {
+      return "Event name must not exceed 60 characters.";
     }
 
     return "";
@@ -276,6 +255,7 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
     submissionData.append("hostFirstName", formData.firstName);
     submissionData.append("hostLastName", formData.lastName);
     submissionData.append("hostEmail", formData.email);
+    submissionData.append("numberOfGroups", formData.numberOfGroups);
     if (formData.eventImage) {
       submissionData.append("eventImgUrl", formData.eventImage);
     }
@@ -399,19 +379,43 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
 
 export default UpdateEventModal;
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 // "use client";
 
 // import React, { useEffect, useState, useRef } from "react";
 // import { AiOutlineClose } from "react-icons/ai";
-// import EventFormFields from "@/components/aboutEvent/EventFormFields";
 // import PersonalDetails from "@/components/aboutEvent/PersonalDetails";
 // import ImagePickerModal from "@/components/aboutEvent/ImagePickerModal";
 // import { toast, ToastContainer } from "react-toastify";
 // import axiosInstance from "@/lib/axiosInstance";
-// // import DatePicker from "react-datepicker";
 // import { convertTo12Hour } from "@/utils/timeUtils";
 // import Container from "../Container";
 // import FormButtons3 from "./FormButton3";
+// import EventFormFields2 from "./EventFormFields2";
+// import { trackEvent } from "@/lib/mixpanel";
 
 // interface UpdateEventModalProps {
 //   isOpen: boolean;
@@ -460,11 +464,10 @@ export default UpdateEventModal;
 //   useEffect(() => {
 //     const authToken = localStorage.getItem("authToken");
 //     setIsAuthenticated(!!authToken);
-
 //     if (eventData) {
 //       const {
 //         eventName = "",
-//         date = new Date().toISOString(),
+//         date = new Date().toISOString().split("T")[0], // Ensures date is in 'YYYY-MM-DD' format
 //         time = "12:00 PM",
 //         eventLocation = "",
 //         hostFirstName = "",
@@ -477,16 +480,17 @@ export default UpdateEventModal;
 
 //       setFormData({
 //         eventName,
-//         eventDate: new Date(date),
-//         eventTime: parseTimeString(time),
+//         eventDate: new Date(date), // Ensures a valid date object
+//         eventTime: parseTimeString(time), // Parse time correctly
 //         location: eventLocation,
 //         firstName: hostFirstName,
 //         lastName: hostLastName,
 //         email: hostEmail,
 //         description: eventDescription,
-//         numberOfGroups: numberOfGroups.toString(),
+//         numberOfGroups: numberOfGroups?.toString() ?? "0",
 //         eventImage: null
 //       });
+
 //       setSelectedImage(eventImgUrl);
 //     }
 //   }, [eventData]);
@@ -494,7 +498,8 @@ export default UpdateEventModal;
 //   const parseTimeString = (timeString: string): Date => {
 //     try {
 //       const [time, modifier] = timeString.split(" ");
-//       let [hours, minutes] = time.split(":");
+//       let [hours] = time.split(":");
+//       const [minutes] = time.split(":");
 
 //       if (modifier === "PM" && parseInt(hours) !== 12) {
 //         hours = (parseInt(hours) + 12).toString();
@@ -581,10 +586,19 @@ export default UpdateEventModal;
 //     setErrors((prev) => ({ ...prev, [id]: validateField(id, value) }));
 //   };
 
+//   //   const handleDateChange = (date: Date | null, field: string) => {
+//   //     if (date) {
+//   //       setFormData((prev) => ({ ...prev, [field]: date }));
+//   //       setErrors((prev) => ({ ...prev, [field]: "" }));
+//   //     }
+//   //   };
+
 //   const handleDateChange = (date: Date | null, field: string) => {
 //     if (date) {
 //       setFormData((prev) => ({ ...prev, [field]: date }));
 //       setErrors((prev) => ({ ...prev, [field]: "" }));
+//     } else {
+//       setErrors((prev) => ({ ...prev, [field]: "This field is required." }));
 //     }
 //   };
 
@@ -597,6 +611,14 @@ export default UpdateEventModal;
 //   };
 
 //   const handleSubmit = async (isSaveLater: boolean = false) => {
+//       trackEvent("Edit An Event - Started", {
+//         source: "dashboard event page",
+//         timestamp: new Date().toISOString(),
+//         page_name: "dashboard event page",
+//         event_id: eventData?._id,
+//         event_name: formData.eventName,
+//       });
+      
 //     const newErrors = { ...errors };
 //     Object.keys(formData).forEach((key) => {
 //       if (key !== "eventImage") {
@@ -640,11 +662,28 @@ export default UpdateEventModal;
 //       localStorage.setItem("eventData", JSON.stringify(response.data));
 //       window.dispatchEvent(new Event("refreshEvents"));
 //       toast.success("Event updated successfully!");
+
+//       trackEvent("Edit An Event - End", {
+//         source: "dashboard event page",
+//         timestamp: new Date().toISOString(),
+//         page_name: "dashboard event page",
+//         event_id: eventData?._id,
+//         event_name: formData.eventName,
+//         status: "Successfull"
+//       });
 //       setTimeout(() => {
 //         onClose();
 //       }, 3000);
 //     } catch (error: any) {
 //       toast.error(error.response?.data?.message || "Failed to update event");
+//       trackEvent("Edit An Event - End", {
+//         source: "dashboard event page",
+//         timestamp: new Date().toISOString(),
+//         page_name: "dashboard event page",
+//         event_id: eventData?._id,
+//         event_name: formData.eventName,
+//         status: "Failed"
+//       });
 //     } finally {
 //       isSaveLater ? setLoading2(false) : setLoading(false);
 //     }
@@ -665,7 +704,7 @@ export default UpdateEventModal;
 //           </div>
 
 //           <div className="relative space-y-8 p-5">
-//             <EventFormFields
+//             <EventFormFields2
 //               formData={formData}
 //               errors={errors}
 //               selectedImage={selectedImage}
@@ -698,27 +737,17 @@ export default UpdateEventModal;
 //                 isAuthenticated={isAuthenticated}
 //               />
 //             )}
+//           </div>
 
-//            {/* <div className="bg-black-100 h-max fixed buttom-0">
-//            <FormButtons2
+//           <div className="sticky bottom-0 w-full bg-white p-5 border-t border-gray-200">
+//             <FormButtons3
 //               isFormValid={Object.values(errors).every((err) => err === "")}
 //               onContinue={() => handleSubmit()}
 //               onContinue2={() => handleSubmit(true)}
 //               loading={loading}
 //               loading2={loading2}
 //             />
-//            </div> */}
 //           </div>
-
-//             <div className="sticky bottom-0 w-full bg-white p-5 border-t border-gray-200">
-//                 <FormButtons3
-//                 isFormValid={Object.values(errors).every((err) => err === "")}
-//                 onContinue={() => handleSubmit()}
-//                 onContinue2={() => handleSubmit(true)}
-//                 loading={loading}
-//                 loading2={loading2}
-//                 />
-//      </div>
 //           {showImagePickerModal && (
 //             <ImagePickerModal
 //               onSelectGallery={() => {
@@ -740,3 +769,4 @@ export default UpdateEventModal;
 // };
 
 // export default UpdateEventModal;
+

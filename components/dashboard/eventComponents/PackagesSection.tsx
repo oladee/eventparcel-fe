@@ -172,7 +172,9 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({
               <button
                 onClick={() => {
                   if (group.isDisabled) {
-                    handleDisabledAction();
+                    toast.warning(
+                      "This action is not allowed on a disabled group."
+                    );
                   } else {
                     setModalMode("create");
                     setSelectedPackage(null);
@@ -259,7 +261,10 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({
               <button
                 onClick={() => {
                   if (group.isDisabled) {
-                    handleDisabledAction();
+                    // handleDisabledAction();
+                    toast.warning(
+                      "This action is not allowed on a disabled group."
+                    );
                   } else if (!isPickupAvailable) {
                     toast.warning(
                       "You can't send invites to an event without pickup details."
@@ -274,7 +279,7 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({
               >
                 <IoIosSend size={18} /> Send Invite
               </button>
-              
+
               {/* <button
                 onClick={() => {
                   if (group.isDisabled) {
