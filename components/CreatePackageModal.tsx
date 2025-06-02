@@ -48,6 +48,9 @@ const packageSizeMap: Record<string, string> = {
     "100": "extraLargeBox",
   };
 
+const capitalizeFirstLetter = (text: string) =>
+    text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();  
+
 const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupCurrency, setOpenModalPackage, mode, packageData }) => {
     const [errors, setErrors] = useState<FormErrors>({});
     const [loading, setLoading] = useState(false);
@@ -60,7 +63,9 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
     const [formData, setFormData] = useState<PackageFormData>({
         groupId: groudId,
         eventId: eventId,
-        packageTitle: packageData?.packageTitle || "",
+        packageTitle: packageData?.packageTitle
+        ? capitalizeFirstLetter(packageData.packageTitle)
+        : "",
         packageDescription: packageData?.packageDescription || "",
         packagePriceCurrency: groupCurrency,
         packagePrice: packageData?.packagePrice || "",
