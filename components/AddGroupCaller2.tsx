@@ -150,7 +150,11 @@ const AddGroup2: React.FC<AddGroupProps> = ({
 
     const formDataToSend = new FormData();
 
-    formDataToSend.append("groupName", formData.groupName);
+    formDataToSend.append("groupName", formData.groupName.trim());
+    // formDataToSend.append(
+    //   "groupName",
+    //   formData.groupName.replace(/\s+/g, " ").trim()
+    // );
     formDataToSend.append("groupDescription", formData.groupDescription);
     formDataToSend.append("groupPrivacy", formData.groupPrivacy.toLowerCase());
     formDataToSend.append("groupCurrency", formData.groupCurrency);
@@ -194,12 +198,14 @@ const AddGroup2: React.FC<AddGroupProps> = ({
           window.location.reload();
         } else {
           // Get current currency flags from localStorage
-          const currentIsNaira = localStorage.getItem("isNairaAccount") === "true";
-          const currentIsDollar = localStorage.getItem("isDollarAccount") === "true";
-        
+          const currentIsNaira =
+            localStorage.getItem("isNairaAccount") === "true";
+          const currentIsDollar =
+            localStorage.getItem("isDollarAccount") === "true";
+
           // Determine new currency type from form data
           const newCurrencyType = formData.groupCurrency;
-        
+
           // If existing currency matches new one, reload
           if (
             (currentIsNaira && newCurrencyType === "NGN") ||
@@ -208,20 +214,23 @@ const AddGroup2: React.FC<AddGroupProps> = ({
             window.location.reload();
             return;
           }
-        
+
           // Update flags based on new currency type
           const updatedFlags = {
             isNaira: currentIsNaira || newCurrencyType === "NGN",
             isDollar: currentIsDollar || newCurrencyType === "USD"
           };
-        
+
           // Store all data in localStorage
           localStorage.setItem("eventId", eventData._id);
           localStorage.setItem("groupLength", eventData.eventGroups.length);
           localStorage.setItem("isNairaAccount", String(updatedFlags.isNaira));
-          localStorage.setItem("isDollarAccount", String(updatedFlags.isDollar));
+          localStorage.setItem(
+            "isDollarAccount",
+            String(updatedFlags.isDollar)
+          );
           localStorage.setItem("groupLength", "1");
-        
+
           // Redirect to payment page
           router.push("/dashboard/editPaymentDetails");
         }
@@ -319,7 +328,11 @@ const AddGroup2: React.FC<AddGroupProps> = ({
         className="w-[320px] h-[545px] space-y-4 bg-[#FFFFFF] px-5 py-6 rounded-3xl relative !z-50"
         onSubmit={handleSubmit}
       >
-        <FiX size={24}  onClick={() => setIsAddGroupOpen(false)} className="absolute top-3 right-3 text-black-300 " />
+        <FiX
+          size={24}
+          onClick={() => setIsAddGroupOpen(false)}
+          className="absolute top-3 right-3 text-black-300 "
+        />
         <GroupHeader mode={mode} onClose={() => setIsAddGroupOpen(false)} />
         <GroupFormFields
           formData={formData}
