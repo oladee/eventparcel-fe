@@ -156,7 +156,7 @@ const HostsPage: React.FC = () => {
             </select>
           </div>
 
-          <div className="flex-1 max-w-md flex items-center bg-white rounded-[12px] px-4 py-2">
+          <div className="flex-1 flex items-center bg-white rounded-[12px] px-4 py-2">
             <FiSearch className="text-[#000]" />
             <input
               type="text"
