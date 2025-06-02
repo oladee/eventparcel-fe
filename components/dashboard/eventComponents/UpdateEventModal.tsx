@@ -11,6 +11,7 @@ import Container from "../Container";
 import FormButtons3 from "./FormButton3";
 import EventFormFields2 from "./EventFormFields2";
 import { trackEvent } from "@/lib/mixpanel";
+
 interface UpdateEventModalProps {
   isOpen: boolean;
   onClose: () => void;
