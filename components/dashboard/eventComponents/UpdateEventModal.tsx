@@ -69,7 +69,7 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
         hostLastName = "",
         hostEmail = "",
         eventDescription = "",
-        numberOfGroups = "1",
+        numberOfGroups = "",
         eventImgUrl = null
       } = eventData;
 
@@ -82,7 +82,7 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
         lastName: hostLastName,
         email: hostEmail,
         description: eventDescription,
-        numberOfGroups: numberOfGroups?.toString() ?? "0",
+        numberOfGroups: numberOfGroups?.toString(),
         eventImage: null
       });
 

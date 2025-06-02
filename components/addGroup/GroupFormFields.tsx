@@ -20,6 +20,7 @@ const GroupFormFields: React.FC<GroupFormFieldsProps> = ({
   const [isOpen, setIsOpen] = useState(false);
   
   
+  
     const currencies = [
       { id: "NGN", name: "Nigerian Naira (₦)" },
       { id: "USD", name: "US Dollar ($)" },
