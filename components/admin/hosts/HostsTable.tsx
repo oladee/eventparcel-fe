@@ -193,7 +193,7 @@ const HostsTable: React.FC<Props> = ({ hosts, onStatusUpdate }) => {
                             >
                               {loadingButton?.id === h.id && loadingButton?.action === "Disabled"
                                 ? <span className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
-                                : "Suspend Host"}
+                                : "Disable Host"}
                             </button>
                           </li>
                         </>
@@ -217,7 +217,7 @@ const HostsTable: React.FC<Props> = ({ hosts, onStatusUpdate }) => {
                             >
                               {loadingButton?.id === h.id && loadingButton?.action === "Disabled"
                                 ? <span className="w-4 h-4 border-2 border-red-600 border-t-transparent rounded-full animate-spin" />
-                                : "Suspend Host"}
+                                : "Disable Host"}
                             </button>
                           </li>
                         </>
