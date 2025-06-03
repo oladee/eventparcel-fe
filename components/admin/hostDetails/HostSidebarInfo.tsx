@@ -57,7 +57,7 @@ const HostSidebarInfo: React.FC<Props> = ({ host, pickup }) => (
           </div>
         )}
         {pickup.pickUpLocation && (
-          <div className="flex items-center gap-3 text-[#718096] text-sm font-medium">
+          <div className="flex items-center gap-3 text-[#718096] text-sm font-medium capitalize">
             <GrLocation size={20} /> {pickup.pickUpLocation}
           </div>
         )}

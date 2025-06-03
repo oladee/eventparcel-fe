@@ -28,7 +28,7 @@ import { trackEvent } from "@/lib/mixpanel";
   const DeliveryTable: React.FC<DeliveryProps> = ({orders, currentPage, setOrderStatus, orderStatus, setCurrentPage,searchTerm, totalPages, setLimit, limit, setSearchTerm}) => {
     const pathname = usePathname();
     const [isOpen, setIsOpen] = useState(false);
-    const orderOptions = ["All Orders", "pending", "shipped", "delivered", "PickedUp"];
+    const orderOptions = ["All Orders", "pending", "shipped", "delivered"];
     const [selected, setSelected] = useState("All Orders");
     const [currencySortState, setCurrencySortState] = useState<"asc" | "desc">("asc");
     const [ordersData, setOrdersData] = useState<GuestOrder[]>(orders);
