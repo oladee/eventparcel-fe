@@ -65,7 +65,7 @@ export default function ConfirmationCards() {
             <button 
               id="create-event-button"
               className="w-full h-14 rounded-[12px] mt-4 px-4 py-2 border border-[#751423] text-[#751423] text-sm font-semibold hover:bg-red-50 transition"
-              onClick={() => router.push("/")}
+              onClick={() => Router.push("/")}
             >
               Create an Event
             </button>
