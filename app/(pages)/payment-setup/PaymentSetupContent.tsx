@@ -584,7 +584,7 @@ const PaymentSetupContent = () => {
         if (authToken) {
           router.push("/dashboard/events");
         } else {
-          router.push("/");
+          router.push("/login");
         }
       } else {
         const parsedEventDetails = {

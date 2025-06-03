@@ -48,7 +48,7 @@ axiosInstance.interceptors.response.use(
         console.log(refreshError);
         
         // Handle refresh token error (e.g., redirect to login)
-        window.location.href = "/"; // Update this to your login route
+        window.location.href = "/login"; // Update this to your login route
         return Promise.reject(refreshError);
       }
     }

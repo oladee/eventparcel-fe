@@ -16,7 +16,7 @@ const ToolTipProfileHost: React.FC = () => {
       page_name: `${pathname} page`,
     });
     localStorage.clear(); // Clear localStorage
-    router.replace("/"); // Navigate to /login
+    router.replace("/login"); // Navigate to /login
   };
 
   const handleChangePassword = () => {

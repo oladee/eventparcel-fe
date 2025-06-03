@@ -38,7 +38,7 @@ const Page = () => {
     if (typeof window !== "undefined") {
       const loggedInUserEmail = localStorage.getItem("loggedInUserEmail");
       if (!loggedInUserEmail) {
-        router.replace("/");
+        router.replace("/login");
         return;
       }
 

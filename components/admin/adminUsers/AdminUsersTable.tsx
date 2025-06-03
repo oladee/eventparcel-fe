@@ -37,7 +37,7 @@ const AdminUsersTable: React.FC<{ admins: AdminInterface[] }> = ({ admins }) => 
       const user = loggedInUser ? JSON.parse(loggedInUser) : null
   
       if (!user) {
-        router.push("/");
+        router.push("/login");
         return;
       }
       setRole(user.data.role);

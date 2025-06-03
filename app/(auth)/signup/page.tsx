@@ -330,7 +330,7 @@ const Signup: React.FC = () => {
               <a
                 href="#"
                 className="text-primary font-bold"
-                onClick={() => router.push("/")}
+                onClick={() => router.push("/login")}
               >
                 Sign In
               </a>

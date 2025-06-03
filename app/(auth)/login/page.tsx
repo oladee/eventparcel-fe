@@ -1,17 +1,21 @@
 "use client";
-import Image from "next/image";
-import { HiOutlineEye, HiOutlineEyeOff } from "react-icons/hi";
-import { useRouter as Route } from "next-nprogress-bar";
+
 import { useEffect, useState } from "react";
+import { IoEyeOutline } from "react-icons/io5";
+import { FiEyeOff } from "react-icons/fi";
+import { useRouter as Route } from "next-nprogress-bar";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
-import axiosInstance from "@/lib/axiosInstance";
 import { BiLoaderCircle } from "react-icons/bi";
+import axiosInstance from "@/lib/axiosInstance";
+import AuthLeft from "@/components/auth/AuthLeft";
+import Cookies from "js-cookie";
 import { useRouter } from "next/navigation";
-import { identifyUser, trackEvent } from "@/lib/mixpanel";
+import { trackEvent, identifyUser } from "@/lib/mixpanel";
 import getBrowserType from "@/lib/getBrowserType";
+import SocialSignin from "@/components/auth/SocialSignin";
 
-const Page: React.FC = () => {
+const Login: React.FC = () => {
   const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -19,7 +23,17 @@ const Page: React.FC = () => {
   const [errors, setErrors] = useState({ email: "", password: "" });
   const router = useRouter();
   const route = Route();
-  // const [localEmail, setLocalEmail] = useState("");
+  const [location, setLocation] = useState<string | null>(null);
+
+  useEffect(() => {
+    if ("geolocation" in navigator) {
+      navigator.geolocation.getCurrentPosition((pos) => {
+        const { latitude, longitude } = pos.coords;
+        setLocation(`${latitude},${longitude}`);
+      });
+    }
+  }, []);
+  
 
   useEffect(() => {
     // Get eventDetails from localStorage
@@ -55,41 +69,35 @@ const Page: React.FC = () => {
     validateInput(name, value);
   };
 
+
   const handleLogin = async () => {
     if (!email || !password) {
       toast.error("Email and password are required!");
       return;
     }
-    
-    trackEvent("Admin Started sign-in", {
-      source: "admin login page",
+  
+    trackEvent("Started sign-in", {
+      source: "login page",
       sign_in_method: "email_password",
       timestamp: new Date().toISOString(),
-      page_name: "Admin Login Page",
+      page_name: "Login Page",
       browser_type: getBrowserType(),
       location,
     });
-
+  
     try {
       setLoading(true);
       const response = await axiosInstance.post(
-        "/login-admin",
+        "/login",
         { email, password },
-        {
-          withCredentials: true // Ensure cookies are sent with the request
-        }
+        { withCredentials: true }
       );
-      console.log(response.data);
-
-      // Store the accessToken in localStorage
+      
       localStorage.setItem("authToken", response.data.accessToken);
-      // Save the response to localStorage as the logged-in user
       localStorage.setItem("loggedInUser", JSON.stringify(response.data));
-      localStorage.setItem("loggedInUserEmail", response.data.data.email);
-      localStorage.setItem("loggedInUserId", response.data.data._id);
-
-      toast.success(response?.data?.message);
-        
+      localStorage.setItem("loggedInUserEmail", response.data.email);
+      localStorage.setItem("loggedInUserId", response.data.data.hostId);
+  
       identifyUser(response.data.data.hostId, {
         userType: response.data.data.role,
         location,
@@ -97,94 +105,92 @@ const Page: React.FC = () => {
         email: response.data.data.email,
         user_first_name: response.data.data.firstName,
         user_last_name: response.data.data.lastName,
-        role: response.data.data.role,
       });
 
-        trackEvent("Admin Completed sign-in", {
-          source: "admin login page",
-          sign_in_method: "email_password",
-          timestamp: new Date().toISOString(),
-          page_name: "Admin Login Page",
-          browser_type: getBrowserType(),
-          location,
-          email,
-          role: response.data.data.role,
-          status: "Successful"
-        });
-
-      route.replace("/admin");
-      // router.push("/");
+      trackEvent("Completed sign-in", {
+        source: "login page",
+        sign_in_method: "email_password",
+        timestamp: new Date().toISOString(),
+        page_name: "Login Page",
+        browser_type: getBrowserType(),
+        location,
+        email,
+        status: "Successful"
+      });
+  
+      toast.success(response?.data?.message);
+  
+      const redirectPath = Cookies.get("redirectAfterLogin");
+      const formData = localStorage.getItem("unsavedFormData");
+  
+      if (redirectPath || formData) {
+        router.push(`${redirectPath}?resumeForm=true`);
+        return;
+      } else {
+        route.push("/dashboard");
+      }
     } catch (error: any) {
+      trackEvent("Failed sign-in", {
+        source: "login page",
+        sign_in_method: "email_password",
+        error_message: error.response?.data?.message || "Unknown error",
+        timestamp: new Date().toISOString(),
+        page_name: "Login Page",
+        browser_type: getBrowserType(),
+        location,
+        status: "Failed"
+      });
+  
       if (
         error.response?.data?.message ===
         "User not verified. Please verify OTP first"
       ) {
         localStorage.setItem("email", email);
-        toast.error(
-          error.response?.data?.message ||
-            "User not verified. Please verify OTP first"
-        );
+        toast.error(error.response?.data?.message || "User not verified. Please verify OTP first");
         setTimeout(() => {
           router.push("/otp-verification");
         }, 3000);
       } else {
         toast.error(error.response?.data?.message);
       }
-
-      trackEvent("Admin Failed sign-in", {
-        source: "admin login page",
-        sign_in_method: "email_password",
-        error_message: error.response?.data?.message || "Unknown error",
-        timestamp: new Date().toISOString(),
-        page_name: "Admin Login Page",
-        browser_type: getBrowserType(),
-        location,
-        status: "Failed"
-      });
     } finally {
       setLoading(false);
     }
   };
+  
 
   const isFormValid =
     email && password && Object.values(errors).every((err) => err === "");
 
   return (
     <>
-      <div className="flex items-center justify-center min-h-screen bg-[#FAFAFA] px-4">
-        <div className="bg-white p-8 rounded-2xl w-full max-w-md">
-          {/* Logo and Title */}
-          <div className="flex flex-col items-center mb-6">
-            {/* Place your logo.svg in /public */}
-            <Image
-              src="/images/logo4.png"
-              alt="Event Parcel"
-              width={70}
-              height={70}
-              style={{ width: "auto", height: "auto" }}
-            />
-          </div>
+      <main
+        className="grid lg:grid-cols-2 min-h-screen mt-8 md:mt-4 lg:mt-0"
+        role="main"
+      >
+        {/* Left Side - Login Form */}
+        <div className="flex items-center justify-center px-6 py-10">
+          <div className="max-w-md w-full">
+            <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-6 text-black-100">
+              Login to your account
+            </h2>
 
-          {/* Heading */}
-          <h2 className="text-center text-lg font-bold text-gray-900 mb-6">
-            Login to your admin account
-          </h2>
-
-          {/* Form */}
-          <form onSubmit={handleLogin} className="grid gap-4">
             {/* Email Input */}
-            <div className="">
+            <div className="mb-4">
+              <label htmlFor="login-email" className="sr-only">
+                Email Address
+              </label>
               <input
+                id="login-email"
                 type="email"
                 placeholder="Email"
-                id="login-email"
+                className="authInput"
                 aria-describedby="email-desc"
                 name="email"
                 value={email}
                 onChange={(e) => handleChange("email", e.target.value)}
                 required
                 aria-required="true"
-                className="w-full py-3 px-4 bg-gray-100 rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[#7E1C2B] focus:bg-white"
               />
               {errors.email && (
                 <p
@@ -197,77 +203,102 @@ const Page: React.FC = () => {
               )}
             </div>
 
-            {/* Password Input with Toggle */}
-            <div className="relative">
+            {/* Password Input */}
+            <div className="mb-4 relative">
+              <label htmlFor="login-password" className="sr-only">
+                Password
+              </label>
               <input
                 type={showPassword ? "text" : "password"}
                 id="login-password"
                 name="password"
                 placeholder="Password"
+                className="authInput"
                 aria-describedby="password-desc"
                 value={password}
                 onChange={(e) => handleChange("password", e.target.value)}
                 required
                 aria-required="true"
-                className="w-full py-3 px-4 bg-gray-100 pr-12 rounded-[7px] focus:outline-none focus:ring-2 focus:ring-[#7E1C2B] focus:bg-white"
-                autoComplete="current-password"
               />
               <button
-                type="button"
                 id="login-password-toggle"
+                type="button"
                 aria-label="Toggle password visibility"
-                onClick={() => setShowPassword((prev) => !prev)}
-                className="absolute inset-y-0 right-3 flex items-center"
+                className="absolute right-3 top-[16px] text-gray-500 outline-none"
+                onClick={() => setShowPassword(!showPassword)}
               >
                 {showPassword ? (
-                  <HiOutlineEyeOff size={20} color="gray" />
+                  <FiEyeOff size={20} />
                 ) : (
-                  <HiOutlineEye size={20} color="gray" />
+                  <IoEyeOutline size={20} />
                 )}
               </button>
             </div>
 
             {/* Remember Me & Forgot Password */}
-            <div className="flex items-center justify-between">
-              <label className="flex items-center text-gray-700">
+            <div className="flex justify-between items-center mb-6">
+              <label
+                id="remember_me"
+                className="flex items-center text-sm text-black-100"
+              >
                 <input
                   type="checkbox"
+                  className="mr-2 outline-none"
                   id="checkbox"
-                  className="rounded-checkbox"
                 />
-                <span className="ml-2">Remember me</span>
+                Remember me
               </label>
-              <a
-                href="/admin-forgotPassword"
-                className="text-primary text-xs font-semibold hover:underline"
-              >
+              <a href="/forgot-password" className="text-primary text-sm">
                 Forgot Password?
               </a>
             </div>
 
-            {/* Submit Button */}
+            {/* Sign In Button */}
             <button
+              className={`button_v1 mb-4 w-full flex justify-center items-center ${
+                !isFormValid ? "opacity-50 cursor-not-allowed" : ""
+              }`}
               onClick={handleLogin}
               disabled={!isFormValid || loading}
               aria-disabled={!isFormValid || loading}
-              type="submit"
-              className={`button_v1 ${
-                !isFormValid ? "opacity-50 cursor-not-allowed" : ""
-              }`}
             >
               {loading ? (
                 <BiLoaderCircle className="animate-spin mr-2" size={22} />
               ) : (
-                "Sign in"
+                "Sign in with email"
               )}
             </button>
-          </form>
+
+            {/* Or Login With */}
+            <div className="text-center text-gray-500 text-sm mb-4">
+              Or login with
+            </div>
+
+            {/* Social Login Buttons */}
+            <SocialSignin />
+
+            {/* Signup Link */}
+            <div className="text-left text-sm text-gray-500 mt-6">
+              Don’t have an account?{" "}
+              <a
+                href="#"
+                className="text-primary font-bold"
+                onClick={() => router.push("/signup")}
+              >
+                Get Started
+              </a>
+            </div>
+          </div>
         </div>
-      </div>
+
+        {/* Right Side - Image & Carousel */}
+        <AuthLeft />
+      </main>
+
       {/* Toast Notifications */}
       <ToastContainer aria-live="polite" />
     </>
   );
 };
 
-export default Page;
+export default Login;

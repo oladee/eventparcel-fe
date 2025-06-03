@@ -39,7 +39,7 @@ const Page = () => {
       const loggedInUserString = localStorage.getItem("loggedInUserId");
 
       if (!loggedInUserString) {
-        router.replace("/");
+        router.replace("/login");
         return;
       }
       
@@ -68,7 +68,7 @@ const Page = () => {
   //   if (typeof window !== "undefined") {
   //     const storedEventId = localStorage.getItem("eventId");
   //     if (!storedEventId) {
-  //       router.replace("/event-creation");
+  //       router.replace("/login");
   //       return;
   //     }
       
@@ -244,7 +244,7 @@ export default Page;
 //       const storedEventId = localStorage.getItem("eventId");
 //       // const storedEventId = "67d4b39a98acd292aa0daa32";
 //       if (!storedEventId) {
-//         router.replace("/event-creation");
+//         router.replace("/login");
 //         return;
 //       }
       

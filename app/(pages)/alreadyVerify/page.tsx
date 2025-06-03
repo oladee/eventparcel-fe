@@ -7,7 +7,7 @@ const AlreadyVerify = () => {
   const router = useRouter();
 
   const handleLoginRedirect = () => {
-    router.replace("/");
+    router.replace("/login");
   };
 
   return (

@@ -142,7 +142,7 @@ const Page = () => {
               <a
                 href="#"
                 className="text-primary font-bold"
-                onClick={() => router.push("/")}
+                onClick={() => router.push("/login")}
               >
                 Back to Login
               </a>

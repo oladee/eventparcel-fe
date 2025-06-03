@@ -19,7 +19,7 @@ const SuccessPage: React.FC = () => {
           You have successfully verified your email address on <br /> Event Parcel, you can now create an event
         </p>
         <button 
-          onClick={() => router.push("/")} 
+          onClick={() => router.push("/login")} 
           className="button_v1"
           aria-label="Continue to Login"
         >

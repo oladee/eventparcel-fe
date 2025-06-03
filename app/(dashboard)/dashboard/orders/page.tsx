@@ -65,7 +65,7 @@ const Page: React.FC = ({}) => {
       // const loggedInUser = loggedInUserString ? JSON.parse(loggedInUserString) : null;
 
       if (!loggedInUserString) {
-        router.replace("/");
+        router.replace("/login");
         return;
       }
       setLoading(true);

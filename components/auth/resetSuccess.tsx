@@ -15,7 +15,7 @@ const ResetSuccess: React.FC = () => {
             </p>
             <button
               className="button_v1 mt-6 w-full"
-              onClick={() => router.push("/")}
+              onClick={() => router.push("/login")}
             >
               Continue to Login
             </button>

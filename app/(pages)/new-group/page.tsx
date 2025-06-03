@@ -43,7 +43,7 @@ const NewGroup: React.FC = () => {
       const storedEventId = localStorage.getItem("eventId");
 
       if (!storedEventId) {
-        router.replace("/event-creation");
+        router.replace("/login");
         return;
       }
 
