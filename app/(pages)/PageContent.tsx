@@ -657,7 +657,7 @@ const PageContent: React.FC = () => {
   );
 };
 
-export default function Page() {
+export default function EventCreation() {
   return (
     <Suspense
       fallback={
