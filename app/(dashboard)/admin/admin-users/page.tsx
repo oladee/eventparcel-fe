@@ -50,7 +50,7 @@ const AdminPage: React.FC = () => {
     const user = loggedInUser ? JSON.parse(loggedInUser) : null
 
     if (!user) {
-      router.push("/login");
+      Router.push("/login");
       return;
     }
     setRole(user.data.role);
