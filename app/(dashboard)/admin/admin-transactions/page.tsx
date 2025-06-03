@@ -84,6 +84,7 @@ const Page: React.FC = () => {
             { params }
           );
           setOrderSummary(response.data.data.summary.summaryByCurrency);
+          console.log("check",response.data.data)
           setOrderData(response.data.data.payments);
           setTotalPages(response.data.data.totalPages)
         }catch (error: any) {

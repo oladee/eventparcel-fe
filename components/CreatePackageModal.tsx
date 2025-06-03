@@ -123,6 +123,22 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
             if (!value.trim()) return "Package size is required.";
         }
 
+        if (field === "packageQuantity") {
+            if (value === null || value === undefined) {
+                return "Package quantity is required.";
+            }
+        
+            const quantity = typeof value === "string" ? value.trim() : String(value).trim();
+        
+            if (quantity === "") return "Package quantity is required.";
+            const num = Number(quantity);
+        
+            if (isNaN(num) || num <= 0) {
+                return "Package quantity must be a valid positive number.";
+            }
+        }
+               
+
         return ""; 
     };
     
@@ -270,11 +286,14 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
 
     const isFormValid =
     mode === "update" ||
-    (formData.packageTitle?.trim() &&
-    formData.packageSize?.trim() &&
-    formData.packagePrice?.toString().trim() &&
-     Object.values(errors).every((err) => err === ""));
-     
+    (
+        formData.packageTitle?.trim() &&
+        formData.packageSize?.trim() &&
+        String(formData.packageQuantity).trim() &&
+        formData.packagePrice?.toString().trim() &&
+        Object.values(errors).every((err) => err === "")
+    );
+
 
     const handleSubmit = async () => {
         if(mode === "create") {
@@ -640,14 +659,15 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
                     {/* Quantity Input */}
                     <div className="flex-1 w-full">
                         <input 
-                            type="number" 
-                            id="packageQuantity" 
-                            value={formData.packageQuantity} 
-                            onChange={handleChange} 
-                            placeholder="Quantity (optional)" 
-                            className="w-full h-10 p-2 rounded-[10px] outline-primary border-gray-300 bg-[#FAFAFA]" 
-                            />
+                        type="number" 
+                        id="packageQuantity" 
+                        value={formData.packageQuantity} 
+                        onChange={handleChange} 
+                        placeholder="Quantity" 
+                        className="w-full h-10 p-2 rounded-[10px] outline-primary border-gray-300 bg-[#FAFAFA]" 
+                        />
                     </div>
+                    {errors.packageQuantity && <p className="text-red-500 text-sm mt-1">{errors.packageQuantity}</p>}
                 </div>
 
                 </div>
