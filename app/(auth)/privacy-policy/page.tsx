@@ -10,9 +10,9 @@ const PrivacyPolicy = () => {
           <strong>Last updated:</strong> 19 May 2025
         </p>
         <p className="mb-4">
-          This Privacy Policy outlines how The Events Parcel Limited ("we", "us", or "our") collects, uses, discloses, and protects your personal information when you use our website, platform, or services (collectively, the “Platform”).
+          This Privacy Policy outlines how The Events Parcel Limited (&quot;we&quot;, &quot;us&quot;, or &quot;our&quot;) collects, uses, discloses, and protects your personal information when you use our website, platform, or services (collectively, the &ldquo;Platform&rdquo;).
         </p>
-        <p className="mb-4">
+       <p className="mb-4">
           By accessing or using our Platform, you consent to the practices described in this Privacy Policy.
         </p>
 
@@ -102,7 +102,7 @@ const PrivacyPolicy = () => {
           We use cookies and similar technologies to improve functionality, analyze usage, and enhance user experience. You can control the use of cookies through your browser settings.
         </p>
 
-        <h2 className="text-2xl font-semibold mb-2">9. Children's Privacy</h2>
+        <h2 className="text-2xl font-semibold mb-2">9. Children&apos;s Privacy</h2>
         <p className="mb-4">
           Our services are not intended for use by individuals under 18 years of age. We do not knowingly collect personal data from children. If we become aware that we have collected such data, we will delete it.
         </p>

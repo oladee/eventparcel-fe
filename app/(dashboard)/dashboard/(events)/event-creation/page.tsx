@@ -246,16 +246,16 @@ const PageContent: React.FC = () => {
   };
 
   // Helper function to convert 24-hour time (HH:mm) to 12-hour format (hh:mm AM/PM) matching the regex
-  const convertTo12Hour = (time24: string): string => {
-    const [hourStr, minute] = time24.split(":");
-    let hours = parseInt(hourStr, 10);
-    const ampm = hours >= 12 ? "PM" : "AM";
-    // Convert hour '0' to '12'
-    hours = hours % 12 || 12;
-    // Pad hours with a leading zero if necessary
-    const paddedHours = hours < 10 ? `0${hours}` : `${hours}`;
-    return `${paddedHours}:${minute} ${ampm}`;
-  };
+  // const convertTo12Hour = (time24: string): string => {
+  //   const [hourStr, minute] = time24.split(":");
+  //   let hours = parseInt(hourStr, 10);
+  //   const ampm = hours >= 12 ? "PM" : "AM";
+  //   // Convert hour '0' to '12'
+  //   hours = hours % 12 || 12;
+  //   // Pad hours with a leading zero if necessary
+  //   const paddedHours = hours < 10 ? `0${hours}` : `${hours}`;
+  //   return `${paddedHours}:${minute} ${ampm}`;
+  // };
 
   const handleDateChange = (date: Date | null, field: string) => {
     if (date) {
