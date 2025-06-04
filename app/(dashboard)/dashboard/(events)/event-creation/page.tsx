@@ -266,15 +266,24 @@ const PageContent: React.FC = () => {
     }
   };
 
+  const formatTimeTo12Hour = (date: Date) => {
+    let hours = date.getHours();
+    const minutes = date.getMinutes();
+    const ampm = hours >= 12 ? "PM" : "AM";
+    hours = hours % 12 || 12;
+    const paddedHours = hours < 10 ? `0${hours}` : `${hours}`;
+    const paddedMinutes = minutes < 10 ? `0${minutes}` : `${minutes}`;
+    return `${paddedHours}:${paddedMinutes} ${ampm}`;
+  };
+
   // API call triggered on clicking Continue
   const handleContinue = async () => {
-
     trackEvent("New Event Creation Started", {
       source: "event-creation page",
       timestamp: new Date().toISOString(),
-      page_name: "Event-creation page",
+      page_name: "Event-creation page"
     });
-    
+
     const newErrors = { ...errors };
     Object.keys(formData).forEach((key) => {
       if (key !== "eventImage") {
@@ -301,7 +310,7 @@ const PageContent: React.FC = () => {
 
       // Convert eventTime if needed
       const formattedTime = formData.eventTime
-        ? convertTo12Hour(formData.eventTime.toISOString().split("T")[1])
+        ? formatTimeTo12Hour(formData.eventTime)
         : "";
       submissionData.append("time", formattedTime);
 
@@ -339,7 +348,6 @@ const PageContent: React.FC = () => {
         add_group_number: response.data.data.numberOfGroups ? "Yes" : "No",
         status: "Successful"
       });
-
     } catch (error: any) {
       toast.error(error.response?.data?.message);
 
@@ -398,7 +406,7 @@ const PageContent: React.FC = () => {
 
       // Convert eventTime if needed
       const formattedTime = formData.eventTime
-        ? convertTo12Hour(formData.eventTime.toISOString().split("T")[1])
+        ? formatTimeTo12Hour(formData.eventTime)
         : "";
       submissionData.append("time", formattedTime);
 
@@ -602,12 +610,6 @@ export default function Page() {
     </Suspense>
   );
 }
-
-
-
-
-
-
 
 // "use client";
 // import { Suspense, useState, useRef, useEffect } from "react";
