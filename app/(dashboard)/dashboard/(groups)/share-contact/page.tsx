@@ -121,7 +121,7 @@ const ShareContact: React.FC = () => {
 
         try {
           const res = await fetch(
-            "https://api-eventparcel.onrender.com/auth/fetch-contacts",
+            "https://api.eventparcel.com/auth/fetch-contacts",
             {
               method: "GET",
               credentials: "include"

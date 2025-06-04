@@ -30,7 +30,7 @@ const SocialSignin: React.FC = () => {
           
       try {
         const response = await axios.post(
-          "https://api-eventparcel.onrender.com/auth/user",
+          "https://api.eventparcel.com/auth/user",
           { token } // Send token in the request body
         );
         if (response.data && response.data.data) {  
@@ -70,10 +70,10 @@ const SocialSignin: React.FC = () => {
   return (
     // <div className="grid grid-cols-3 gap-4 place-items-center justify-center">
     <div className="flex items-center justify-center">
-      <a href='https://api-eventparcel.onrender.com/auth/google' className="authButton w-max">
+      <a href='https://api.eventparcel.com/auth/google' className="authButton w-max">
         <Google width={20} height={20} /> <span className='hidden sm:block'>Google</span>
       </a>
-      {/* <a href='https://api-eventparcel.onrender.com/auth/facebook' className="authButton w-max">
+      {/* <a href='https://api.eventparcel.com/auth/facebook' className="authButton w-max">
         <Facebook width={20} height={20} /> <span className='hidden sm:block'>Facebook</span>
       </a>
       <button className="authButton w-max">

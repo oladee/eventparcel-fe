@@ -92,7 +92,7 @@ const ContactModal: React.FC<ContactModalProps> = ({
           <AccessError
             title="We couldn't access your contact"
             subtitle="You need to grant us access to your google contacts to import from contacts"
-            route="https://api-eventparcel.onrender.com/auth/google/contacts"
+            route="https://api.eventparcel.com/auth/google/contacts"
             buttonText="Grant Access Contact"
           />
         )}
