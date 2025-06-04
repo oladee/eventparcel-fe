@@ -294,11 +294,16 @@ const Signup: React.FC = () => {
             )}
 
             <div className="text-left text-black-100 my-2 text-sm md:text-base">
-              By proceeding, you agree to the{" "}
+              By proceeding, you agree to our{" "}
+              <a href="/privacy-policy" className="text-primary font-bold">
+                Privacy Policy
+              </a>
+              {" "}and{" "}
               <a href="/terms" className="text-primary font-bold">
-                Terms and Conditions
+               Terms & Conditions
               </a>
             </div>
+            {/* By proceeding, you agree to our Privacy Policy and Terms & Conditions */}
 
             <button
               id="submit"
