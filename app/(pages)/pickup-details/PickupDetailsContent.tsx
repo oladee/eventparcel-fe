@@ -206,21 +206,53 @@ useEffect(() => {
   Cookies.remove("redirectAfterLogin");
 }, []);
 
+const toDateString = (dateInput: string | Date | undefined): string | undefined => {
+  if (!dateInput) return undefined;
+
+  const date = new Date(dateInput);
+  if (isNaN(date.getTime())) return undefined;
+
+  const year = date.getFullYear();
+  const month = `${date.getMonth() + 1}`.padStart(2, "0");
+  const day = `${date.getDate()}`.padStart(2, "0");
+
+  return `${year}-${month}-${day}`;
+};
+
+
+
 // Parse form data from URL query parameters
 useEffect(() => {
   const data = searchParams.get("data");
+
   if (data) {
     try {
       const parsedData = JSON.parse(data);
+      setEventDetails(parsedData);
+
+      // Convert time string like "10:40AM" to a Date object
+      const convertToDate = (timeStr: string | undefined): Date | undefined => {
+        if (!timeStr) return undefined;
+
+        // Use today's date
+        const today = new Date().toISOString().split("T")[0]; // "2025-06-04"
+        const dateTimeString = `${today} ${timeStr}`;
+
+        const parsed = new Date(dateTimeString);
+
+        return isNaN(parsed.getTime()) ? undefined : parsed;
+      };
+      
+
       setFormData((prev) => ({
         ...prev,
         ...parsedData,
         nairaAccount: { ...prev.nairaAccount, ...parsedData.nairaAccount },
         dollarAccount: { ...prev.dollarAccount, ...parsedData.dollarAccount },
-        paymentDate: parsedData.paymentDate ? new Date(parsedData.paymentDate) : prev.paymentDate,
-        paymentTime: parsedData.paymentTime ? new Date(parsedData.paymentTime) : prev.paymentTime,
+        paymentDate: toDateString(parsedData.paymentDate) ? new Date(parsedData.paymentDate) : prev.paymentDate,
+        paymentTime: convertToDate(parsedData.paymentTime) || prev.paymentTime,
         deliveryDate: parsedData.deliveryDate ? new Date(parsedData.deliveryDate) : prev.deliveryDate,
-        deliveryTime: parsedData.deliveryTime ? new Date(parsedData.deliveryTime) : prev.deliveryTime,
+        deliveryTime: convertToDate(parsedData.deliveryTime) || prev.deliveryTime,
       }));
     } catch (error) {
       console.error("Error parsing form data:", error);
@@ -346,8 +378,8 @@ const handleSubmit = async (e: React.FormEvent) => {
         : "",
       paymentDate:
         formData.paymentDate instanceof Date
-          ? formData.paymentDate.toISOString().split("T")[0]
-          : "",
+          ? `${formData.paymentDate.getFullYear()}-${(formData.paymentDate.getMonth() + 1).toString().padStart(2, "0")}-${formData.paymentDate.getDate().toString().padStart(2, "0")}`
+          : "",            
     };
 
     const cleanedData = cleanObject(formattedData);

@@ -14,6 +14,7 @@ import { MapPin } from "lucide-react";
 import PhoneNumberInput from "@/components/PhoneNumberInput";
 import PickupDeliveryLoationPicker from "@/components/aboutEvent/PickupDeliveryLoationPicker";
 import { debounce } from "lodash";
+import { trackEvent } from "@/lib/mixpanel";
 
 function DeliveryDetailsForm() {
   const router = useRouter();
@@ -235,9 +236,19 @@ function DeliveryDetailsForm() {
         submissionData
       );
 
+      const successCheckout = JSON.parse(localStorage.getItem('checkoutPackageOrder') || '{}');
+      trackEvent("Checkout started", {
+        ...successCheckout.data,
+        guestFirstName: formData.guestFirstName,
+        guestLastName: formData.guestLastName,
+        guestEmail: formData.guestEmail,
+        guestPhoneNumber: formData.guestPhoneNumber,
+      });
+      
       const query = new URLSearchParams({
         orderData: JSON.stringify(res.data)
       }).toString();
+      
 
       router.push(`/guest-payment-details?${query}`);
     } catch (err:any) {

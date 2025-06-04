@@ -239,56 +239,6 @@ const PaymentSetupContent = () => {
     return `${paddedHours}:${paddedMinutes} ${ampm}`;
   };
 
-  //  const checkEventDateTime = () => {
-    //   if (!eventDate || !formData?.paymentDate) return true;
-    
-    //   const formatDateToYMD = (dateInput: Date | string): string => {
-    //     const date = new Date(dateInput);
-    //     if (isNaN(date.getTime())) return "0000-00-00";
-    //     return date.toISOString().split('T')[0];
-    //   };
-    
-    //   const eventDateStr = formatDateToYMD(eventDate);
-    //   const paymentDateStr = formatDateToYMD(formData.paymentDate);
-    
-    //   const eventDay = new Date(eventDateStr);
-    //   const paymentDay = new Date(paymentDateStr);
-    
-    //   if (paymentDay > eventDay) {
-    //     toast.error("Payment date cannot be after the event date!");
-    //     return false;
-    //   }
-    
-    //   if (
-    //     paymentDay.getTime() === eventDay.getTime() &&
-    //     formData.paymentTime &&
-    //     eventTime
-    //   ) {
-    //     const createDateTime = (dateStr: string, time: Date | string): Date | null => {
-    //       const timeStr = typeof time === "string"
-    //         ? time
-    //         : time.toTimeString().split(' ')[0].slice(0, 5);
-    
-    //       const [hours, minutes] = timeStr.split(':').map(Number);
-    //       const date = new Date(dateStr);
-    //       date.setHours(hours, minutes || 0, 0, 0);
-    //       return isNaN(date.getTime()) ? null : date;
-    //     };
-    
-    //     const paymentDateTime = createDateTime(paymentDateStr, formData.paymentTime);
-    //     const eventDateTime = createDateTime(eventDateStr, eventTime);
-    
-    //     if (!paymentDateTime || !eventDateTime) return true;
-    
-    //     if (paymentDateTime > eventDateTime) {
-    //       toast.error("Payment time cannot be after the event time!");
-    //       return false;
-    //     }
-    //   }
-    
-    //   return true;
-    // };
-
     const checkEventDateTime = () => {
       // First check if we have the required dates
       if (!eventDate || !formData?.paymentDate) return true;
