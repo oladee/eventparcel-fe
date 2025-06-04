@@ -20,7 +20,7 @@ const Page: React.FC = () => {
       const loggedInUserEmail = localStorage.getItem("loggedInUserEmail");
       // const storedEventId = "67d4b39a98acd292aa0daa32";
       if (!loggedInUserEmail) {
-        router.replace("/");
+        router.replace("/login");
         return;
       }
 

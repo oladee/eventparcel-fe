@@ -38,7 +38,7 @@ const Page = () => {
     if (typeof window !== "undefined") {
       const hostId = localStorage.getItem("loggedInUserId");
       if (!hostId) {
-        router.replace("/event-creation");
+        router.replace("/login");
         return;
       }
 
@@ -233,7 +233,7 @@ export default Page;
 //     if (typeof window !== "undefined") {
 //       const hostId = localStorage.getItem("loggedInUserId");
 //       if (!hostId) {
-//         router.replace("/event-creation");
+//         router.replace("/login");
 //         return;
 //       }
 

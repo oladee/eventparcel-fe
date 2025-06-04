@@ -2,13 +2,14 @@
 
 import React from "react";
 import dynamic from "next/dynamic";
-const Login = dynamic(() => import("./(auth)/Login"), { ssr: false });
+const EventCreation = dynamic(() => import("./(pages)/PageContent"), { ssr: false });
 import HeaderLayout from "@/components/layout/HeaderLayout";
 
 const Home = () => {
   return (
     <HeaderLayout>
-      <Login />
+      {/* <Login /> */}
+      <EventCreation />
     </HeaderLayout>
   );
 };

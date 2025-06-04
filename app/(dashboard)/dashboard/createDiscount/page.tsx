@@ -44,14 +44,14 @@ const Page = () => {
     setHostId(loggedInUser?._id);
 
     if (!authToken) {
-      router.replace("/");
+      router.replace("/login");
       return;
     }
 
     const fetchEventData = async () => {
       const authToken = localStorage.getItem("authToken");
       if (!authToken) {
-        router.replace("/");
+        router.replace("/login");
         return;
       }
 

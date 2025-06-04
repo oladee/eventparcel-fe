@@ -37,7 +37,7 @@ const Page = () => {
     // const loggedInUser = loggedInUserString ? JSON.parse(loggedInUserString) : null;
 
     if (!loggedInUserEmail || !loggedInUserString) {
-      router.replace("/");
+      router.replace("/login");
       return;
     }
 

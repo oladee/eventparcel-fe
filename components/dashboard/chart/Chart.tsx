@@ -222,7 +222,7 @@ const Chart: React.FC = () => {
   //   const loggedInUserId = localStorage.getItem("loggedInUserId");
 
   //   if (!loggedInUserId) {
-  //     router.replace("/");
+  //     router.replace("/login");
   //     console.log(
   //       "User ID not found in localStorage. Redirecting to login page."
   //     );
@@ -653,7 +653,7 @@ export default Chart;
 //     const loggedInUserId = localStorage.getItem("loggedInUserId");
 
 //     if (!loggedInUserId) {
-//       router.replace("/");
+//       router.replace("/login");
 //       console.log(
 //         "User ID not found in localStorage. Redirecting to login page."
 //       );

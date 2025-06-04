@@ -89,7 +89,7 @@ export const Sidebar: React.FC = () => {
   useEffect(() => {
     const authToken = localStorage.getItem("authToken");
     if (!authToken) {
-      router.push("/");
+      router.push("/login");
     }
   }, [router]);
 
@@ -435,7 +435,7 @@ export const Sidebar: React.FC = () => {
 //     console.log(authToken);
 
 //     if (!authToken) {
-//       router.push("/");
+//       router.push("/login");
 //       console.log("This is from the container", "No auth token found.");
 
 //     }

@@ -41,7 +41,7 @@ const CompleteCohost: React.FC = () => {
   useEffect(() => {
     const id = window.location.pathname.split("/").pop();
     if (!id) {
-      router.replace("/");
+      router.replace("/login");
       return;
     }
  setCohostId(id)
@@ -118,7 +118,7 @@ const CompleteCohost: React.FC = () => {
 
       // Redirect to OTP verification page
       // router.push("/verify-cohost");
-      router.push("/");
+      router.push("/login");
     } catch (error: any) {
       toast.error(
         error.response?.data?.message || "Signup failed. Please try again."
@@ -319,7 +319,7 @@ const CompleteCohost: React.FC = () => {
               <a
                 href="#"
                 className="text-primary font-bold"
-                onClick={() => router.push("/")}
+                onClick={() => router.push("/login")}
               >
                 Sign In
               </a>
@@ -409,7 +409,7 @@ export default CompleteCohost;
 //   useEffect(() => {
 //     const id = window.location.pathname.split("/").pop();
 //     if (!id) {
-//       router.replace("/");
+//       router.replace("/login");
 //       return;
 //     }
 //  setCohostId(id)
@@ -487,7 +487,7 @@ export default CompleteCohost;
 
 //       // Redirect to OTP verification page
 //       // router.push("/verify-cohost");
-//       router.push("/");
+//       router.push("/login");
 //     } catch (error: any) {
 //       toast.error(
 //         error.response?.data?.message || "Signup failed. Please try again."
@@ -688,7 +688,7 @@ export default CompleteCohost;
 //               <a
 //                 href="#"
 //                 className="text-primary font-bold"
-//                 onClick={() => router.push("/")}
+//                 onClick={() => router.push("/login")}
 //               >
 //                 Sign In
 //               </a>

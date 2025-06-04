@@ -65,7 +65,7 @@ export default AdminContainer;
 
 //     const authToken = localStorage.getItem("authToken");
 //     if (!authToken) {
-//       // router.push("/");
+//       // router.push("/login");
 //       console.log("Auth Token:", "There are no authToken"); // Debugging line
 
 //       return;

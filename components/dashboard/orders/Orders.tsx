@@ -63,7 +63,7 @@ const Orders: React.FC = ({  }) => {
     const loggedInUserString = localStorage.getItem("loggedInUserId");
 
     if (!loggedInUserString) {
-      router.replace("/");
+      router.replace("/login");
       console.log("User ID not found in localStorage. Redirecting to login page.");
       return;
     }

@@ -43,7 +43,7 @@ const Page = () => {
       // const loggedInUser = loggedInUserString ? JSON.parse(loggedInUserString) : null;
   
       if (!loggedInUserString) {
-        router.replace("/");
+        router.replace("/login");
         return;
       }
       
@@ -75,7 +75,7 @@ const Page = () => {
         // const loggedInUser = loggedInUserString ? JSON.parse(loggedInUserString) : null;
     
         if (!loggedInUserString) {
-          router.replace("/");
+          router.replace("/login");
           return;
         }
 

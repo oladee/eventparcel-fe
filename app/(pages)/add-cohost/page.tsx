@@ -41,7 +41,7 @@ const Page = () => {
       if (storedEventId) {
         setSelectedEventId(storedEventId);
       } else {
-        router.replace("/event-creation");
+        router.replace("/login");
       }
     }
   }, [router]);
@@ -51,7 +51,7 @@ const Page = () => {
   //     const loggedInUserEmail = localStorage.getItem("loggedInUserEmail");
   //     const storedEventId = localStorage.getItem("eventId");
   //     if (!loggedInUserEmail && !storedEventId) {
-  //       router.replace("/");
+  //       router.replace("/login");
   //       return;
   //     }
 
@@ -394,7 +394,7 @@ export default Page;
 //         const loggedInUserEmail = localStorage.getItem("loggedInUserEmail");
 //         // const storedEventId = "67d4b39a98acd292aa0daa32";
 //         if (!loggedInUserEmail) {
-//           router.replace("/");
+//           router.replace("/login");
 //           return;
 //         }
 

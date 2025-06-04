@@ -108,7 +108,7 @@ const Verification = () => {
       console.log(response);
 
       setTimeout(() => {
-        router.push("/");
+        router.push("/login");
       }, 3000);
     } catch (error: unknown) {
       console.error("Verification error:", error);

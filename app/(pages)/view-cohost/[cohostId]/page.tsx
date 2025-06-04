@@ -86,7 +86,7 @@ export default function Page() {
 
   useEffect(() => {
     if (!cohostId) {
-      router.replace("/");
+      router.replace("/login");
       return;
     }
 
@@ -403,7 +403,7 @@ export default function Page() {
 
 //   useEffect(() => {
 //     if (!cohostId) {
-//       router.replace("/");
+//       router.replace("/login");
 //       return;
 //     }
 

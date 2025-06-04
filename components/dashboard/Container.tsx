@@ -29,7 +29,7 @@ function Container({ children }: { children: React.ReactNode }) {
     console.log("Auth Token:", authToken); // Debugging line
     
     if (!authToken) {
-      // router.replace("/");
+      // router.replace("/login");
       console.log("No auth token found. Redirecting to login.");
       return;
     }
