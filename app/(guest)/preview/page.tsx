@@ -142,16 +142,21 @@ const ViewEvent = () => {
       const currentCurrency = currency() || "NGN";
   
       const totalPackageCount = cartItems.length; // or sum quantities if you want total units
-  
-      trackEvent("Checkout Started", {
-        source: "preview page",
-        event_id: eventData?._id,
-        event_name: eventData?.name,
-        package_count: totalPackageCount,
-        currency: currentCurrency,
-        timestamp: new Date().toISOString(),
-        page_name: "Preview Page",
-      });
+
+      const checkoutPackageOrder = {
+        eventName: "Checkout Started",
+        data: {
+          source: "Delivery Details page",
+          event_id: eventData?._id,
+          event_name: eventData?.name,
+          package_count: totalPackageCount,
+          currency: currentCurrency,
+          timestamp: new Date().toISOString(),
+          page_name: "Delivery Details page",
+        }
+      };
+      
+      localStorage.setItem('checkoutPackageOrder', JSON.stringify(checkoutPackageOrder));
   
       // Prepare data for routing
       const minimalEventData = {
