@@ -12,6 +12,7 @@ const openSans = Open_Sans({
   variable: "--font-open-sans"
 });
 
+
 export const metadata: Metadata = {
   title: "Event Parcel",
   description: "Do your business transaction here!!"

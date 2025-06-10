@@ -75,7 +75,7 @@ const HostsTable: React.FC<Props> = ({ hosts, onStatusUpdate }) => {
   };
 
   return (
-    <div className="bg-white min-w-full overflow-x-auto no-scrollbar">
+    <div className="bg-white min-w-full overflow-x-auto no-scrollbar mt-6">
       <table className="w-full table-auto bg-white rounded-t-2xl overflow-visible">
         <thead className="bg-gray-50">
           <tr>
