@@ -73,6 +73,7 @@ const HostsTable: React.FC<Props> = ({ hosts, onStatusUpdate }) => {
       setLoadingButton(null);
     }
   };
+
   
 
   return (
