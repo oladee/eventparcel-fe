@@ -286,14 +286,14 @@ const Page = () => {
                       </div>
                     )}
 
-                    <div className="flex justify-between">
+                    {/* <div className="flex justify-between">
                       <span className="font-medium text-[#acb9ca] text-sm">Tax</span>
                       <span>
                         {order?.totalAmountCurrency === "NGN"
                           ? formatCurrency(order?.tax)
                           : formatDollarCurrency(order?.tax)}
                       </span>
-                    </div>
+                    </div> */}
 
                     <div className="h-px bg-gray-100 my-2" />
 

@@ -347,13 +347,13 @@ const Page = () => {
                     {orders?.homeDeliveryFee && (
                         <div id="delivery-cost" className='flex items-center justify-between'>
                             <span id="delivery-label" className='text-[#718096] font-general font-medium text-[14px]'>Home Delivery</span>
-                            <span id="delivery-price" className='text-[#718096] font-general font-medium text-[14px]'>{orders.totalAmountCurrency === "NGN" ? "₦" : "$"}{orders?.homeDeliveryFee}</span>
+                            <span id="delivery-price" className='text-[#718096] font-general font-medium text-[14px]'>{orders.totalAmountCurrency === "NGN" ? "₦" : "$"}{orders?.homeDeliveryFee.toLocaleString()}</span>
                         </div>
                     )}
-                    <div id="delivery-cost" className='flex items-center justify-between'>
+                    {/* <div id="delivery-cost" className='flex items-center justify-between'>
                         <span id="tax-label" className='text-[#718096] font-general font-medium text-[14px]'>Tax</span>
                         <span id="tax-price" className='text-[#718096] font-general font-medium text-[14px]'>{orders.totalAmountCurrency === "NGN" ? "₦" : "$"}{orders?.tax.toLocaleString()}</span>
-                    </div>
+                    </div> */}
                     <div id="total-cost" className='flex items-center justify-between'>
                         <span id="total-label" className='font-general font-bold text-[14px] text-[#111827]'>Total</span>
                         <span id="total-price" className='font-general font-bold text-[16px] text-[#111827]'>{orders.totalAmountCurrency === "NGN" ? "₦" : "$"}{orders?.totalAmount.toLocaleString()}</span>

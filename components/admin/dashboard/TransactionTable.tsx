@@ -71,7 +71,6 @@ const TransactionTable: React.FC<TransactionProps> = ({orders, currentPage, setC
         'Guest Name',
         'Total Amount',
         'Net Payout',
-        'Tax',
         'Delivery Fee',
         'Transaction fee',
         'Service fee'
@@ -101,11 +100,6 @@ const TransactionTable: React.FC<TransactionProps> = ({orders, currentPage, setC
             case 'Net Payout':
               value = row.amountReceived != null
                 ? `="${row.totalAmountCurrency === "NGN" ? "₦" : "$"}${row.amountReceived.toLocaleString()}"`
-                : '';
-              break;
-            case 'Tax':
-              value = row.tax != null
-                ? `="${row.totalAmountCurrency === "NGN" ? "₦" : "$"}${row.tax.toLocaleString()}"`
                 : '';
               break;
             case 'Delivery Fee':
@@ -453,10 +447,10 @@ const TransactionTable: React.FC<TransactionProps> = ({orders, currentPage, setC
                       </div>
                     </div>
                     <div className="flex-1 flex flex-col justify-between max-sm:pt-2" id={`breakdown-right-${order.orderNumber}`}>
-                      <div className="flex justify-between max-sm:gap-2">
+                      {/* <div className="flex justify-between max-sm:gap-2">
                         <span className="text-gray-500 text-sm sm:pl-24">Tax</span>
                         <span className="text-gray-500 text-sm">{order.totalAmountCurrency === "NGN" ? "₦" : "$"}{order.tax.toLocaleString()}</span>
-                      </div>
+                      </div> */}
                       <div className="flex justify-between max-sm:gap-2">
                         <span className="text-gray-500 text-sm sm:pl-24">Total</span>
                         <span className="text-gray-500 text-sm">{order.totalAmountCurrency === "NGN" ? "₦" : "$"}{order.totalAmount.toLocaleString()}</span>
