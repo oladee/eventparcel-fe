@@ -252,39 +252,44 @@ const getPageNumbers = (currentPage: number, totalPages: number) => {
                   </select>
                 </div>
               </div>
-              <div className="flex items-center gap-1 text-sm overflow-x-auto py-2 sm:py-0 w-full justify-center sm:w-auto">
+             <div className="flex items-center gap-1 text-sm overflow-x-auto py-2 sm:py-0 w-full justify-center sm:w-auto">
                 <button
                   onClick={() => page > 1 && setPage(page - 1)}
-                  className="text-[#A0AEC0] whitespace-nowrap"
+                  className="text-[#A0AEC0] whitespace-nowrap p-1 disabled:opacity-50"
                   disabled={page === 1}
                 >
-                  &lt;
+                  &lt; Previous
                 </button>
 
-                {getPageNumbers(page, pageCount).map((pageNum, index) =>
+                {getPageNumbers(page, pageCount).map((pageNum, index) => (
                   pageNum === '...' ? (
-                    <span key={`ellipsis-${index}`} className="px-2 text-[#A0AEC0]">...</span>
+                    <span 
+                      key={`ellipsis-${index}`} 
+                      className="px-2 text-[#A0AEC0]"
+                    >
+                      ...
+                    </span>
                   ) : (
                     <button
                       key={pageNum}
                       onClick={() => setPage(Number(pageNum))}
-                      className={`w-8 h-8 rounded-[12px] p-[8px] whitespace-nowrap ${
+                      className={`min-w-8 h-8 rounded-[12px] p-2 flex items-center justify-center whitespace-nowrap ${
                         pageNum === page
-                          ? "bg-[#DCFCE7] text-[#16A34A]"
+                          ? "bg-[#DCFCE7] text-[#16A34A] font-medium"
                           : "text-[#A0AEC0] hover:bg-gray-100"
                       }`}
                     >
                       {pageNum}
                     </button>
                   )
-                )}
+                ))}
 
                 <button
                   onClick={() => page < pageCount && setPage(page + 1)}
-                  className="text-[#A0AEC0] whitespace-nowrap"
+                  className="text-[#A0AEC0] whitespace-nowrap p-1 disabled:opacity-50"
                   disabled={page === pageCount}
                 >
-                  &gt;
+                  Next &gt;
                 </button>
               </div>
             </div>
