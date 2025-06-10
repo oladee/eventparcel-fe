@@ -30,9 +30,9 @@ const NewGroup: React.FC = () => {
   console.log(loading, error);
   const router = useRouter();
   const [, setIsDialogOpen] = useState(false);
-  const [loadingGroup, setLoadingGroup] = useState(false);
   const [selectedGroupToDelete, setSelectedGroupToDelete] = useState<Group | null>(null);
-
+  const [duplicatingGroupId, setDuplicatingGroupId] = useState<string | null>(null);
+  
 
   useEffect(() => {
     Cookies.remove("redirectAfterLogin");
@@ -74,7 +74,7 @@ const NewGroup: React.FC = () => {
   };
 
   const handleDuplicate = async (groupId: string) => {
-    setLoadingGroup(true);
+    setDuplicatingGroupId(groupId);
     try {
       const response = await axiosInstance.get(`/clone-group/${groupId}`);
 
@@ -109,7 +109,7 @@ const NewGroup: React.FC = () => {
       });
 
     } finally {
-      setLoadingGroup(false);
+    setDuplicatingGroupId(null);
     }
   };
 
@@ -252,7 +252,7 @@ const NewGroup: React.FC = () => {
                   group={group}
                   handleDuplicate={handleDuplicate}
                   handleDeleteGroup={handleDeleteGroup}
-                  loadingGroup={loadingGroup}
+                  duplicatingGroupId={duplicatingGroupId}
                   onSelectGroupToDelete={handleSelectGroupToDelete}
                 />
               ))}
@@ -281,7 +281,7 @@ const NewGroup: React.FC = () => {
                     group={group}
                     handleDuplicate={handleDuplicate}
                     handleDeleteGroup={handleDeleteGroup}
-                    loadingGroup={loadingGroup}
+                    duplicatingGroupId={duplicatingGroupId}
                     onSelectGroupToDelete={handleSelectGroupToDelete}
                   />
                 ))}

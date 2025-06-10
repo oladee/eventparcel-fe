@@ -13,11 +13,12 @@ type generalGroupProps = {
   group: Group;
   handleDuplicate: (groudId: string) => void;
   handleDeleteGroup: (groupId: string) => void;
-  loadingGroup: boolean;
+  // loadingGroup: boolean;
+  duplicatingGroupId: string | null;
   onSelectGroupToDelete: (group: Group) => void; 
 };
 
-const GeneralModal: React.FC<generalGroupProps> = ({ group, handleDuplicate, handleDeleteGroup,onSelectGroupToDelete, loadingGroup }) => {
+const GeneralModal: React.FC<generalGroupProps> = ({ group, handleDuplicate, handleDeleteGroup,onSelectGroupToDelete, duplicatingGroupId }) => {
   const [openModalPackage, setOpenModalPackage] = useState(false);
   const [modalMode, setModalMode] = useState<"create" | "update">("create");
   const [selectedPackage, setSelectedPackage] = useState<Package | null>(null);
@@ -214,7 +215,7 @@ const GeneralModal: React.FC<generalGroupProps> = ({ group, handleDuplicate, han
               </span>
             </div> 
             <div className="flex items-center gap-1 cursor-pointer">
-            {loadingGroup ? (
+            {duplicatingGroupId === group._id ? (
                <svg
                className="animate-spin h-4 w-4 text-gray-400"
                xmlns="http://www.w3.org/2000/svg"
@@ -249,7 +250,7 @@ const GeneralModal: React.FC<generalGroupProps> = ({ group, handleDuplicate, han
                 onClick={() => handleDuplicate(group._id)}
               >
                 {
-                  loadingGroup ? "Duplicating" : "Duplicate"
+                  duplicatingGroupId === group._id ? "Duplicating" : "Duplicate"
                 }
               </span>
             </div>

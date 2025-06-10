@@ -31,9 +31,8 @@ const NewGroup: React.FC = () => {
   console.log(loading, error);
   const router = useRouter();
   const [, setIsDialogOpen] = useState(false);
-  const [loadingGroup, setLoadingGroup] = useState(false);
   const [selectedGroupToDelete, setSelectedGroupToDelete] = useState<Group | null>(null);
-
+  const [duplicatingGroupId, setDuplicatingGroupId] = useState<string | null>(null);
 
   useEffect(() => {
     Cookies.remove("redirectAfterLogin");
@@ -77,13 +76,14 @@ const NewGroup: React.FC = () => {
 
    
   const handleDuplicate = async (groupId: string) => {
-    setLoadingGroup(true);
+    setDuplicatingGroupId(groupId);
+    // setLoadingGroup(true);
     try {
       const response = await axiosInstance.get(`/clone-group/${groupId}`);
 
       if (!response) throw new Error("Failed to duplicate group");
 
-      await response.data.data;
+     await response.data.data;
       trackEvent("Duplicate Group", {
         source: "New-group page",
         timestamp: new Date().toISOString(),
@@ -94,8 +94,8 @@ const NewGroup: React.FC = () => {
         group_type: response.data.data.groupPrivacy,
         status: "Successful"
       });
-      // setGroups((prevGroups) => [...prevGroups, data]);
-      window.location.reload();
+      setGroups((prevGroups) => [...prevGroups, response?.data?.data]);
+      // window.location.reload();
     } catch (error: any) {
       toast.error("Error duplicating group");
       console.error(
@@ -112,7 +112,8 @@ const NewGroup: React.FC = () => {
       });
 
     } finally {
-      setLoadingGroup(false);
+      setDuplicatingGroupId(null);
+      // setLoadingGroup(false);
     }
   };
 
@@ -247,7 +248,8 @@ const NewGroup: React.FC = () => {
                   group={group}
                   handleDuplicate={handleDuplicate}
                   handleDeleteGroup={handleDeleteGroup}
-                  loadingGroup={loadingGroup}
+                  // loadingGroup={loadingGroup}
+                  duplicatingGroupId={duplicatingGroupId}
                   onSelectGroupToDelete={handleSelectGroupToDelete}
                 />
               ))}
@@ -276,7 +278,7 @@ const NewGroup: React.FC = () => {
                   group={group}
                   handleDuplicate={handleDuplicate}
                   handleDeleteGroup={handleDeleteGroup}
-                  loadingGroup={loadingGroup}
+                  duplicatingGroupId={duplicatingGroupId}
                   onSelectGroupToDelete={handleSelectGroupToDelete}
                 />
               ))}
