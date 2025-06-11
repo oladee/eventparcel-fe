@@ -10,6 +10,7 @@ import useUpdateOrderStatus from '@/hooks/useUpdateOrderStatus';
 import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { Circle } from 'lucide-react';
+import { ToastContainer } from 'react-toastify';
 
 
 const Page = () => {
@@ -25,41 +26,44 @@ const Page = () => {
 
     const { updateOrderStatus } = useUpdateOrderStatus();
     const handleStatusChange = async (status: string) => {
-        try {
-            if (!orders?.orderId) {
-                toast.error("Invalid order. Please try again.");
-                return;
-            }
-    
-            const paymentStatus: string = orders.paymentStatus ?? "Unknown";
-    
-            // Update the order status through your API
-            await updateOrderStatus(orders?._id, paymentStatus, status);
-    
+    try {
+        if (!orders?.orderId) {
+            toast.error("Invalid order. Please try again.");
+            return;
+        }
+
+        const paymentStatus: string = orders.paymentStatus ?? "Unknown";
+
+        // Update the order status through your API
+        await updateOrderStatus(orders?._id, paymentStatus, status);
+
+        // Only proceed with UI updates if the new status is "successful"
+        if (status === "successful") {
             // Retrieve and update the selected order in localStorage
             const storedOrder = JSON.parse(localStorage.getItem("selectedOrder") || "{}");
-    
+
             if (!storedOrder || Object.keys(storedOrder).length === 0) {
                 console.warn("No selected order found in local storage.");
                 return;
             }
-    
+
             // Update orderStatus in the localStorage object
             storedOrder.orderStatus = status;
-    
+
             // Save the updated object back to localStorage
             localStorage.setItem("selectedOrder", JSON.stringify(storedOrder));
-    
+
             // Update the state to trigger a re-render
             setOrders((prevOrders: any) => ({
                 ...prevOrders,
                 orderStatus: status
             }));
-            
-        } catch (error) {
-            console.error("Failed to update order status:", error);
         }
-    };
+        
+    } catch (error: any) {
+        toast.error(error?.response?.data?.message);
+    }
+};
 
     const handleViewOneEvent = (eventId: any) => {
         router.push(`/dashboard/events/${eventId}`);
@@ -137,6 +141,7 @@ const Page = () => {
 
     return (
         <Container>
+            <ToastContainer />
             <div id="order-details-container" className="min-h-screen mt-2">
                 {/* Heading */}
                 <h4 id="order-details-heading" className="text-2xl font-general font-bold text-[#111827] mb-6">
