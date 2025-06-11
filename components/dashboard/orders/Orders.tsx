@@ -145,7 +145,7 @@ const Orders: React.FC = ({  }) => {
     localStorage.setItem("selectedOrder", JSON.stringify(order));
     router.push(`/dashboard/orderDetails`);
   };
-  
+
   const { updateOrderStatus } = useUpdateOrderStatus();
 
   const handleStatusChange = async (status: string) => {
@@ -154,28 +154,32 @@ const Orders: React.FC = ({  }) => {
         toast.error("Invalid order. Please try again.");
         return;
       }
-  
-      await updateOrderStatus(
-        selectedOrder?._id,
+
+      const response = await updateOrderStatus(
+        selectedOrder._id,
         selectedOrder.paymentStatus ?? "Unknown",
         status
       );
-  
-      setOrders((prevOrders) => {
-        if (!prevOrders) return prevOrders; 
-  
-        return {
-          ...prevOrders,
-          orders: prevOrders.orders.map((order) =>
-            order.orderId === selectedOrder.orderId
-              ? { ...order, orderStatus: status } 
-              : order
-          ),
-        };
-      });
-  
-    } catch (error) {
-      console.error("Error updating order status:", error);
+
+      // Only update UI if status update is successful
+      if (response?.success) {
+        setOrders((prevOrders) => {
+          if (!prevOrders) return prevOrders;
+
+          return {
+            ...prevOrders,
+            orders: prevOrders.orders.map((order) =>
+              order.orderId === selectedOrder.orderId
+                ? { ...order, orderStatus: status }
+                : order
+            )
+          };
+        });
+      } else {
+        // toast.error("Failed to update status. Please try again.");
+      }
+    } catch (error: any) {
+      toast.error(error?.response?.data?.message);
     } finally {
       setIsModalOpen(false);
     }
