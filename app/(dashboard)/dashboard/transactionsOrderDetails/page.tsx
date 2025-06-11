@@ -26,44 +26,44 @@ const Page = () => {
 
     const { updateOrderStatus } = useUpdateOrderStatus();
     const handleStatusChange = async (status: string) => {
-    try {
-        if (!orders?.orderId) {
-            toast.error("Invalid order. Please try again.");
-            return;
-        }
-
-        const paymentStatus: string = orders.paymentStatus ?? "Unknown";
-
-        // Update the order status through your API
-        await updateOrderStatus(orders?._id, paymentStatus, status);
-
-        // Only proceed with UI updates if the new status is "successful"
-        if (status === "successful") {
-            // Retrieve and update the selected order in localStorage
-            const storedOrder = JSON.parse(localStorage.getItem("selectedOrder") || "{}");
-
-            if (!storedOrder || Object.keys(storedOrder).length === 0) {
-                console.warn("No selected order found in local storage.");
+        try {
+            if (!orders?.orderId) {
+                toast.error("Invalid order. Please try again.");
                 return;
             }
 
-            // Update orderStatus in the localStorage object
-            storedOrder.orderStatus = status;
+            const paymentStatus: string = orders.paymentStatus ?? "Unknown";
 
-            // Save the updated object back to localStorage
-            localStorage.setItem("selectedOrder", JSON.stringify(storedOrder));
+            // Update the order status through your API
+            const response = await updateOrderStatus(orders?._id, paymentStatus, status);
 
-            // Update the state to trigger a re-render
-            setOrders((prevOrders: any) => ({
-                ...prevOrders,
-                orderStatus: status
-            }));
+            // If the API call succeeds, update the UI (localStorage + state)
+            if (response?.success) {  // Assuming the API returns a `success` flag
+                // Retrieve and update the selected order in localStorage
+                const storedOrder = JSON.parse(localStorage.getItem("selectedOrder") || "{}");
+
+                if (!storedOrder || Object.keys(storedOrder).length === 0) {
+                    console.warn("No selected order found in local storage.");
+                    return;
+                }
+
+                // Update orderStatus in the localStorage object
+                storedOrder.orderStatus = status;
+
+                // Save the updated object back to localStorage
+                localStorage.setItem("selectedOrder", JSON.stringify(storedOrder));
+
+                // Update the state to trigger a re-render
+                setOrders((prevOrders: any) => ({
+                    ...prevOrders,
+                    orderStatus: status
+                }));
+            }
+            
+        } catch (error: any) {
+            toast.error(error?.response?.data?.message || "Failed to update order status.");
         }
-        
-    } catch (error: any) {
-        toast.error(error?.response?.data?.message);
-    }
-};
+    };
 
     const handleViewOneEvent = (eventId: any) => {
         router.push(`/dashboard/events/${eventId}`);
