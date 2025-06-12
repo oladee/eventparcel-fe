@@ -1,4 +1,4 @@
-"use client"
+"use client";
 
 import { useEffect, useState } from "react";
 import axiosInstance from "@/lib/axiosInstance";
@@ -18,14 +18,20 @@ const ResetPassword: React.FC = () => {
   const [confirmPassword, setConfirmPassword] = useState<string>("");
   const [loading, setLoading] = useState<boolean>(false);
   const [errors, setErrors] = useState({ password: "", confirmPassword: "" });
-  const [passwordValidation, setPasswordValidation] = useState<boolean[]>([false, false, false, false, false]);
+  const [passwordValidation, setPasswordValidation] = useState<boolean[]>([
+    false,
+    false,
+    false,
+    false,
+    false
+  ]);
   const [showValidation, setShowValidation] = useState<boolean>(false); // New state for showing validation
   const router = useRouter();
-  const [showPassword, setShowPassword] = useState<boolean>(false); 
-  const [showConfirmPassword, setShowConfirmPassword] = useState<boolean>(false); 
+  const [showPassword, setShowPassword] = useState<boolean>(false);
+  const [showConfirmPassword, setShowConfirmPassword] =
+    useState<boolean>(false);
   const [onSuccess, setOnSuccess] = useState<boolean>(false);
   const [location, setLocation] = useState<string | null>(null);
-
 
   const requirements = [
     { label: "At least 8 characters", regex: /.{8,}/ },
@@ -54,7 +60,9 @@ const ResetPassword: React.FC = () => {
   }, []);
 
   const validatePassword = (password: string) => {
-    const validationResults = requirements.map((req) => req.regex.test(password));
+    const validationResults = requirements.map((req) =>
+      req.regex.test(password)
+    );
     setPasswordValidation(validationResults);
     return validationResults.every(Boolean);
   };
@@ -65,7 +73,9 @@ const ResetPassword: React.FC = () => {
       validatePassword(value);
       setErrors((prev) => ({
         ...prev,
-        password: validatePassword(value) ? "" : "Password does not meet the required criteria."
+        password: validatePassword(value)
+          ? ""
+          : "Password does not meet the required criteria."
       }));
     } else if (name === "confirmPassword") {
       setConfirmPassword(value);
@@ -91,16 +101,16 @@ const ResetPassword: React.FC = () => {
       const response = await axiosInstance.post("/reset-password", {
         email,
         password,
-        confirmPassword,
+        confirmPassword
       });
       toast.success(response?.data?.message || "Password reset successful.");
       setOnSuccess(true);
-      
+
       identifyUser(email, {
         userType: "admin",
         location,
         browser_type: getBrowserType(),
-        user_email: email,
+        user_email: email
       });
 
       trackEvent("Reset Password Clicked", {
@@ -110,11 +120,11 @@ const ResetPassword: React.FC = () => {
         page_name: "Reset Password Page",
         status: "Successful"
       });
-      
+
       setTimeout(() => router.push("/login"), 3000);
     } catch (error: any) {
       toast.error(error.response?.data?.message || "Something went wrong.");
-      
+
       trackEvent("Reset Password Clicked", {
         source: "reset password page",
         sign_in_method: "email_password",
@@ -127,13 +137,14 @@ const ResetPassword: React.FC = () => {
     }
   };
 
-  const isFormValid = password &&
+  const isFormValid =
+    password &&
     confirmPassword &&
     password === confirmPassword &&
     passwordValidation.every(Boolean);
 
-    return (
-      <Container>
+  return (
+    <Container>
       <div>
         <main className="grid lg:grid-cols-2 min-h-screen mt-8 md:mt-4 lg:mt-0">
           {/* Left Side - Reset Password Form */}
@@ -142,45 +153,49 @@ const ResetPassword: React.FC = () => {
               <h2 className="text-xl md:text-2xl lg:text-3xl font-bold mb-6 text-black-100">
                 Reset Your Password
               </h2>
-  
+
               {/* Password Input with Toggle */}
               <div className="mb-4 relative">
                 <label htmlFor="reset-password" className="sr-only">
                   New Password
                 </label>
-                  <input
-                    type={showPassword ? "text" : "password"}
-                    id="reset-password"
-                    placeholder="New Password"
-                    className="authInput w-full pr-10" // Added pr-10 for icon spacing
-                    value={password}
-                    onChange={(e) => handleChange("password", e.target.value)}
-                    onFocus={handlePasswordFocus}
-                    required
-                    />
-                  <button
-                    type="button"
-                    className="absolute right-3 top-7 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
-                    onClick={() => setShowPassword(!showPassword)}
-                    aria-label={showPassword ? "Hide password" : "Show password"}
-                    >
-                    {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
-                  </button>
+                <input
+                  type={showPassword ? "text" : "password"}
+                  id="reset-password"
+                  placeholder="New Password"
+                  className="authInput w-full pr-10" // Added pr-10 for icon spacing
+                  value={password}
+                  onChange={(e) => handleChange("password", e.target.value)}
+                  onFocus={handlePasswordFocus}
+                  required
+                />
+                <button
+                  type="button"
+                  className="absolute right-3 top-7 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
+                  onClick={() => setShowPassword(!showPassword)}
+                  aria-label={showPassword ? "Hide password" : "Show password"}
+                >
+                  {showPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+                </button>
                 {errors.password && (
                   <p className="text-red-500 text-sm" role="alert">
                     {errors.password}
                   </p>
                 )}
               </div>
-  
+
               {/* Password Requirements */}
               {showValidation && (
                 <div className="text-sm mb-4">
                   <ul className="list-disc pl-5">
                     {requirements.map((req, index) => (
                       <li
-                      key={index}
-                      className={passwordValidation[index] ? "text-green-500" : "text-red-500"}
+                        key={index}
+                        className={
+                          passwordValidation[index]
+                            ? "text-green-500"
+                            : "text-red-500"
+                        }
                       >
                         {req.label}
                       </li>
@@ -188,7 +203,7 @@ const ResetPassword: React.FC = () => {
                   </ul>
                 </div>
               )}
-  
+
               {/* Confirm Password Input with Toggle */}
               <div className="mb-4 relative">
                 <label htmlFor="reset-confirm-password" className="sr-only">
@@ -200,16 +215,24 @@ const ResetPassword: React.FC = () => {
                   placeholder="Confirm Password"
                   className="authInput w-full pr-10"
                   value={confirmPassword}
-                  onChange={(e) => handleChange("confirmPassword", e.target.value)}
+                  onChange={(e) =>
+                    handleChange("confirmPassword", e.target.value)
+                  }
                   required
-                  />
+                />
                 <button
                   type="button"
                   className="absolute right-3 top-7 transform -translate-y-1/2 text-gray-500 hover:text-gray-700 focus:outline-none"
                   onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                  aria-label={showConfirmPassword ? "Hide password" : "Show password"}
+                  aria-label={
+                    showConfirmPassword ? "Hide password" : "Show password"
+                  }
                 >
-                  {showConfirmPassword ? <FiEyeOff size={20} /> : <FiEye size={20} />}
+                  {showConfirmPassword ? (
+                    <FiEyeOff size={20} />
+                  ) : (
+                    <FiEye size={20} />
+                  )}
                 </button>
                 {errors.confirmPassword && (
                   <p className="text-red-500 text-sm" role="alert">
@@ -217,7 +240,7 @@ const ResetPassword: React.FC = () => {
                   </p>
                 )}
               </div>
-  
+
               {/* Reset Button */}
               <button
                 className={`button_v1 mb-4 w-full flex justify-center items-center ${
@@ -225,11 +248,11 @@ const ResetPassword: React.FC = () => {
                 }`}
                 onClick={handleResetPassword}
                 disabled={!isFormValid || loading}
-                >
+              >
                 {loading ? "Processing..." : "Reset Password"}
               </button>
             </div>
-          {onSuccess && <ResetSuccess />}
+            {onSuccess && <ResetSuccess />}
           </div>
           {/* Right Side - Image */}
           <AuthLeft />
@@ -237,7 +260,7 @@ const ResetPassword: React.FC = () => {
         <ToastContainer />
       </div>
     </Container>
-    );
+  );
 };
 
 export default ResetPassword;

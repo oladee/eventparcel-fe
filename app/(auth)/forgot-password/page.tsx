@@ -9,6 +9,7 @@ import axiosInstance from "@/lib/axiosInstance";
 import AuthLeft from "@/components/auth/AuthLeft";
 import { identifyUser, trackEvent } from "@/lib/mixpanel";
 import getBrowserType from "@/lib/getBrowserType";
+import HeaderLayout from "@/components/layout/HeaderLayout";
 
 const Page = () => {
   const [email, setEmail] = useState("");
@@ -90,7 +91,7 @@ const Page = () => {
   const isFormValid = email && !errors.email;
 
   return (
-    <>
+    <HeaderLayout>
       <main className="grid lg:grid-cols-2 min-h-screen mt-8 md:mt-4 lg:mt-0" role="main">
         {/* Left Side - Forgot Password Form */}
         <div className="flex items-center justify-center px-6 py-10">
@@ -155,7 +156,7 @@ const Page = () => {
 
       {/* Toast Notifications */}
       <ToastContainer aria-live="polite" />
-    </>
+    </HeaderLayout>
   );
 };
 

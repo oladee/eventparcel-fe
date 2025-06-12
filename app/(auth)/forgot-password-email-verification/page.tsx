@@ -11,6 +11,7 @@ import axios from "axios";
 import { z } from "zod";
 import { identifyUser, trackEvent } from "@/lib/mixpanel";
 import getBrowserType from "@/lib/getBrowserType";
+import HeaderLayout from "@/components/layout/HeaderLayout";
 // import Container from "@/components/dashboard/Container";
 // import ResetSuccess from "@/components/auth/resetSuccess";
 
@@ -182,7 +183,7 @@ const Verification = () => {
     }
   };
   return (
-    <>
+    <HeaderLayout>
       <ToastContainer role="alert" />
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#F9FAFB] px-4">
         {!onSuccess && (
@@ -277,7 +278,7 @@ const Verification = () => {
 
         {/* {onSuccess && <ResetSuccess />} */}
       </div>
-    </>
+    </HeaderLayout>
   );
 };
 
