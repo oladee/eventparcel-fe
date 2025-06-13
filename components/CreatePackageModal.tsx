@@ -655,7 +655,12 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
 
                     <div className="w-full h-[60px] bg-[#FFF7F2] px-3 py-2 rounded-[12px] my-2">
                         <span className="font-general font-medium text-[13px] text-[#718096]">
-                            <span className="font-semibold text-[#111827] h-[36px]">P.S</span>: {`${groupCurrency === "NGN" ? "7" : "8.5"}% fee will be deducted from the package price as service fee`}</span>
+                        <span className="font-semibold text-[#111827] h-[36px]">P.S</span>: {
+                        groupCurrency === "NGN" 
+                            ? "3.5% fee (plus ₦100 if price ≥ ₦2,500) will be deducted as service fee" 
+                            : "5.49% + $0.49 fee will be deducted as service fee"
+                        }
+                        </span>
                     </div>
 
                     {/* Quantity Input */}
