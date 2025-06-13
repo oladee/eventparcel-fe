@@ -492,12 +492,14 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
     const price = Number(formData?.packagePrice) || 0;
 
     const whatHostReceives =
-      groupCurrency === "NGN"
-        ? price * 0.93 // deduct 7%
-        : price * 0.915; // deduct 8.5%
-    
+        !price || isNaN(price) // If price is empty/not a number
+            ? 0 // Default to 0
+            : groupCurrency === "NGN"
+            ? price < 2500
+                ? price * 0.965 // Deduct 3.5% (NGN < 2500)
+                : price * 0.965 - 100 // Deduct 3.5% + 100 NGN (NGN ≥ 2500)
+            : price * (1 - 0.0549) - 0.49; // For USD: deduct 5.49% + $0.49
 
-    
     return (
         <>
             <ToastContainer aria-live="polite" />
