@@ -1,5 +1,5 @@
 "use client";
-import RightBar from "@/components/Rightbar";
+// import RightBar from "@/components/Rightbar";
 import Container from "@/components/dashboard/Container";
 import axiosInstance from "@/lib/axiosInstance";
 import { toast, ToastContainer } from "react-toastify";

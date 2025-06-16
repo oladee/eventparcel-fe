@@ -203,7 +203,7 @@ const NewGroup: React.FC = () => {
     <>
     <ToastContainer />
     <Container>
-      <section className="flex flex-col w-auto h-screen">
+      <section className="flex flex-col justify-between w-auto h-screen">
         <div className="py-6 lg:py-12">
           {/* Header Section */}
           <div className="mb-6 lg:mb-12 text-start pl-5 lg:text-center">
