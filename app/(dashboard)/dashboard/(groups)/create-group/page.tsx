@@ -16,7 +16,6 @@ import axios from "axios";
 import Cookies from "js-cookie";
 import { trackEvent } from "@/lib/mixpanel";
 
-
 const AddGroup = dynamic(() => import("@/components/AddGroupCaller"), {
   ssr: false
 });
@@ -31,13 +30,15 @@ const NewGroup: React.FC = () => {
   console.log(loading, error);
   const router = useRouter();
   const [, setIsDialogOpen] = useState(false);
-  const [selectedGroupToDelete, setSelectedGroupToDelete] = useState<Group | null>(null);
-  const [duplicatingGroupId, setDuplicatingGroupId] = useState<string | null>(null);
+  const [selectedGroupToDelete, setSelectedGroupToDelete] =
+    useState<Group | null>(null);
+  const [duplicatingGroupId, setDuplicatingGroupId] = useState<string | null>(
+    null
+  );
 
   useEffect(() => {
     Cookies.remove("redirectAfterLogin");
   }, []);
-  
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -74,7 +75,6 @@ const NewGroup: React.FC = () => {
     setIsAddGroupOpen(true);
   };
 
-   
   const handleDuplicate = async (groupId: string) => {
     setDuplicatingGroupId(groupId);
     // setLoadingGroup(true);
@@ -83,7 +83,7 @@ const NewGroup: React.FC = () => {
 
       if (!response) throw new Error("Failed to duplicate group");
 
-     await response.data.data;
+      await response.data.data;
       trackEvent("Duplicate Group", {
         source: "New-group page",
         timestamp: new Date().toISOString(),
@@ -108,22 +108,20 @@ const NewGroup: React.FC = () => {
         source: "New-group page",
         timestamp: new Date().toISOString(),
         page_name: "new-group page",
-        status: "Failed",
+        status: "Failed"
       });
-
     } finally {
       setDuplicatingGroupId(null);
       // setLoadingGroup(false);
     }
   };
 
-
   const handleSelectGroupToDelete = (group: Group) => {
-    setSelectedGroupToDelete(group); 
+    setSelectedGroupToDelete(group);
   };
 
   const handleDeleteGroup = async (groupId: string) => {
-    console.log("del", selectedGroupToDelete)
+    console.log("del", selectedGroupToDelete);
 
     trackEvent("Delete Group Started", {
       source: "New-group page",
@@ -132,9 +130,9 @@ const NewGroup: React.FC = () => {
       group_Id: selectedGroupToDelete?._id,
       group_name: selectedGroupToDelete?.groupName,
       currency_type: selectedGroupToDelete?.groupCurrency,
-      group_type: selectedGroupToDelete?.groupPrivacy,
+      group_type: selectedGroupToDelete?.groupPrivacy
     });
-    
+
     try {
       await axiosInstance.delete(`/delete-group/${groupId}`);
       setGroups((prevGroups) =>
@@ -164,7 +162,6 @@ const NewGroup: React.FC = () => {
 
       setIsDialogOpen(false);
     } catch (error) {
-      
       trackEvent("Deleted Group Failed", {
         source: "create-group page",
         timestamp: new Date().toISOString(),
@@ -198,116 +195,126 @@ const NewGroup: React.FC = () => {
     }
   };
 
-
   return (
     <>
-    <ToastContainer />
-    <Container>
-      <section className="flex flex-col justify-between w-auto h-screen">
-        <div className="py-6 lg:py-12">
-          {/* Header Section */}
-          <div className="mb-6 lg:mb-12 text-start pl-5 lg:text-center">
-            <h3
-              id="header"
-              className="text-2xl sm:text-3xl font-bold text-gray-900"
+      <ToastContainer />
+      <Container>
+        <section className="flex flex-col justify-between w-auto h-screen">
+          <div className="py-6 lg:py-12">
+            {/* Header Section */}
+            <div className="mb-6 lg:mb-12 text-start pl-5 lg:text-center">
+              <h3
+                id="header"
+                className="text-2xl sm:text-3xl font-bold text-gray-900"
               >
-              Event Groups & Packages
-            </h3>
-            <div className="w-[313px] lg:w-full flex items-center justify-center gap-2 text-sm sm:text-base text-gray-600">
-              <span id="desc">
-                Create groups and packages for different types of guests
-                <span
-                  onClick={() => setIsRightBarOpen(true)}
-                  className="px-2 text-sm cursor-pointer ml-2 rounded-[200px] bg-[#ECB795] text-white"
-                >
-                  !
-                </span> 
-              </span>
-            </div>
-          </div>
-
-          {loading ? (
-            <div className="h-screen flex flex-col items-center justify-center">
-            <div className="flex flex-col items-center">
-              <div className="w-12 h-12 border-4 border-[#751423] border-t-transparent rounded-full animate-spin"></div>
-              <p className="text-xl font-semibold text-[#751423] mt-4">Loading groups...</p>
-            </div>
-          </div>
-          ) : groups.length === 0 ? (
-            <div
-            onClick={handleAddGroupClick}
-            className="w-full flex justify-center xl:justify-start xl:pl-[380px] h-full"
-            >
-              <AddGroup mode="noGroup" setIsAddGroupOpen={setIsAddGroupOpen} />
-            </div>
-          ) : groups.length === 1 ? (
-            <div className="flex flex-col md:flex-row gap-7 justify-center px-5">
-               {groups.map((group) => (
-                <GeneralModal
-                  key={group._id}
-                  group={group}
-                  handleDuplicate={handleDuplicate}
-                  handleDeleteGroup={handleDeleteGroup}
-                  // loadingGroup={loadingGroup}
-                  duplicatingGroupId={duplicatingGroupId}
-                  onSelectGroupToDelete={handleSelectGroupToDelete}
-                />
-              ))}
-
-              {isAddSingleGroupOpen && (
-                <AddGroup
-                setIsAddGroupOpen={setIsAddGroupOpen}
-                mode="noGroup"
-                />
-              )}
-              {/* Clicking this will open AddGroup */}
-              <div
-                className=""
-                onClick={() => setIsAddSingleGroupOpen(!isAddSingleGroupOpen)}
-                >
-                <CreateGroupCaller />
+                Event Groups & Packages
+              </h3>
+              <div className="w-[313px] lg:w-full flex items-center justify-center gap-2 text-sm sm:text-base text-gray-600">
+                <span id="desc">
+                  Create groups and packages for different types of guests
+                  <span
+                    onClick={() => setIsRightBarOpen(true)}
+                    className="px-2 text-sm cursor-pointer ml-2 rounded-[200px] bg-[#ECB795] text-white"
+                  >
+                    !
+                  </span>
+                </span>
               </div>
             </div>
-          ) : (
-            // Render content for when there are multiple groups
-            <div className="flex flex-col sm:flex-row lg:justify-center">
-              <div className=" flex flex-wrap w-full max-w-3xl space-x-2 space-y-4 pl-3 md:pl-2 xl:pl-24 -mr-6">
-              {groups.map((group) => (
-                <GeneralModal
-                  key={group._id}
-                  group={group}
-                  handleDuplicate={handleDuplicate}
-                  handleDeleteGroup={handleDeleteGroup}
-                  duplicatingGroupId={duplicatingGroupId}
-                  onSelectGroupToDelete={handleSelectGroupToDelete}
+
+            {loading ? (
+              <div className="h-screen flex flex-col items-center justify-center">
+                <div className="flex flex-col items-center">
+                  <div className="w-12 h-12 border-4 border-[#751423] border-t-transparent rounded-full animate-spin"></div>
+                  <p className="text-xl font-semibold text-[#751423] mt-4">
+                    Loading groups...
+                  </p>
+                </div>
+              </div>
+            ) : groups.length === 0 ? (
+              <div
+                onClick={handleAddGroupClick}
+                className="w-full flex justify-center xl:justify-start xl:pl-[380px] h-full"
+              >
+                <AddGroup
+                  mode="noGroup"
+                  setIsAddGroupOpen={setIsAddGroupOpen}
                 />
-              ))}
+              </div>
+            ) : groups.length === 1 ? (
+              <div className="flex flex-col md:flex-row gap-7 justify-center px-5">
+                {groups.map((group) => (
+                  <GeneralModal
+                    key={group._id}
+                    group={group}
+                    handleDuplicate={handleDuplicate}
+                    handleDeleteGroup={handleDeleteGroup}
+                    // loadingGroup={loadingGroup}
+                    duplicatingGroupId={duplicatingGroupId}
+                    onSelectGroupToDelete={handleSelectGroupToDelete}
+                  />
+                ))}
 
                 {isAddSingleGroupOpen && (
                   <AddGroup
-                  setIsAddGroupOpen={setIsAddGroupOpen}
-                  mode="noGroup"
+                    setIsAddGroupOpen={setIsAddGroupOpen}
+                    mode="noGroup"
                   />
                 )}
-              </div>
-
-              <div className="px-8 md:px-0 py-4">
                 {/* Clicking this will open AddGroup */}
                 <div
                   className=""
                   onClick={() => setIsAddSingleGroupOpen(!isAddSingleGroupOpen)}
-                  >
+                >
                   <CreateGroupCaller />
                 </div>
               </div>
-            </div>
-          )}
-          <RightBar isOpen={isRightBarOpen} setIsOpen={setIsRightBarOpen} />
-        </div>
+            ) : (
+              // Render content for when there are multiple groups
+              <div className="flex flex-col sm:flex-row lg:justify-center">
+                <div className=" flex flex-wrap w-full max-w-3xl space-x-2 space-y-4 pl-3 md:pl-2 xl:pl-24 -mr-6">
+                  {groups.map((group) => (
+                    <GeneralModal
+                      key={group._id}
+                      group={group}
+                      handleDuplicate={handleDuplicate}
+                      handleDeleteGroup={handleDeleteGroup}
+                      duplicatingGroupId={duplicatingGroupId}
+                      onSelectGroupToDelete={handleSelectGroupToDelete}
+                    />
+                  ))}
+
+                  {isAddSingleGroupOpen && (
+                    <AddGroup
+                      setIsAddGroupOpen={setIsAddGroupOpen}
+                      mode="noGroup"
+                    />
+                  )}
+                </div>
+
+                <div className="px-8 md:px-0 py-4">
+                  {/* Clicking this will open AddGroup */}
+                  <div
+                    className=""
+                    onClick={() =>
+                      setIsAddSingleGroupOpen(!isAddSingleGroupOpen)
+                    }
+                  >
+                    <CreateGroupCaller />
+                  </div>
+                </div>
+              </div>
+            )}
+            <RightBar isOpen={isRightBarOpen} setIsOpen={setIsRightBarOpen} />
+          </div>
           {/* Right Bar */}
-            <FormButtons fromDashboard={true} isFormValid={!!isFormValid} groups={groups}/>
-      </section>
-    </Container>
+          <FormButtons
+            fromDashboard={true}
+            isFormValid={!!isFormValid}
+            groups={groups}
+          />
+        </section>
+      </Container>
     </>
   );
 };
