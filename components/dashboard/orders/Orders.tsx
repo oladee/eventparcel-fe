@@ -302,7 +302,7 @@ const Orders: React.FC = ({  }) => {
             <div 
             id={`stat-card-${index}`}
             key={index} 
-              className="w-[163px] h-[121px] bg-[#FFFFFF] shadow-sm p-3 rounded-[12px]"
+              className="w-full h-[121px] bg-[#FFFFFF] shadow-sm p-3 rounded-[12px]"
             >
               <div id={`stat-header-${index}`} className='flex items-center gap-2'>
                 <Image 
