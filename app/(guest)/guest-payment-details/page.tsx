@@ -164,8 +164,8 @@ function PaymentDetailsCard() {
   return (
     <HeaderLayout>
       <ToastContainer position="top-right" autoClose={5000} />
-      <div className="rounded-xl bg-[#F9FAFB] p-4 space-y-4 mt-20 pb-7">
-        <form onSubmit={handleSubmit} className="bg-white rounded-xl w-full max-w-sm shadow-sm py-5 px-4">
+      <div className="rounded-xl bg-[#F9FAFB]  flex flex-col items-center justify-center p-4 space-y-4 mt-20 pb-7 md:h-screen">
+        <form onSubmit={handleSubmit} className="bg-white rounded-xl w-full max-w-2xl shadow-sm py-5 px-4">
           <h2 className="text-xl font-bold font-general text-[#111827] mb-4">Payment Details</h2>
 
           {parsedCartItems?.data?.items?.map((item: any) => (

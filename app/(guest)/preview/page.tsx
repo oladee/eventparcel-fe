@@ -204,7 +204,7 @@ const ViewEvent = () => {
     <HeaderLayout>
       <ToastContainer position="top-right" autoClose={5000} />
 
-      <div id="event-container" className="bg-[#F9FAFB] mt-20 md:mt-10 text-black px-6 pt-6 pb-24">
+      <div id="event-container" className="bg-[#F9FAFB] h-screen mt-20 md:mt-10 text-black px-6 pt-6 pb-24">
         {/* Event Card */}
         <div id="event-card" className="rounded-[20px] bg-[#FFF7F2] p-4">
           <Image
