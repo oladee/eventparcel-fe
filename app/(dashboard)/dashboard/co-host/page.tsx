@@ -13,7 +13,7 @@ import CohostActionsModal from "@/components/dashboard/cohost/CohostActionsModal
 import { trackEvent } from "@/lib/mixpanel";
 
 const Page = () => {
-  const [isRightBarOpen, setIsRightBarOpen] = useState(false);
+  // const [isRightBarOpen, setIsRightBarOpen] = useState(false);
   const [coHosts, setCoHosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const router = useRouter();
@@ -30,9 +30,9 @@ const Page = () => {
     router.push("/dashboard/add-cohost");
   };
 
-  const handleContinue = () => {
-    router.push("/new-group");
-  };
+  // const handleContinue = () => {
+  //   router.push("/new-group");
+  // };
 
   useEffect(() => {
     if (typeof window !== "undefined") {
@@ -77,6 +77,7 @@ const Page = () => {
   return (
     <Container>
       <ToastContainer />
+      <h1 className="text-2xl font-bold mb-4 text-[#111827]">Co-host</h1>
       <section className="bg-[#F9FAFB] relative">
         <div className="py-20 lg:py-24 px-3 sm:px-4 mx-auto max-w-screen-md h-screen overflow-y-auto no-scrollbar">
           {loading ? (
@@ -136,7 +137,7 @@ const Page = () => {
           </div>
         </div>
 
-        <div className="bg-[#FFFF] py-4 flex justify-center absolute z-10 right-0 bottom-0 w-full">
+        {/* <div className="bg-[#FFFF] py-4 flex justify-center absolute z-10 right-0 bottom-0 w-full">
           <div className="max-w-3xl flex gap-4 items-center justify-center sm:justify-end w-full">
             <button className="p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827]">
               Save for later
@@ -158,7 +159,7 @@ const Page = () => {
           </div>
 
           <RightBar isOpen={isRightBarOpen} setIsOpen={setIsRightBarOpen} />
-        </div>
+        </div> */}
       </section>
       {/* Render the modal if a co-host is selected */}
       {selectedCohost && (
