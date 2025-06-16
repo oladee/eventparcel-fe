@@ -215,7 +215,7 @@ const Page = () => {
   return (
    <Container>
     <ToastContainer />
-    <div className="w-[343px] lg:w-[700px] h-full flex flex-col gap-5 items-center justify-center">
+    <div className="w-full h-full flex flex-col gap-5 items-center justify-center">
       <div id="discount-header" className="w-full flex justify-start">
         <h2 id="discount-title" className="font-general text-2xl font-bold text-[#111827]">Delivery</h2>
       </div>
