@@ -127,7 +127,8 @@ const Login: React.FC = () => {
       const formData = localStorage.getItem("unsavedFormData");
 
       if (redirectPath || formData) {
-        router.push(`${redirectPath}?resumeForm=true`);
+        // router.push(`${redirectPath}?resumeForm=true`);
+        router.push("/dashboard/add-cohost");
         return;
       } else {
         route.push("/dashboard");

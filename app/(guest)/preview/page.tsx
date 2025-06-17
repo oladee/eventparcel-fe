@@ -224,16 +224,16 @@ if (groupPrivacy === "general") {
     <HeaderLayout>
       <ToastContainer position="top-right" autoClose={5000} />
 
-      <div id="event-container" className="bg-[#F9FAFB] h-auto mt-20 md:mt-10 text-black px-6 pt-6 pb-24">
+      <div id="event-container" className="bg-[#F9FAFB] h-auto mt-20 md:mt-20 text-black px-6 pt-6 pb-24">
         {/* Event Card */}
-        <div id="event-card" className="rounded-[20px] bg-[#FFF7F2] p-4">
+        <div id="event-card" className="rounded-[20px] bg-[#FFF7F2] p-6">
           <Image
             id="event-image"
             src={data?.event?.eventImgUrl || "/images/placeholder_eventCover2.jpg"}
             width={311}
             height={311}
             alt="Wedding Invite"
-            className="rounded-2xl h-[311px] w-[311px]"
+            className="rounded-2xl h-[311px] w-full"
           />
 
           <div id="event-details" className="pt-5 ">
@@ -383,7 +383,7 @@ if (groupPrivacy === "general") {
           )}
 
           {activeTab === "Private" && (
-            <>
+            <div className="mb-10">
               <h3 id="private-package-title" className="text-xl font-bold text-[#111827]">
                   {data?.eventGroup?.groupName
                   ?.split(" ")
@@ -451,7 +451,7 @@ if (groupPrivacy === "general") {
                     </div>
                 </div>
               ))}
-              </>
+              </div>
             )}
         </div>
 

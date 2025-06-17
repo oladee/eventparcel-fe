@@ -117,15 +117,15 @@ const EventFormFields: React.FC<EventFormFieldsProps> = ({
       </div>
 
       {/* Date & Time */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div>
+      <div className="w-full grid grid-cols-1 sm:grid-cols-2 gap-4">
+        <div className="w-full">
           <label
             htmlFor="eventDate"
             className="block mb-2 font-semibold text-[#111827]"
           >
             Date
           </label>
-          <div className="relative">
+          <div className="relative w-full bg-slate-50">
             <FaCalendarAlt className="absolute left-3 top-1/2 transform z-10 -translate-y-1/2 text-gray-500" />
             <DatePicker
               id="eventDate"
@@ -134,7 +134,7 @@ const EventFormFields: React.FC<EventFormFieldsProps> = ({
               onChange={(date) => handleDateChange(date, "eventDate")}
               dateFormat="yyyy-MM-dd"
               popperClassName="custom-datepicker"
-              className="!w-full pl-10 px-3 py-2 input-field outline-primary rounded-[5px] bg-slate-50"
+              className="w-[100%] pl-10 px-3 py-2 input-field outline-primary rounded-[5px] bg-slate-50"
             />
           </div>
           {errors.eventDate && (
@@ -148,7 +148,7 @@ const EventFormFields: React.FC<EventFormFieldsProps> = ({
           >
             Time
           </label>
-          <div className="relative">
+          <div className="relative w-full bg-slate-50">
             <FaClock className="absolute left-3 top-1/2 transform z-10 -translate-y-1/2 text-gray-500" />
             <DatePicker
               selected={formData.eventTime}

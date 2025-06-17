@@ -88,22 +88,39 @@ const Header: React.FC = () => {
           ${isTransparentBg ? "lg:text-white" : "text-black-100"} 
           ${isScrolled ? "!text-black-100" : "bg-transparent"}`}
         >
-          <a href="#" className="hover:text-[#3a8dff] transition">
-            Products
-          </a>
-          <a href="#" className="hover:text-[#3a8dff] transition">
+          <a
+            href="https://eventparcel.com/landing/?nab=1#features"
+            className="hover:text-primary transition"
+          >
             Features
           </a>
-          <a href="#" className="hover:text-[#3a8dff] transition">
+          <a
+            href="https://eventparcel.com/landing/?nab=1#about"
+            className="hover:text-primary transition"
+          >
+            About
+          </a>
+          <a
+            href="https://eventparcel.com/landing/?nab=1#faq"
+            className="hover:text-primary transition"
+          >
+            FAQs
+          </a>
+          {/* <a href="#" className="hover:text-primary transition">
             Pricing
-          </a>
-          <a href="#" className="hover:text-[#3a8dff] transition">
-            FAQ
-          </a>
+          </a> */}
+          <button>
+            <a
+              href="/login"
+              className="bg-primary text-white px-4 py-2 rounded-[4px] hover:bg-primary-dark transition"
+            >
+              Login
+            </a>
+          </button>
         </nav>
 
         {/* Mobile Menu Button */}
-        <div className="flex justify-end md:hidden">
+        <div className="flex justify-end md:hidden bg-white">
           <button
             aria-label="Toggle Mobile Menu"
             aria-expanded={isMobileMenuOpen}
@@ -128,18 +145,35 @@ const Header: React.FC = () => {
             aria-label="Mobile Navigation"
             className="flex flex-col items-center space-y-4 py-4"
           >
-            <a href="#" className="hover:text-[#3a8dff] transition">
-              Products
-            </a>
-            <a href="#" className="hover:text-[#3a8dff] transition">
+            <a
+              href="https://eventparcel.com/landing/?nab=1#features"
+              className="hover:text-primary transition"
+            >
               Features
             </a>
-            <a href="#" className="hover:text-[#3a8dff] transition">
+            <a
+              href="https://eventparcel.com/landing/?nab=1#about"
+              className="hover:text-primary transition"
+            >
+              About
+            </a>
+            {/* <a href="#" className="hover:text-primary transition">
               Pricing
+            </a> */}
+            <a
+              href="https://eventparcel.com/landing/?nab=1#faq"
+              className="hover:text-primary transition"
+            >
+              FAQs
             </a>
-            <a href="#" className="hover:text-[#3a8dff] transition">
-              FAQ
-            </a>
+            <button>
+              <a
+                href="/login"
+                className="bg-primary text-white px-4 py-2 rounded-[4px] hover:bg-primary-dark transition"
+              >
+                Login
+              </a>
+            </button>
           </nav>
         </div>
       )}
