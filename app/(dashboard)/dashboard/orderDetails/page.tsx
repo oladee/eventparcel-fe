@@ -153,7 +153,7 @@ const Page = () => {
                     Order details
                 </h4>
 
-                <div id="order-status-card" className='w-[343px] h-auto bg-[#FFFFFF] rounded-[16px] p-4 mb-5'>
+                <div id="order-status-card" className='w-full max-w-md h-auto bg-[#FFFFFF] rounded-[16px] p-4 mb-5'>
                     <div id="status-container" className='flex items-center gap-2'>
                         <div id="status-icon-container" className='bg-[#FFF0E6] p-2 rounded-[20px]'>
                             <Image id="status-icon" src={BoxTime} alt='box' width={16} height={16} />
