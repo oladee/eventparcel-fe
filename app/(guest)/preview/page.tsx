@@ -363,7 +363,7 @@ const ViewEvent = () => {
           )}
 
           {activeTab === "Private" && (
-            <>
+            <div className="mb-10">
               <h3 id="private-package-title" className="text-xl font-bold text-[#111827]">
                   {data?.eventGroup?.groupName
                   ?.split(" ")
@@ -431,7 +431,7 @@ const ViewEvent = () => {
                     </div>
                 </div>
               ))}
-              </>
+              </div>
             )}
         </div>
 
