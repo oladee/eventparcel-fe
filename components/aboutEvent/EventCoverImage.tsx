@@ -20,7 +20,7 @@ const EventCoverImage: React.FC<EventCoverImageProps> = ({
 }) => {
   return (
     <div
-      className="border-2 border-dashed border-[#718096] rounded-xl flex flex-col justify-center items-center gap-4 cursor-pointer relative"
+      className="h-64 border-2 border-dashed border-[#718096] rounded-xl flex flex-col justify-center items-center gap-4 cursor-pointer relative"
       onClick={onClick}
       onDrop={onDrop}
       onDragOver={onDragOver}

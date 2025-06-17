@@ -49,7 +49,7 @@ const FormButtons2: React.FC<FormButtonsProps> = ({
       <button
         type="submit"
         onClick={onContinue}
-        disabled={!isFormValid}
+        disabled={!isFormValid || loading}
         className={`bg-primary w-[142.24px] text-white py-3 px-8 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center font-extrabold font-manrope ${
           !isFormValid ? "opacity-50 cursor-not-allowed" : ""
         }`}

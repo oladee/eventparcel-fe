@@ -105,6 +105,15 @@ const PageContent: React.FC = () => {
   });
 
   useEffect(() => {
+    if (typeof window !== "undefined") {
+      const authToken = localStorage.getItem("authToken");
+      if (authToken) {
+        router.replace("/dashboard/event-creation");
+      }
+    }
+  }, [router]);
+
+  useEffect(() => {
     Cookies.remove("redirectAfterLogin");
   }, []);
 
@@ -616,7 +625,7 @@ const PageContent: React.FC = () => {
         <div className="py-8 lg:py-16 px-3 sm:px-4 mx-auto max-w-screen-md">
           <EventHeader />
           <form
-            className="space-y-8 bg-white p-8 rounded-3xl shadow-md"
+            className="space-y-8 bg-white p-8 rounded-3xl shadow-md mb-12"
             onSubmit={(e) => e.preventDefault()}
           >
             <EventFormFields
