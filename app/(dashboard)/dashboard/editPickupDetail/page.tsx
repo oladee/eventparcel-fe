@@ -282,7 +282,11 @@ useEffect(() => {
     
         await axiosInstance.put(`/update/${storedEventId}`, formattedData);
         toast.success("Details submitted successfully!");
-        // router.push("/dashboard/events");
+
+        setTimeout(() => {
+          router.back();
+        }, 1000);
+
       } catch (error: any) {
         if (axios.isAxiosError(error)) {
           const errorMessage = error.response?.data?.message || "An error occurred. Please try again.";
@@ -297,7 +301,7 @@ useEffect(() => {
    * Handles saving form data for later completion
    */
   const handleCancel = async () => {
-    router.push("/dashboard/events");
+    router.back();
     };
 
   const handleMapLocationSelect = () => {

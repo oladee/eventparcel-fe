@@ -403,6 +403,10 @@ const handleSubmit = async (e: FormEvent) => {
       status: "Successfull"
     });
 
+    setTimeout(() => {
+      router.back();
+    }, 1000)
+
   } catch(error: any) {
     toast.error(error.response?.data?.message || "Please try again.");
     trackEvent("Edit Payment Details - Failed", {
@@ -421,7 +425,7 @@ const handleSubmit = async (e: FormEvent) => {
   
 
   const handleCancel = async () => {
-    router.push("/dashboard/events");
+    router.back();
   };
 
   if (isLoadingPaymentData) {
