@@ -120,7 +120,7 @@ const Header: React.FC = () => {
         </nav>
 
         {/* Mobile Menu Button */}
-        <div className="flex justify-end md:hidden">
+        <div className="flex justify-end md:hidden bg-white">
           <button
             aria-label="Toggle Mobile Menu"
             aria-expanded={isMobileMenuOpen}
