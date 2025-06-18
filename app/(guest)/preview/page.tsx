@@ -16,6 +16,7 @@ import { BiLoaderCircle } from "react-icons/bi";
 import { identifyUser, trackEvent } from "@/lib/mixpanel";
 import getBrowserType from "@/lib/getBrowserType";
 
+
 const ViewEvent = () => {
   const searchParams = useSearchParams();
   const code = searchParams.get("code");
