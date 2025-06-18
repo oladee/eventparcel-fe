@@ -440,7 +440,7 @@ const PaymentSetupContent = () => {
   };
 
   const handleCancel = async () => {
-    router.push("/dashboard/events");
+    router.back();
   };
 
   if (isLoadingPaymentData) {

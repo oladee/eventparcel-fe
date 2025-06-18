@@ -281,6 +281,32 @@ const PickupDetails = () => {
     if (!isFormValid) return;
     const storedEventId = localStorage.getItem("eventId");
 
+<<<<<<< HEAD
+    
+      setLoading(true);
+    
+      try {
+        const formattedData = {
+          ...formData,
+          deliveryDate: formatToYYYYMMDD(new Date(formData.deliveryDate)),
+          deliveryTime: formatTime12Hour(formData.deliveryTime),
+        }
+    
+        await axiosInstance.put(`/update/${storedEventId}`, formattedData);
+        toast.success("Details submitted successfully!");
+
+        setTimeout(() => {
+          router.back();
+        }, 1000);
+
+      } catch (error: any) {
+        if (axios.isAxiosError(error)) {
+          const errorMessage = error.response?.data?.message || "An error occurred. Please try again.";
+          toast.error(errorMessage);
+        }
+      } finally {
+        setLoading(false); 
+=======
     setLoading(true);
 
     try {
@@ -302,6 +328,7 @@ const PickupDetails = () => {
           error.response?.data?.message ||
           "An error occurred. Please try again.";
         toast.error(errorMessage);
+>>>>>>> 82147df80b9ba5b29a119c874acf08cc000a6168
       }
     } finally {
       setLoading(false);
@@ -312,8 +339,13 @@ const PickupDetails = () => {
    * Handles saving form data for later completion
    */
   const handleCancel = async () => {
+<<<<<<< HEAD
+    router.back();
+    };
+=======
     router.push("/dashboard/events");
   };
+>>>>>>> 82147df80b9ba5b29a119c874acf08cc000a6168
 
   const handleMapLocationSelect = () => {
     setShowMapPickerModal(true);

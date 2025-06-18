@@ -21,7 +21,7 @@ const ViewEvent = () => {
   const code = searchParams.get("code");
 
   const [isExpanded, setIsExpanded] = useState(false);
-  const [activeTab, setActiveTab] = useState("General");
+  const [activeTab, setActiveTab] = useState("");
   const [modalOpen, setModalOpen] = useState(false);
   const [cartOpen, setCartOpen] = useState(false);
   const [data, setData] = useState<any>(null);
@@ -83,6 +83,12 @@ const ViewEvent = () => {
     fetchData();
   }, [code, location]);
 
+  useEffect(() => {
+  const privacy = data?.eventGroup?.groupPrivacy || 'general';
+  const formatted = privacy.charAt(0).toUpperCase() + privacy.slice(1);
+  setActiveTab(formatted);
+}, [data]);
+
   // Don't render anything until data is loaded
   if (loading) {
     return (
@@ -105,9 +111,23 @@ const ViewEvent = () => {
     );
   }
 
-  // Format data only after we're sure it exists
-  const eventData = data?.event;
-  const eventGroupData = data?.eventGroup;
+const eventData = data?.event;
+const eventGroupData = data?.eventGroup;
+const groupPrivacy = eventGroupData?.groupPrivacy;
+
+// Check if there’s at least one “general” group
+const hasGeneralGroup = eventData?.eventGroups?.some(
+  (group: any) => group.groupPrivacy === "general"
+);
+
+let availableTabs: string[] = [];
+
+if (groupPrivacy === "general") {
+  availableTabs = ["General"];
+} else if (groupPrivacy === "private") {
+  availableTabs = hasGeneralGroup ? ["General", "Private"] : ["Private"];
+}
+
 
   const fullText = eventData?.eventDescription || "";
   const formattedText = fullText.charAt(0).toUpperCase() + fullText.slice(1);
@@ -124,9 +144,9 @@ const ViewEvent = () => {
         return `${day} ${month}, ${year}`;
       })()
     : "";
-
-  const groupPrivacy = eventGroupData?.groupPrivacy;
-  const availableTabs = groupPrivacy === "private" ? ["General", "Private"] : ["General"];
+    
+  // const groupPrivacy = eventGroupData?.groupPrivacy;
+  // const availableTabs = groupPrivacy === "private" ? ["General", "Private"] : ["General"];
 
   const handleCheckout = () => {
     setLoadDeliveryDetails(true);
@@ -204,7 +224,7 @@ const ViewEvent = () => {
     <HeaderLayout>
       <ToastContainer position="top-right" autoClose={5000} />
 
-      <div id="event-container" className="bg-[#F9FAFB] h-screen mt-20 md:mt-14 text-black px-6 pt-6 pb-24">
+      <div id="event-container" className="bg-[#F9FAFB] h-auto mt-20 md:mt-20 text-black px-6 pt-6 pb-24">
         {/* Event Card */}
         <div id="event-card" className="rounded-[20px] bg-[#FFF7F2] p-6">
           <Image
