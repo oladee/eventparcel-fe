@@ -16,7 +16,7 @@ const SuccessPage: React.FC = () => {
           Your email address has been verified
         </p>
         <p className="font-medium text-[#718096]">
-          You have successfully verified your email address on <br /> Event Parcel, you can now create an event
+          You have successfully verified your email address on Event Parcel, you can now create an event
         </p>
         <button 
           onClick={() => router.push("/login")} 
