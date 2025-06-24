@@ -11,6 +11,7 @@ import { useRouter } from "next/navigation";
 import { AiOutlineArrowLeft } from "react-icons/ai";
 // import AddGroup from "@/components/AddGroupCaller";
 import AddGroup2 from "@/components/AddGroupCaller2";
+import Back from "@/components/layout/Back";
 
 const Page: React.FC = () => {
   const [eventData, setEventData] = useState<any>(null);
@@ -120,6 +121,7 @@ const Page: React.FC = () => {
   if (error) {
     return (
       <Container>
+        <Back />
         <div className="flex flex-col items-center justify-center min-h-screen">
           {error === "Sorry, this event has been disabled!" ? (
             <div className="text-center">
