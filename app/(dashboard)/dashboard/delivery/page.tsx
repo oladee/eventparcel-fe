@@ -212,6 +212,8 @@ const Page = () => {
       );
     }  
 
+    console.log("orders",orders)
+
   return (
    <Container>
     <ToastContainer />
@@ -341,8 +343,8 @@ const Page = () => {
                         className="flex items-center gap-3 mb-2 h-[91px] bg-[#FAFAFA] rounded-[12px] space-x-4 px-2 py-2"
                         >
                           <Image
-                            src={item.packageId?.packageImgUrls?.[0] || "/fallback-image.png"}
-                            alt={item.packageId?.packageTitle || "Order Image"}
+                            src={item?.packageImgUrls?.[0] || "/fallback-image.png"}
+                            alt={item?.packageTitle || "Order Image"}
                             width={42}
                             height={42}
                             className="rounded-md h-[42px] w-[42px] object-contain"
@@ -350,14 +352,14 @@ const Page = () => {
 
                           <div className="flex-1">
                             <p className="font-semibold text-sm text-[#111827]">
-                            {item.packageId?.packageTitle
-                              ? item.packageId.packageTitle.charAt(0).toUpperCase() + item.packageId.packageTitle.slice(1)
+                            {item.packageTitle
+                              ? item.packageTitle.charAt(0).toUpperCase() + item.packageTitle.slice(1)
                               : "No Title"}
 
                             </p>
                             <p className="text-[#718096] font-normal text-sm">
-                              {item.packageId?.packagePriceCurrency === "NGN" ? "₦" : "$"}
-                              {item.packageId?.packagePrice?.toLocaleString() || "N/A"}
+                              {item?.packagePriceCurrency === "NGN" ? "₦" : "$"}
+                              {item?.packagePrice?.toLocaleString() || "N/A"}
                             </p>
                           </div>
 

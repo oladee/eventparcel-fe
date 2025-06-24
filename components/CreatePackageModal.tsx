@@ -120,8 +120,14 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
         }
 
         if (field === "packageSize") {
-            if (!value.trim()) return "Package size is required.";
-        }
+            const delivery = formData.packageDelivery || [];
+const isSelfManagedPickup =
+  delivery.includes("pickUp") && delivery.includes("homeDelivery:selfManaged");
+
+            if (isSelfManagedPickup && !value.trim()) {
+                return "Package size is required for self-managed pickup.";
+            }
+            }
 
         if (field === "packageQuantity") {
             if (value === null || value === undefined) {
@@ -284,16 +290,31 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
         });
     };
 
+    const delivery = formData.packageDelivery || [];
+
+    const isSelfManagedPickup =
+    delivery.includes("pickUp") && delivery.includes("homeDelivery:selfManaged");
+
+    const isPlatformDelivery = delivery.includes("homeDelivery:platformDelivery");
+
+    const hasDeliveryMethod =
+    delivery.includes("pickUp") ||
+    delivery.includes("homeDelivery:platformDelivery") ||
+    delivery.includes("homeDelivery:selfManaged");
+
+    const packageSizeIsRequired =
+    isSelfManagedPickup || isPlatformDelivery; //now platform delivery also requires size
+
     const isFormValid =
     mode === "update" ||
     (
         formData.packageTitle?.trim() &&
-        formData.packageSize?.trim() &&
-        String(formData.packageQuantity).trim() &&
         formData.packagePrice?.toString().trim() &&
+        // String(formData.packageQuantity).trim() &&
+        hasDeliveryMethod && // at least one delivery selected
+        (!packageSizeIsRequired || formData.packageSize?.trim()) && // require packageSize conditionally
         Object.values(errors).every((err) => err === "")
     );
-
 
     const handleSubmit = async () => {
         if(mode === "create") {

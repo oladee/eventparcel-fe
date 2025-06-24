@@ -17,6 +17,7 @@ import DollarPayoutForm from "@/components/DollarPayoutForm";
 import axiosInstance from "@/lib/axiosInstance";
 import Container from "@/components/dashboard/Container";
 import { trackEvent } from "@/lib/mixpanel";
+import { ChevronLeft } from 'lucide-react';
 
 const LocationPickerModal = dynamic(
   () => import("@/components/aboutEvent/LocationPickerModal"),
@@ -536,6 +537,15 @@ const PaymentSetupContent = () => {
         />
       )}
       <section className="!overflow-hidden relative">
+        <div
+          className="fixed top-16 w-[90%] md:w-[80%] h-auto py-3 bg-gray-100"
+          id="back-button"
+        >
+          <button className="w-[20%] md:w-[5%] cursor-pointer flex flex-row items-center" onClick={() => window.history.back()}>
+            <ChevronLeft className="w-6 h-6 " />
+            <span className="font-medium text-base text-[#111827] ml-1">Back</span>
+          </button>
+        </div>
         <div className="mt-4 pb-20 lg:py-24 px-3 sm:px-4 mx-auto max-w-screen-md h-[98vh] overflow-y-auto no-scrollbar">
           <div className="md:mb-12 text-center p-3 sm:p-0 space-y-3 lg:flex lg:justify-center lg:flex-col">
             <h2

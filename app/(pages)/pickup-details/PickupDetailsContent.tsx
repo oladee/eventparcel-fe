@@ -19,6 +19,7 @@ import Cookies from "js-cookie";
 import EventSaveSuccess from "@/components/aboutEvent/EventSaveSuccess";
 import { debounce } from "lodash";
 import { trackEvent } from "@/lib/mixpanel";
+import { ChevronLeft } from 'lucide-react';
 
 export type EventDetails = {
   event_id: string;
@@ -466,7 +467,17 @@ const handleSaveForLater = async () => {
         />
       )}
       <div>{showSuccess2 && <EventSaveSuccess />}</div>
-      <div className="py-20 bg-[#EEEFF2] lg:py-24 px-6 sm:px-4 mx-auto max-w-screen-md h-screen overflow-y-auto no-scrollbar relative">
+        <section className="!overflow-hidden relative">
+          <div
+            className="fixed top-16 w-[90%] md:w-[80%] h-auto py-3 bg-gray-100"
+            id="back-button"
+          >
+            <button className="w-[20%] md:w-[5%] cursor-pointer flex flex-row items-center" onClick={() => window.history.back()}>
+              <ChevronLeft className="w-6 h-6 " />
+              <span className="font-medium text-base text-[#111827] ml-1">Back</span>
+            </button>
+          </div>
+      <div className="py-10 bg-[#EEEFF2] lg:py-24 px-6 sm:px-4 mx-auto max-w-screen-md h-screen overflow-y-auto no-scrollbar relative">
         <div className="mt-8">
           <div className="mb-5">
             <h4 id="deliveryDetailsHeader" className="text-2xl font-semibold text-[#111827] mb-2">
@@ -628,6 +639,7 @@ const handleSaveForLater = async () => {
           </form>
         </div>
       </div>
+      </section>
     </HeaderLayout>
   );
 };

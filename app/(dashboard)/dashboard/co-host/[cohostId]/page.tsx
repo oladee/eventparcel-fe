@@ -9,6 +9,7 @@ import { toast, ToastContainer } from "react-toastify";
 import Container from "@/components/dashboard/Container";
 import CohostActionsModal from "@/components/dashboard/cohost/CohostActionsModal";
 import { useRouter as Route } from "next-nprogress-bar";
+import { ChevronLeft } from 'lucide-react';
 
 // Define interfaces for user & log entry
 // interface ActivityUser {
@@ -190,7 +191,16 @@ export default function Page() {
 
   return (
     <Container>
-      <section className="bg-[#F9FAFB] min-h-screen md:px-8 py-20 lg:py-24 px-3 sm:px-4 mx-auto  h-screen overflow-y-auto no-scrollbar">
+      <div
+        className="fixed top-16 w-[90%] md:w-[80%] h-auto py-3 bg-gray-100"
+        id="back-button"
+      >
+        <button className="w-[20%] md:w-[5%] cursor-pointer flex flex-row items-center" onClick={() => window.history.back()}>
+          <ChevronLeft className="w-6 h-6 " />
+          <span className="font-medium text-base text-[#111827] ml-1">Back</span>
+        </button>
+      </div>
+      <section className=" min-h-screen md:px-8 py-14 lg:py-24 px-3 sm:px-4 mx-auto  h-screen overflow-y-auto no-scrollbar">
         {/* Header: Avatar, name, email, More button */}
         <div className="bg-white rounded-xl p-4 flex items-center justify-between mb-6">
           <div className="flex items-center space-x-4">

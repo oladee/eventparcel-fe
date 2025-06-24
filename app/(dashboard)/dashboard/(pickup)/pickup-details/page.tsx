@@ -18,7 +18,7 @@ import dynamic from "next/dynamic";
 import axios from "axios";
 import { trackEvent } from "@/lib/mixpanel";
 import { EventDetails } from "@/app/(pages)/pickup-details/PickupDetailsContent";
-
+import { ChevronLeft } from 'lucide-react';
 
 const PickupDeliveryLoationPicker = dynamic(
   () => import("@/components/aboutEvent/PickupDeliveryLoationPicker"),
@@ -399,7 +399,17 @@ useEffect(() => {
           onCancel={() => setShowMapPickerModal(false)}
         />
       )}
-      <div className="lg:py-24 px-6 sm:px-4 mx-auto max-w-screen-md h-screen overflow-y-auto no-scrollbar relative">
+    <section className="!overflow-hidden relative">
+      <div
+        className="fixed top-16 w-[90%] md:w-[80%] h-auto py-3 bg-gray-100"
+        id="back-button"
+      >
+        <button className="w-[20%] md:w-[5%] cursor-pointer flex flex-row items-center" onClick={() => window.history.back()}>
+          <ChevronLeft className="w-6 h-6 " />
+          <span className="font-medium text-base text-[#111827] ml-1">Back</span>
+        </button>
+      </div>
+      <div className="mt-6 pb-20 lg:py-10 px-3 sm:px-4 mx-auto max-w-screen-md h-[98vh] overflow-y-auto no-scrollbar">
         <div className="mt-3">
           <div className="mb-5">
             <h4 id="deliveryDetailsHeader" className="text-2xl font-semibold text-[#111827] mb-2">
@@ -562,6 +572,7 @@ useEffect(() => {
           </form>
         </div>
       </div>
+      </ section>
       </Container>
   );
 };

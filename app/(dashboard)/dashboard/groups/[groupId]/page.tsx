@@ -18,7 +18,7 @@ import useUpdateOrderStatus from '@/hooks/useUpdateOrderStatus';
 import OrderPagination from '@/components/OrderPagination';
 import { motion } from 'framer-motion';
 import { ToastContainer } from 'react-toastify';
-
+import { ChevronLeft } from 'lucide-react';
 
 interface Order {
   _id: string;
@@ -272,7 +272,16 @@ const Page = () => {
   return (
     <Container>
       <ToastContainer />
-      <div id="orders-page-container" className="min-h-screen mt-2">
+      <div
+        className="fixed top-16 w-[90%] md:w-[80%] h-auto py-3 bg-gray-100"
+        id="back-button"
+      >
+        <button className="w-[20%] md:w-[5%] cursor-pointer flex flex-row items-center" onClick={() => window.history.back()}>
+          <ChevronLeft className="w-6 h-6 " />
+          <span className="font-medium text-base text-[#111827] ml-1">Back</span>
+        </button>
+      </div>
+      <div id="orders-page-container" className="min-h-screen mt-12">
         <div>
           <div className="bg-white rounded-2xl p-6">
             <div className="flex justify-between items-start">

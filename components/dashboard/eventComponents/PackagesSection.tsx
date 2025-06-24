@@ -13,6 +13,7 @@ import { toast, ToastContainer } from "react-toastify";
 // import AddGroup from "@/components/AddGroupCaller";
 import AddGroup2 from "@/components/AddGroupCaller2";
 // import { isNull } from "node:util";
+import { ChevronLeft } from 'lucide-react';
 
 interface PackagesSectionProps {
   eventData: {
@@ -86,9 +87,18 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({
   return (
     <>
       <ToastContainer />
+        <div
+          className="fixed top-16 w-[90%] md:w-[80%] h-auto py-3 bg-gray-100"
+          id="back-button"
+        >
+          <button className="w-[20%] md:w-[5%] cursor-pointer flex flex-row items-center" onClick={() => window.history.back()}>
+            <ChevronLeft className="w-6 h-6 " />
+            <span className="font-medium text-base text-[#111827] ml-1">Back</span>
+          </button>
+        </div> 
       <div className="flex justify-between items-center mb-4 mt-11">
         <h1 className="capitalize text-2xl text-[#111827] font-bold font-general">
-          Groups
+          Group
         </h1>
 
         <button

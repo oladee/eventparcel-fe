@@ -11,7 +11,7 @@ import toast from 'react-hot-toast';
 import { useRouter } from 'next/navigation';
 import { Circle } from 'lucide-react';
 import { ToastContainer } from 'react-toastify';
-
+import { ChevronLeft } from 'lucide-react';
 
 const Page = () => {
     const [orders, setOrders] = useState<any>(null);
@@ -142,13 +142,22 @@ const Page = () => {
     return (
         <Container>
             <ToastContainer />
-            <div id="order-details-container" className="min-h-screen mt-2">
+              <div
+                className="fixed top-16 w-[90%] md:w-[80%] h-auto py-3 bg-gray-100"
+                id="back-button"
+                >
+                    <button className="w-[20%] md:w-[5%] -ml-2 cursor-pointer flex flex-row items-center" onClick={() => window.history.back()}>
+                        <ChevronLeft className="w-6 h-6 " />
+                        <span className="font-medium text-base text-[#111827] ml-1">Back</span>
+                    </button>
+                </div>
+            <div id="order-details-container" className="min-h-screen mt-11">
                 {/* Heading */}
                 <h4 id="order-details-heading" className="text-2xl font-general font-bold text-[#111827] mb-6">
                     Order details
                 </h4>
 
-                <div id="order-status-card" className='w-[343px] h-auto bg-[#FFFFFF] rounded-[16px] p-4 mb-5'>
+                <div id="order-status-card" className='w-[348px] h-auto bg-[#FFFFFF] rounded-[16px] p-4 mb-5'>
                     <div id="status-container" className='flex items-center gap-2'>
                         <div id="status-icon-container" className='bg-[#FFF0E6] p-2 rounded-[20px]'>
                             <Image id="status-icon" src={BoxTime} alt='box' width={16} height={16} />

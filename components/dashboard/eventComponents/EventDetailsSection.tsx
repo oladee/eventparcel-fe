@@ -46,7 +46,7 @@ const EventDetailsSection: React.FC<EventDetailsProps> = ({ eventData }) => {
 
 
   return (
-    <div className="bg-[#fff4ed] p-4 rounded-2xl">
+    <div className="bg-[#fff4ed] p-4 mt-10 rounded-2xl">
       {/* Image Section */}
       <div className="relative w-full rounded-xl overflow-hidden">
         <Image

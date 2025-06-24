@@ -8,6 +8,8 @@ import AddGroup from "./AddGroupCaller";
 import { ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import DeleteConfirmationDialog from "./modals/DeleteConfirmationDialog";
+import { Ellipsis } from 'lucide-react';
+import DeletePackageCaution from "./DeletePackageCaution";
 
 type generalGroupProps = {
   group: Group;
@@ -27,7 +29,9 @@ const GeneralModal: React.FC<generalGroupProps> = ({ group, handleDuplicate, han
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [deleteId, setDeleteId] = useState<string | null>("");
   const [, setDeletEndPoint] = useState<string | null>("");
-  const [packages] = useState(group.packages);
+  const [packages, setPackages] = useState(group.packages);
+  const [openPackageOptions, setOpenPackageOptions] = useState(false);
+  const [deletePackageOption ,setDeletePackageOption] = useState(false);
 
   const handleDeleteModal = () => {
     setDeleteId(group._id);
@@ -180,18 +184,11 @@ const GeneralModal: React.FC<generalGroupProps> = ({ group, handleDuplicate, han
                     </div>
                   </div>
                   <div className="flex flex-col justify-center items-center gap-5">
-                    <Image
-                      src="/images/edit.png"
-                      alt="edit"
-                      id="editPackage"
-                      width={12}
-                      height={12}
-                      className="cursor-pointer"
-                      onClick={() => {
-                        setModalMode("update");
+                    <Ellipsis className="w-[20px] h-[20px] text-[#A0AEC0] cursor-pointer" 
+                      onClick = {() => {
+                        setOpenPackageOptions(true);
                         setSelectedPackage(item);
-                        setOpenModalPackage(true);
-                      }}
+                      }} 
                     />
                   </div>
                 </div>
@@ -276,6 +273,37 @@ const GeneralModal: React.FC<generalGroupProps> = ({ group, handleDuplicate, han
             />
           </div>
         )}
+      {openPackageOptions && (
+        <div className="fixed inset-0 flex items-center justify-center z-50">
+          <div className="bg-white rounded-2xl shadow-xl p-6 w-[90%] max-w-sm">
+            <div className="flex flex-col space-y-3">
+              <button
+                onClick={() => {
+                  setModalMode("update");
+                  setOpenModalPackage(true);
+                  setOpenPackageOptions(false);
+                }}
+                className="w-full py-2 text-left text-[#111827] hover:bg-[#F9FAFB] rounded-lg px-4 font-medium"
+              >
+                Edit Package
+              </button>
+
+              <button
+                onClick={() => {
+                  setOpenPackageOptions(false);
+                  setDeletePackageOption(true)
+                }}
+                className="w-full py-2 text-left text-[#DE4222] hover:bg-[#F9FAFB] rounded-lg px-4 font-medium"
+              >
+                Delete Package
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {deletePackageOption && (
+        <DeletePackageCaution selectedId={selectedPackage?._id} setDelete={setDeletePackageOption} setPackages={setPackages}/>
+      )}
       </div>
     </>
   );
