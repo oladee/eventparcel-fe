@@ -4,7 +4,7 @@ import { Package } from "@/app/interface/Group";
 import axiosInstance from "@/lib/axiosInstance";
 import axios from "axios";
 import Image from "next/image";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
@@ -12,6 +12,8 @@ import { boxOptions } from "@/data/boxOption";
 import { BiChevronDown } from "react-icons/bi";
 import { cn } from "@/utils/cn";
 import { trackEvent } from "@/lib/mixpanel";
+import Cookies from "js-cookie";
+import EventSaveSuccess from "./aboutEvent/EventSaveSuccess";
 
 
 interface PackageFormData {
@@ -54,12 +56,16 @@ const capitalizeFirstLetter = (text: string) =>
 const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupCurrency, setOpenModalPackage, mode, packageData }) => {
     const [errors, setErrors] = useState<FormErrors>({});
     const [loading, setLoading] = useState(false);
+    const [showSuccess2, setShowSuccess2] = useState(false);
     const [, setError] = useState(false);
     const [openHomeDeliveryOption, setOpenHomeDeliveryOption] = useState(false);
     const router = useRouter();
+    const pathname = usePathname();
     const [eventId, setEventId] = useState<string | null>(null);
     const [isOpen, setIsOpen] = useState(false);
     const [selected, setSelected] = useState<BoxOption | null>(null);
+    const [showModal, setShowModal] = useState(false);
+    const [isSaveLoading, setIsSaveLoading] = useState(false);
     const [formData, setFormData] = useState<PackageFormData>({
         groupId: groudId,
         eventId: eventId,
@@ -121,8 +127,8 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
 
         if (field === "packageSize") {
             const delivery = formData.packageDelivery || [];
-const isSelfManagedPickup =
-  delivery.includes("pickUp") && delivery.includes("homeDelivery:selfManaged");
+        const isSelfManagedPickup =
+        delivery.includes("pickUp") && delivery.includes("homeDelivery:selfManaged");
 
             if (isSelfManagedPickup && !value.trim()) {
                 return "Package size is required for self-managed pickup.";
@@ -509,9 +515,50 @@ const isSelfManagedPickup =
             setLoading(false);
         }
     };
-    
+
+    const handleCancel = () => setShowModal(true);
+    const callSaveForLater = () => {
+        setShowModal(false);
+        handleSaveForLater();
+    };
+
+    const handleSaveForLater = async() => {
+    setIsSaveLoading(true);
+    const authToken = localStorage.getItem("authToken");
+    const storedEventId = localStorage.getItem("eventId");
+
+  
+    if (!authToken) {
+      Cookies.set("redirectAfterLogin", pathname); 
+      setShowSuccess2(true);
+      return;
+    }
+
+    try{
+      await axiosInstance.put(`save-for-later/${storedEventId}`, {
+        isDraft: true
+      });
+      toast.success("Saved! Continue from your dashboard.");
+      router.push("/dashboard");    
+    }catch(error: any) {
+      console.log(error)
+      toast.error(error.response?.data?.message || "Failed to save event");
+    }finally{
+      setIsSaveLoading(false);
+    }
+  };
     const price = Number(formData?.packagePrice) || 0;
 
+    const handleDiscard = () => {
+    // setShowModal(false);
+
+    if (pathname === "/dashboard/create-group") {
+      router.push("/dashboard/events");
+    } else {
+      router.push("https://eventparcel.com"); 
+    }
+  };
+  
     const whatHostReceives =
         !price || isNaN(price) // If price is empty/not a number
             ? 0 // Default to 0
@@ -524,6 +571,7 @@ const isSelfManagedPickup =
     return (
         <>
             <ToastContainer aria-live="polite" />
+            <div>{showSuccess2 && <EventSaveSuccess />}</div>
             <div className="w-[94vw] lg:w-[680px] max-h-[80vh] lg:max-h-[97vh] bg-[#FFFFFF] rounded-2xl shadow-lg px-5  md:p-5 flex flex-col overflow-y-auto">                {/* Header */}
                 <div className="sticky top-0 z-10 flex justify-between items-center py-4 bg-[#FFFFFF]">
                     <div className="flex flex-col items-start">
@@ -851,7 +899,7 @@ const isSelfManagedPickup =
                         <div className="flex justify-center md:justify-end gap-2">
                             <button 
                                 id="cancel"
-                                onClick={() => setOpenModalPackage(false)} 
+                                onClick={handleCancel}
                                 className="w-[147px] h-[48px] px-4 py-2 rounded-xl border"
                             >
                                 Cancel
@@ -878,6 +926,45 @@ const isSelfManagedPickup =
                 </div>
             </div>
             </div>
+             {showModal && (
+        <div
+          // onClick={handleCloseModal}
+          className="fixed inset-0 px-6 bg-black bg-opacity-40 flex items-center justify-center z-[999]"
+        >
+          <div onClick={(e) => e.stopPropagation()} className="relative bg-white rounded-[8px] p-8 shadow-lg max-w-md w-full">
+               {/* Close icon */}
+            <button
+              onClick={() => setShowModal(false)}
+              className="absolute top-3 right-4 text-xl text-black-100 hover:text-gray-800"
+            >
+              ✕
+            </button>
+            <h2 className="text-xl font-bold hidden md:block">
+              What would you like to do?
+            </h2>
+            <p className="mb-6 text-gray-600 hidden md:block">
+              {" "}
+              You can save your progress and come back later, or discard this
+              event creation.
+            </p>
+            <div className="flex flex-col md:flex-row gap-4 justify-end">
+              <button
+                onClick={callSaveForLater}
+                disabled={isSaveLoading}
+                className="w-full md:p-3 md:border border-[#111827] md:rounded-[12px] font-medium text-left md:text-center text-[#000] whitespace-nowrap"
+              >
+                {isSaveLoading ? "saving..." : "Save for later"}
+              </button>
+              <button
+                onClick={handleDiscard}
+                className="w-full md:bg-primary text-red-500 md:text-white md:p-3 md:rounded-[12px] hover:text-red-800 transition flex items-center md:justify-center font-medium whitespace-nowrap"
+              >
+                Discard event creation
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
         </>
     );
 };

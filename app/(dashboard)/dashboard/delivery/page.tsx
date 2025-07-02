@@ -7,7 +7,7 @@ import Package from "../../../../assets/orderIcons/package.png";
 import Image from 'next/image';
 import { Search  } from "lucide-react";
 import { Order, OrderDashboardResponse } from '@/app/interface/Order';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import useDebounce from '@/hooks/useDebounce';
 import axiosInstance from '@/lib/axiosInstance';
 import useUpdateOrderStatus from '@/hooks/useUpdateOrderStatus';
@@ -16,6 +16,7 @@ import OrderPagination from '@/components/OrderPagination';
 import { cn } from '@/utils/cn';
 import { motion } from 'framer-motion';
 import { trackEvent } from '@/lib/mixpanel';
+import { HiOutlineDocumentDownload } from 'react-icons/hi';
 
 const tabs = ["All Orders", "Shipped", "Completed"];
 
@@ -30,6 +31,7 @@ const Page = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
   const modalRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const pathname = usePathname();
   const debouncedSearchQuery = useDebounce(searchQuery, 1000);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);  
   const [stats, setStats] = useState([
@@ -188,6 +190,101 @@ const Page = () => {
     }
   };
 
+
+   const exportToCSV = (data: OrderDashboardResponse, filename = 'delivery.csv') => {
+      if (!data || !data.orders || data.orders.length === 0) return;
+        
+          const headers = [
+            'Order ID',
+            'Order Date',
+            'Delivery Type',
+            'Delivery Fee',
+            'Delivery Location',
+            'Carrier',
+            'Status'
+          ];
+        
+          const csvRows = [headers.join(',')];
+        
+          // const capitalize = (str?: string) =>
+          //   str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : '';
+        
+          for (const row of data.orders) {
+            const values = headers.map(header => {
+              let value;
+        
+              switch (header) {
+                case 'Order ID':
+                  value = row.orderId;
+                  break;
+                case 'Order Date':
+                  value = row.createdAt ? new Date(row.createdAt).toLocaleString() : '';
+                  break;
+                case 'Delivery Type':
+                  value = row.deliveryType || '';
+                  break;
+                case 'Delivery Fee':
+                  value = row.homeDeliveryFee != null
+                    ? `="${row.totalAmountCurrency === "NGN" ? "₦" : "$"}${row.homeDeliveryFee.toLocaleString()}"`
+                    : 'N/A';
+                  break;
+                case 'Delivery Location':
+                  value = row.shippingAddress || 'N/A';
+                  break;
+                case 'Carrier':
+                  value = row.deliveryType === "pickUp" ? "PickUp" : 'GIG';
+                  break;
+                case 'Status':
+                  value = row.orderStatus || '';
+                  break;
+                default:
+                  value = '';
+              }
+        
+              const escaped = String(value ?? '').replace(/"/g, '""');
+              return `"${escaped}"`;
+            });
+        
+            csvRows.push(values.join(','));
+          }
+  
+          try {
+            const BOM = '\uFEFF';
+            const blob = new Blob([BOM + csvRows.join('\n')], { type: 'text/csv;charset=utf-8;' });
+          
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = filename;
+            a.style.display = 'none';
+            document.body.appendChild(a);
+            a.click();
+          
+            setTimeout(() => {
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+            }, 100);
+  
+            trackEvent("Export Data", {
+              source: `${pathname} page`,
+              timestamp: new Date().toISOString(),
+              page_name: `${pathname} Page`,
+              route: pathname,
+              status: "Successful"
+            });
+  
+          }catch(error) {
+            console.error(error);
+            trackEvent("Export Data", {
+              source: `${pathname} page`,
+              timestamp: new Date().toISOString(),
+              page_name: `${pathname} Page`,
+              route: pathname,
+              status: "Failed"
+            });
+          }
+        };
+
     if (loading) {
       return (
         <div>
@@ -212,14 +309,27 @@ const Page = () => {
       );
     }  
 
-    console.log("orders",orders)
-
   return (
    <Container>
     <ToastContainer />
     <div className="w-full h-full flex flex-col gap-5 items-center justify-center">
-      <div id="discount-header" className="w-full flex justify-start">
-        <h2 id="discount-title" className="font-general text-2xl font-bold text-[#111827]">Delivery</h2>
+      {/* Heading */}
+      <div className="flex justify-between items-center mb-6 w-full">
+        <h4
+          id="delivery-page-heading"
+          className="text-2xl font-general font-bold text-[#111827]"
+          >
+          Delivery
+        </h4>
+        {/* Right: Export */}
+        <div id="table-export" className="w-[90.71px] h-[37px] md:w-auto">
+          <button
+          onClick={() => orders && exportToCSV(orders)}
+          className="w-full h-full flex items-center justify-center gap-1 bg-[#FFFFFF] rounded-[12px] px-3 py-1.5 text-sm text-[#718096] font-medium shadow-sm">
+            <HiOutlineDocumentDownload size={16} />
+            Export 
+          </button>
+        </div>
       </div>
 
        {/* Stats Grid */}

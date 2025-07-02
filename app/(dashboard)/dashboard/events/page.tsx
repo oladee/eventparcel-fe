@@ -54,6 +54,10 @@ const Page: React.FC = () => {
     }
   }, [router]);
 
+  useEffect(() => {
+    localStorage.removeItem("goToEventDashboard")
+  }, [])
+
   if (loading) {
     return (
       <Container>

@@ -8,14 +8,17 @@ import { Mail, Phone, MapPin, CircleDollarSign } from "lucide-react";
 import { MdOutlineCalendarToday } from "react-icons/md";
 import useUpdateOrderStatus from '@/hooks/useUpdateOrderStatus';
 import toast from 'react-hot-toast';
-import { useRouter } from 'next/navigation';
+import { usePathname, useRouter } from 'next/navigation';
 import { Circle } from 'lucide-react';
 import { ToastContainer } from 'react-toastify';
 import { ChevronLeft } from 'lucide-react';
+import { HiOutlineDocumentDownload } from 'react-icons/hi';
+import { trackEvent } from '@/lib/mixpanel';
 
 const Page = () => {
     const [orders, setOrders] = useState<any>(null);
     const router = useRouter();
+    const pathname = usePathname();
 
     useEffect(() => {
       const storedOrder = localStorage.getItem("selectedOrder");
@@ -126,6 +129,75 @@ const Page = () => {
         <span className={`absolute inset-0 flex items-center justify-center text-sm font-bold ${getStatusClass(orders?.paymentStatus || '')}`}>₦</span>
     </div>
     );
+
+     const capitalize = (str?: string) =>
+          str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : '';
+    
+    
+    const exportToCSV = (order: any, filename = "order.csv") => {
+        if (!order) return;
+
+        const headers = [
+            "Order ID",
+            "Order Date",
+            "Guest Name",
+            "Event Name",
+            "Price",
+            "Delivery Type",
+            "Status"
+        ];
+
+        const values = [
+            order.orderId || "",
+            order.createdAt ? new Date(order.createdAt).toLocaleString() : "",
+            `${capitalize(order.guestFirstName || "")} ${capitalize(order.guestLastName || "")}`.trim(),
+            order.eventId?.eventName ? capitalize(order.eventId.eventName) : "",
+            order.totalAmount != null
+            ? `="${order.totalAmountCurrency === "NGN" ? "₦" : "$"}${order.totalAmount.toLocaleString()}"`
+            : "",
+            order.deliveryType || "",
+            order.orderStatus || ""
+        ].map((value) => `"${String(value).replace(/"/g, '""')}"`);
+
+        const csvContent = [headers.join(","), values.join(",")].join("\n");
+
+        try {
+            const BOM = "\uFEFF";
+            const blob = new Blob([BOM + csvContent], { type: "text/csv;charset=utf-8;" });
+            const url = URL.createObjectURL(blob);
+
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = filename;
+            document.body.appendChild(a);
+            a.click();
+
+            setTimeout(() => {
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+            }, 100);
+
+            trackEvent?.("Export Data", {
+            source: `${pathname} page`,
+            timestamp: new Date().toISOString(),
+            page_name: `${pathname} Page`,
+            route: pathname,
+            status: "Successful"
+            });
+
+        } catch (error) {
+            console.error("CSV export failed", error);
+            trackEvent?.("Export Data", {
+            source: `${pathname} page`,
+            timestamp: new Date().toISOString(),
+            page_name: `${pathname} Page`,
+            route: pathname,
+            status: "Failed"
+            });
+        }
+    };
+
+    
           
     if (!orders) {
         return (
@@ -153,9 +225,24 @@ const Page = () => {
                 </div>
             <div id="order-details-container" className="min-h-screen mt-11">
                 {/* Heading */}
-                <h4 id="order-details-heading" className="text-2xl font-general font-bold text-[#111827] mb-6">
-                    Order details
-                </h4>
+                  <div className="flex justify-between items-center mb-6">
+                    <h4
+                    id="orders-page-heading"
+                    className="text-2xl font-general font-bold text-[#111827]"
+                    >
+                        Order details
+                    </h4>
+                    {/* Right: Export */}
+                    <div id="table-export" className="w-[90.71px] h-[37px] md:w-auto">
+                    <button
+                    onClick={() => orders && exportToCSV(orders)}
+                    className="w-full h-full flex items-center justify-center gap-1 bg-[#FFFFFF] rounded-[12px] px-3 py-1.5 text-sm text-[#718096] font-medium shadow-sm">
+                        <HiOutlineDocumentDownload size={16} />
+                        Export 
+                        {/* <MdOutlineKeyboardArrowDown className="w-6 h-6 text-[#718096]"/> */}
+                    </button>
+                    </div>
+                </div>
 
                 <div id="order-status-card" className='w-[348px] h-auto bg-[#FFFFFF] rounded-[16px] p-4 mb-5'>
                     <div id="status-container" className='flex items-center gap-2'>

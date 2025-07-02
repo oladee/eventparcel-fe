@@ -88,7 +88,7 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({
     <>
       <ToastContainer />
         <div
-          className="fixed top-16 w-[90%] md:w-[80%] h-auto py-3 bg-gray-100"
+          className="fixed top-16 w-[90%] md:w-[90%] h-auto py-3 bg-gray-100"
           id="back-button"
         >
           <button className="w-[20%] md:w-[5%] cursor-pointer flex flex-row items-center" onClick={() => window.history.back()}>

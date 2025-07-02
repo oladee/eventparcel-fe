@@ -10,7 +10,7 @@ import Eye from "../../../../assets/orderIcons/eye.png";
 import { Search } from "lucide-react";
 import { cn } from "@/utils/cn";
 import OrderPagination from "@/components/OrderPagination";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import axiosInstance from "@/lib/axiosInstance";
 import useDebounce from "@/hooks/useDebounce";
 import { Order, OrderDashboardResponse } from "@/app/interface/Order";
@@ -18,6 +18,7 @@ import useUpdateOrderStatus from "@/hooks/useUpdateOrderStatus";
 import { toast, ToastContainer } from "react-toastify";
 import { motion } from "framer-motion";
 import { trackEvent } from "@/lib/mixpanel";
+import { HiOutlineDocumentDownload } from "react-icons/hi";
 
 const tabs = ["All Orders", "Pending", "Shipped", "Completed"];
 
@@ -34,6 +35,7 @@ const Page: React.FC = ({}) => {
   const router = useRouter();
   const debouncedSearchQuery = useDebounce(searchQuery, 1000);
   const [selectedOrder, setSelectedOrder] = useState<Order | null>(null);
+  const pathname = usePathname();
 
   const [stats, setStats] = useState([
     { icon: Cart, title: "Total Orders", count: 0, change: "0%" },
@@ -210,6 +212,104 @@ const Page: React.FC = ({}) => {
     }
   };
 
+   const capitalize = (str?: string) =>
+      str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : '';
+
+
+  const exportToCSV = (data: OrderDashboardResponse, filename = "orders.csv") => {
+    if (!data || !data.orders || data.orders.length === 0) return;
+
+    const headers = [
+      "Order ID",
+      "Order Date",
+      "Guest Name",
+      "Event Name",
+      "Price",
+      "Delivery Type",
+      "Status"
+    ];
+
+    const csvRows = [headers.join(",")];
+
+    for (const row of data.orders) {
+      const values = headers.map((header) => {
+        let value;
+
+        switch (header) {
+          case "Order ID":
+            value = row.orderId;
+            break;
+          case "Order Date":
+            value = row.createdAt ? new Date(row.createdAt).toLocaleString() : "";
+            break;
+          case "Guest Name":
+            value = `${capitalize(row.guestFirstName || "")} ${capitalize(row.guestLastName || "")}`.trim();
+            break;
+          case "Event Name":
+            value = row.eventId?.eventName ? capitalize(row.eventId.eventName) : "";
+            break;
+          case "Price":
+            value =
+              row.totalAmount != null
+                ? `="${row.totalAmountCurrency === "NGN" ? "₦" : "$"}${row.totalAmount.toLocaleString()}"`
+                : "";
+            break;
+          case "Delivery Type":
+            value = row.deliveryType || "";
+            break;
+          case "Status":
+            value = row.orderStatus || "";
+            break;
+          default:
+            value = "";
+        }
+
+        const escaped = String(value ?? "").replace(/"/g, '""');
+        return `"${escaped}"`;
+      });
+
+      csvRows.push(values.join(","));
+    }
+
+    try {
+      const BOM = "\uFEFF";
+      const blob = new Blob([BOM + csvRows.join("\n")], { type: "text/csv;charset=utf-8;" });
+      const url = URL.createObjectURL(blob);
+
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = filename;
+      a.style.display = "none";
+      document.body.appendChild(a);
+      a.click();
+
+      setTimeout(() => {
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+      }, 100);
+
+      // Optional tracking
+      trackEvent?.("Export Data", {
+        source: `${pathname} page`,
+        timestamp: new Date().toISOString(),
+        page_name: `${pathname} Page`,
+        route: pathname,
+        status: "Successful"
+      });
+
+    } catch (error) {
+      console.error("CSV export failed", error);
+      trackEvent?.("Export Data", {
+        source: `${pathname} page`,
+        timestamp: new Date().toISOString(),
+        page_name: `${pathname} Page`,
+        route: pathname,
+        status: "Failed"
+      });
+    }
+  };
+
+
   if (loading) {
     return (
       <Container>
@@ -319,12 +419,24 @@ const Page: React.FC = ({}) => {
         ) : (
           <div>
             {/* Heading */}
-            <h4
-              id="orders-page-heading"
-              className="text-2xl font-general font-bold text-[#111827] mb-6"
-            >
-              All Orders
-            </h4>
+            <div className="flex justify-between items-center mb-6">
+              <h4
+                id="orders-page-heading"
+                className="text-2xl font-general font-bold text-[#111827]"
+                >
+                All Orders
+              </h4>
+              {/* Right: Export */}
+              <div id="table-export" className="w-[90.71px] h-[37px] md:w-auto">
+                <button
+                onClick={() => orders && exportToCSV(orders)}
+                className="w-full h-full flex items-center justify-center gap-1 bg-[#FFFFFF] rounded-[12px] px-3 py-1.5 text-sm text-[#718096] font-medium shadow-sm">
+                  <HiOutlineDocumentDownload size={16} />
+                  Export 
+                  {/* <MdOutlineKeyboardArrowDown className="w-6 h-6 text-[#718096]"/> */}
+                </button>
+              </div>
+            </div>
 
 
             {/* Stats Grid */}

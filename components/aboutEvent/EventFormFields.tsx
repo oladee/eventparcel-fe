@@ -186,11 +186,12 @@ const EventFormFields: React.FC<EventFormFieldsProps> = ({
           <input
             type="text"
             id="location"
+            disabled
             value={formData.location}
             onChange={handleChange}
             onBlur={handleBlur}
             className="input-field outline-primary pl-12 w-full p-2 rounded-[5px] bg-slate-50"
-            placeholder="Enter location of the event"
+            placeholder="Click map icon to add address"
             required
           />
           {errors.location && (

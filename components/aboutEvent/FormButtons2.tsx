@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { BiLoaderCircle } from "react-icons/bi";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 
 interface FormButtonsProps {
   isFormValid: boolean;
@@ -19,6 +19,7 @@ const FormButtons2: React.FC<FormButtonsProps> = ({
 }) => {
   const [showModal, setShowModal] = useState(false);
   const router = useRouter();
+  const pathname = usePathname();
 
   const handleCancel = () => setShowModal(true);
 
@@ -27,10 +28,15 @@ const FormButtons2: React.FC<FormButtonsProps> = ({
     onContinue2();
   };
 
-  const handleDiscard = () => {
-    setShowModal(false);
-    router.back();
-  };
+const handleDiscard = () => {
+  // setShowModal(false);
+
+  if (pathname === "/dashboard/event-creation") {
+    router.push("/dashboard/events");
+  } else {
+    router.push("https://eventparcel.com"); 
+  }
+};
 
   const handleCloseModal = () => setShowModal(false);
 

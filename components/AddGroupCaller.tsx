@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import GroupHeader from "./addGroup/GroupHeader";
 import GroupFormFields from "./addGroup/GroupFormFields";
 import GroupPrivacySelector from "./addGroup/GroupPrivacySelector";
@@ -11,7 +11,6 @@ import { Group } from "@/app/interface/Group";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { trackEvent } from "@/lib/mixpanel";
-import { useRouter } from "next/navigation";
 
 interface AddGroupProps {
   setIsAddGroupOpen: React.Dispatch<React.SetStateAction<boolean>>;
@@ -26,7 +25,6 @@ const AddGroup: React.FC<AddGroupProps> = ({
 }) => {
   const eventId = localStorage.getItem("eventId");
   const [loading, setLoading] = useState(false);
-  const router = useRouter();
   const [, setError] = useState(false);
   const [formData, setFormData] = useState({
     eventId: eventId,
@@ -45,6 +43,10 @@ const AddGroup: React.FC<AddGroupProps> = ({
     groupName: false,
     groupDescription: false
   });
+
+  useEffect(() => {
+  localStorage.removeItem("redirectBackToCreateGroup");
+}, []);
 
   const validateField = (id: string, value: string) => {
     if (id === "groupName") {
@@ -101,12 +103,6 @@ const AddGroup: React.FC<AddGroupProps> = ({
 
   const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Check for authToken before proceeding
-    const authToken = localStorage.getItem("authToken");
-    if (!authToken) {
-      router.push("/signup");
-      return;
-    }
 
     if (selectedGroup) {
       trackEvent("Edit Group Started", {

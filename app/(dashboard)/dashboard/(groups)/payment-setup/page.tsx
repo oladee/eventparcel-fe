@@ -84,6 +84,7 @@ const PaymentSetupContent = () => {
   const [isSaveLoading, setIsSaveLoading] = useState(false);
   const [eventDate, setEventDate] = useState<string | null>(null);
   const [eventTime, setEventTime] = useState<string | null>(null);
+  const [showModalCancel, setShowModalCancel] = useState(false);
 
   const router = useRouter();
 
@@ -457,6 +458,8 @@ const PaymentSetupContent = () => {
     }
   };
 
+  const handleCancel = () => setShowModalCancel(true);
+
   const handleSaveForLater = async () => {
     setIsSaveLoading(true);
   
@@ -522,6 +525,17 @@ const PaymentSetupContent = () => {
   );
 
   const today = new Date();
+
+    
+  const callSaveForLater = () => {
+    setShowModalCancel(false);
+    handleSaveForLater();
+  };
+
+  const handleDiscard = () => {
+    // setShowModalCancel(false);
+    router.push("/dashboard/events");
+  };
 
   return (
     <Container>
@@ -714,14 +728,14 @@ const PaymentSetupContent = () => {
 
             <div className="bg-[#FFFF] py-4 flex justify-center fixed z-10 left-0 bottom-0 w-full">
               <div className="max-w-3xl flex gap-4 items-center justify-center sm:justify-end w-full px-4">
-              <button
-                id="save"
-                type="button"
-                className="p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827]"
-                onClick={() => handleSaveForLater()}
+               <button
+                  id="save"
+                  type="button"
+                  className="p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827] w-[142.24px]"
+                  onClick={handleCancel}
                 >
-                  {isSaveLoading ? "saving..." : "Save for later"}
-              </button>
+                  Cancel
+                </button>
                 <button
                   type="submit"
                   disabled={!isFormValid}
@@ -749,6 +763,45 @@ const PaymentSetupContent = () => {
           route="/event-creation"
           buttonText="continue"
         />
+      )}
+       {showModalCancel && (
+        <div
+          // onClick={handleCloseModal}
+          className="fixed inset-0 px-6 bg-black bg-opacity-40 flex items-center justify-center z-[999]"
+        >
+          <div onClick={(e) => e.stopPropagation()} className="relative bg-white rounded-[8px] p-8 shadow-lg max-w-md w-full">
+               {/* Close icon */}
+            <button
+              onClick={() => setShowModalCancel(false)}
+              className="absolute top-3 right-4 text-xl text-black-100 hover:text-gray-800"
+            >
+              ✕
+            </button>
+            <h2 className="text-xl font-bold hidden md:block">
+              What would you like to do?
+            </h2>
+            <p className="mb-6 text-gray-600 hidden md:block">
+              {" "}
+              You can save your progress and come back later, or discard this
+              event creation.
+            </p>
+            <div className="flex flex-col md:flex-row gap-4 justify-end">
+              <button
+                onClick={callSaveForLater}
+                disabled={isSaveLoading}
+                className="w-full md:p-3 md:border border-[#111827] md:rounded-[12px] font-medium text-left md:text-center text-[#000] whitespace-nowrap"
+              >
+                {isSaveLoading ? "saving..." : "Save for later"}
+              </button>
+              <button
+                onClick={handleDiscard}
+                className="w-full md:bg-primary text-red-500 md:text-white md:p-3 md:rounded-[12px] hover:text-red-800 transition flex items-center md:justify-center font-medium whitespace-nowrap"
+              >
+                Discard event creation
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </Container>
   );

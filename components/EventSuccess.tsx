@@ -14,15 +14,14 @@ const EventSuccess: React.FC = () => {
 
   const handleAddCoHost = () => {
     if (authToken) {
-      router.push("/add-cohost");
+      router.push("/dashboard/add-cohost");
     } else {
       // before routing to "/", we need to save the current page (to cookies) and it should expire in 5 minutes
-      Cookies.set("redirectAfterLogin", "co-host", { expires: 1 / 288 });
+      Cookies.set("redirectAfterLogin", "/dashboard/add-cohost", { expires: 1 / 288 });
       // router.push("/add-cohost");
       router.push("/signup");
     }
   };
-
   
   return (
     <div className="fixed py-4 !px-4 w-screen inset-0  overflow-y-auto  bg-[#00000098] h-screen left-0 top-0 z-50 flex items-center justify-center md:justify-center">

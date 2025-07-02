@@ -88,6 +88,7 @@ const PaymentSetupContent = () => {
   // Modal and UI states
   const [showMapPickerModal, setShowMapPickerModal] = useState(false);
   const [showModal] = useState<boolean>(false);
+  const [showModalCancel, setShowModalCancel] = useState(false);
   const [showSuccess2, setShowSuccess2] = useState(false);
 
   // Loading states
@@ -526,6 +527,7 @@ const PaymentSetupContent = () => {
         if (authToken) {
           router.push("/dashboard/events");
         } else {
+          localStorage.setItem("goToEventDashboard", "/dashboard/events");
           router.push("/login");
         }
       } else {
@@ -582,6 +584,8 @@ const PaymentSetupContent = () => {
   /**
    * Handles saving form data for later completion
    */
+  const handleCancel = () => setShowModalCancel(true);
+
   const handleSaveForLater = async () => {
     setIsSaveLoading(true);
 
@@ -632,6 +636,18 @@ const PaymentSetupContent = () => {
     }
   };
 
+  
+  const callSaveForLater = () => {
+    setShowModalCancel(false);
+    handleSaveForLater();
+  };
+
+  const handleDiscard = () => {
+    // setShowModalCancel(false);
+    router.push("http://eventparcel.com");
+  };
+
+
   return (
     <HeaderLayout>
       <ToastContainer />
@@ -647,7 +663,7 @@ const PaymentSetupContent = () => {
       <div>{showSuccess2 && <EventSaveSuccess />}</div>
       <section className="bg-[#EEEFF2] !overflow-hidden relative">
         <div
-          className="fixed top-16 w-[90%] md:w-[80%] h-auto py-3 bg-gray-100"
+          className="fixed top-16 w-full h-auto py-3 bg-[#ededf0] mt-2"
           id="back-button"
         >
           <button className="w-[20%] md:w-[5%] cursor-pointer flex flex-row items-center" onClick={() => window.history.back()}>
@@ -655,7 +671,7 @@ const PaymentSetupContent = () => {
             <span className="font-medium text-base text-[#111827] ml-1">Back</span>
           </button>
         </div>
-        <div className="py-20 lg:py-24 px-3 sm:px-4 mx-auto max-w-screen-md h-[98vh] overflow-y-auto no-scrollbar">
+        <div className="py-20 lg:py-24 px-3 sm:px-4 mx-auto max-w-screen-md h-[98vh] mt-8 overflow-y-auto no-scrollbar">
           <div className="md:mb-12 text-center p-3 sm:p-0 space-y-3">
             <h2
               id="payment_deliveryHeader"
@@ -832,10 +848,10 @@ const PaymentSetupContent = () => {
                 <button
                   id="save"
                   type="button"
-                  className="p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827]"
-                  onClick={() => handleSaveForLater()}
+                  className="p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827] w-[142.24px]"
+                  onClick={handleCancel}
                 >
-                  {isSaveLoading ? "saving..." : "Save for later"}
+                  Cancel
                 </button>
                 <button
                   type="submit"
@@ -862,6 +878,45 @@ const PaymentSetupContent = () => {
           route="/event-creation"
           buttonText="continue"
         />
+      )}
+      {showModalCancel && (
+        <div
+          // onClick={handleCloseModal}
+          className="fixed inset-0 px-6 bg-black bg-opacity-40 flex items-center justify-center z-[999]"
+        >
+          <div onClick={(e) => e.stopPropagation()} className="relative bg-white rounded-[8px] p-8 shadow-lg max-w-md w-full">
+               {/* Close icon */}
+            <button
+              onClick={() => setShowModalCancel(false)}
+              className="absolute top-3 right-4 text-xl text-black-100 hover:text-gray-800"
+            >
+              ✕
+            </button>
+            <h2 className="text-xl font-bold hidden md:block">
+              What would you like to do?
+            </h2>
+            <p className="mb-6 text-gray-600 hidden md:block">
+              {" "}
+              You can save your progress and come back later, or discard this
+              event creation.
+            </p>
+            <div className="flex flex-col md:flex-row gap-4 justify-end">
+              <button
+                onClick={callSaveForLater}
+                disabled={isSaveLoading}
+                className="w-full md:p-3 md:border border-[#111827] md:rounded-[12px] font-medium text-left md:text-center text-[#000] whitespace-nowrap"
+              >
+                {isSaveLoading ? "saving..." : "Save for later"}
+              </button>
+              <button
+                onClick={handleDiscard}
+                className="w-full md:bg-primary text-red-500 md:text-white md:p-3 md:rounded-[12px] hover:text-red-800 transition flex items-center md:justify-center font-medium whitespace-nowrap"
+              >
+                Discard event creation
+              </button>
+            </div>
+          </div>
+        </div>
       )}
     </HeaderLayout>
   );

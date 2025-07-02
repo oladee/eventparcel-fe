@@ -508,7 +508,8 @@ function DeliveryDetailsForm() {
                       <input
                         type="text"
                         id="shippingAddress"
-                        placeholder="Enter location"
+                        placeholder="Click map icon to add address"
+                        disabled
                         name="shippingAddress"
                         value={formData.shippingAddress}
                         onChange={handleInputChange}

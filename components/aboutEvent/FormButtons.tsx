@@ -22,9 +22,26 @@ const FormButtons: React.FC<FormButtonsProps> = ({ isFormValid, groups, fromDash
   const pathname = usePathname();
   
   const [loading, setLoading] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const [isSaveLoading, setIsSaveLoading] = useState(false);
   const [showSuccess2, setShowSuccess2] = useState(false);
+  
+  const handleCancel = () => setShowModal(true);
 
+   const callSaveForLater = () => {
+    setShowModal(false);
+    handleSaveForLater();
+  };
+
+  const handleDiscard = () => {
+    // setShowModal(false);
+
+    if (pathname === "/dashboard/create-group") {
+      router.push("/dashboard/events");
+    } else {
+      router.push("https://eventparcel.com"); 
+    }
+  };
 
   const handleContinue = async () => {
     if (!isFormValid || loading) return;
@@ -83,11 +100,13 @@ const FormButtons: React.FC<FormButtonsProps> = ({ isFormValid, groups, fromDash
     <div className="bg-[#FFFF] h-32 py-10 flex justify-center ">
       <div className="max-w-screen-md flex gap-4 items-center justify-center sm:justify-end w-full">
         <button
-          id="save"
-          className="p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827]"
-          onClick={() => handleSaveForLater()}
-          >
-            {isSaveLoading ? "saving..." : "Save for later"}
+          id="cancel"
+          type="button"
+          disabled={loading}
+          onClick={handleCancel}
+          className="py-3 px-8 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827]"
+        >
+          Cancel
         </button>
         <button
           id="continue"
@@ -104,6 +123,45 @@ const FormButtons: React.FC<FormButtonsProps> = ({ isFormValid, groups, fromDash
           )}
         </button>
       </div>
+       {showModal && (
+        <div
+          // onClick={handleCloseModal}
+          className="fixed inset-0 px-6 bg-black bg-opacity-40 flex items-center justify-center z-[999]"
+        >
+          <div onClick={(e) => e.stopPropagation()} className="relative bg-white rounded-[8px] p-8 shadow-lg max-w-md w-full">
+               {/* Close icon */}
+            <button
+              onClick={() => setShowModal(false)}
+              className="absolute top-3 right-4 text-xl text-black-100 hover:text-gray-800"
+            >
+              ✕
+            </button>
+            <h2 className="text-xl font-bold hidden md:block">
+              What would you like to do?
+            </h2>
+            <p className="mb-6 text-gray-600 hidden md:block">
+              {" "}
+              You can save your progress and come back later, or discard this
+              event creation.
+            </p>
+            <div className="flex flex-col md:flex-row gap-4 justify-end">
+              <button
+                onClick={callSaveForLater}
+                disabled={isSaveLoading}
+                className="w-full md:p-3 md:border border-[#111827] md:rounded-[12px] font-medium text-left md:text-center text-[#000] whitespace-nowrap"
+              >
+                {isSaveLoading ? "saving..." : "Save for later"}
+              </button>
+              <button
+                onClick={handleDiscard}
+                className="w-full md:bg-primary text-red-500 md:text-white md:p-3 md:rounded-[12px] hover:text-red-800 transition flex items-center md:justify-center font-medium whitespace-nowrap"
+              >
+                Discard event creation
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
     </>
   );

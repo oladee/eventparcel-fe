@@ -24,6 +24,13 @@ interface GroupOptionsModalProps {
   // };
 }
 
+type EventData = {
+  eventName: string;
+  date: string;
+  eventLocation: string;
+  time: string;
+}
+
 const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
   isOpen,
   onClose,
@@ -36,6 +43,7 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
   const [isDeleteModal, setIsDeleteModal] = useState(false);
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingMessage, setLoadingMessage] = useState<string | null>("");
+  const [eventData, setEventData] = useState<EventData | null>(null);
 
   // Focus on the modal when it opens and add Escape key support
   useEffect(() => {
@@ -43,6 +51,22 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
       modalRef.current.focus();
     }
   }, [isOpen]);
+
+  useEffect(() => {
+    const data = localStorage.getItem("eventData");
+
+    if (data) {
+      try {
+        const parsed = JSON.parse(data);
+        setEventData(parsed);
+      } catch (err) {
+        console.error("Invalid JSON in localStorage for 'eventData'", err);
+      }
+    }
+  }, []);
+
+  console.log("event", eventData)
+
 
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "Escape") {
@@ -60,11 +84,18 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
 
     if (navigator.share) {
       try {
-        await navigator.share({
+
+          await navigator.share({
           title: group.groupName,
-          text: `Check out the group: ${group.groupName}`,
+          text: `You're invited! Join us in celebrating ${eventData?.eventName} on ${eventData?.date} at ${eventData?.eventLocation} at ${eventData?.time}. \nYou can explore and purchase your curated Aso-Ebi package by clicking this link:`,
           url: shareUrl
         });
+
+        // await navigator.share({
+        //   title: group.groupName,
+        //   text: `Check out the group: ${group.groupName}`,
+        //   url: shareUrl
+        // });
         console.log("Group link shared successfully");
       } catch (error) {
         console.error("Error sharing:", error);

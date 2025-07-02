@@ -23,7 +23,7 @@ const EventSaveSuccess: React.FC = () => {
       <Link href="/signup" className="button_v1">
         <button className="">Create Account</button>
       </Link>
-      <Link href="/" className="w-full bg-[#FFFFFF] text-[#111827] border border-[#111827] py-3 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center">
+      <Link href="/login" className="w-full bg-[#FFFFFF] text-[#111827] border border-[#111827] py-3 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center">
         <button className="">login</button>
       </Link>
     </div>

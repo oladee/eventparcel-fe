@@ -123,12 +123,17 @@ const Login: React.FC = () => {
 
       toast.success(response?.data?.message);
 
-      const redirectPath = Cookies.get("redirectAfterLogin");
+      const redirectPath = Cookies.get("redirectAfterLogin") || "/dashboard";
+      const goToEventDashboard = localStorage.getItem("goToEventDashboard");
       const formData = localStorage.getItem("unsavedFormData");
 
       if (redirectPath || formData) {
         // router.push(`${redirectPath}?resumeForm=true`);
-        router.push("/dashboard/add-cohost");
+        // router.push("/dashboard/add-cohost");
+        router.push(redirectPath)
+        return;
+      } else if (goToEventDashboard) {
+        router.replace(goToEventDashboard);
         return;
       } else {
         route.push("/dashboard");
