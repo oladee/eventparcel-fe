@@ -480,7 +480,7 @@ const handleDiscard = () => {
         />
       )}
       <div>{showSuccess2 && <EventSaveSuccess />}</div>
-      <section className="!overflow-hidden relative bg-[#ededf0]">
+      <section className="!overflow-hidden relative bg-[#ededf0] pb-20 ">
       <div className="py-10 bg-[#EEEFF2] lg:py-24 px-6 sm:px-4 mx-auto max-w-screen-md h-screen overflow-y-auto no-scrollbar relative">
         <div
             className="fixed top-16 w-full h-auto py-3 bg-[#ededf0] mt-2 "
