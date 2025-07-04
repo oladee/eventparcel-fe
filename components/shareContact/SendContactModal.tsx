@@ -22,6 +22,7 @@ interface EventOptionsModalProps {
   contacts: { guestName: string; phoneNumber: string }[];
   // For WhatsApp and Both invites, we continue using phoneNumbers list.
   phoneNumbers: string[];
+  setPopupModalOpen: () => void;
 }
 
 const SendContactModal: React.FC<EventOptionsModalProps> = ({
@@ -30,6 +31,7 @@ const SendContactModal: React.FC<EventOptionsModalProps> = ({
   eventGroupId,
   contacts,
   phoneNumbers,
+  setPopupModalOpen
 }) => {
   // Loading states for each invitation type
   const [isLoadingSMS, setIsLoadingSMS] = useState(false);
@@ -80,6 +82,8 @@ const SendContactModal: React.FC<EventOptionsModalProps> = ({
       });
     } finally {
       setIsLoadingSMS(false);
+      onClose();
+      setPopupModalOpen();
     }
   };
 
@@ -112,6 +116,8 @@ const SendContactModal: React.FC<EventOptionsModalProps> = ({
       });
     } finally {
       setIsLoadingWA(false);
+      onClose();
+      setPopupModalOpen();
     }
   };
 
@@ -143,6 +149,8 @@ const SendContactModal: React.FC<EventOptionsModalProps> = ({
       });
     } finally {
       setIsLoadingBoth(false);
+      onClose();
+      setPopupModalOpen();
     }
   };
 
