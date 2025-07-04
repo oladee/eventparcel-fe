@@ -97,7 +97,7 @@ const FormButtons: React.FC<FormButtonsProps> = ({ isFormValid, groups, fromDash
   return (
     <>
     <div>{showSuccess2 && <EventSaveSuccess />}</div>
-    <div className="bg-[#FFFF] h-32 py-10 flex justify-center ">
+    <div className="bg-[#FFFF] pt-4 pb-11 flex justify-center fixed z-10 left-0 bottom-0 w-full">
       <div className="max-w-screen-md flex gap-4 items-center justify-center sm:justify-end w-full">
         <button
           id="cancel"

@@ -261,7 +261,7 @@ const AddGroup: React.FC<AddGroupProps> = ({
       <ToastContainer />
 
       <form
-        className="w-[320px] h-[545px] space-y-4 bg-[#FFFFFF] px-5 py-6 rounded-3xl"
+        className="w-[320px] h-[525px] space-y-4 bg-[#FFFFFF] px-5 py-6 rounded-3xl"
         onSubmit={handleSubmit}
       >
         <GroupHeader mode={mode} onClose={() => setIsAddGroupOpen(false)} />

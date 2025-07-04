@@ -482,12 +482,12 @@ useEffect(() => {
                   <input
                     type="text"
                     id="pickupLocation"
-                    placeholder="Click map icon to add address"
+                    placeholder="Click the map icon to add address"
                     disabled
                     value={formData.pickupLocation}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    className="input-field outline-primary pl-12 w-full p-2 rounded-[8px] bg-[#FAFAFA]"
+                    className="input-field placeholder:text-[15px] outline-primary pl-12 w-full p-2 rounded-[8px] bg-[#FAFAFA]"
                     required
                   />
                   {errors.pickupLocation && (

@@ -195,7 +195,7 @@ const NewGroup: React.FC = () => {
 
   return (
     <HeaderLayout>
-      <section className="w-auto border border-gray-300 bg-[#EEEFF2] mt-14 h-full">
+      <section className="w-auto border border-gray-300 bg-[#EEEFF2] mt-14 h-screen">
         <div className="py-6 lg:py-12">
           {/* Header Section */}
           <div className="mb-6 lg:mb-12 text-start pl-8 lg:text-center">
@@ -215,15 +215,7 @@ const NewGroup: React.FC = () => {
                   !
                 </span>
               </span>
-              {/* <Image
-                onClick={() => setIsRightBarOpen(true)}
-                src="/images/information.png"
-                width={20}
-                height={20}
-                alt="information"
-                className="cursor-pointer absolute right-2 lg:right-[500px]"
-                id="infoButton"
-                /> */}
+      
             </div>
           </div>
 
