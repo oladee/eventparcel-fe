@@ -452,12 +452,13 @@ const PickupDetails = () => {
                   <input
                     type="text"
                     id="pickupLocation"
-                    placeholder="Enter location"
+                    placeholder="Click the map icon to add address"
                     value={formData.pickupLocation}
                     onChange={handleChange}
                     onBlur={handleBlur}
-                    className="input-field outline-primary pl-12 w-full p-2 rounded-[8px] bg-[#FAFAFA]"
+                    className="input-field placeholder:text-[15px] outline-primary pl-12 w-full p-2 rounded-[8px] bg-[#FAFAFA]"
                     required
+                    disabled
                   />
                   {errors.pickupLocation && (
                     <p className="text-red-500 text-sm mt-1">

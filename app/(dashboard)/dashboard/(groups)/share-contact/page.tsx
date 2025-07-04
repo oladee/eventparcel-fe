@@ -17,6 +17,7 @@ import DisplayGoogleContactModal, {
   Contact as DisplayContact,
 } from "@/components/shareContact/DisplayGoogleContactModal";
 import { trackEvent } from "@/lib/mixpanel";
+import { useRouter } from "next/navigation";
 
 // Types
 type ContactProperty = "name" | "email" | "tel";
@@ -98,6 +99,7 @@ const ShareContact: React.FC = () => {
   const [, setPopupError] = useState<string>("");
   const [popupModalOpen, setPopupModalOpen] = useState(false);
   const [eventData, setEventData] = useState<any>(null);
+  const router = useRouter();
 
   useEffect(() => {
     // This code runs only on the client side
@@ -347,8 +349,8 @@ const ShareContact: React.FC = () => {
         </div>
         <div className="bg-white py-10 flex justify-center">
           <div className="max-w-md flex gap-4 items-center justify-center sm:justify-end w-full">
-            <button className="p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827]">
-              Save for later
+            <button onClick={() => router.back()} className="w-[128px] p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827]">
+              Cancel
             </button>
             <button
               disabled={!selectedOption}
@@ -394,6 +396,7 @@ const ShareContact: React.FC = () => {
         eventGroupId={groupId || ""}
         contacts={extractedContacts}
         phoneNumbers={extractedPhoneNumbers}
+        setPopupModalOpen={() => setPopupModalOpen(false)}
       />
     </Container>
   );

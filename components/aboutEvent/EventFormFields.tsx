@@ -190,8 +190,8 @@ const EventFormFields: React.FC<EventFormFieldsProps> = ({
             value={formData.location}
             onChange={handleChange}
             onBlur={handleBlur}
-            className="input-field outline-primary pl-12 w-full p-2 rounded-[5px] bg-slate-50"
-            placeholder="Click map icon to add address"
+            className="input-field placeholder:text-[15px] outline-primary pl-12 w-full p-2 rounded-[5px] bg-slate-50"
+            placeholder="Click the map icon to add address"
             required
           />
           {errors.location && (

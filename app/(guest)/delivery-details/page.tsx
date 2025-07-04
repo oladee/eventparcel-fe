@@ -508,13 +508,13 @@ function DeliveryDetailsForm() {
                       <input
                         type="text"
                         id="shippingAddress"
-                        placeholder="Click map icon to add address"
+                        placeholder="Click the map icon to add address"
                         disabled
                         name="shippingAddress"
                         value={formData.shippingAddress}
                         onChange={handleInputChange}
                         onBlur={handleBlur}
-                        className="input-field outline-primary pl-12 w-full p-2 rounded-[8px] bg-[#FAFAFA]"
+                        className="input-field placeholder:text-[15px] outline-primary pl-12 w-full p-2 rounded-[8px] bg-[#FAFAFA]"
                         required
                       />
                       {errors.shippingAddress && (

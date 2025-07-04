@@ -661,7 +661,7 @@ const PaymentSetupContent = () => {
         />
       )}
       <div>{showSuccess2 && <EventSaveSuccess />}</div>
-      <section className="bg-[#EEEFF2] !overflow-hidden relative">
+      <section className="bg-[#EEEFF2] relative min-h-screen mb-10">
         <div
           className="fixed top-16 w-full h-auto py-3 bg-[#ededf0] mt-2"
           id="back-button"
@@ -671,7 +671,7 @@ const PaymentSetupContent = () => {
             <span className="font-medium text-base text-[#111827] ml-1">Back</span>
           </button>
         </div>
-        <div className="py-20 lg:py-24 px-3 sm:px-4 mx-auto max-w-screen-md h-[98vh] mt-8 overflow-y-auto no-scrollbar">
+        <div className="py-20 lg:py-24 px-3 sm:px-4 mx-auto max-w-screen-md mt-8 overflow-y-auto no-scrollbar">
           <div className="md:mb-12 text-center p-3 sm:p-0 space-y-3">
             <h2
               id="payment_deliveryHeader"

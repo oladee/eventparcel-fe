@@ -75,39 +75,46 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
   };
 
   // Share group link function
-  const handleShareGroupLink = async () => {
-    if (!group || !group.link) {
-      alert("No link available to share.");
-      return;
+const handleShareGroupLink = async () => {
+  if (!group?.link) {
+    alert("No link available to share.");
+    return;
+  }
+
+  const shareUrl = group.link;
+
+  const text = `You're invited! Join us in celebrating ${eventData?.eventName} on ${eventData?.date} at ${eventData?.eventLocation} at ${eventData?.time}.
+
+You can explore and purchase your curated Aso-Ebi package by clicking the link:`;
+
+  const fullMessageWithLink = `${text}${shareUrl}`;
+
+  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+  if (navigator.share && isMobile) {
+    try {
+      await navigator.share({
+        title: group.groupName,
+        text,
+        url: shareUrl, 
+      });
+      console.log("Group link shared successfully");
+    } catch (error) {
+      console.error("Error sharing:", error);
     }
-    const shareUrl = group.link;
-
-    if (navigator.share) {
-      try {
-
-          await navigator.share({
-          title: group.groupName,
-          text: `You're invited! Join us in celebrating ${eventData?.eventName} on ${eventData?.date} at ${eventData?.eventLocation} at ${eventData?.time}. \nYou can explore and purchase your curated Aso-Ebi package by clicking this link:`,
-          url: shareUrl
-        });
-
-        // await navigator.share({
-        //   title: group.groupName,
-        //   text: `Check out the group: ${group.groupName}`,
-        //   url: shareUrl
-        // });
-        console.log("Group link shared successfully");
-      } catch (error) {
-        console.error("Error sharing:", error);
-      }
-    } else if (navigator.clipboard) {
-      // Fallback: copy the link to clipboard
-      navigator.clipboard.writeText(shareUrl);
-      alert("Link copied to clipboard!");
-    } else {
-      alert("Sharing not supported on this browser.");
+  } else if (navigator.clipboard) {
+    try {
+      await navigator.clipboard.writeText(fullMessageWithLink);
+      alert("Invite copied to clipboard!");
+    } catch (error) {
+      console.error("Failed to copy:", error);
+      alert("Failed to copy link. Please try again.");
     }
-  };
+  } else {
+    alert("Sharing is not supported on this browser.");
+  }
+};
+
 
   const handleDelete = async () => {
     if (!group?._id) return;
