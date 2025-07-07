@@ -14,6 +14,7 @@ import {
 } from "@/api/invites";
 import { trackEvent } from "@/lib/mixpanel";
 
+
 interface EventOptionsModalProps {
   isOpen: boolean;
   onClose: () => void;
