@@ -5,7 +5,6 @@ import { MdOutlinePowerSettingsNew, MdDeleteOutline } from "react-icons/md";
 import { PiCaretRightBold } from "react-icons/pi";
 import { LuPencilLine } from "react-icons/lu";
 import { AiOutlineClose } from "react-icons/ai";
-import { GoShareAndroid } from "react-icons/go";
 import AddGroup from "@/components/AddGroupCaller";
 import { Group } from "@/app/interface/Group";
 import axiosInstance from "@/lib/axiosInstance";
@@ -13,6 +12,9 @@ import axios from "axios";
 import { toast, ToastContainer } from "react-toastify";
 import DeleteConfirmationDialog from "@/components/modals/DeleteConfirmationDialog";
 import { trackEvent } from "@/lib/mixpanel";
+import { useRouter } from "next/navigation";
+import Vector from "../../../public/icons/Vector.png";
+import Image from "next/image";
 
 interface GroupOptionsModalProps {
   isOpen: boolean;
@@ -44,6 +46,7 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
   const [loading, setLoading] = useState<boolean>(false);
   const [loadingMessage, setLoadingMessage] = useState<string | null>("");
   const [eventData, setEventData] = useState<EventData | null>(null);
+  const router = useRouter();
 
   // Focus on the modal when it opens and add Escape key support
   useEffect(() => {
@@ -65,56 +68,11 @@ const GroupOptionsModal: React.FC<GroupOptionsModalProps> = ({
     }
   }, []);
 
-  console.log("event", eventData)
-
-
   const handleKeyDown = (e: React.KeyboardEvent<HTMLDivElement>) => {
     if (e.key === "Escape") {
       onClose();
     }
   };
-
-  // Share group link function
-const handleShareGroupLink = async () => {
-  if (!group?.link) {
-    alert("No link available to share.");
-    return;
-  }
-
-  const shareUrl = group.link;
-
-  const text = `You're invited! Join us in celebrating ${eventData?.eventName} on ${eventData?.date} at ${eventData?.eventLocation} at ${eventData?.time}.
-
-You can explore and purchase your curated Aso-Ebi package by clicking the link:`;
-
-  const fullMessageWithLink = `${text}${shareUrl}`;
-
-  const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-  if (navigator.share && isMobile) {
-    try {
-      await navigator.share({
-        title: group.groupName,
-        text,
-        url: shareUrl, 
-      });
-      console.log("Group link shared successfully");
-    } catch (error) {
-      console.error("Error sharing:", error);
-    }
-  } else if (navigator.clipboard) {
-    try {
-      await navigator.clipboard.writeText(fullMessageWithLink);
-      alert("Invite copied to clipboard!");
-    } catch (error) {
-      console.error("Failed to copy:", error);
-      alert("Failed to copy link. Please try again.");
-    }
-  } else {
-    alert("Sharing is not supported on this browser.");
-  }
-};
-
 
   const handleDelete = async () => {
     if (!group?._id) return;
@@ -241,6 +199,12 @@ You can explore and purchase your curated Aso-Ebi package by clicking the link:`
     }
   };
 
+  console.log(eventData)
+
+  const handleSendInviteClick = (groupId: any) => {
+    router.push(`/dashboard/share-contact?groupId=${groupId}`);
+  };
+
   if (!isOpen) return null; // Don't render if modal is closed
 
   return (
@@ -309,8 +273,7 @@ You can explore and purchase your curated Aso-Ebi package by clicking the link:`
               </div>
             )}
 
-            {!group?.isDisabled && isPickupAvailable && (
-              <div
+              {/* <div
                 className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
                 onClick={handleShareGroupLink}
               >
@@ -321,9 +284,35 @@ You can explore and purchase your curated Aso-Ebi package by clicking the link:`
                   <span className="ml-3 font-medium">Share Group Link</span>
                 </div>
                 <PiCaretRightBold />
-              </div>
-            )}
+              </div> */}
 
+          {!group?.isDisabled && isPickupAvailable && (
+            <div
+              className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
+              onClick={() => {
+                if (group?.isDisabled) {
+                  // handleDisabledAction();
+                  toast.warning(
+                    "This action is not allowed on a disabled group."
+                  );
+                } else if (!isPickupAvailable) {
+                  toast.warning(
+                    "You can't send invites to an event without pickup details."
+                  );
+                } else {
+                  handleSendInviteClick(group?._id);
+                }
+              }}
+            >
+              <div className="flex items-center">
+                <span className="p-2 bg-[#FFF7F2] rounded-full text-primary">
+                  <Image src={Vector} alt="copy" width={20} height={20} />   
+                </span>
+                <span className="ml-3 font-medium">Invite Contacts</span>
+              </div>
+              <PiCaretRightBold />
+            </div>
+          )}
             <div
               className="flex justify-between items-center p-3 rounded-xl border cursor-pointer hover:bg-gray-100"
               onClick={handleDisableGroup}

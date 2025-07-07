@@ -3,7 +3,7 @@
 import { CSV, Doc, Done } from "@/components/icons/Icons";
 import CsvModal from "@/components/shareContact/CsvModal";
 import { useState, useEffect, useMemo, useCallback, Suspense } from "react";
-import { ToastContainer } from "react-toastify";
+import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 // import ReusuableSuccess from "@/components/modals/ReusuableSuccess";
 // import HeaderLayout from "@/components/layout/HeaderLayout";
@@ -18,6 +18,7 @@ import DisplayGoogleContactModal, {
 } from "@/components/shareContact/DisplayGoogleContactModal";
 import { trackEvent } from "@/lib/mixpanel";
 import { useRouter } from "next/navigation";
+import axiosInstance from "@/lib/axiosInstance";
 
 // Types
 type ContactProperty = "name" | "email" | "tel";
@@ -99,6 +100,8 @@ const ShareContact: React.FC = () => {
   const [, setPopupError] = useState<string>("");
   const [popupModalOpen, setPopupModalOpen] = useState(false);
   const [eventData, setEventData] = useState<any>(null);
+  const [showModalCancel, setShowModalCancel] = useState(false);
+  const [isSaveLoading, setIsSaveLoading] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -267,16 +270,43 @@ const ShareContact: React.FC = () => {
       : filteredContacts.filter((contact) => contact.group === selectedTab);
   }, [filteredContacts, selectedTab]);
 
+   const handleSaveForLater = async () => {
+    setIsSaveLoading(true);
+
+    const eventId = localStorage.getItem("eventId");
+  
+    try {
+      await axiosInstance.put(`save-for-later/${eventId}`, {
+        isDraft: true
+      });
+      toast.success("Saved! Continue from your dashboard.");
+
+      setTimeout(() => {
+        router.back();
+      }, 1000);
+    } catch (error: any) {
+      console.error("Error saving for later:", error);
+      toast.error(error.response?.data?.message || "Failed to save event");
+    } finally {
+      setIsSaveLoading(false);
+    }
+  };
+
+  const handleCancel = () => setShowModalCancel(true);
+
   const handleClosePopup = () => {
     setPopupModalOpen(false);
     // optionally clear popupContacts...
   };
+  const callSaveForLater = () => {
+    setShowModalCancel(false);
+    handleSaveForLater();
+  };
 
-  // if (popupContacts.length > 0) {
-  //   return (
-  //     <DisplayGoogleContactModal onClose={onClose} contacts={popupContacts} />
-  //   );
-  // }
+  const handleDiscard = () => {
+    // setShowModalCancel(false);
+    router.push("/dashboard/events");
+  };
 
   if (popupContacts.length > 0 && popupModalOpen) {
     return (
@@ -340,16 +370,12 @@ const ShareContact: React.FC = () => {
               }
             />
           </div>
-          {/* <div className="mt-8 w-full max-w-md bg-[#FFF7F2] p-4">
-            <span className="font-semibold text-black-100">P.S</span>
-            <span className="italic text-[#718096] text-sm font-semibold">
-              : Data retention policy will apply – we will nudge them after a period asking if they want us to keep the data. If no consent is given, we will expunge it.
-            </span>
-          </div> */}
         </div>
-        <div className="bg-white py-10 flex justify-center">
+        <div className="bg-[#FFFF] pt-4 pb-11 flex justify-center fixed z-10 left-0 bottom-0 w-full">
           <div className="max-w-md flex gap-4 items-center justify-center sm:justify-end w-full">
-            <button onClick={() => router.back()} className="w-[128px] p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827]">
+            <button 
+              onClick={handleCancel}
+              className="w-[128px] p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827]">
               Cancel
             </button>
             <button
@@ -398,6 +424,45 @@ const ShareContact: React.FC = () => {
         phoneNumbers={extractedPhoneNumbers}
         setPopupModalOpen={() => setPopupModalOpen(false)}
       />
+       {showModalCancel && (
+        <div
+          // onClick={handleCloseModal}
+          className="fixed inset-0 px-6 bg-black bg-opacity-40 flex items-center justify-center z-[999]"
+        >
+          <div onClick={(e) => e.stopPropagation()} className="relative bg-white rounded-[8px] p-8 shadow-lg max-w-md w-full">
+               {/* Close icon */}
+            <button
+              onClick={() => setShowModalCancel(false)}
+              className="absolute top-3 right-4 text-xl text-black-100 hover:text-gray-800"
+            >
+              ✕
+            </button>
+            <h2 className="text-xl font-bold hidden md:block">
+              What would you like to do?
+            </h2>
+            <p className="mb-6 text-gray-600 hidden md:block">
+              {" "}
+              You can save your progress and come back later, or discard this
+              event creation.
+            </p>
+            <div className="flex flex-col md:flex-row gap-4 justify-end">
+              <button
+                onClick={callSaveForLater}
+                disabled={isSaveLoading}
+                className="w-full md:p-3 md:border border-[#111827] md:rounded-[12px] font-medium text-left md:text-center text-[#000] whitespace-nowrap"
+              >
+                {isSaveLoading ? "saving..." : "Save for later"}
+              </button>
+              <button
+                onClick={handleDiscard}
+                className="w-full md:bg-primary text-red-500 md:text-white md:p-3 md:rounded-[12px] hover:text-red-800 transition flex items-center md:justify-center font-medium whitespace-nowrap"
+              >
+                Discard event creation
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </Container>
   );
 };
