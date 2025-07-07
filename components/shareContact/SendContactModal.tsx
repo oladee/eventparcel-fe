@@ -90,7 +90,7 @@ const SendContactModal: React.FC<EventOptionsModalProps> = ({
   const handleSendWhatsApp = async () => {
     setIsLoadingWA(true);
     try {
-      const data = await sendInviteWhatsApp(eventGroupId, phoneNumbers);
+      const data = await sendInviteWhatsApp(eventGroupId, contacts);
       toast.success(data.message || "Invitations sent via WhatsApp");
       console.log(data.message);
       trackEvent("Share Invite", {
@@ -247,6 +247,9 @@ const SendContactModal: React.FC<EventOptionsModalProps> = ({
 };
 
 export default SendContactModal;
+
+
+
 
 
 

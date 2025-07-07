@@ -17,12 +17,13 @@ export const sendInviteSMS = async (
 
 export const sendInviteWhatsApp = async (
   eventGroupId: string,
-  phoneNumbers: string[]
+  // phoneNumbers: string[],
+    contacts: { guestName: string; phoneNumber: string }[]
 ) => {
   try {
     const response = await axiosInstance.post("/invite-whatsapp", {
       eventGroupId,
-      phoneNumbers,
+      contacts,
     });
     return response.data;
   } catch (error) {
