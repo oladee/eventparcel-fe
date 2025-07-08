@@ -112,9 +112,9 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({
   
     const fullMessageWithLink = `${text}${shareUrl}`;
   
-    const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+    // const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
   
-    if (navigator.share && isMobile) {
+    if (navigator.share) {
       try {
         await navigator.share({
           title: group.groupName,
