@@ -5,14 +5,14 @@ import axiosInstance from "@/lib/axiosInstance";
 import axios from "axios";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
 import { boxOptions } from "@/data/boxOption";
 import { BiChevronDown } from "react-icons/bi";
 import { cn } from "@/utils/cn";
 import { trackEvent } from "@/lib/mixpanel";
-import Cookies from "js-cookie";
+// import Cookies from "js-cookie";
 import EventSaveSuccess from "./aboutEvent/EventSaveSuccess";
 
 
@@ -109,7 +109,8 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
         }
     }, [eventId]);
         
-const validateField = (field: keyof PackageFormData, value: string | null | undefined) => {
+const validateField = useCallback(
+    (field: keyof PackageFormData, value: string | null | undefined) => {
     // Convert null/undefined to empty string for validation
     const stringValue = value || "";
     
@@ -144,7 +145,9 @@ const validateField = (field: keyof PackageFormData, value: string | null | unde
     }
 
     return "";
-};
+},
+[formData.packageDelivery]
+)
 
     useEffect(() => {
     // Re-validate when delivery options change
@@ -520,31 +523,31 @@ const validateField = (field: keyof PackageFormData, value: string | null | unde
     //     handleSaveForLater();
     // };
 
-    const handleSaveForLater = async() => {
-    setIsSaveLoading(true);
-    const authToken = localStorage.getItem("authToken");
-    const storedEventId = localStorage.getItem("eventId");
+//     const handleSaveForLater = async() => {
+//     setIsSaveLoading(true);
+//     const authToken = localStorage.getItem("authToken");
+//     const storedEventId = localStorage.getItem("eventId");
 
   
-    if (!authToken) {
-      Cookies.set("redirectAfterLogin", pathname); 
-      setShowSuccess2(true);
-      return;
-    }
+//     if (!authToken) {
+//       Cookies.set("redirectAfterLogin", pathname); 
+//       setShowSuccess2(true);
+//       return;
+//     }
 
-    try{
-      await axiosInstance.put(`save-for-later/${storedEventId}`, {
-        isDraft: true
-      });
-      toast.success("Saved! Continue from your dashboard.");
-      router.push("/dashboard");    
-    }catch(error: any) {
-      console.log(error)
-      toast.error(error.response?.data?.message || "Failed to save event");
-    }finally{
-      setIsSaveLoading(false);
-    }
-  };
+//     try{
+//       await axiosInstance.put(`save-for-later/${storedEventId}`, {
+//         isDraft: true
+//       });
+//       toast.success("Saved! Continue from your dashboard.");
+//       router.push("/dashboard");    
+//     }catch(error: any) {
+//       console.log(error)
+//       toast.error(error.response?.data?.message || "Failed to save event");
+//     }finally{
+//       setIsSaveLoading(false);
+//     }
+//   };
     const price = Number(formData?.packagePrice) || 0;
   
     const whatHostReceives =
