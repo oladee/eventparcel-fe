@@ -4,7 +4,7 @@ import { Package } from "@/app/interface/Group";
 import axiosInstance from "@/lib/axiosInstance";
 import axios from "axios";
 import Image from "next/image";
-import { usePathname, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useCallback, useEffect, useState } from "react";
 import { toast, ToastContainer } from "react-toastify";
 import "react-toastify/dist/ReactToastify.css";
