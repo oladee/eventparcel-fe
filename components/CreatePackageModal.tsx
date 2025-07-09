@@ -718,8 +718,8 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
 
                     </div>
 
-                    <div>
-                        <p className="font-medium text-sm text-[#718096]">What you will receive: <span className="text-[#751423]">{groupCurrency === "NGN" ? "₦" : "$"}{whatHostReceives.toLocaleString()}</span></p>
+                    <div className="w-full ">
+                        <p className="text-left font-medium text-sm text-[#718096]">What you will receive: <span className="text-[#751423]">{groupCurrency === "NGN" ? "₦" : "$"}{whatHostReceives.toLocaleString()}</span></p>
                     </div>
 
                     <div className="w-full h-[60px] bg-[#FFF7F2] px-3 py-2 rounded-[12px] my-2">

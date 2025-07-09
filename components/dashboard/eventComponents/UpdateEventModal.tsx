@@ -358,6 +358,7 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
               onContinue2={() => handleSubmit(true)}
               loading={loading}
               loading2={loading2}
+              onClose={onClose}
             />
           </div>
           {showImagePickerModal && (

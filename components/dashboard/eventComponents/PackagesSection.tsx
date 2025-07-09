@@ -13,7 +13,7 @@ import { toast, ToastContainer } from "react-toastify";
 // import AddGroup from "@/components/AddGroupCaller";
 import AddGroup2 from "@/components/AddGroupCaller2";
 // import { isNull } from "node:util";
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft } from "lucide-react";
 
 interface PackagesSectionProps {
   eventData: {
@@ -32,8 +32,7 @@ type EventDataToUse = {
   date: string;
   eventLocation: string;
   time: string;
-}
-
+};
 
 const PackagesSection: React.FC<PackagesSectionProps> = ({
   eventData,
@@ -48,8 +47,16 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({
   // New state to keep track of the selected group for sharing (if needed for modal)
   const [selectedGroup, setSelectedGroup] = useState<Group | null>(null);
   const router = useRouter();
-  const [eventDataToUse, setEventDataToUse] = useState<EventDataToUse | null>(null);
-  
+  const [eventDataToUse, setEventDataToUse] = useState<EventDataToUse | null>(
+    null
+  );
+  const [warning, setWarning] = useState<string | null>(null);
+
+  const showWarning = (msg: string) => {
+    setWarning(msg);
+    setTimeout(() => setWarning(null), 4000); // Hide after 4 seconds
+  };
+
   useEffect(() => {
     const data = localStorage.getItem("eventData");
 
@@ -65,7 +72,7 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({
 
   // Use groups from eventData
   const groups = eventData.eventGroups || [];
-  console.log("groups", groups)
+  console.log("groups", groups);
 
   // Open modal and store selected group for group-specific actions.
   const openGroupOptions = (group: Group) => {
@@ -98,28 +105,28 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({
     router.push(`/dashboard/groups/${group._id}`);
   };
 
-    // Share group link function
+  // Share group link function
   const handleShareGroupLink = async (group: Group) => {
     if (!group?.link) {
-       console.log("selectedGroup", group)
+      console.log("selectedGroup", group);
       alert("No link available to share.");
       return;
     }
-  
+
     const shareUrl = group.link;
-  
+
     const text = `You're invited! Join us in celebrating ${eventDataToUse?.eventName} on ${eventDataToUse?.date} at ${eventDataToUse?.eventLocation} at ${eventDataToUse?.time}. You can explore and purchase your curated Aso-Ebi package by clicking the link:`;
-  
+
     const fullMessageWithLink = `${text}${shareUrl}`;
-  
+
     // const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-  
+
     if (navigator.share) {
       try {
         await navigator.share({
           title: group.groupName,
           text,
-          url: shareUrl, 
+          url: shareUrl
         });
         console.log("Group link shared successfully");
       } catch (error) {
@@ -137,7 +144,6 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({
       alert("Sharing is not supported on this browser.");
     }
   };
-  
 
   // const handleAddGroupClick = () => {
   //   // localStorage.setItem("eventId", eventId);
@@ -151,15 +157,20 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({
   return (
     <>
       <ToastContainer />
-        <div
-          className="fixed top-16 w-[90%] md:w-[90%] h-auto py-3 bg-gray-100"
-          id="back-button"
+      <div
+        className="fixed top-16 w-[90%] md:w-[90%] h-auto py-3 bg-gray-100"
+        id="back-button"
+      >
+        <button
+          className="w-[20%] md:w-[5%] cursor-pointer flex flex-row items-center"
+          onClick={() => window.history.back()}
         >
-          <button className="w-[20%] md:w-[5%] cursor-pointer flex flex-row items-center" onClick={() => window.history.back()}>
-            <ChevronLeft className="w-6 h-6 " />
-            <span className="font-medium text-base text-[#111827] ml-1">Back</span>
-          </button>
-        </div> 
+          <ChevronLeft className="w-6 h-6 " />
+          <span className="font-medium text-base text-[#111827] ml-1">
+            Back
+          </span>
+        </button>
+      </div>
       <div className="flex justify-between items-center mb-4 mt-11">
         <h1 className="capitalize text-2xl text-[#111827] font-bold font-general">
           Group
@@ -328,7 +339,10 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({
                   onClick={() => handleInvitedContacts(group._id)}
                   className="text-gray-500 text-sm font-medium outline-none"
                 >
-                  Contacts: <span className="text-black-100 font-bold text-lg">{group?.contacts.length === 0 ? "" : group?.contacts.length} </span>
+                  Contacts:{" "}
+                  <span className="text-black-100 font-bold text-lg">
+                    {group?.contacts.length === 0 ? "" : group?.contacts.length}{" "}
+                  </span>
                 </button>
               )}
 
@@ -336,11 +350,17 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({
                 onClick={() => {
                   if (group.isDisabled) {
                     // handleDisabledAction();
-                    toast.warning(
+                    // toast.warning(
+                    //   "This action is not allowed on a disabled group."
+                    // );
+                    showWarning(
                       "This action is not allowed on a disabled group."
                     );
                   } else if (!isPickupAvailable) {
-                    toast.warning(
+                    // toast.warning(
+                    //   "You can't send invites to an event without pickup details."
+                    // );
+                    showWarning(
                       "You can't send invites to an event without pickup details."
                     );
                   } else {
@@ -351,7 +371,8 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({
                   group.isDisabled ? "opacity-50 cursor-not-allowed" : ""
                 }`}
               >
-                <Image src={Vector} alt="copy" width={16} height={16} /> Share Invite
+                <Image src={Vector} alt="copy" width={16} height={16} /> Share
+                Invite
               </button>
 
               {/* <button
@@ -403,6 +424,14 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({
             groudId={group1?._id}
             groupCurrency={group1?.groupCurrency}
           />
+        </div>
+      )}
+
+      {/* Warning Error */}
+      {warning && (
+        <div className="fixed left-1/2 top-3 transform -translate-x-1/2 bg-yellow-100 border-l-4 border-yellow-500 text-yellow-700 px-4 py-3 rounded shadow z-[9999] w-full max-w-xl">
+          <strong className="font-bold">Warning: </strong>
+          <span>{warning}</span>
         </div>
       )}
       {/* You may also have a GroupOptionsModal if needed */}
