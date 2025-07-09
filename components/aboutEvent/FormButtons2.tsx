@@ -99,7 +99,7 @@ const handleDiscard = () => {
               </button>
               <button
                 onClick={handleDiscard}
-                className="w-full md:bg-primary text-red-500 md:text-white md:p-3 md:rounded-[12px] hover:text-red-800 transition flex items-center md:justify-center font-medium whitespace-nowrap"
+                className="w-full md:bg-primary text-red-500 md:text-white md:p-3 md:rounded-[12px] hover:text-white transition flex items-center md:justify-center font-medium whitespace-nowrap"
               >
                 Discard event creation
               </button>
