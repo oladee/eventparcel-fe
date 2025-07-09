@@ -117,7 +117,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
             packageSize: validateField("packageSize", formData.packageSize)
         }));
     }
-}, [formData.packageDelivery, formData.packageSize, validateField]);
+}, [formData.packageDelivery, formData.packageSize,]);
     
     
 const validateField = (field: keyof PackageFormData, value: string | null | undefined) => {
