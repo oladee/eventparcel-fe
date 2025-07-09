@@ -65,7 +65,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
     const [isOpen, setIsOpen] = useState(false);
     const [selected, setSelected] = useState<BoxOption | null>(null);
     const [showModal, setShowModal] = useState(false);
-    const [isSaveLoading, setIsSaveLoading] = useState(false);
+    const [,setIsSaveLoading] = useState(false);
     const [formData, setFormData] = useState<PackageFormData>({
         groupId: groudId,
         eventId: eventId,
@@ -117,7 +117,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
             packageSize: validateField("packageSize", formData.packageSize)
         }));
     }
-}, [formData.packageDelivery, formData.packageSize]);
+}, [formData.packageDelivery, formData.packageSize, validateField]);
     
     
 const validateField = (field: keyof PackageFormData, value: string | null | undefined) => {
@@ -547,16 +547,6 @@ const validateField = (field: keyof PackageFormData, value: string | null | unde
     }
   };
     const price = Number(formData?.packagePrice) || 0;
-
-    const handleDiscard = () => {
-    // setShowModal(false);
-
-    if (pathname === "/dashboard/create-group") {
-      router.push("/dashboard/events");
-    } else {
-      router.push("https://eventparcel.com"); 
-    }
-  };
   
     const whatHostReceives =
         !price || isNaN(price) // If price is empty/not a number
