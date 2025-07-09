@@ -108,18 +108,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
             }));
         }
     }, [eventId]);
-
-    useEffect(() => {
-    // Re-validate when delivery options change
-    if (formData.packageSize) {
-        setErrors(prev => ({
-            ...prev,
-            packageSize: validateField("packageSize", formData.packageSize)
-        }));
-    }
-}, [formData.packageDelivery, formData.packageSize,]);
-    
-    
+        
 const validateField = (field: keyof PackageFormData, value: string | null | undefined) => {
     // Convert null/undefined to empty string for validation
     const stringValue = value || "";
@@ -156,6 +145,16 @@ const validateField = (field: keyof PackageFormData, value: string | null | unde
 
     return "";
 };
+
+    useEffect(() => {
+    // Re-validate when delivery options change
+    if (formData.packageSize) {
+        setErrors(prev => ({
+            ...prev,
+            packageSize: validateField("packageSize", formData.packageSize)
+        }));
+    }
+}, [formData.packageDelivery, formData.packageSize,validateField]);
     
     const [selectedOptions, setSelectedOptions] = useState<{ homeDelivery: boolean; pickUp: boolean }>({
         homeDelivery: false, 
@@ -516,10 +515,10 @@ const validateField = (field: keyof PackageFormData, value: string | null | unde
     };
 
     const handleCancel = () => setShowModal(true);
-    const callSaveForLater = () => {
-        setShowModal(false);
-        handleSaveForLater();
-    };
+    // const callSaveForLater = () => {
+    //     setShowModal(false);
+    //     handleSaveForLater();
+    // };
 
     const handleSaveForLater = async() => {
     setIsSaveLoading(true);
