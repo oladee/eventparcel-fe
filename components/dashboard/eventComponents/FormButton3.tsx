@@ -21,8 +21,6 @@ const FormButtons3: React.FC<FormButtonsProps> = ({
   onClose
 }) => {
   const [showModal, setShowModal] = useState(false);
-  const router = useRouter();
-  const pathname = usePathname();
 
   const handleCancel = () => setShowModal(true);
 
