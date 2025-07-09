@@ -56,16 +56,16 @@ const capitalizeFirstLetter = (text: string) =>
 const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupCurrency, setOpenModalPackage, mode, packageData }) => {
     const [errors, setErrors] = useState<FormErrors>({});
     const [loading, setLoading] = useState(false);
-    const [showSuccess2, setShowSuccess2] = useState(false);
+    const [showSuccess2,] = useState(false);
     const [, setError] = useState(false);
     const [openHomeDeliveryOption, setOpenHomeDeliveryOption] = useState(false);
     const router = useRouter();
-    const pathname = usePathname();
+    // const pathname = usePathname();
     const [eventId, setEventId] = useState<string | null>(null);
     const [isOpen, setIsOpen] = useState(false);
     const [selected, setSelected] = useState<BoxOption | null>(null);
     const [showModal, setShowModal] = useState(false);
-    const [,setIsSaveLoading] = useState(false);
+    // const [,setIsSaveLoading] = useState(false);
     const [formData, setFormData] = useState<PackageFormData>({
         groupId: groudId,
         eventId: eventId,
