@@ -108,51 +108,54 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
             }));
         }
     }, [eventId]);
-    
-    
-    const validateField = (field: keyof PackageFormData, value: string) => {
-        if (field === "packageTitle") {
-            if (!value.trim()) return "Title is required.";
-            if (value.length < 2 || value.length > 60) return "Title must be between 2 and 60 characters.";
-        }
-    
-        if (field === "packageDescription") {
-            if (value && value.length > 150) return "Description cannot exceed 150 characters.";
-        }
-    
-        if (field === "packagePrice") {
-            if (!value.trim()) return "Price is required.";
-            if (isNaN(Number(value)) || Number(value) <= 0) return "Price must be a valid positive number.";
-        }
 
-        if (field === "packageSize") {
-            const delivery = formData.packageDelivery || [];
+    useEffect(() => {
+    // Re-validate when delivery options change
+    if (formData.packageSize) {
+        setErrors(prev => ({
+            ...prev,
+            packageSize: validateField("packageSize", formData.packageSize)
+        }));
+    }
+}, [formData.packageDelivery, formData.packageSize]);
+    
+    
+const validateField = (field: keyof PackageFormData, value: string | null | undefined) => {
+    // Convert null/undefined to empty string for validation
+    const stringValue = value || "";
+    
+    if (field === "packageTitle") {
+        if (!stringValue.trim()) return "Title is required.";
+        if (stringValue.length < 2 || stringValue.length > 60) return "Title must be between 2 and 60 characters.";
+    }
+
+    if (field === "packageDescription") {
+        if (stringValue && stringValue.length > 150) return "Description cannot exceed 150 characters.";
+    }
+
+    if (field === "packagePrice") {
+        if (!stringValue.trim()) return "Price is required.";
+        if (isNaN(Number(stringValue)) || Number(stringValue) <= 0) return "Price must be a valid positive number.";
+    }
+
+    if (field === "packageSize") {
+        const delivery = formData.packageDelivery || [];
+        const isPlatformDelivery = delivery.includes("homeDelivery:platformDelivery");
+        
+        if (isPlatformDelivery && !stringValue.trim()) {
+            return "Package size is required for platform delivery.";
+        }
+        
         const isSelfManagedPickup =
-        delivery.includes("pickUp") && delivery.includes("homeDelivery:selfManaged");
+            delivery.includes("pickUp") && delivery.includes("homeDelivery:selfManaged");
 
-            if (isSelfManagedPickup && !value.trim()) {
-                return "Package size is required for self-managed pickup.";
-            }
-            }
-
-        if (field === "packageQuantity") {
-            if (value === null || value === undefined) {
-                return "Package quantity is required.";
-            }
-        
-            const quantity = typeof value === "string" ? value.trim() : String(value).trim();
-        
-            if (quantity === "") return "Package quantity is required.";
-            const num = Number(quantity);
-        
-            if (isNaN(num) || num <= 0) {
-                return "Package quantity must be a valid positive number.";
-            }
+        if (isSelfManagedPickup && !stringValue.trim()) {
+            return "Package size is required for self-managed pickup.";
         }
-               
+    }
 
-        return ""; 
-    };
+    return "";
+};
     
     const [selectedOptions, setSelectedOptions] = useState<{ homeDelivery: boolean; pickUp: boolean }>({
         homeDelivery: false, 
@@ -309,18 +312,14 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
     delivery.includes("homeDelivery:selfManaged");
 
     const packageSizeIsRequired =
-    isSelfManagedPickup || isPlatformDelivery; //now platform delivery also requires size
+    isSelfManagedPickup || isPlatformDelivery;
 
-    const isFormValid =
-    mode === "update" ||
-    (
-        formData.packageTitle?.trim() &&
-        formData.packagePrice?.toString().trim() &&
-        // String(formData.packageQuantity).trim() &&
-        hasDeliveryMethod && // at least one delivery selected
-        (!packageSizeIsRequired || formData.packageSize?.trim()) && // require packageSize conditionally
-        Object.values(errors).every((err) => err === "")
-    );
+ const isFormValid =
+    formData.packageTitle?.trim() &&
+    formData.packagePrice?.toString().trim() &&
+    hasDeliveryMethod &&
+    (!packageSizeIsRequired || formData.packageSize?.trim()) &&
+    Object.values(errors).every((err) => err === "");
 
     const handleSubmit = async () => {
         if(mode === "create") {
@@ -566,7 +565,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
             ? price < 2500
                 ? price * 0.965 // Deduct 3.5% (NGN < 2500)
                 : price * 0.965 - 100 // Deduct 3.5% + 100 NGN (NGN ≥ 2500)
-            : price * (1 - 0.0549) - 0.49; // For USD: deduct 5.49% + $0.49
+            : price * (1 - 0.055) - 0.49; // For USD: deduct 5.5% + $0.49
 
     return (
         <>
@@ -718,7 +717,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
 
                     </div>
 
-                    <div>
+                    <div className="w-full flex justify-start">
                         <p className="font-medium text-sm text-[#718096]">What you will receive: <span className="text-[#751423]">{groupCurrency === "NGN" ? "₦" : "$"}{whatHostReceives.toLocaleString()}</span></p>
                     </div>
 
@@ -727,7 +726,7 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
                         <span className="font-semibold text-[#111827] h-[36px]">P.S</span>: {
                         groupCurrency === "NGN" 
                             ? "3.5% fee (plus ₦100 if price ≥ ₦2,500) will be deducted as service fee" 
-                            : "5.49% + $0.49 fee will be deducted as service fee"
+                            : "5.5% + $0.49 fee will be deducted as service fee"
                         }
                         </span>
                     </div>
@@ -948,19 +947,21 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
               event creation.
             </p>
             <div className="flex flex-col md:flex-row gap-4 justify-end">
-              <button
-                onClick={callSaveForLater}
-                disabled={isSaveLoading}
-                className="w-full md:p-3 md:border border-[#111827] md:rounded-[12px] font-medium text-left md:text-center text-[#000] whitespace-nowrap"
-              >
-                {isSaveLoading ? "saving..." : "Save for later"}
-              </button>
-              <button
-                onClick={handleDiscard}
-                className="w-full md:bg-primary text-red-500 md:text-white md:p-3 md:rounded-[12px] hover:text-red-800 transition flex items-center md:justify-center font-medium whitespace-nowrap"
-              >
-                Discard event creation
-              </button>
+              <button 
+                    id="createPackage"
+                    onClick={handleSubmit} 
+                    disabled={loading || !isFormValid}  
+                    className={`w-[147px] h-[48px] px-4 py-2 text-white whitespace-nowrap rounded-xl ${
+                        loading || !isFormValid
+                        ? "bg-gray-400 cursor-not-allowed" 
+                        : "bg-[#751423]"
+                    }`}
+                >
+                    {loading 
+                        ? (mode === "create" ? "Creating..." : "Updating...") 
+                        : (mode === "create" ? "Create Package" : "Update Package")
+                    }
+                </button>
             </div>
           </div>
         </div>
