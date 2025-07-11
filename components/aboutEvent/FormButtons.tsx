@@ -44,6 +44,15 @@ const FormButtons: React.FC<FormButtonsProps> = ({ isFormValid, groups, fromDash
   };
 
   const handleContinue = async () => {
+    const authToken = localStorage.getItem("authToken");
+
+    if (!authToken) {
+      Cookies.set("redirectAfterLogin", pathname); 
+      setTimeout(() => {
+        router.push("/login");
+      },1000);
+    }
+
     if (!isFormValid || loading) return;
   
     setLoading(true);

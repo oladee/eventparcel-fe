@@ -303,8 +303,8 @@ const validateField = useCallback(
 
     const delivery = formData.packageDelivery || [];
 
-    const isSelfManagedPickup =
-    delivery.includes("pickUp") && delivery.includes("homeDelivery:selfManaged");
+    // const isSelfManagedPickup =
+    // delivery.includes("pickUp") && delivery.includes("homeDelivery:selfManaged");
 
     const isPlatformDelivery = delivery.includes("homeDelivery:platformDelivery");
 
@@ -313,8 +313,7 @@ const validateField = useCallback(
     delivery.includes("homeDelivery:platformDelivery") ||
     delivery.includes("homeDelivery:selfManaged");
 
-    const packageSizeIsRequired =
-    isSelfManagedPickup || isPlatformDelivery;
+    const packageSizeIsRequired = isPlatformDelivery;
 
  const isFormValid =
     formData.packageTitle?.trim() &&
