@@ -11,6 +11,14 @@ import Container from "../Container";
 import FormButtons3 from "./FormButton3";
 import EventFormFields2 from "./EventFormFields2";
 import { trackEvent } from "@/lib/mixpanel";
+import dynamic from "next/dynamic";
+
+// Dynamically import LocationPickerModal with SSR disabled.
+const LocationPickerModal = dynamic(
+  () => import("@/components/aboutEvent/LocationPickerModal"),
+  { ssr: false }
+);
+
 
 interface UpdateEventModalProps {
   isOpen: boolean;
@@ -25,6 +33,7 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
 }) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [showImagePickerModal, setShowImagePickerModal] = useState(false);
+    const [showMapPickerModal, setShowMapPickerModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
   const [loading2, setLoading2] = useState(false);
@@ -303,6 +312,11 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
 
   if (!isOpen) return null;
 
+    // Map location handler
+  const handleMapLocationSelect = () => {
+    setShowMapPickerModal(true);
+  };
+
   return (
     <Container>
       <ToastContainer />
@@ -337,7 +351,7 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
               handleDateChange={handleDateChange}
               fileInputRef={fileInputRef}
               handleFileChange={handleFileChange}
-              handleMapLocationSelect={() => {}}
+              handleMapLocationSelect={handleMapLocationSelect}
             />
 
             {!isAuthenticated && (
@@ -375,6 +389,17 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
               onCancel={() => setShowImagePickerModal(false)}
             />
           )}
+           {showMapPickerModal && (
+        <LocationPickerModal
+          onLocationSelect={(location) => {
+            // setFormData({ ...formData, location });
+            setFormData((prev) => ({ ...prev, location }));
+            setErrors((prev) => ({ ...prev, location: "" }));
+            setShowMapPickerModal(false);
+          }}
+          onCancel={() => setShowMapPickerModal(false)}
+        />
+      )}
         </div>
       </div>
     </Container>
