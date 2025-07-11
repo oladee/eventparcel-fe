@@ -62,7 +62,7 @@ const FormButtons3: React.FC<FormButtonsProps> = ({
       {showModal && (
         <div
           onClick={handleCloseModal}
-          className="fixed inset-0 px-6 bg-black bg-opacity-40 flex items-center justify-center z-[99]"
+          className="fixed inset-0 px-6 bg-black bg-opacity-40 flex items-center justify-center !z-[99999]"
         >
           <div
             onClick={(e) => e.stopPropagation()}

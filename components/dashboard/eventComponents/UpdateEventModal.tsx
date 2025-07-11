@@ -11,6 +11,13 @@ import Container from "../Container";
 import FormButtons3 from "./FormButton3";
 import EventFormFields2 from "./EventFormFields2";
 import { trackEvent } from "@/lib/mixpanel";
+import dynamic from "next/dynamic";
+
+// Dynamically import LocationPickerModal with SSR disabled.
+const LocationPickerModal = dynamic(
+  () => import("@/components/aboutEvent/LocationPickerModal"),
+  { ssr: false }
+);
 
 interface UpdateEventModalProps {
   isOpen: boolean;
@@ -25,6 +32,7 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
 }) => {
   const [selectedImage, setSelectedImage] = useState<string | null>(null);
   const [showImagePickerModal, setShowImagePickerModal] = useState(false);
+  const [showMapPickerModal, setShowMapPickerModal] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [loading, setLoading] = useState(false);
   const [loading2, setLoading2] = useState(false);
@@ -303,12 +311,17 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
 
   if (!isOpen) return null;
 
+  // Map location handler
+  const handleMapLocationSelect = () => {
+    setShowMapPickerModal(true);
+  };
+
   return (
     <Container>
       <ToastContainer />
       <div className="fixed h-screen overflow-y-auto inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50 md:items-center md:p-11">
         <div className="relative bg-white w-full h-full overflow-y-auto no-scrollbar z-[99] max-w-md md:rounded-t-[35px] shadow-lg md:rounded-xl md:max-w-2xl">
-          <div className="sticky top-0 right-0 !z-50 flex w-full justify-between items-center mb-4 p-4 bg-white border-b">
+          <div className="sticky top-0 right-0 z-[9] flex w-full justify-between items-center mb-4 p-4 bg-white border-b">
             <h2 className="text-lg font-bold">Update Event</h2>
             <button onClick={onClose} className="text-xl">
               <AiOutlineClose />
@@ -337,7 +350,7 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
               handleDateChange={handleDateChange}
               fileInputRef={fileInputRef}
               handleFileChange={handleFileChange}
-              handleMapLocationSelect={() => {}}
+              handleMapLocationSelect={handleMapLocationSelect}
             />
 
             {!isAuthenticated && (
@@ -373,6 +386,17 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
                 setShowImagePickerModal(false);
               }}
               onCancel={() => setShowImagePickerModal(false)}
+            />
+          )}
+          {showMapPickerModal && (
+            <LocationPickerModal
+              onLocationSelect={(location) => {
+                // setFormData({ ...formData, location });
+                setFormData((prev) => ({ ...prev, location }));
+                setErrors((prev) => ({ ...prev, location: "" }));
+                setShowMapPickerModal(false);
+              }}
+              onCancel={() => setShowMapPickerModal(false)}
             />
           )}
         </div>
