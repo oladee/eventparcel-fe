@@ -403,7 +403,7 @@ const Page = () => {
                     <div id="shipping-address-section">
                         <p id="shipping-title" className='font-general font-bold text-[14px] text-[#111827]'>Shipping Address</p>
                         <div id="shipping-address" className='flex items-center gap-2 mt-3'>
-                            <MapPin id="shipping-icon" className='text-[#A0AEC0] h-[24px] w-[24px]' />
+                            <MapPin id="shipping-icon" className='text-[#A0AEC0] h-[24px] w-[24px] z-30' />
                             <p id="shipping-text" className='text-[#718096] font-general font-medium text-[14px]'>
                             {orders.shippingAddress
                                 ? orders.shippingAddress

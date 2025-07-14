@@ -446,7 +446,7 @@ const PickupDetails = () => {
                 <div className="relative">
                   <MapPin
                     onClick={handleMapLocationSelect}
-                    className="absolute left-4 top-5 transform -translate-y-1/2 text-gray-500 cursor-pointer"
+                    className="absolute left-4 top-5 transform -translate-y-1/2 text-gray-500 cursor-pointer z-30"
                     size={20}
                   />
                   <input

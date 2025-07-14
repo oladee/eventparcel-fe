@@ -265,7 +265,7 @@ const Page = () => {
               <div id="shipping-address-section">
                 <h2 className="font-bold text-[#111827] text-[16px] mb-3">Shipping Address</h2>
                 <div className="flex items-start gap-3">
-                  <MapPin className="text-gray-400 h-5 w-5 mt-1" />
+                  <MapPin className="text-gray-400 h-5 w-5 mt-1 z-30" />
                   <span id="address-text" className="text-gray-600 w-[255px]">
                     {order?.shippingAddress
                       ?.split(" ")
