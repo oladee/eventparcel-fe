@@ -258,12 +258,12 @@ const TermsAndConditions = () => {
             <tr>
               <td className="border px-4 py-2">Guest Package Purchase (Naira)</td>
               <td className="border px-4 py-2">Includes Aso Ebi, kits, or bundles paid in Naira</td>
-              <td className="border px-4 py-2">5% per transaction</td>
+              <td className="border px-4 py-2">3.5% per transaction</td>
             </tr>
             <tr className="bg-gray-50">
               <td className="border px-4 py-2">Guest Package Purchase (USD)</td>
               <td className="border px-4 py-2">Includes Aso Ebi, kits, or bundles paid in USD</td>
-              <td className="border px-4 py-2">7% per transaction</td>
+              <td className="border px-4 py-2">5.5% per transaction</td>
             </tr>
             <tr>
               <td className="border px-4 py-2">Host Payout Processing</td>
