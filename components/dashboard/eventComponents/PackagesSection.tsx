@@ -106,44 +106,88 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({
   };
 
   // Share group link function
-  const handleShareGroupLink = async (group: Group) => {
-    if (!group?.link) {
-      console.log("selectedGroup", group);
-      alert("No link available to share.");
-      return;
-    }
+const handleShareGroupLink = async (group: Group) => {
+  if (!group?.link) {
+    showWarning("No link available to share.");
+    return;
+  }
 
-    const shareUrl = group.link;
+  const shareUrl = group.link;
+  const text = `You're invited! Join us in celebrating ${eventDataToUse?.eventName} on ${eventDataToUse?.date} at ${eventDataToUse?.eventLocation} at ${eventDataToUse?.time}. You can explore and purchase your curated Aso-Ebi package by clicking the link: `;
+  const fullMessageWithLink = `${text}${shareUrl}`;
 
-    const text = `You're invited! Join us in celebrating ${eventDataToUse?.eventName} on ${eventDataToUse?.date} at ${eventDataToUse?.eventLocation} at ${eventDataToUse?.time}. You can explore and purchase your curated Aso-Ebi package by clicking the link:`;
+  // Desktop detection (simple)
+  const isDesktop = window.innerWidth > 768;
 
-    const fullMessageWithLink = `${text}${shareUrl}`;
-
-    // const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
-
-    if (navigator.share) {
-      try {
-        await navigator.share({
-          title: group.groupName,
-          text,
-          url: shareUrl
-        });
-        console.log("Group link shared successfully");
-      } catch (error) {
-        console.error("Error sharing:", error);
-      }
-    } else if (navigator.clipboard) {
-      try {
+  if (navigator.share && !isDesktop) {
+    // Mobile: use native share
+    try {
+      await navigator.share({
+        title: group.groupName,
+        text: fullMessageWithLink,
+        url: shareUrl
+      });
+    } catch (error) {
+      console.error("Error sharing:", error);
+      showWarning("Failed to share. The full invite message has been copied to your clipboard.");
+      if (navigator.clipboard) {
         await navigator.clipboard.writeText(fullMessageWithLink);
-        alert("Invite copied to clipboard!");
-      } catch (error) {
-        console.error("Failed to copy:", error);
-        alert("Failed to copy link. Please try again.");
       }
-    } else {
-      alert("Sharing is not supported on this browser.");
     }
-  };
+  } else if (navigator.clipboard) {
+    // Desktop: copy to clipboard and show warning
+    try {
+      await navigator.clipboard.writeText(fullMessageWithLink);
+      showWarning("Invite message (with link) copied to clipboard! Paste it manually to share.");
+    } catch (error) {
+      console.error("Failed to copy:", error);
+      showWarning("Failed to copy invite. Please try again.");
+    }
+  } else {
+    showWarning("Sharing is not supported on this browser.");
+  }
+};
+
+
+
+  // const handleShareGroupLink = async (group: Group) => {
+  //   if (!group?.link) {
+  //     console.log("selectedGroup", group);
+  //     alert("No link available to share.");
+  //     return;
+  //   }
+
+  //   const shareUrl = group.link;
+
+  //   const text = `You're invited! Join us in celebrating ${eventDataToUse?.eventName} on ${eventDataToUse?.date} at ${eventDataToUse?.eventLocation} at ${eventDataToUse?.time}. You can explore and purchase your curated Aso-Ebi package by clicking the link:`;
+
+  //   const fullMessageWithLink = `${text}${shareUrl}`;
+
+  //   // const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
+  //   if (navigator.share) {
+  //     try {
+  //       await navigator.share({
+  //         title: group.groupName,
+  //         text,
+  //         url: shareUrl
+  //       });
+  //       console.log("Group link shared successfully");
+  //     } catch (error) {
+  //       console.error("Error sharing:", error);
+  //     }
+  //   } else if (navigator.clipboard) {
+  //     try {
+  //       await navigator.clipboard.writeText(fullMessageWithLink);
+  //       alert("Invite copied to clipboard!");
+  //     } catch (error) {
+  //       console.error("Failed to copy:", error);
+  //       alert("Failed to copy link. Please try again.");
+  //     }
+  //   } else {
+  //     alert("Sharing is not supported on this browser.");
+  //   }
+  // };
 
   // const handleAddGroupClick = () => {
   //   // localStorage.setItem("eventId", eventId);
