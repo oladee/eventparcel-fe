@@ -442,8 +442,7 @@ const ShareContact: React.FC = () => {
             </h2>
             <p className="mb-6 text-gray-600 hidden md:block">
               {" "}
-              You can save your progress and come back later, or discard this
-              event creation.
+              You can save your progress and come back later, or discard this process.
             </p>
             <div className="flex flex-col md:flex-row gap-4 justify-end">
               <button
