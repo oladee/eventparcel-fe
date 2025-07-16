@@ -149,7 +149,6 @@ const handleShareGroupLink = async (group: Group) => {
 };
 
 
-
   // const handleShareGroupLink = async (group: Group) => {
   //   if (!group?.link) {
   //     console.log("selectedGroup", group);
