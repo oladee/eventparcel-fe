@@ -517,36 +517,7 @@ const validateField = useCallback(
     };
 
     const handleCancel = () => setShowModal(true);
-    // const callSaveForLater = () => {
-    //     setShowModal(false);
-    //     handleSaveForLater();
-    // };
 
-//     const handleSaveForLater = async() => {
-//     setIsSaveLoading(true);
-//     const authToken = localStorage.getItem("authToken");
-//     const storedEventId = localStorage.getItem("eventId");
-
-  
-//     if (!authToken) {
-//       Cookies.set("redirectAfterLogin", pathname); 
-//       setShowSuccess2(true);
-//       return;
-//     }
-
-//     try{
-//       await axiosInstance.put(`save-for-later/${storedEventId}`, {
-//         isDraft: true
-//       });
-//       toast.success("Saved! Continue from your dashboard.");
-//       router.push("/dashboard");    
-//     }catch(error: any) {
-//       console.log(error)
-//       toast.error(error.response?.data?.message || "Failed to save event");
-//     }finally{
-//       setIsSaveLoading(false);
-//     }
-//   };
     const price = Number(formData?.packagePrice) || 0;
   
     const whatHostReceives =
@@ -823,67 +794,69 @@ const validateField = useCallback(
                             </div>
                         </div>
                     </div>
-                    <div className="relative w-full max-w-md flex flex-col gap-3">
-                        <p className="font-semibold text-base text-[#111827]">Package Size</p>
-                        <span className="text-sm text-[#718096]">To efficiently manage you deliveries, please select the box size your package would fit.</span>
-                        <div
-                            className="h-10 flex items-center justify-between px-4 py-3 rounded-[10px] cursor-pointer bg-[#FAFAFA]"
-                            onClick={() => setIsOpen(!isOpen)}
-                        >
-                            <span className="text-gray-400 text-sm">
-                            {
-                                formData?.packageSize
-                                    ? {
-                                        smallBox: "Small Box",
-                                        mediumBox: "Medium Box",
-                                        largeBox: "Large Box",
-                                        extraLarge: "Extra Large",
-                                    }[formData.packageSize] || "Select box size"
-                                    : "Select box size"
-                                }
-                            </span>
-                            <BiChevronDown className="w-4 h-4 text-gray-500" />
-                        </div>
+                    {isPlatformDelivery && (
+                        <div className="relative w-full max-w-md flex flex-col gap-3">
+                            <p className="font-semibold text-base text-[#111827]">Package Size</p>
+                            <span className="text-sm text-[#718096]">To efficiently manage you deliveries, please select the box size your package would fit.</span>
+                            <div
+                                className="h-10 flex items-center justify-between px-4 py-3 rounded-[10px] cursor-pointer bg-[#FAFAFA]"
+                                onClick={() => setIsOpen(!isOpen)}
+                            >
+                                <span className="text-gray-400 text-sm">
+                                {
+                                    formData?.packageSize
+                                        ? {
+                                            smallBox: "Small Box",
+                                            mediumBox: "Medium Box",
+                                            largeBox: "Large Box",
+                                            extraLarge: "Extra Large",
+                                        }[formData.packageSize] || "Select box size"
+                                        : "Select box size"
+                                    }
+                                </span>
+                                <BiChevronDown className="w-4 h-4 text-gray-500" />
+                            </div>
 
-                        {isOpen && (
-                            <div className="absolute z-10 mt-2 w-full bg-white border border-gray-200 rounded-[10px] shadow-lg">
-                            {boxOptions.map((option) => (
-                                <div
-                                key={option.value}
-                                onClick={() => handleSelect(option)}
-                                className={cn(
-                                    "flex items-start gap-3 px-4 py-3 hover:bg-gray-100 cursor-pointer"
-                                )}
-                                >
+                            {isOpen && (
+                                <div className="absolute z-10 mt-2 w-full bg-white border border-gray-200 rounded-[10px] shadow-lg">
+                                {boxOptions.map((option) => (
+                                    <div
+                                    key={option.value}
+                                    onClick={() => handleSelect(option)}
+                                    className={cn(
+                                        "flex items-start gap-3 px-4 py-3 hover:bg-gray-100 cursor-pointer"
+                                    )}
+                                    >
+                                    <div>
+                                        <Image 
+                                            src={option.icon}
+                                            alt=""
+                                            width={55}
+                                            height={54}
+                                            style={{width:"55px", height:"54px", objectFit:"cover"}}
+                                        />
+                                    </div>
+                                    <div className="w-[200px]">
+                                        <p className="font-semibold text-sm text-[#111827]">
+                                        {option.label}
+                                        </p>
+                                        <p className="text-xs text-gray-500">{option.description}</p>
+                                    </div>
+                                    </div>
+                                ))}
+                                </div>
+                            )}
+                            {selected?.description && (
                                 <div>
-                                    <Image 
-                                        src={option.icon}
-                                        alt=""
-                                        width={55}
-                                        height={54}
-                                        style={{width:"55px", height:"54px", objectFit:"cover"}}
-                                    />
+                                    <span className="text-sm text-[#718096]">{selected?.description}</span>
                                 </div>
-                                <div className="w-[200px]">
-                                    <p className="font-semibold text-sm text-[#111827]">
-                                    {option.label}
-                                    </p>
-                                    <p className="text-xs text-gray-500">{option.description}</p>
-                                </div>
-                                </div>
-                            ))}
+                            )}
+                            <div className="w-full h-[60px] bg-[#FFF7F2] px-3 py-2 rounded-[12px] mt-2">
+                                <span className="font-general font-medium text-[13px] text-[#718096]">
+                                    <span className="font-semibold text-[#111827] h-[36px]">P.S</span>: Kindly select the best estimate as wrong selection may lead to additional cost for the host.</span>
                             </div>
-                        )}
-                        {selected?.description && (
-                            <div>
-                                <span className="text-sm text-[#718096]">{selected?.description}</span>
-                            </div>
-                        )}
-                          <div className="w-full h-[60px] bg-[#FFF7F2] px-3 py-2 rounded-[12px] mt-2">
-                            <span className="font-general font-medium text-[13px] text-[#718096]">
-                                <span className="font-semibold text-[#111827] h-[36px]">P.S</span>: Kindly select the best estimate as wrong selection may lead to additional cost for the host.</span>
                         </div>
-                        </div>
+                    )}
                     {/* Buttons */}
                     <div className="mt-auto sticky bottom-0 bg-white pt-4 pb-3 -mx-5 px-5 border-t border-gray-100">
                         <div className="flex justify-center md:justify-end gap-2">
