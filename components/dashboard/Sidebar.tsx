@@ -188,23 +188,23 @@ export const Sidebar: React.FC = () => {
     []
   );
 
-  const settingsMenu = useMemo(
-    () => [
-      {
-        label: "Settings",
-        path: "/dashboard/settings",
-        iconName: "settings",
-        exact: true
-      },
-      {
-        label: "Get Help",
-        path: "/dashboard/help",
-        iconName: "get-help",
-        exact: true
-      }
-    ],
-    []
-  );
+  // const settingsMenu = useMemo(
+  //   () => [
+  //     {
+  //       label: "Settings",
+  //       path: "/dashboard/settings",
+  //       iconName: "settings",
+  //       exact: true
+  //     },
+  //     {
+  //       label: "Get Help",
+  //       path: "/dashboard/help",
+  //       iconName: "get-help",
+  //       exact: true
+  //     }
+  //   ],
+  //   []
+  // );
 
   return (
     <>
@@ -297,7 +297,7 @@ export const Sidebar: React.FC = () => {
             </div>
 
             {/* Settings & Help */}
-            <div className="mt-auto pt-4 border-t">
+            {/* <div className="mt-auto pt-4 border-t">
               <nav className="space-y-2">
                 {settingsMenu.map((item) => (
                   <MenuItem
@@ -307,7 +307,7 @@ export const Sidebar: React.FC = () => {
                   />
                 ))}
               </nav>
-            </div>
+            </div> */}
 
             {/* Mobile close button */}
             <button
