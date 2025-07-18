@@ -30,6 +30,8 @@ function DeliveryDetailsForm() {
     ?.map((item: any) => item.packageDelivery)
     .flat();
 
+    console.log("del",packageDelivery)
+
   const [debouncedAddress, setDebouncedAddress] = useState("");
   const [deliveryType, setDeliveryType] = useState("home");
   const [stateSearch, setStateSearch] = useState("");
@@ -621,7 +623,7 @@ function DeliveryDetailsForm() {
                   </div>
 
                   {/* Dispatch Type Dropdown */}
-                  <div className="relative">
+                  {packageDelivery.includes("homeDelivery:platformDelivery") && <div className="relative">
                     <label
                       htmlFor="home-dispatch-type"
                       className="font-general font-medium text-base block mb-1 text-[#718096]"
@@ -658,7 +660,7 @@ function DeliveryDetailsForm() {
                         </div>
                       </div>
                     )}
-                  </div>
+                  </div>}
                 </div>
               ) : (
                 /* Pickup Form */
