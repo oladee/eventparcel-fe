@@ -144,13 +144,17 @@ function DeliveryDetailsForm() {
     }
 
     // Home delivery specific validations
-    if (deliveryType === "home") {
+  if (deliveryType === "home") {
       if (!formData.shippingAddress)
         errors.shippingAddress = "Address is required";
       if (!formData.state) errors.state = "State is required";
       if (!formData.city) errors.city = "City is required";
-      if (!formData.dispatchType)
-        errors.dispatchType = "Dispatch type is required";
+
+      const includesPlatformDelivery = packageDelivery.includes("homeDelivery:platformDelivery");
+
+      if (includesPlatformDelivery && !formData.dispatchType) {
+        errors.dispatchType = "Dispatch type is required for platform delivery";
+      }
     }
 
     return errors;
@@ -191,6 +195,7 @@ function DeliveryDetailsForm() {
 
       // Validate required fields based on delivery type
       if (deliveryType === "home") {
+       const includesPlatformDelivery = packageDelivery.includes("homeDelivery:platformDelivery");
         if (
           !formData.guestFirstName ||
           !formData.guestLastName ||
@@ -199,7 +204,7 @@ function DeliveryDetailsForm() {
           !formData.shippingAddress ||
           !formData.state ||
           !formData.city ||
-          !formData.dispatchType
+          (includesPlatformDelivery && !formData.dispatchType)
         ) {
           throw new Error("Please fill all required fields");
         }
