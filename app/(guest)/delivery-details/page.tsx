@@ -558,9 +558,10 @@ function DeliveryDetailsForm() {
                           setStateDropdownOpen(true);
                         }}
                         onFocus={() => setStateDropdownOpen(true)}
+                        onClick={() => setStateDropdownOpen((prev) => !prev)}
                       />
                       {stateDropdownOpen && (
-                        <div className="absolute left-0 right-0 max-h-60 overflow-y-auto bg-white border border-[#E5E7EB] shadow-lg z-10 mt-1 rounded-[12px]">
+                        <div className="absolute left-0 right-0 bottom-full mb-1 max-h-60 overflow-y-auto bg-white border border-[#E5E7EB] shadow-lg z-[99] rounded-[12px]">
                           {filteredStates.map((state) => (
                             <div
                               key={state.value}
@@ -606,9 +607,10 @@ function DeliveryDetailsForm() {
                           setCityDropdownOpen(true);
                         }}
                         onFocus={() => setCityDropdownOpen(true)}
+                        onClick={() => setCityDropdownOpen((prev) => !prev)}
                       />
                       {cityDropdownOpen && (
-                        <div className="absolute left-0 right-0 max-h-60 overflow-y-auto bg-white border border-[#E5E7EB] shadow-lg z-10 mt-1 rounded-[12px]">
+                        <div className="absolute left-0 right-0 bottom-full mb-1 max-h-60 overflow-y-auto bg-white border border-[#E5E7EB] shadow-lg z-[99] rounded-[12px]">
                           {filteredCities.map((city) => (
                             <div
                               key={city}
