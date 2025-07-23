@@ -27,6 +27,7 @@ const Page = () => {
   const [isModalOpen, setIsModalOpen] = useState(false);
 
   const handleAddNew = () => {
+    localStorage.removeItem("eventId");
     router.push("/dashboard/add-cohost");
   };
 

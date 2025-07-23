@@ -8,9 +8,10 @@ import AuthLeft from "@/components/auth/AuthLeft";
 import { useRouter } from "next/navigation";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import ResetSuccess from "@/components/auth/resetSuccess";
-import Container from "@/components/dashboard/Container";
+// import Container from "@/components/dashboard/Container";
 import { identifyUser, trackEvent } from "@/lib/mixpanel";
 import getBrowserType from "@/lib/getBrowserType";
+import HeaderLayout from "@/components/layout/HeaderLayout";
 
 const ResetPassword: React.FC = () => {
   const [email, setEmail] = useState<string>("");
@@ -144,7 +145,7 @@ const ResetPassword: React.FC = () => {
     passwordValidation.every(Boolean);
 
   return (
-    <Container>
+    <HeaderLayout>
       <div>
         <main className="grid lg:grid-cols-2 min-h-screen mt-8 md:mt-4 lg:mt-0">
           {/* Left Side - Reset Password Form */}
@@ -259,7 +260,7 @@ const ResetPassword: React.FC = () => {
         </main>
         <ToastContainer />
       </div>
-    </Container>
+    </HeaderLayout>
   );
 };
 

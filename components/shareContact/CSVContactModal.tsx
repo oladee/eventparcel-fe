@@ -144,7 +144,7 @@ const CSVContactModal: React.FC<CSVContactModalProps> = ({
       )}
 
       {!showErrorModal && (
-        <div className="fixed overflow-y-auto no-scrollbar inset-0 flex items-center justify-center bg-black bg-opacity-50 p-4">
+        <div className="fixed overflow-y-auto no-scrollbar inset-0 flex items-center justify-center bg-black bg-opacity-50 px-3 pb-12">
           <div className="bg-white rounded-2xl shadow-lg w-full max-w-lg p-6 mt-44">
             {/* Header */}
             <div className="relative border-b pb-3">

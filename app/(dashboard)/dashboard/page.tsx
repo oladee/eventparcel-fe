@@ -1,3 +1,5 @@
+"use client"
+
 import Chart from '@/components/dashboard/chart/Chart'
 import Container from '@/components/dashboard/Container'
 import Orders from '@/components/dashboard/orders/Orders'

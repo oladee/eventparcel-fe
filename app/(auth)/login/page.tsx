@@ -152,12 +152,12 @@ const Login: React.FC = () => {
 
       if (
         error.response?.data?.message ===
-        "User not verified. Please verify OTP first"
+       "User not verified. Please verify OTP first, check your mail"
       ) {
         localStorage.setItem("email", email);
         toast.error(
           error.response?.data?.message ||
-            "User not verified. Please verify OTP first"
+            "User not verified. Please verify OTP first, check your mail"
         );
         setTimeout(() => {
           router.push("/otp-verification");
