@@ -1,4 +1,5 @@
 "use client";
+
 import React, { useState, useEffect, FormEvent } from "react";
 import axiosInstance from "@/lib/axiosInstance";
 import { ToastContainer } from "react-toastify";
@@ -29,7 +30,16 @@ const Page = () => {
   const [eventData, setEventData] = useState<EventDetailsProps["eventData"]>(
     []
   );
-  const [selectedEventId, setSelectedEventId] = useState<string>(localStorage.getItem("eventId") || ""); // Store selected event ID
+  const [selectedEventId, setSelectedEventId] = useState<string>(""); // Store selected event ID
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const storedEventId = localStorage.getItem("eventId");
+      if (storedEventId) {
+        setSelectedEventId(storedEventId);
+      }
+    }
+  }, []);
   const [error, setError] = useState<string | null>(null);
   const router = useRouter();
   console.log(error);
@@ -153,7 +163,7 @@ const Page = () => {
           firstName: formData.firstName.trim(),
           lastName: formData.lastName.trim(),
           email: formData.email.trim(),
-          eventId: localStorage.getItem("eventId") || selectedEventId // Send eventId to the backend
+          eventId: (typeof window !== "undefined" && localStorage.getItem("eventId")) || selectedEventId // Send eventId to the backend
         },
         {
           withCredentials: true
@@ -300,7 +310,7 @@ const Page = () => {
                   <p className="text-red-500 text-sm mt-1">{errors.email}</p>
                 )}
               </div>
-              {!localStorage.getItem("eventId") && (
+              {typeof window !== "undefined" && !localStorage.getItem("eventId") && (
                 <div className="flex flex-col mt-3">
                   <label
                     id="eventSelection"
