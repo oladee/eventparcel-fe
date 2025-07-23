@@ -12,14 +12,6 @@ function Container({ children }: { children: React.ReactNode }) {
   const [isLoaded, setIsLoaded] = useState(false);
 
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setIsLoaded(true);
-    }, 3000);
-    return () => clearTimeout(timer);
-  }, []);
-
-
-  useEffect(() => {
     // Parse URL search parameters for the authToken
     const searchParams = new URLSearchParams(window.location.search);
     const tokenFromUrl = searchParams.get("token");
@@ -30,6 +22,14 @@ function Container({ children }: { children: React.ReactNode }) {
       // Optionally, remove the token from the URL after saving it
       const cleanUrl = window.location.pathname;
       router.replace(cleanUrl);
+
+      // Set a timeout to show the loading modal for 3 seconds
+      const timer = setTimeout(() => {
+        setIsLoaded(true);
+      }, 3000);
+      return () => clearTimeout(timer);
+    } else {
+      setIsLoaded(true);
     }
 
     // Check for authToken in localStorage
