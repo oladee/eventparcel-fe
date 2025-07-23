@@ -8,7 +8,7 @@ import AuthLeft from "@/components/auth/AuthLeft";
 import { useRouter } from "next/navigation";
 import { FiEye, FiEyeOff } from "react-icons/fi";
 import ResetSuccess from "@/components/auth/resetSuccess";
-import Container from "@/components/dashboard/Container";
+// import Container from "@/components/dashboard/Container";
 import { identifyUser, trackEvent } from "@/lib/mixpanel";
 import getBrowserType from "@/lib/getBrowserType";
 import HeaderLayout from "@/components/layout/HeaderLayout";
