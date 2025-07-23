@@ -31,7 +31,7 @@ const SendContactModal: React.FC<EventOptionsModalProps> = ({
   onClose,
   eventGroupId,
   contacts,
-  phoneNumbers,
+  // phoneNumbers,
   setPopupModalOpen
 }) => {
   // Loading states for each invitation type
@@ -125,7 +125,7 @@ const SendContactModal: React.FC<EventOptionsModalProps> = ({
   const handleSendBoth = async () => {
     setIsLoadingBoth(true);
     try {
-      const data = await sendInviteBoth(eventGroupId, phoneNumbers);
+      const data = await sendInviteBoth(eventGroupId, contacts);
       toast.success(data.message || "Invitations sent via WhatsApp/SMS");
       trackEvent("Share Invite", {
         source: "share-contact page",

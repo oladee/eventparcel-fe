@@ -2,14 +2,22 @@
 
 import axiosInstance from "@/lib/axiosInstance";
 import { useRouter } from "next-nprogress-bar";
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import { toast } from "react-toastify";
 
 
 function Container({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const [isAuthenticated, setIsAuthenticated] = useState(false);
-  const [isLoaded, setIsLoaded] = useState(false);
+  // const [isAuthenticated, setIsAuthenticated] = useState(false);
+  // const [isLoaded, setIsLoaded] = useState(false);
+
+  // useEffect(() => {
+  //   const timer = setTimeout(() => {
+  //     setIsLoaded(true);
+  //   }, 3000);
+  //   return () => clearTimeout(timer);
+  // }, []);
+
 
   useEffect(() => {
     // Parse URL search parameters for the authToken
@@ -22,14 +30,6 @@ function Container({ children }: { children: React.ReactNode }) {
       // Optionally, remove the token from the URL after saving it
       const cleanUrl = window.location.pathname;
       router.replace(cleanUrl);
-
-      // Set a timeout to show the loading modal for 3 seconds
-      const timer = setTimeout(() => {
-        setIsLoaded(true);
-      }, 3000);
-      return () => clearTimeout(timer);
-    } else {
-      setIsLoaded(true);
     }
 
     // Check for authToken in localStorage
@@ -42,7 +42,7 @@ function Container({ children }: { children: React.ReactNode }) {
       return;
     }
 
-    setIsAuthenticated(true);
+    // setIsAuthenticated(true);
 
     // Consume the profile endpoint to fetch the user details
     const fetchUserProfile = async () => {
@@ -67,16 +67,16 @@ function Container({ children }: { children: React.ReactNode }) {
     fetchUserProfile();
   }, [router]);
 
-  if (!isAuthenticated || !isLoaded) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center">
-          <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-100 mx-auto mb-4"></div>
-          <p className="text-gray-600">Loading...</p>
-        </div>
-      </div>
-    );
-  }
+  // if (!isAuthenticated || !isLoaded) {
+  //   return (
+  //     <div className="min-h-screen bg-gray-50 flex items-center justify-center">
+  //       <div className="text-center">
+  //         <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-primary-100 mx-auto mb-4"></div>
+  //         <p className="text-gray-600">Loading...</p>
+  //       </div>
+  //     </div>
+  //   );
+  // }
 
   return (
     <main className="absolute top-0 left-0 right-0 md:pl-64 !pt-16 h-screen overflow-y-auto custom-scrollbar bg-gray-100">
