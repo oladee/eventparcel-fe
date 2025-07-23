@@ -23,6 +23,18 @@ import axiosInstance from "@/lib/axiosInstance";
 // Types
 type ContactProperty = "name" | "email" | "tel";
 
+interface ContactsToUse {
+  id: number;
+  name: string;
+  phone: string;
+  category: string;
+  initials: string;
+  firstName: string;
+  lastName: string;
+  phoneValue: string;
+}
+
+
 // Reusable OptionCard component
 type OptionCardProps = {
   option: "contact" | "csv";
@@ -103,7 +115,10 @@ const ShareContact: React.FC = () => {
   const [showModalCancel, setShowModalCancel] = useState(false);
   const [isSaveLoading, setIsSaveLoading] = useState(false);
   const router = useRouter();
+  const [contactsToUse, setContactsToUse] = useState<ContactsToUse[]>([]);
 
+  console.log("contactsToUse", contactsToUse)
+  
   useEffect(() => {
     // This code runs only on the client side
     const storedData = localStorage.getItem('eventData');
@@ -298,7 +313,17 @@ const ShareContact: React.FC = () => {
     setPopupModalOpen(false);
     // optionally clear popupContacts...
   };
+  
   const callSaveForLater = () => {
+    if (contactsToUse.length > 0) {
+      localStorage.setItem("ImportedContacts", JSON.stringify(contactsToUse));
+
+      const idToUseNextTime = localStorage.getItem("sendGroupId");
+      if (idToUseNextTime) {
+        localStorage.setItem("idToUseNextTime", idToUseNextTime);
+      }
+    };
+
     setShowModalCancel(false);
     handleSaveForLater();
   };
@@ -307,6 +332,10 @@ const ShareContact: React.FC = () => {
     // setShowModalCancel(false);
     router.push("/dashboard/events");
   };
+
+  const handleReceiveContacts = (importedContacts: ContactsToUse[]) => {
+  setContactsToUse(importedContacts);
+};
 
   if (popupContacts.length > 0 && popupModalOpen) {
     return (
@@ -392,7 +421,13 @@ const ShareContact: React.FC = () => {
       </div>
 
       {/* CSV Modal */}
-      {isModalOpen && <CsvModal onClose={() => setIsModalOpen(false)} />}
+      {/* {isModalOpen && <CsvModal onClose={() => setIsModalOpen(false)} />} */}
+      {isModalOpen && (
+        <CsvModal
+          onClose={() => setIsModalOpen(false)}
+          onValidContacts={handleReceiveContacts}
+        />
+      )}
 
       {/* Contact Modal */}
       <ContactModal

@@ -25,7 +25,7 @@ const ResetPassword: React.FC = () => {
     false,
     false
   ]);
-  const [showValidation, setShowValidation] = useState<boolean>(false); // New state for showing validation
+  const [showValidation, setShowValidation] = useState<boolean>(false); 
   const router = useRouter();
   const [showPassword, setShowPassword] = useState<boolean>(false);
   const [showConfirmPassword, setShowConfirmPassword] =
