@@ -28,11 +28,11 @@ function Container({ children }: { children: React.ReactNode }) {
     const authToken = localStorage.getItem("authToken");
     console.log("Auth Token:", authToken); // Debugging line
     
-    if (!authToken) {
-      // router.replace("/login");
-      console.log("No auth token found. Redirecting to login.");
-      return;
-    }
+    // if (!authToken) {
+    //   // router.replace("/login");
+    //   console.log("No auth token found. Redirecting to login.");
+    //   return;
+    // }
 
     setIsAuthenticated(true);
 
