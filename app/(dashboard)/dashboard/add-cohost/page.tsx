@@ -163,13 +163,12 @@ const Page = () => {
           firstName: formData.firstName.trim(),
           lastName: formData.lastName.trim(),
           email: formData.email.trim(),
-          eventId: (typeof window !== "undefined" && localStorage.getItem("eventId")) || selectedEventId // Send eventId to the backend
+          eventId: (typeof window !== "undefined" && localStorage.getItem("eventId")) || selectedEventId 
         },
         {
           withCredentials: true
         }
       );
-
       
       console.log("Response:", response.data);
       localStorage.setItem("eventId", selectedEventId);
@@ -359,12 +358,16 @@ const Page = () => {
         </div>
       </section>
       {showModal && (
-        <ReusuableSuccess
-          title="Co-host Invited"
-          subtitle={`An invite has been sent to ${formData.firstName} ${formData.lastName} via email to join you as a co-host for your event`}
-          route="/dashboard/co-host"
-          buttonText="Ok, thank you"
-        />
+      <ReusuableSuccess
+        title="Co-host Invited"
+        subtitle={`An invite has been sent to ${formData.firstName} ${formData.lastName} via email to join you as a co-host for your event`}
+        route={
+          typeof window !== "undefined" && localStorage.getItem("redirectAfterAdd-cohost")
+            ? "/dashboard/create-group"
+            : "/dashboard/co-host"
+        }
+        buttonText="Ok, thank you"
+      />
       )}
     </Container>
   );

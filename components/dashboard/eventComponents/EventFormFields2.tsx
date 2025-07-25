@@ -187,7 +187,6 @@ const EventFormFields2: React.FC<EventFormFieldsProps> = ({
           <input
             type="text"
             id="location"
-            disabled
             value={formData.location}
             onChange={handleChange}
             onBlur={handleBlur}

@@ -329,13 +329,20 @@ const ShareContact: React.FC = () => {
   };
 
   const handleDiscard = () => {
-    // setShowModalCancel(false);
-    router.push("/dashboard/events");
+    const sendGroupId = localStorage.getItem("sendGroupId");
+    const idToUseNextTime = localStorage.getItem("idToUseNextTime");
+    if(sendGroupId === idToUseNextTime) {
+      localStorage.removeItem("ImportedContacts");
+      localStorage.removeItem("idToUseNextTime");
+      router.back();
+    } else {
+      router.back();
+    }
   };
 
   const handleReceiveContacts = (importedContacts: ContactsToUse[]) => {
-  setContactsToUse(importedContacts);
-};
+     setContactsToUse(importedContacts);
+  };
 
   if (popupContacts.length > 0 && popupModalOpen) {
     return (

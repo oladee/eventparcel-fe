@@ -14,9 +14,11 @@ const EventSuccess: React.FC = () => {
 
   const handleAddCoHost = () => {
     if (authToken) {
+      localStorage.setItem("redirectAfterAdd-cohost", "/dashboard/create-group");
       router.push("/dashboard/add-cohost");
     } else {
       // before routing to "/", we need to save the current page (to cookies) and it should expire in 5 minutes
+      localStorage.setItem("redirectAfterAdd-cohost", "/dashboard/create-group");
       Cookies.set("redirectAfterLogin", "/dashboard/add-cohost", { expires: 1 / 288 });
       // router.push("/add-cohost");
       router.push("/signup");
@@ -31,7 +33,7 @@ const EventSuccess: React.FC = () => {
           You&apos;ve successfully created an event
         </p>
         <p className="font-medium text-sm text-[#718096]">
-        Would you like to add a co-host to this event or continue with the group creation?
+         Would you like to add a co-host to this event or continue with the group creation?
         </p>
         <Link href={authToken ? "/dashboard/create-group" : "/new-group"} className="button_v1">
           <button className="font-bold">Continue to Group</button>

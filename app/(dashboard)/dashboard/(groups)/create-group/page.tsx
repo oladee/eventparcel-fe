@@ -38,6 +38,7 @@ const NewGroup: React.FC = () => {
 
   useEffect(() => {
     Cookies.remove("redirectAfterLogin");
+    localStorage.removeItem("redirectAfterAdd-cohost");
   }, []);
 
   useEffect(() => {
