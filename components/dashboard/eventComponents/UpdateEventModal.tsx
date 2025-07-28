@@ -317,7 +317,8 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
   };
 
   return (
-    <Container>
+    // <Container>
+    <>
       <ToastContainer />
       <div className="fixed h-screen overflow-y-auto inset-0 bg-black bg-opacity-50 flex items-end justify-center z-50 md:items-center md:p-11">
         <div className="relative bg-white w-full h-full overflow-y-auto no-scrollbar z-[99] max-w-md md:rounded-t-[35px] shadow-lg md:rounded-xl md:max-w-2xl">
@@ -401,7 +402,8 @@ const UpdateEventModal: React.FC<UpdateEventModalProps> = ({
           )}
         </div>
       </div>
-    </Container>
+    </>
+    // </Container>
   );
 };
 
