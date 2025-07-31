@@ -465,7 +465,7 @@ const Page = () => {
                         {order?.guestName
                           ?.split(" ")
                           .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                          .join(" ") || "Guest Name"}
+                          .join(" ")}
 
                         </p>
 
