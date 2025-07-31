@@ -462,13 +462,16 @@ const Page = () => {
 
                         <p className="font-medium">Guest</p>
                         <p className="font-bold text-gray-900">
-                        {order?.guestName
-                          ?.split(" ")
-                          .map(word => word.charAt(0).toUpperCase() + word.slice(1))
-                          .join(" ") || "Guest Name"}
-
+                          {`${[order?.guestFirstName, order?.guestLastName]
+                              .filter(Boolean)
+                              .map(name =>
+                                name
+                                  .split(" ")
+                                  .map(word => word.charAt(0).toUpperCase() + word.slice(1))
+                                  .join(" ")
+                              )
+                              .join(" ") || "Guest Name"}`}
                         </p>
-
                         <p className="font-medium">Delivery</p>
                         <p className="font-bold text-gray-900">
                           {order?.items[0]?.deliveryMethod || "N/A"}
