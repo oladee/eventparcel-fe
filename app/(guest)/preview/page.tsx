@@ -135,7 +135,7 @@ if (groupPrivacy === "general") {
   const isLong = formattedText.length > 120;
   const displayText = isExpanded ? formattedText : formattedText.slice(0, 120);
 
-  const rawDate = eventData?.date;
+  // const rawDate = eventData?.date;
   // const formattedDate = rawDate
   //   ? (() => {
   //       const dateObj = new Date(rawDate);
