@@ -136,15 +136,15 @@ if (groupPrivacy === "general") {
   const displayText = isExpanded ? formattedText : formattedText.slice(0, 120);
 
   const rawDate = eventData?.date;
-  const formattedDate = rawDate
-    ? (() => {
-        const dateObj = new Date(rawDate);
-        const day = dateObj.getDate().toString().padStart(2, "0");
-        const month = dateObj.toLocaleString("default", { month: "short" });
-        const year = dateObj.getFullYear();
-        return `${day} ${month}, ${year}`;
-      })()
-    : "";
+  // const formattedDate = rawDate
+  //   ? (() => {
+  //       const dateObj = new Date(rawDate);
+  //       const day = dateObj.getDate().toString().padStart(2, "0");
+  //       const month = dateObj.toLocaleString("default", { month: "short" });
+  //       const year = dateObj.getFullYear();
+  //       return `${day} ${month}, ${year}`;
+  //     })()
+  //   : "";
     
   // const groupPrivacy = eventGroupData?.groupPrivacy;
   // const availableTabs = groupPrivacy === "private" ? ["General", "Private"] : ["General"];
@@ -260,7 +260,7 @@ if (groupPrivacy === "general") {
 
             <div id="event-date" className="flex items-center gap-2 text-sm text-gray-600 mt-4 py ">
               <LuCalendarDays id="calendar-icon" className="w-4 h-4" />
-              <span id="date-text" className="font-medium text-sm text-[#111827]">{formattedDate} at {data?.event?.time} WAT</span>
+              <span id="date-text" className="font-medium text-sm text-[#111827]">{data?.display_date_time}</span>
             </div>
 
             <p id="event-location" className="text-sm text-[#78858F] font-normal mt-1">

@@ -17,6 +17,7 @@ interface EventDetailsProps {
     eventDescription: string;
     date: string;
     time: string;
+    display_date_time: string;
     eventLocation: string;
     isShared?: boolean;
   }>;
@@ -75,13 +76,13 @@ const EventDetailsSection2: React.FC<EventDetailsProps> = ({ eventData }) => {
           )} */}
         </div>
         {eventData.map((event, i) => {
-          const formattedDate = (() => {
-            const dateObj = new Date(event.date);
-            const day = dateObj.getDate().toString().padStart(2, "0");
-            const month = dateObj.toLocaleString("default", { month: "short" });
-            const year = dateObj.getFullYear();
-            return `${day} ${month}, ${year}`;
-          })();
+          // const formattedDate = (() => {
+          //   const dateObj = new Date(event.date);
+          //   const day = dateObj.getDate().toString().padStart(2, "0");
+          //   const month = dateObj.toLocaleString("default", { month: "short" });
+          //   const year = dateObj.getFullYear();
+          //   return `${day} ${month}, ${year}`;
+          // })();
 
           return (
             <div key={i} className="bg-[#fff4ed] p-4 rounded-2xl mb-4">
@@ -145,7 +146,7 @@ const EventDetailsSection2: React.FC<EventDetailsProps> = ({ eventData }) => {
                       id="date-text"
                       className="font-medium text-sm text-[#111827]"
                     >
-                      {formattedDate} at {event.time} WAT
+                     {event?.display_date_time}
                     </span>
                   </div>
                   <p className="text-sm mt-1 text-gray-500">

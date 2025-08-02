@@ -13,6 +13,7 @@ interface EventDetailsProps {
     eventDescription: string;
     date: string;
     time: string;
+    display_date_time: string;
     eventLocation: string;
     isShared?: boolean;
   };
@@ -27,20 +28,21 @@ const EventDetailsSection: React.FC<EventDetailsProps> = ({ eventData }) => {
     eventImgUrl,
     eventName,
     eventDescription,
-    date,
+    // date,
     time,
     eventLocation,
+    display_date_time,
     isShared
   } = eventData;
 
   // Format the date
-  const formattedDate = (() => {
-    const dateObj = new Date(date);
-    const day = dateObj.getDate().toString().padStart(2, "0");
-    const month = dateObj.toLocaleString("default", { month: "short" });
-    const year = dateObj.getFullYear();
-    return `${day} ${month}, ${year}`;
-  })();
+  // const formattedDate = (() => {
+  //   const dateObj = new Date(date);
+  //   const day = dateObj.getDate().toString().padStart(2, "0");
+  //   const month = dateObj.toLocaleString("default", { month: "short" });
+  //   const year = dateObj.getFullYear();
+  //   return `${day} ${month}, ${year}`;
+  // })();
 
   const loggedInUser = JSON.parse(localStorage.getItem("loggedInUser") || "{}");
 
@@ -91,7 +93,7 @@ const EventDetailsSection: React.FC<EventDetailsProps> = ({ eventData }) => {
           <div className="flex items-center gap-2 text-sm font-semibold">
             <MdOutlineCalendarToday size={18} />
             <span>
-              {formattedDate} at {time}
+             {display_date_time} at {time} 
             </span>
           </div>
           <p className="text-sm mt-1 text-gray-500">{eventLocation}</p>
