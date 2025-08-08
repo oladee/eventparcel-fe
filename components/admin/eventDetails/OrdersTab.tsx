@@ -16,7 +16,7 @@ export interface EventOrder {
   orderStatus: "pending" | "shipped" | "delivered"
 }
 
-const statusTabs = ["All Orders", "pending", "shipped", "delivered"] as const
+const statusTabs = ["All Orders", "Pending", "Shipped", "delivered"] as const
 type Status = typeof statusTabs[number]
 
 interface OrdersTabProps {
