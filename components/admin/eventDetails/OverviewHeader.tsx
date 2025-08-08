@@ -32,6 +32,7 @@ const OverviewHeader: React.FC<OverviewHeaderProps> = ({
   packagesSold
 }) => {
   const hasBothSales = overallSales && overallSalesDollar;
+  const hasNoneOversales = !overallSales && !overallSalesDollar;
   const hasOnlyNaira = overallSales && !overallSalesDollar;
   const hasOnlyDollar = !overallSales && overallSalesDollar;
   const hasBothPayouts = netPayout && netPayoutDollar;
@@ -94,6 +95,18 @@ const OverviewHeader: React.FC<OverviewHeaderProps> = ({
                 </p>
               </>
             )}
+            {hasNoneOversales && (
+              <>
+                <div className="flex flex-col">
+                  <p className="text-xl text-[#751423] font-semibold">
+                  0
+                  </p>
+                </div>
+                <p className="text-xs text-[#718096] font-medium">
+                  Overall sales
+                </p>
+              </>
+            )}
             {hasOnlyNaira && (
               <>
                 <p className="text-xl text-[#751423] font-semibold">
@@ -139,7 +152,7 @@ const OverviewHeader: React.FC<OverviewHeaderProps> = ({
               </p>
             )}
             {!netPayout && !netPayoutDollar && (
-              <p className="text-xl text-gray-500 font-semibold">-</p>
+              <p className="text-xl text-black font-semibold">0</p>
             )}
             <p className="text-xs text-[#718096] font-medium">Net payout</p>
           </div>

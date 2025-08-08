@@ -169,7 +169,7 @@ function formatCurrency(amount?: number, currency?: "NGN" | "USD") {
     <AdminContainer>
       <ToastContainer position="top-right" autoClose={3000} />
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div className="lg:col-span-2 lg:h-[143vh] no-scrollbar overflow-y-scroll">
+        <div className="lg:col-span-2 lg:h-[143vh] no-scrollbar overflow-y-auto">
           <OverviewHeader
             imageUrl={data.eventImgUrl}
             name={data.eventName}
@@ -206,6 +206,15 @@ function formatCurrency(amount?: number, currency?: "NGN" | "USD") {
 };
 
 export default EventDetailPage;
+
+
+
+
+
+
+
+
+
 
 // "use client";
 // // app/(dashboard)/admin/admin-events/[eventId]/page.tsx
