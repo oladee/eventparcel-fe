@@ -25,14 +25,21 @@ const ChangePass: React.FC = () => {
 
   // grab email from localStorage once on mount
   useEffect(() => {
-    const stored = localStorage.getItem("loggedInUser");
-    if (stored) {
-      try {
-        const u = JSON.parse(stored);
-        if (u.email) setEmail(u.email);
-      } catch {}
+  const stored = localStorage.getItem("loggedInUser");
+  if (stored) {
+    try {
+      const u = JSON.parse(stored);      
+      if (u.data?.email) {
+        setEmail(u.data.email);
+      }
+    } catch (err) {
+      console.error("Failed to parse user data", err);
     }
-  }, []);
+  } else {
+    console.log("No user data found in localStorage");
+  }
+}, []);
+ 
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
