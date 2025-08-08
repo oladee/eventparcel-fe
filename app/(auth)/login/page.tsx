@@ -74,7 +74,6 @@ const Login: React.FC = () => {
   };
 
   const handleLogin = async () => {
-    console.log("handleLogin called with email:", email, "and password", password)
     if (!email || !password) {
       toast.error("Email and password are required!");
       return;
