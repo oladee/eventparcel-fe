@@ -48,7 +48,7 @@ interface OrderStatProps {
 const OrdersStatCardGroup: React.FC<OrderStatProps> = ({ orderSummary }) => {
   // Extract values from orderSummary
   const {
-    invitesSummary: { totalInvites, viewedRate },
+    // invitesSummary: { totalInvites, viewedRate },
     // invitesSummary: { totalInvites, totalViewed, viewedRate },
     ordersSummary: { totalOrders, totalDelivered, pendingOrders }
   } = orderSummary;

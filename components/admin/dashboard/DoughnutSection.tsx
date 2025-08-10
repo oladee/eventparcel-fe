@@ -8,7 +8,7 @@ interface Props {
 }
 
 const DoughnutSection: React.FC<Props> = ({ orderStats }) => {
-  const total = orderStats.completed + orderStats.shipped + orderStats.pending;
+  // const total = orderStats.completed + orderStats.shipped + orderStats.pending;
   const data = {
     labels: [],
     datasets: [
