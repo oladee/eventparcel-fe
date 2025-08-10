@@ -1,6 +1,6 @@
 import React from "react";
 import StatCard from "./OrderStatCard";
-import { FiEye } from "react-icons/fi";
+// import { FiEye } from "react-icons/fi";
 import { PiPackageBold, PiShoppingCartBold } from "react-icons/pi";
 import BoxTime from "../../../assets/orderIcons/box-time.png";
 import Image from "next/image";
@@ -61,13 +61,13 @@ const OrdersStatCardGroup: React.FC<OrderStatProps> = ({ orderSummary }) => {
       delta: `${totalOrders.growthRate}%`,
       subtext: "from last week"
     },
-    {
-      icon: <FiEye size={20} />,
-      label: "Total Invites",
-      value: totalInvites.toString(),
-      delta: `${viewedRate}%`,
-      subtext: "viewed invites"
-    },
+    // {
+    //   icon: <FiEye size={20} />,
+    //   label: "Total Invites",
+    //   value: totalInvites.toString(),
+    //   delta: `${viewedRate}%`,
+    //   subtext: "viewed invites"
+    // },
     {
       icon: <PiPackageBold size={20} />,
       label: "Total Delivered",
@@ -93,7 +93,8 @@ const OrdersStatCardGroup: React.FC<OrderStatProps> = ({ orderSummary }) => {
   ];
 
   return (
-    <div className="grid grid-cols-2 sm:grid-cols-2 lg:flex lg:justify-between items-center gap-4">
+    // <div className="grid grid-cols-2 sm:grid-cols-2 lg:flex lg:justify-between items-center gap-4">
+    <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {stats.map((s, i) => (
         <StatCard
           key={i}

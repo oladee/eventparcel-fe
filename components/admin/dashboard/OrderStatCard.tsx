@@ -6,7 +6,7 @@ const OrderStatCard: React.FC<Props> = ({ icon, label, value, delta, subtext }) 
 
    <div id="stats-grid" className="">
         <div 
-          className="w-[163px] xl:w-[232px] h-[121px] lg:h-[165px] bg-[#FFFFFF] shadow-sm p-3 rounded-[12px]"
+          className="w-full h-[121px] lg:h-[165px] bg-[#FFFFFF] shadow-sm p-3 rounded-[12px]"
           >
           <div id={`stat-header`} className='flex items-center gap-2 text-primary'>
               {icon}
