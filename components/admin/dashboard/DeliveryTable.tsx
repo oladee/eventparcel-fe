@@ -353,8 +353,9 @@ import { trackEvent } from "@/lib/mixpanel";
                 : "N/A"}
             </div>
             <div className="w-[200px] font-semibold text-base text-[#111827]" id={`carrier-info-${order.orderId}`}>
-              {order.deliveryType === "pickUp" 
-                ? "PickUp" : order.deliveryType === "homeDelivery" ? "GIG" : ""}
+              {/* {order.deliveryType === "pickUp" 
+                ? "PickUp" : order.deliveryType === "homeDelivery" ? "GIG" : ""} */}
+                {order?.carrier}
             </div>
             <div className="w-[160px]" id={`status-info-${order.orderId}`}>
               <span

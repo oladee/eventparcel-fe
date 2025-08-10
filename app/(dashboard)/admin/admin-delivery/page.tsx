@@ -20,6 +20,7 @@ export interface GuestOrder {
   state: string;
   shippingAddress: string;
   deliveryType: string;
+  carrier: string;
   dispatchType: string;
   homeDeliveryFee: number;
   tax: number;
