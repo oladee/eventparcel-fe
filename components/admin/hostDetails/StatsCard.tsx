@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import { FiInfo } from "react-icons/fi";
+// import { FiInfo } from "react-icons/fi";
 
 interface Props {
   title: string;
@@ -9,6 +9,7 @@ interface Props {
   delta: string;
   highlight?: boolean;
 }
+
 
 const StatsCard: React.FC<Props> = ({ title, value, delta, highlight }) => (
   <div
@@ -20,7 +21,7 @@ const StatsCard: React.FC<Props> = ({ title, value, delta, highlight }) => (
       <span className={`text-xs ${highlight ? "text-white" : "text-[#718096]"}`}>
         {title}
       </span>
-      <FiInfo className={highlight ? "text-gray-200" : "text-gray-400"} />
+      {/* <FiInfo className={highlight ? "text-gray-200" : "text-gray-400"} /> */}
     </div>
     <h3 className={`${highlight ? "text-lg font-bold" : "text-2xl font-semibold"}`}>
       {value}
