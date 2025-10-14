@@ -1,7 +1,8 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "https://api.eventparcel.com/api/v1",
+  // baseURL: "https://api.eventparcel.com/api/v1",
+  baseURL: "https://api-eventparcel.onrender.com/api/v1",
   headers: { "Content-Type": "application/json" }
 });
 
@@ -34,7 +35,8 @@ axiosInstance.interceptors.response.use(
 
       try {
         // Call the refresh token endpoint
-        const refreshResponse = await axios.post("https://api.eventparcel.com/api/v1/refresh-token", {}, {
+        // const refreshResponse = await axios.post("https://api.eventparcel.com/api/v1/refresh-token", {}, {
+        const refreshResponse = await axios.post("https://api-eventparcel.onrender.com/api/v1/refresh-token", {}, {
           withCredentials: true // Ensure cookies are sent with the request
         });
 
