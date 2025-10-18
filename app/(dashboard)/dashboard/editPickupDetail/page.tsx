@@ -207,6 +207,9 @@ const PickupDetails = () => {
           pickupLocation: deliveryData.pickupLocation || prev.pickupLocation,
           pickupLatitude: deliveryData.pickupLatitude || prev.pickupLatitude,
           pickupLongitude: deliveryData.pickupLongitude || prev.pickupLongitude,
+          // populate state and city if present in delivery data
+          state: deliveryData.state || (prev as any).state,
+          city: deliveryData.city || (prev as any).city,
           deliveryDate:
             parseAPIDate(deliveryData.deliveryDate) || prev.deliveryDate,
           deliveryTime:
@@ -214,6 +217,9 @@ const PickupDetails = () => {
           deliveryTimeZone:
             deliveryData.deliveryTimeZone || prev.deliveryTimeZone
         }));
+        // Also populate the visible search inputs so the dropdowns show current values
+        if (deliveryData.state) setStateSearch(deliveryData.state);
+        if (deliveryData.city) setCitySearch(deliveryData.city);
       } catch (error: any) {
         console.log(error);
         // toast.error(error.response?.data?.message || "Please try again.");
@@ -234,6 +240,15 @@ const PickupDetails = () => {
 
     return () => clearTimeout(handler);
   }, [formData.pickupLocation]);
+
+  // Ensure the state/city search inputs show values when formData already has them
+  useEffect(() => {
+    const currentState = (formData as any).state;
+    const currentCity = (formData as any).city;
+
+    if (currentState && !stateSearch) setStateSearch(currentState);
+    if (currentCity && !citySearch) setCitySearch(currentCity);
+  }, [formData, stateSearch, citySearch]);
 
   // Refactor validateForm to use useCallback
   const validateForm = useCallback(() => {
