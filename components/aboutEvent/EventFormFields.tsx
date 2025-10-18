@@ -134,7 +134,7 @@ const EventFormFields: React.FC<EventFormFieldsProps> = ({
               onChange={(date) => handleDateChange(date, "eventDate")}
               dateFormat="yyyy-MM-dd"
               popperClassName="custom-datepicker"
-              className="w-[100%] pl-10 px-3 py-2 input-field outline-primary rounded-[5px] bg-slate-50"
+              className="w-[100%] pl-10 px-3 py-2 input-field outline-primary rounded-[5px] bg-slate-50 z-[1000]"
             />
           </div>
           {errors.eventDate && (
@@ -180,7 +180,7 @@ const EventFormFields: React.FC<EventFormFieldsProps> = ({
         <div className="relative">
           <MapPin
             onClick={handleMapLocationSelect}
-            className="absolute left-4 top-5 transform -translate-y-1/2 text-gray-500 cursor-pointer z-30"
+            className="absolute left-4 top-5 transform -translate-y-1/2 text-gray-500 cursor-pointer"
             size={20}
           />
           <input
