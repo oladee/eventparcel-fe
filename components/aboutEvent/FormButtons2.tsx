@@ -40,6 +40,7 @@ const handleDiscard = () => {
 };
 
   const handleCloseModal = () => setShowModal(false);
+  console.log("Loading state in FormButtons2:", loading);
 
   return (
     <div className="bg-[#FFFF] pt-4 pb-11 flex justify-center fixed z-10 left-0 bottom-0 w-full">

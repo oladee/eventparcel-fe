@@ -1,13 +1,14 @@
 "use client"; 
 
 import { Group } from "@/app/interface/Group";
-import { usePathname, useRouter } from "next/navigation";
+import { usePathname } from "next/navigation";
 import React, { useState } from "react";
 import { FaSpinner } from "react-icons/fa";
 import Cookies from "js-cookie";
 import EventSaveSuccess from "./EventSaveSuccess";
 import axiosInstance from "@/lib/axiosInstance";
 import { toast } from "react-toastify";
+import { useRouter } from "next-nprogress-bar";
 
 
 interface FormButtonsProps {

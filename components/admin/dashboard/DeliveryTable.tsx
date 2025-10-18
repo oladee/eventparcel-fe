@@ -1,7 +1,7 @@
 import { FiPackage, FiSearch } from "react-icons/fi";
 import { HiOutlineDocumentDownload } from "react-icons/hi";
 import { MdOutlineKeyboardArrowDown } from "react-icons/md";
-import { BsThreeDots } from "react-icons/bs";
+// import { BsThreeDots } from "react-icons/bs";
 import { FaRegCircle } from "react-icons/fa6";
 import { PiArrowsDownUpFill } from "react-icons/pi";
 import { GoArrowUp } from "react-icons/go";
@@ -312,9 +312,9 @@ import { trackEvent } from "@/lib/mixpanel";
           <div className="w-[160px] flex items-center gap-1 text-base font-medium text-[#718096]" id="status-header">
             Status <PiArrowsDownUpFill   onClick={sortOrdersByCurrency} className="cursor-pointer"/>
           </div>
-          <div className="w-[60px] flex items-center justify-center shrink-0" id="actions-header">
+          {/* <div className="w-[60px] flex items-center justify-center shrink-0" id="actions-header">
             <BsThreeDots className="w-5 h-5 text-[#A0AEC0]"/>
-          </div>
+          </div> */}
         </div>
 
     {/* Table Body */}
@@ -366,9 +366,9 @@ import { trackEvent } from "@/lib/mixpanel";
                 {order?.orderStatus?.charAt(0)?.toUpperCase() + order?.orderStatus?.slice(1)}
               </span>
             </div>
-            <div className="w-[60px] flex justify-center shrink-0" id={`actions-${order.orderId}`}>
+            {/* <div className="w-[60px] flex justify-center shrink-0" id={`actions-${order.orderId}`}>
               <BsThreeDots className="w-5 h-5 text-[#A0AEC0]"/>
-            </div>
+            </div> */}
           </div>
         ))}
 

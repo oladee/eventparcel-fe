@@ -67,7 +67,7 @@ const CsvModal: React.FC<CsvModalProps> = ({ onClose, onValidContacts }) => {
       if (contacts.length > 0) {
         onValidContacts?.(contacts);
       }
-  }, [contacts]);
+  }, [contacts, onValidContacts]);
 
   // Close modal on Escape key press.
   useEffect(() => {

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, Suspense } from "react";
+import { useState, useEffect, Suspense, useRef } from "react";
 import { useRouter } from "next/navigation";
 import DatePicker from "react-datepicker";
 import "react-datepicker/dist/react-datepicker.css";
@@ -16,6 +16,9 @@ import Container from "@/components/dashboard/Container";
 import dynamic from "next/dynamic";
 import axios from "axios";
 import { ToastContainer, toast } from "react-toastify";
+import { nigerianStates } from "@/utils/data";
+import { trackEvent } from "@/lib/mixpanel";
+import InfoModal from "@/components/modals/InfoModal";
 
 const PickupDeliveryLoationPicker = dynamic(
   () => import("@/components/aboutEvent/PickupDeliveryLoationPicker"),
@@ -35,6 +38,9 @@ const PickupDetails = () => {
   const [isLoadingPaymentData, setIsLoadingPaymentData] = useState(false);
   const [showMapPickerModal, setShowMapPickerModal] = useState(false);
   const [noGroup, setNoGroup] = useState(false);
+  const [isPlatformDeliveryEvent, setIsPlatformDeliveryEvent] = useState(true);
+  const [showInfoModal, setShowInfoModal] = useState(false);
+  const [infoModalData, setInfoModalData] = useState<any>(null);
   const [formData, setFormData] = useState({
     contactName: "",
     contactPhoneNumber: "",
@@ -46,11 +52,55 @@ const PickupDetails = () => {
     deliveryTimeZone: "WAT"
   });
 
+  // State/City dropdown states (mirrors delivery-details page behavior)
+  const [stateSearch, setStateSearch] = useState("");
+  const [citySearch, setCitySearch] = useState("");
+  const [stateDropdownOpen, setStateDropdownOpen] = useState(false);
+  const [cityDropdownOpen, setCityDropdownOpen] = useState(false);
+  const stateInputRef = useRef<HTMLInputElement | null>(null);
+  const cityInputRef = useRef<HTMLInputElement | null>(null);
+
+  const filteredStates = nigerianStates.filter((state) =>
+    state.value.toLowerCase().includes(stateSearch.toLowerCase())
+  );
+
+  const selectedState = nigerianStates.find(
+    (s) => s.value === (formData as any).state
+  );
+  const filteredCities = selectedState
+    ? selectedState.cities.filter((city) =>
+        city.toLowerCase().includes(citySearch.toLowerCase())
+      )
+    : [];
+
+  // Show modal when a state is selected if conditions match
+  const handleStateSelect = (stateValue: string) => {
+    setStateSearch(stateValue);
+    setFormData((prev) => ({ ...(prev as any), state: stateValue }));
+  };
+
   useEffect(() => {
     if (typeof window !== "undefined") {
       setIsClient(true);
     }
   }, []);
+
+  // Fetch event details to determine whether platform delivery is available
+  useEffect(() => {
+    const fetchEvent = async () => {
+      try {
+        const id = localStorage.getItem("eventId") || firstEventId;
+        if (!id) return;
+        const res = await axiosInstance.get(`/view-event/${id}`);
+        setIsPlatformDeliveryEvent(res.data?.data?.isPlatformDelivery);
+      } catch (e) {
+        console.log(e)
+        // ignore
+      }
+    };
+
+    fetchEvent();
+  }, [firstEventId]);
 
   const today = new Date();
 
@@ -216,6 +266,24 @@ const PickupDetails = () => {
     return () => handler.cancel();
   }, [formData.pickupLocation]);
 
+  // Close dropdowns when clicking outside
+  useEffect(() => {
+    const handleClickOutside = (event: MouseEvent) => {
+      if (
+        stateInputRef.current &&
+        !stateInputRef.current.contains(event.target as Node) &&
+        cityInputRef.current &&
+        !cityInputRef.current.contains(event.target as Node)
+      ) {
+        setStateDropdownOpen(false);
+        setCityDropdownOpen(false);
+      }
+    };
+
+    document.addEventListener("click", handleClickOutside);
+    return () => document.removeEventListener("click", handleClickOutside);
+  }, []);
+
   // update the form data with the corresponding latitude and longitude when user type the address
   useEffect(() => {
     const address = debouncedAddress?.trim();
@@ -281,31 +349,66 @@ const PickupDetails = () => {
     if (!isFormValid) return;
     const storedEventId = localStorage.getItem("eventId");
 
-    setLoading(true);
+    // If platform delivery is not part of the event, proceed to save immediately
+    if (!isPlatformDeliveryEvent) {
+      setLoading(true);
+      try {
+        const formattedData = {
+          ...formData,
+          deliveryDate: formatToYYYYMMDD(new Date(formData.deliveryDate)),
+          deliveryTime: formatTime12Hour(formData.deliveryTime)
+        };
 
-    try {
-      const formattedData = {
-        ...formData,
-        deliveryDate: formatToYYYYMMDD(new Date(formData.deliveryDate)),
-        deliveryTime: formatTime12Hour(formData.deliveryTime)
-      };
-
-      await axiosInstance.put(`/update/${storedEventId}`, formattedData);
-      toast.success("Details submitted successfully!");
-      setTimeout(() => {
-        router.back();
-      }, 1000);
-      // router.push("/dashboard/events");
-    } catch (error: any) {
-      if (axios.isAxiosError(error)) {
-        const errorMessage =
-          error.response?.data?.message ||
-          "An error occurred. Please try again.";
-        toast.error(errorMessage);
+        await axiosInstance.put(`/update/${storedEventId}`, formattedData);
+        toast.success("Details submitted successfully!");
+        setTimeout(() => {
+          router.back();
+        }, 1000);
+      } catch (error: any) {
+        if (axios.isAxiosError(error)) {
+          const errorMessage =
+            error.response?.data?.message ||
+            "An error occurred. Please try again.";
+          toast.error(errorMessage);
+        }
+      } finally {
+        setLoading(false);
       }
-    } finally {
-      setLoading(false);
+      return;
     }
+
+    // For platform delivery events, show the InfoModal on submit
+    const selectedState = (formData as any).state;
+    const coveredStates = ["Lagos", "Oyo", "Abuja", "Osun", "Ogun"];
+    const isCovered = coveredStates.includes(selectedState);
+
+    if (isCovered) {
+        setInfoModalData({
+              title: "Some of your guest addresses may fall outside our delivery partner’s coverage.",
+              des: "In such cases, our internal team will work with you directly to arrange delivery to those specific guests.",
+              actionBtnTxt: "Save",
+              isCovered: true
+            });
+        trackEvent("Host Pickup Disclaimer Shown", {
+          event_id: localStorage.getItem("eventId") || firstEventId,
+          state: (formData as any).state,
+          city: (formData as any).city,
+        });
+    } else {
+        setInfoModalData({
+              title: `We are currently unable to cover ${selectedState}`,
+              des: `Platform delivery is currently not available in ${selectedState}, Please choose self-managed delivery under packages creation in groups to continue.`,
+              actionBtnTxt: "Go To Groups",
+              isCovered: false
+            });
+        trackEvent("Host Pickup Disclaimer Shown", {
+          event_id: localStorage.getItem("eventId") || firstEventId,
+          state: (formData as any).state,
+          city: (formData as any).city,
+        });
+    }
+
+    setShowInfoModal(true);
   };
 
   /**
@@ -351,6 +454,48 @@ const PickupDetails = () => {
   }
   return (
     <Container>
+      {showInfoModal && infoModalData && (
+        <InfoModal
+          title={infoModalData.title}
+          des={infoModalData.des}
+          actionBtnTxt={infoModalData.actionBtnTxt}
+          loading={loading}
+          handleActionBtn={async () => {
+            trackEvent("Host Pickup Disclaimer - Continue", {
+              event_id: localStorage.getItem("eventId") || firstEventId,
+              state: (formData as any).state,
+              city: (formData as any).city,
+            });
+            setShowInfoModal(false);
+            if (infoModalData.isCovered) {
+              // Save and continue
+              try {
+                setLoading(true);
+                const storedEventId = localStorage.getItem("eventId");
+                const formattedData = {
+                  ...formData,
+                  deliveryDate: formatToYYYYMMDD(new Date(formData.deliveryDate)),
+                  deliveryTime: formatTime12Hour(formData.deliveryTime)
+                };
+                await axiosInstance.put(`/update/${storedEventId}`, formattedData);
+                toast.success("Details saved");
+                // proceed to next step if any — here we go back
+                router.back();
+              } catch (err) {
+                // ignore
+                console.log(err)
+              } finally {
+                setLoading(false);
+              }
+            } else {
+              // Go To Groups
+              const eventId = localStorage.getItem("eventId") || firstEventId;
+              router.push(`/dashboard/events/${eventId}`);
+            }
+          }}
+          handleClose={() => setShowInfoModal(false)}
+        />
+      )}
       <ToastContainer />
       {showMapPickerModal && (
         <PickupDeliveryLoationPicker
@@ -366,7 +511,7 @@ const PickupDetails = () => {
           onCancel={() => setShowMapPickerModal(false)}
         />
       )}
-      <div className="lg:py-24 px-6 sm:px-4 mx-auto max-w-screen-md h-screen overflow-y-auto no-scrollbar relative">
+      <div className="pb-24 lg:py-24 px-6 sm:px-4 mx-auto max-w-screen-md h-screen overflow-y-auto no-scrollbar relative">
         <div className="mt-3">
           <div className="mb-5">
             <h4
@@ -458,12 +603,103 @@ const PickupDetails = () => {
                     onBlur={handleBlur}
                     className="input-field placeholder:text-[15px] outline-primary pl-12 w-full p-2 rounded-[8px] bg-[#FAFAFA]"
                     required
-                    disabled
+                    // disabled
                   />
                   {errors.pickupLocation && (
                     <p className="text-red-500 text-sm mt-1">
                       {errors.pickupLocation}
                     </p>
+                  )}
+                </div>
+              </div>
+
+              {/* State and City Dropdowns (added to match delivery-details) */}
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                {/* State Dropdown */}
+                <div className="relative">
+                  <label
+                    htmlFor="home-state"
+                    className="block mb-2 font-semibold text-[#111827]"
+                  >
+                    State
+                  </label>
+                  <input
+                    id="home-state"
+                    ref={stateInputRef}
+                    name="state"
+                    type="text"
+                    autoComplete="new-state"
+                    placeholder="Search states..."
+                    spellCheck="false"
+                    autoCorrect="off"
+                    className="w-full px-3 h-12 py-2 rounded-[8px] border border-[#E5E7EB] bg-[#FAFAFA] outline-none"
+                    value={stateSearch}
+                    required
+                    onChange={(e) => {
+                      setStateSearch(e.target.value);
+                    }}
+                    onClick={() => setStateDropdownOpen(true)}
+                  />
+                  {stateDropdownOpen && (
+                    <div className="absolute left-0 right-0 bottom-full mb-1 max-h-60 overflow-y-auto bg-white border border-[#E5E7EB] shadow-lg z-[99] rounded-[12px]">
+                      {filteredStates.map((state) => (
+                        <div
+                          key={state.value}
+                          className="px-3 py-3 cursor-pointer hover:bg-gray-100 text-sm"
+                          onClick={() => {
+                            handleStateSelect(state.value);
+                            setStateDropdownOpen(false);
+                          }}
+                        >
+                          {state.value}
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+
+                {/* City Dropdown */}
+                <div className="relative">
+                  <label
+                    htmlFor="home-city"
+                    className="block mb-2 font-semibold text-[#111827]"
+                  >
+                    City
+                  </label>
+                  <input
+                    id="home-city"
+                    ref={cityInputRef}
+                    name="city"
+                    type="text"
+                    autoComplete="new-city"
+                    placeholder="Search cities..."
+                    spellCheck="false"
+                    autoCorrect="off"
+                    required
+                    className="w-full h-12 rounded-[8px] px-3 py-2 border border-[#E5E7EB] bg-[#FAFAFA] text-sm outline-none"
+                    value={citySearch}
+                    onChange={(e) => {
+                      setCitySearch(e.target.value);
+                      setCityDropdownOpen(true);
+                    }}
+                    onClick={() => setCityDropdownOpen((prev) => !prev)}
+                  />
+                  {cityDropdownOpen && (
+                    <div className="absolute left-0 right-0 bottom-full mb-1 max-h-60 overflow-y-auto bg-white border border-[#E5E7EB] shadow-lg z-[99] rounded-[12px]">
+                      {filteredCities.map((city) => (
+                        <div
+                          key={city}
+                          className="px-3 py-3 cursor-pointer hover:bg-gray-100 text-sm"
+                          onClick={() => {
+                            setCitySearch(city);
+                            setFormData((prev) => ({ ...(prev as any), city }));
+                            setCityDropdownOpen(false);
+                          }}
+                        >
+                          {city}
+                        </div>
+                      ))}
+                    </div>
                   )}
                 </div>
               </div>

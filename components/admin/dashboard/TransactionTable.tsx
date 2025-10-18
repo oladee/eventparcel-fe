@@ -1,6 +1,6 @@
 import { FiPackage, FiSearch } from "react-icons/fi";
 import { HiOutlineDocumentDownload } from "react-icons/hi";
-import { BsThreeDots } from "react-icons/bs";
+// import { BsThreeDots } from "react-icons/bs";
 import { FaRegCircle } from "react-icons/fa6";
 import { PiArrowsDownUpFill } from "react-icons/pi";
 import { BiChevronDown, BiChevronUp } from "react-icons/bi";
@@ -352,9 +352,9 @@ const TransactionTable: React.FC<TransactionProps> = ({orders, currentPage, setC
                 Status 
               </div>
             </th>
-            <th className="p-3 text-center" id="actions-header">
+            {/* <th className="p-3 text-center" id="actions-header">
               <BsThreeDots className="w-5 h-5 text-[#A0AEC0] mx-auto"/>
-            </th>
+            </th> */}
           </tr>
         </thead>
 
@@ -422,9 +422,9 @@ const TransactionTable: React.FC<TransactionProps> = ({orders, currentPage, setC
                       )}          
                   </button>
                 </td>
-                <td className="p-3 text-center" id={`actions-${order.orderNumber}`}>
+                {/* <td className="p-3 text-center" id={`actions-${order.orderNumber}`}>
                   <BsThreeDots className="w-5 h-5 text-[#A0AEC0] mx-auto"/>
-                </td>
+                </td> */}
               </tr>
 
               {/* Expanded Details Row */}

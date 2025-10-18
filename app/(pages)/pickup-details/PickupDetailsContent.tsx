@@ -550,7 +550,7 @@ const handleDiscard = () => {
                   <input
                     type="text"
                     id="pickupLocation"
-                    disabled
+                    // disabled
                     placeholder="Click the map icon to add address"
                     value={formData.pickupLocation}
                     onChange={handleChange}
