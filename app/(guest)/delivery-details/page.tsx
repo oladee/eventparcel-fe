@@ -226,17 +226,31 @@ function DeliveryDetailsForm() {
             value !== null && value !== "" && value !== undefined
         )
       );
+// Construct payload
+const getDeliveryMethod = (type: string) => {
+  switch(type) {
+    case "home":
+      return "homeDelivery";
+    case "platformDelivery":
+      return "platformDelivery";
+    case "selfManaged":
+      return "selfManaged";
+    case "pickup":
+      return "pickUp";
+    default:
+      return "pickUp";
+  }
+};
 
-      // Construct payload
-      const submissionData = {
-        ...cleanedFormData,
-        items: parsedCartItems.map((item: any) => ({
-          packageId: item._id,
-          quantity: item.quantity,
-          deliveryMethod: deliveryType === "home" ? "homeDelivery" : "pickUp"
-        })),
-        deliveryType: deliveryType === "home" ? "homeDelivery" : "pickUp"
-      };
+const submissionData = {
+  ...cleanedFormData,
+  items: parsedCartItems.map((item: any) => ({
+    packageId: item._id,
+    quantity: item.quantity,
+    deliveryMethod: getDeliveryMethod(deliveryType)
+  })),
+  deliveryType: getDeliveryMethod(deliveryType)
+};
 
       // Check platform coverage for home delivery when platform delivery is required by package
       const includesPlatformDelivery = 
