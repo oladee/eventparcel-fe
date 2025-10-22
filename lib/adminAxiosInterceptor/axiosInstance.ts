@@ -1,7 +1,8 @@
 import axios from "axios";
 
 const axiosInstance = axios.create({
-  baseURL: "https://api.eventparcel.com/api/v1",
+  // baseURL: "https://api.eventparcel.com/api/v1",
+  baseURL: "https://api-eventparcel.onrender.com/api/v1",
   headers: { "Content-Type": "application/json" }
 });
 
@@ -9,7 +10,7 @@ const axiosInstance = axios.create({
 axiosInstance.interceptors.request.use(
   function (config) {
     // Retrieve auth token from localStorage
-    const token = localStorage.getItem("authToken"); 
+    const token = localStorage.getItem("authToken");
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
     }
@@ -34,7 +35,8 @@ axiosInstance.interceptors.response.use(
 
       try {
         // Call the refresh token endpoint
-        const refreshResponse = await axios.post("https://api.eventparcel.com/api/v1/refresh-token", {}, {
+        // const refreshResponse = await axios.post("https://api.eventparcel.com/api/v1/refresh-token", {}, {
+        const refreshResponse = await axios.post("https://api-eventparcel.onrender.com/api/v1/refresh-token", {}, {
           withCredentials: true // Ensure cookies are sent with the request
         });
 
@@ -46,7 +48,7 @@ axiosInstance.interceptors.response.use(
         return axiosInstance(originalRequest);
       } catch (refreshError) {
         console.log(refreshError);
-        
+
         // Handle refresh token error (e.g., redirect to login)
         window.location.href = "/adminLogin"; // Update this to your login route
         return Promise.reject(refreshError);
