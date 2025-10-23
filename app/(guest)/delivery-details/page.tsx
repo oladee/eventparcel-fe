@@ -129,6 +129,74 @@ function DeliveryDetailsForm() {
     setDispatchDropdownOpen(false);
   };
 
+  // Map UI selection to backend submission strings (component scope)
+  // Backend requires camelCase, no-space strings: pickUp, platformDelivery, selfManagedDelivery
+  const mapSelectionToSubmission = (sel: string) => {
+    if (!sel) return "";
+    if (sel === "pickup") return "pickUp";
+    if (sel === "platformDelivery") return "platformDelivery";
+    if (sel === "selfManaged") return "selfManagedDelivery";
+    if (sel === "home") {
+      const needsPlatform = packageDelivery?.some((pd: string) => pd === "homeDelivery:platformDelivery" || pd === "platformDelivery");
+      const needsSelf = packageDelivery?.some((pd: string) => pd === "homeDelivery:selfManaged" || pd === "selfManaged");
+      if (needsPlatform) return "platformDelivery";
+      if (needsSelf) return "selfManagedDelivery";
+      // default home fallback — prefer platformDelivery
+      return "platformDelivery";
+    }
+    return "";
+  };
+
+  const perItemMethodFromSelection = (sel: string) => {
+    const submission = mapSelectionToSubmission(sel);
+    // For per-item deliveryMethod, backend expects camelCase no-space keys too
+    if (submission === "pickUp") return "pickUp";
+    if (submission === "platformDelivery") return "platformDelivery";
+    if (submission === "selfManagedDelivery") return "selfManagedDelivery";
+    return "pickUp";
+  };
+
+  // When guest clicks Platform Delivery, show the coverage InfoModal before finalizing
+  const handlePlatformDeliveryClick = () => {
+    // Immediately mark platform delivery selection so the form shows the state/city inputs
+    setDeliveryType("platformDelivery");
+    setFormData((prev) => ({ ...prev, deliveryType: "platformDelivery" }));
+
+    const state = formData.state;
+    const coveredStates = ["Lagos", "Oyo", "Abuja", "Osun", "Ogun"];
+
+    // If state is not selected yet, show a friendly modal prompting the user to pick a state
+    if (!state) {
+      setGuestInfoModalData({
+        title: "Some of your guest addresses may fall outside our delivery partner’s coverage.",
+        des: "Please select your state on the form to check if we cover it. You can continue and provide your state now.",
+        actionBtnTxt: "Continue",
+        isCovered: true,
+        context: "selection",
+      });
+    } else {
+      const isCovered = coveredStates.includes(state);
+      setGuestInfoModalData({
+        title: isCovered
+          ? "Some of your guest addresses may fall outside our delivery partner’s coverage."
+          : `We are currently unable to cover ${state}`,
+        des: isCovered
+          ? "In such cases, our internal team will work with you directly to arrange delivery to those specific guests."
+          : `Platform delivery is currently not available in ${state}. Please choose pickup or choose another address.`,
+        actionBtnTxt: isCovered ? "Continue" : "Go Back",
+        isCovered,
+        context: "selection",
+      });
+    }
+
+    trackEvent("Guest Delivery Disclaimer Shown", {
+      state: formData.state,
+      city: formData.city,
+    });
+
+    setShowGuestInfoModal(true);
+  };
+
   //validate form
   const validateForm = () => {
     const errors: Record<string, string> = {};
@@ -226,30 +294,19 @@ function DeliveryDetailsForm() {
             value !== null && value !== "" && value !== undefined
         )
       );
-// Construct payload
-const getDeliveryMethod = (type: string) => {
-  switch(type) {
-    case "home":
-      return "homeDelivery";
-    case "platformDelivery":
-      return "platformDelivery";
-    case "selfManaged":
-      return "selfManaged";
-    case "pickup":
-      return "pickUp";
-    default:
-      return "pickUp";
-  }
-};
+// Use the component-scope mapping helpers (mapSelectionToSubmission and perItemMethodFromSelection)
+// so the submission payload uses the backend-expected labels.
 
+// Construct payload
+const submissionDeliveryType = mapSelectionToSubmission(deliveryType || formData.deliveryType || "");
 const submissionData = {
   ...cleanedFormData,
   items: parsedCartItems.map((item: any) => ({
     packageId: item._id,
     quantity: item.quantity,
-    deliveryMethod: getDeliveryMethod(deliveryType)
+    deliveryMethod: perItemMethodFromSelection(deliveryType || formData.deliveryType || "")
   })),
-  deliveryType: getDeliveryMethod(deliveryType)
+  deliveryType: submissionDeliveryType
 };
 
       // Check platform coverage for home delivery when platform delivery is required by package
@@ -257,27 +314,31 @@ const submissionData = {
         packageDelivery.includes("homeDelivery:platformDelivery") || 
         packageDelivery.includes("platformDelivery");
 
-      // If platform delivery is required, ensure state is supported. If unsupported, show modal.
-      if (includesPlatformDelivery && deliveryType === "home") {
+      // If platform delivery is required, ensure state is supported. If unsupported, show modal and DO NOT call backend.
+      if (includesPlatformDelivery && (deliveryType === "home" || deliveryType === "platformDelivery")) {
         const coveredStates = ["Lagos", "Oyo", "Abuja", "Osun", "Ogun"];
         if (!formData.state) {
+          // Prompt user to select state before proceeding
           setErrors((prev) => ({ ...prev, state: "State is required" }));
           setIsSubmitting(false);
           return;
         }
+
         const isCovered = coveredStates.includes(formData.state);
         if (!isCovered) {
-          // Show modal informing guest platform delivery not available
+          // Show modal informing guest platform delivery not available and prevent backend call
           setGuestInfoModalData({
             title: `We are currently unable to cover ${formData.state}`,
             des: `Platform delivery is currently not available in ${formData.state}. Please choose pickup or choose another address.`,
             actionBtnTxt: "Go Back",
             isCovered: false,
+            context: "submission",
           });
           setShowGuestInfoModal(true);
           trackEvent("Guest Delivery Disclaimer Shown", {
             state: formData.state,
             city: formData.city,
+            context: "submission",
           });
           setIsSubmitting(false);
           return;
@@ -436,7 +497,7 @@ const submissionData = {
                     packageDelivery.includes("homeDelivery:platformDelivery")) && (
                     <button
                       type="button"
-                      onClick={() => setDeliveryType("platformDelivery")}
+                      onClick={handlePlatformDeliveryClick}
                       className={`w-[147.5px] h-[45px] flex items-center gap-2 border rounded-[8px] p-1.5 text-[#111827] font-general text-sm ${
                         deliveryType === "platformDelivery"
                           ? "border-[#7A1626] bg-[#FDF4F5]"
@@ -613,7 +674,7 @@ const submissionData = {
                         type="text"
                         id="shippingAddress"
                         placeholder="Click the map icon to add address"
-                        disabled
+                        // disabled
                         name="shippingAddress"
                         value={formData.shippingAddress}
                         onChange={handleInputChange}
@@ -897,9 +958,15 @@ const submissionData = {
                 actionBtnTxt={guestInfoModalData.actionBtnTxt}
                 loading={false}
                 handleActionBtn={async () => {
-                  // Guest clicked Continue/Go Back action
+                  const isSelection = guestInfoModalData?.context === "selection";
+
+                  // Track user action
                   trackEvent(
-                    guestInfoModalData.isCovered ? "Guest Delivery Disclaimer - Continue" : "Guest Delivery Disclaimer - Go Back",
+                    guestInfoModalData.isCovered
+                      ? isSelection
+                        ? "Guest Delivery Disclaimer - Continue"
+                        : "Guest Delivery Disclaimer - Continue"
+                      : "Guest Delivery Disclaimer - Go Back",
                     {
                       state: formData.state,
                       city: formData.city,
@@ -908,12 +975,21 @@ const submissionData = {
 
                   setShowGuestInfoModal(false);
 
+                  if (isSelection) {
+                    // Finalize selection if covered
+                    if (guestInfoModalData.isCovered) {
+                      setDeliveryType("platformDelivery");
+                      setFormData((prev) => ({ ...prev, deliveryType: "platformDelivery" }));
+                    }
+                    return;
+                  }
+
+                  // Otherwise, run the original submission retry flow
                   if (!guestInfoModalData.isCovered) {
                     // Go back: simply return user to the form (modal closed)
                     return;
                   }
 
-                  // If covered and guest chose to continue, attempt submit again
                   try {
                     setIsSubmitting(true);
                     const cleanedFormData = Object.fromEntries(
@@ -927,9 +1003,9 @@ const submissionData = {
                       items: parsedCartItems.map((item: any) => ({
                         packageId: item._id,
                         quantity: item.quantity,
-                        deliveryMethod: deliveryType === "home" ? "homeDelivery" : "pickUp"
+                        deliveryMethod: perItemMethodFromSelection(deliveryType || formData.deliveryType || "")
                       })),
-                      deliveryType: deliveryType === "home" ? "homeDelivery" : "pickUp"
+                      deliveryType: mapSelectionToSubmission(deliveryType || formData.deliveryType || "")
                     };
 
                     const res = await axiosInstance.post(

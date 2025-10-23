@@ -65,6 +65,8 @@ const CreatePackageModal: React.FC<CreatePackageModalProps> = ({ groudId, groupC
     const [selected, setSelected] = useState<BoxOption | null>(null);
     const [showModal, setShowModal] = useState(false);
 
+    console.log("group currency:", groupCurrency);
+
     // Normalized initial packageDelivery - support both old and new formats
     const normalizeDeliveryArray = (raw: any): string[] => {
         if (!raw) return [];
@@ -185,7 +187,25 @@ const validateField = useCallback(
         });
     }, [formData.packageDelivery]);
 
+    // If group currency is USD, platform delivery is not available — ensure UI reflects that
+    useEffect(() => {
+        if (groupCurrency === "USD") {
+            // Remove any platformDelivery selections from initial data
+            setFormData((prev) => ({
+                ...prev,
+                packageDelivery: (prev.packageDelivery || []).filter((d) => d !== "platformDelivery" && d !== "homeDelivery:platformDelivery")
+            }));
+
+            setSelectedOptions((prev) => ({ ...prev, platformDelivery: false }));
+        }
+    }, [groupCurrency]);
+
     const toggleDeliveryOption = (option: "pickUp" | "platformDelivery" | "selfManaged") => {
+        // If platformDelivery is disabled for this group, block selection
+        if (option === "platformDelivery" && groupCurrency === "USD") {
+            toast.info("Platform delivery is not available for USD groups. Please choose another delivery option.");
+            return;
+        }
         // helper to get legacy key for homeDelivery variants
         const legacyFor = (opt: string) =>
             opt === "platformDelivery" ? "homeDelivery:platformDelivery" : opt === "selfManaged" ? "homeDelivery:selfManaged" : null;
