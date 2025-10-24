@@ -419,7 +419,7 @@ useEffect(() => {
 
           // For platform delivery events, show modal with appropriate message
           const selectedState = (formData as any).state;
-          const coveredStates = ["Lagos", "Oyo", "Abuja", "Osun", "Ogun"];
+          const coveredStates = ["Lagos", "Oyo", "Abuja", "Osun", "Ogun", "Fct"];
           const isCovered = coveredStates.includes(selectedState);
 
           if (isCovered) {
