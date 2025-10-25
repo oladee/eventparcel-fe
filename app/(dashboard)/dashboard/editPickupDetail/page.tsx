@@ -379,7 +379,7 @@ const PickupDetails = () => {
     }
 
     const selectedStateVal = formData.state;
-    const coveredStates = ["Lagos", "Oyo", "Abuja", "Osun", "Ogun"];
+    const coveredStates = ["Lagos", "Oyo", "Osun", "Ogun", "Fct"];
     const isCovered = coveredStates.includes(selectedStateVal);
 
     if (isCovered) {

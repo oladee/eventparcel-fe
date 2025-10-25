@@ -163,13 +163,13 @@ function DeliveryDetailsForm() {
     setFormData((prev) => ({ ...prev, deliveryType: "platformDelivery" }));
 
     const state = formData.state;
-    const coveredStates = ["Lagos", "Oyo", "Abuja", "Osun", "Ogun"];
+    const coveredStates = ["Lagos", "Oyo", "Fct", "Osun", "Ogun", "FCT - Abuja"];
 
     // If state is not selected yet, show a friendly modal prompting the user to pick a state
     if (!state) {
       setGuestInfoModalData({
-        title: "Some of your guest addresses may fall outside our delivery partner’s coverage.",
-        des: "Please select your state on the form to check if we cover it. You can continue and provide your state now.",
+        title: "Selecting platform delivery requires state selection",
+        des: "Please you'd be required to select your desired state of delivery from the form below, Our covered states are Lagos, Oyo, Abuja, Osun, and Ogun.",
         actionBtnTxt: "Continue",
         isCovered: true,
         context: "selection",
@@ -178,10 +178,10 @@ function DeliveryDetailsForm() {
       const isCovered = coveredStates.includes(state);
       setGuestInfoModalData({
         title: isCovered
-          ? "Some of your guest addresses may fall outside our delivery partner’s coverage."
+          ? "The selected addresses falls outside our delivery partner’s coverage."
           : `We are currently unable to cover ${state}`,
         des: isCovered
-          ? "In such cases, our internal team will work with you directly to arrange delivery to those specific guests."
+          ? "In such cases, our internal team will work with you directly to arrange delivery to you."
           : `Platform delivery is currently not available in ${state}. Please choose pickup or choose another address.`,
         actionBtnTxt: isCovered ? "Continue" : "Go Back",
         isCovered,
@@ -316,7 +316,7 @@ const submissionData = {
 
       // If platform delivery is required, ensure state is supported. If unsupported, show modal and DO NOT call backend.
       if (includesPlatformDelivery && (deliveryType === "home" || deliveryType === "platformDelivery")) {
-        const coveredStates = ["Lagos", "Oyo", "Abuja", "Osun", "Ogun"];
+        const coveredStates = ["Lagos", "Oyo", "Fct", "Osun", "Ogun"];
         if (!formData.state) {
           // Prompt user to select state before proceeding
           setErrors((prev) => ({ ...prev, state: "State is required" }));
