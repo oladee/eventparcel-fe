@@ -499,16 +499,18 @@ const OrdersHeader: React.FC<OrdersProps> = ({orders, currentPage, setCurrentPag
             className="bg-white p-4 rounded-[15px] shadow-md w-64"
           >
             <ul className="space-y-2">
-              {["pending", "shipped", "delivered"].map((status) => (
+              {(selectedOrder.deliveryType === "homeDelivery"
+                ? ["pending", "shipped", "delivered"]
+                : ["pending", "pickedUp"]).map((status) => (
                 <li
-                key={status}
+                  key={status}
                   onClick={() => !statusUpdateLoading && handleStatusUpdate(selectedOrder._id, status)}
                   className={`p-2 hover:bg-[#F9FAFB] rounded-md cursor-pointer ${
                     statusUpdateLoading ? "opacity-50 cursor-not-allowed" : ""
                   } ${
                     selectedOrder.orderStatus === status ? "bg-[#F9FAFB] font-semibold" : ""
                   }`}
-                  >
+                >
                   {status.charAt(0).toUpperCase() + status.slice(1)}
                   {statusUpdateLoading && selectedOrder.orderStatus === status && (
                     <span className="ml-2">...</span>

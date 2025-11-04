@@ -219,9 +219,10 @@ function PaymentDetailsCard() {
             </div> */}
             <hr className="border-[#F1F2F4]"/>
             <div className="flex justify-between font-medium text-[#111827]">
-              <span className="font-general font-semibold text-sm text-[#111827]">Subtotal</span>
+              <span className="font-general font-semibold text-sm text-[#111827]">Total</span>
               <span className="font-general font-semibold text-sm text-[#111827]">
                 {currencySymbol === "NGN" ? "₦" : "$"}{(subtotal + deliveryFee).toLocaleString()}
+                {/* {currencySymbol === "NGN" ? "₦" : "$"}{(subtotal).toLocaleString()} */}
               </span>
             </div>
           </div>

@@ -7,7 +7,7 @@ import { BiLoaderCircle } from 'react-icons/bi';
 interface WarningModalProps {
   title: string;
   des: string;
-  actionBtnTxt: string;
+  actionBtnTxt?: string | null;
   handleActionBtn: () => void;
   handleClose: () => void;
   loading: boolean;
@@ -32,13 +32,15 @@ const InfoModal: React.FC<WarningModalProps> = ({ handleActionBtn, handleClose, 
           <p className="font-medium text-[#718096]">
             {des}
           </p>
-          <div onClick={handleActionBtn} className="button_v1">
-            {loading ? (
-              <BiLoaderCircle className="animate-spin mr-2" size={22} />
-            ) : (
-              <span>{actionBtnTxt}</span>
-            )}
-          </div>
+          {actionBtnTxt ? (
+            <div onClick={handleActionBtn} className="button_v1">
+              {loading ? (
+                <BiLoaderCircle className="animate-spin mr-2" size={22} />
+              ) : (
+                <span>{actionBtnTxt}</span>
+              )}
+            </div>
+          ) : null}
           <div onClick={handleClose} className="w-full bg-[#FFFFFF] text-[#111827] border border-[#111827] py-3 rounded-[12px] hover:bg-red-800 transition flex items-center justify-center">
             <button className="">Go Back</button>
           </div>
