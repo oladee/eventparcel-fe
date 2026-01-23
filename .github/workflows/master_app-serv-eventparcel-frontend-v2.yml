@@ -38,9 +38,9 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_59CF3541AA1340EEA146E2CFB23053D8 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_D0DF5D7F9FDA4245BA379BBD631B8295 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_3C175E38E3A440D7888C36AD46FDADE5 }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_F73FC4D4FFED47C0A10F79D1579E03A3 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_29899A4C42244EB49F2FDA6691943D93 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_21401D13D843435CACE4E29957269148 }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
@@ -50,3 +50,6 @@ jobs:
           slot-name: 'Production'
           package: .
           clean: false  # Keep existing files, including .next
+
+
+
