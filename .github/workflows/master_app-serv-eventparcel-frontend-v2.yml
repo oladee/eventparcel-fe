@@ -27,7 +27,7 @@ jobs:
       - name: Build Next.js app
         run: npm run build
         env:
-          NEXT_PUBLIC_API_URL: 'https://app-serv-eventparcel-backend-v2-bndfhac5gzgne3dx.westeurope-01.azurewebsites.net'
+          NEXT_PUBLIC_API_BASE_URL: 'https://app-serv-eventparcel-backend-v2-bndfhac5gzgne3dx.westeurope-01.azurewebsites.net'
 
       - name: Verify build output
         run: |
@@ -50,6 +50,7 @@ jobs:
           slot-name: 'Production'
           package: .
           clean: false  # Keep existing files, including .next
+
 
 
 
