@@ -39,7 +39,6 @@ function DeliveryDetailsForm() {
   const [citySearch, setCitySearch] = useState("");
   const [stateDropdownOpen, setStateDropdownOpen] = useState(false);
   const [cityDropdownOpen, setCityDropdownOpen] = useState(false);
-  const [dispatchDropdownOpen, setDispatchDropdownOpen] = useState(false);
   const [formData, setFormData] = useState({
     deliveryType,
     guestFirstName: "",
@@ -50,14 +49,12 @@ function DeliveryDetailsForm() {
     addressLatitude: "",
     addressLongitude: "",
     state: "",
-    city: "",
-    dispatchType: ""
+    city: ""
   });
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const stateInputRef = useRef<HTMLInputElement | null>(null);
   const cityInputRef = useRef<HTMLInputElement | null>(null);
-  const dispatchInputRef = useRef<HTMLInputElement | null>(null);
 
   const filteredStates = nigerianStates.filter((state) =>
     state.value.toLowerCase().includes(stateSearch.toLowerCase())
@@ -121,14 +118,6 @@ function DeliveryDetailsForm() {
     }));
   };
 
-  const handleDispatchTypeSelection = (type: string) => {
-    setFormData((prev) => ({
-      ...prev,
-      dispatchType: type
-    }));
-    setDispatchDropdownOpen(false);
-  };
-
   // Map UI selection to backend submission strings (component scope)
   // Backend requires camelCase, no-space strings: pickUp, platformDelivery, selfManagedDelivery
   const mapSelectionToSubmission = (sel: string) => {
@@ -156,45 +145,10 @@ function DeliveryDetailsForm() {
     return "pickUp";
   };
 
-  // When guest clicks Platform Delivery, show the coverage InfoModal before finalizing
+  // When guest clicks Platform Delivery, set selection directly (no coverage modal)
   const handlePlatformDeliveryClick = () => {
-    // Immediately mark platform delivery selection so the form shows the state/city inputs
     setDeliveryType("platformDelivery");
     setFormData((prev) => ({ ...prev, deliveryType: "platformDelivery" }));
-
-    const state = formData.state;
-    const coveredStates = ["Lagos", "Oyo", "Fct", "Osun", "Ogun", "FCT - Abuja"];
-
-    // If state is not selected yet, show a friendly modal prompting the user to pick a state
-    if (!state) {
-      setGuestInfoModalData({
-        title: "Selecting platform delivery requires state selection",
-        des: "Please you'd be required to select your desired state of delivery from the form below, Our covered states are Lagos, Oyo, Abuja, Osun, and Ogun.",
-        actionBtnTxt: "Continue",
-        isCovered: true,
-        context: "selection",
-      });
-    } else {
-      const isCovered = coveredStates.includes(state);
-      setGuestInfoModalData({
-        title: isCovered
-          ? "The selected addresses falls outside our delivery partner’s coverage."
-          : `We are currently unable to cover ${state}`,
-        des: isCovered
-          ? "In such cases, our internal team will work with you directly to arrange delivery to you."
-          : `Platform delivery is currently not available in ${state}. Please choose pickup or choose another address.`,
-        actionBtnTxt: isCovered ? "Continue" : "Go Back",
-        isCovered,
-        context: "selection",
-      });
-    }
-
-    trackEvent("Guest Delivery Disclaimer Shown", {
-      state: formData.state,
-      city: formData.city,
-    });
-
-    setShowGuestInfoModal(true);
   };
 
   //validate form
@@ -219,13 +173,6 @@ function DeliveryDetailsForm() {
       if (!formData.state) errors.state = "State is required";
       if (!formData.city) errors.city = "City is required";
 
-      const includesPlatformDelivery = 
-        packageDelivery.includes("homeDelivery:platformDelivery") || 
-        packageDelivery.includes("platformDelivery");
-
-      if (includesPlatformDelivery && !formData.dispatchType) {
-        errors.dispatchType = "Dispatch type is required for platform delivery";
-      }
     }
 
     return errors;
@@ -260,10 +207,6 @@ function DeliveryDetailsForm() {
 
       // Validate required fields based on delivery type
       if (deliveryType === "home") {
-        const includesPlatformDelivery = 
-          packageDelivery.includes("homeDelivery:platformDelivery") || 
-          packageDelivery.includes("platformDelivery");
-        
         if (
           !formData.guestFirstName ||
           !formData.guestLastName ||
@@ -271,8 +214,7 @@ function DeliveryDetailsForm() {
           !formData.guestPhoneNumber ||
           !formData.shippingAddress ||
           !formData.state ||
-          !formData.city ||
-          (includesPlatformDelivery && !formData.dispatchType)
+          !formData.city
         ) {
           throw new Error("Please fill all required fields");
         }
@@ -309,41 +251,7 @@ const submissionData = {
   deliveryType: submissionDeliveryType
 };
 
-      // Check platform coverage for home delivery when platform delivery is required by package
-      const includesPlatformDelivery = 
-        packageDelivery.includes("homeDelivery:platformDelivery") || 
-        packageDelivery.includes("platformDelivery");
 
-      // If platform delivery is required, ensure state is supported. If unsupported, show modal and DO NOT call backend.
-      if (includesPlatformDelivery && (deliveryType === "home" || deliveryType === "platformDelivery")) {
-        const coveredStates = ["Lagos", "Oyo", "Fct", "Osun", "Ogun"];
-        if (!formData.state) {
-          // Prompt user to select state before proceeding
-          setErrors((prev) => ({ ...prev, state: "State is required" }));
-          setIsSubmitting(false);
-          return;
-        }
-
-        const isCovered = coveredStates.includes(formData.state);
-        if (!isCovered) {
-          // Show modal informing guest platform delivery not available and prevent backend call
-          setGuestInfoModalData({
-            title: `We are currently unable to cover ${formData.state}`,
-            des: `Platform delivery is currently not available in ${formData.state}. Please choose pickup or choose another address.`,
-            actionBtnTxt: null,
-            isCovered: false,
-            context: "submission",
-          });
-          setShowGuestInfoModal(true);
-          trackEvent("Guest Delivery Disclaimer Shown", {
-            state: formData.state,
-            city: formData.city,
-            context: "submission",
-          });
-          setIsSubmitting(false);
-          return;
-        }
-      }
 
       const res = await axiosInstance.post(
         `/guest-checkout/${parsedEventData?.eventId}/${parsedEventData?.eventGroupId}`,
@@ -375,7 +283,7 @@ const submissionData = {
 
   // Guest InfoModal state and handlers
   const [showGuestInfoModal, setShowGuestInfoModal] = useState(false);
-  const [guestInfoModalData, setGuestInfoModalData] = useState<any>(null);
+  const [guestInfoModalData] = useState<any>(null);
 
   // Initialize deliveryType based on packageDelivery contents
   useEffect(() => {
@@ -384,7 +292,7 @@ const submissionData = {
     const hasHomeDelivery = 
       packageDelivery.includes("homeDelivery:platformDelivery") ||
       packageDelivery.includes("homeDelivery:selfManaged") ||
-      packageDelivery.includes("platformDelivery") || 
+      packageDelivery.includes("platformDelivery") ||
       packageDelivery.includes("selfManaged");
     
     const hasPickup = packageDelivery.includes("pickUp");
@@ -413,13 +321,10 @@ const submissionData = {
         stateInputRef.current &&
         !stateInputRef.current.contains(event.target as Node) &&
         cityInputRef.current &&
-        !cityInputRef.current.contains(event.target as Node) &&
-        dispatchInputRef.current &&
-        !dispatchInputRef.current.contains(event.target as Node)
+        !cityInputRef.current.contains(event.target as Node)
       ) {
         setStateDropdownOpen(false);
         setCityDropdownOpen(false);
-        setDispatchDropdownOpen(false);
       }
     };
 
@@ -444,7 +349,6 @@ const submissionData = {
                 addressLatitude: location?.lat?.toString(),
                 addressLongitude: location?.lng?.toString(),
               }));
-            
               // Clear the address error if present
               setErrors((prev) => {
                 const updated = { ...prev };
@@ -453,7 +357,6 @@ const submissionData = {
                 }
                 return updated;
               });
-            
               setShowMapPickerModal(false);
             }}
             onCancel={() => setShowMapPickerModal(false)}
@@ -468,7 +371,7 @@ const submissionData = {
             <form onSubmit={handleSubmit}>
               <div className="w-[311px]">
                 <label className="text-base font-medium text-[#718096] mt-6 mb-3 block">
-                  Delivery Type
+                  Delivery Types
                 </label>
                 <div className="flex justify-between gap-3">
                   {/* Home Delivery Button */}
@@ -784,49 +687,6 @@ const submissionData = {
                     </div>
                   </div>
 
-                  {/* Dispatch Type Dropdown - Show for platform delivery types */}
-                  {(packageDelivery.includes("homeDelivery:platformDelivery") || 
-                    packageDelivery.includes("platformDelivery")) && 
-                    (deliveryType === "home" || deliveryType === "platformDelivery") && (
-                    <div className="relative">
-                      <label
-                        htmlFor="home-dispatch-type"
-                        className="font-general font-medium text-base block mb-1 text-[#718096]"
-                      >
-                        Dispatch Type
-                      </label>
-                      <input
-                        id="home-dispatch-type"
-                        name="dispatchType"
-                        ref={dispatchInputRef}
-                        type="text"
-                        required
-                        placeholder="Select dispatch type"
-                        className="w-full h-14 px-4 py-2 rounded-[12px] border border-[#E5E7EB] bg-[#FAFAFA] focus:outline-none focus:border-[#8B1E3F]"
-                        value={formData.dispatchType}
-                        onChange={() => {}}
-                        onClick={() =>
-                          setDispatchDropdownOpen(!dispatchDropdownOpen)
-                        }
-                      />
-                      {dispatchDropdownOpen && (
-                        <div className="absolute left-0 right-0 bg-white border shadow-lg mt-1 rounded-md z-10">
-                          <div
-                            onClick={() => handleDispatchTypeSelection("Bike")}
-                            className="px-3 py-2 cursor-pointer hover:bg-gray-100 text-sm"
-                          >
-                            Bike
-                          </div>
-                          <div
-                            onClick={() => handleDispatchTypeSelection("Van")}
-                            className="px-3 py-2 cursor-pointer hover:bg-gray-100 text-sm"
-                          >
-                            Van
-                          </div>
-                        </div>
-                      )}
-                    </div>
-                  )}
                 </div>
               ) : (
                 /* Pickup Form */

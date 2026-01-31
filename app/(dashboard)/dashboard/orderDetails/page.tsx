@@ -62,7 +62,6 @@ const Page = () => {
                 orderStatus: status
             }));
         }
-        
     } catch (error: any) {
         toast.error(error?.response?.data?.message || "Failed to update order status.");
     }
@@ -83,20 +82,16 @@ const Page = () => {
 
       const formatDate = (dateString: string) => {
         const date = new Date(dateString);
-        
         const day = date.toLocaleString("en-GB", { day: "2-digit" });
         const month = date.toLocaleString("en-GB", { month: "short" });
         const year = date.getFullYear();
-      
         return `${day} ${month}, ${year}`;
       };
-      
 
       const itemTotalAmount = Math.max(
         (orders?.totalAmount || 0) - (orders?.tax || 0) - (orders?.homeDeliveryFee || 0),
         0
       );
-      
       const getStatusClass = (status: string) => {
         switch (status.toLowerCase()) {
           case 'paid':
@@ -113,20 +108,17 @@ const Page = () => {
       const getBgStatusClass = (status: string) => {
         switch (status.toLowerCase()) {
           case 'paid':
-            return 'bg-green-100';  
+            return 'bg-green-100';
           case 'pending':
-            return 'bg-yellow-100';  
+            return 'bg-yellow-100';
           case 'failed':
-            return 'bg-red-100';    
+            return 'bg-red-100';
           default:
-            return 'bg-gray-100';    
+            return 'bg-gray-100';
         }
       };
-      
-      
       const capitalizeFirstLetter = (text: string) =>
         text.charAt(0).toUpperCase() + text.slice(1).toLowerCase();
-    
 
     const NairaCircleIcon = () => (
     <div className="relative w-6 h-6">
@@ -137,11 +129,10 @@ const Page = () => {
 
          const capitalize = (str?: string) =>
               str ? str.charAt(0).toUpperCase() + str.slice(1).toLowerCase() : '';
-        
-        
+
          const exportToCSV = (order: any, filename = "order.csv") => {
       if (!order) return;
-    
+
       const headers = [
         "Order ID",
         "Order Date",
@@ -151,7 +142,6 @@ const Page = () => {
         "Delivery Type",
         "Status"
       ];
-    
       const values = [
         order.orderId || "",
         order.createdAt ? new Date(order.createdAt).toLocaleString() : "",
@@ -163,25 +153,20 @@ const Page = () => {
         order.deliveryType || "",
         order.orderStatus || ""
       ].map((value) => `"${String(value).replace(/"/g, '""')}"`);
-    
       const csvContent = [headers.join(","), values.join(",")].join("\n");
-    
       try {
         const BOM = "\uFEFF";
         const blob = new Blob([BOM + csvContent], { type: "text/csv;charset=utf-8;" });
         const url = URL.createObjectURL(blob);
-    
         const a = document.createElement("a");
         a.href = url;
         a.download = filename;
         document.body.appendChild(a);
         a.click();
-    
         setTimeout(() => {
           document.body.removeChild(a);
           URL.revokeObjectURL(url);
         }, 100);
-    
         trackEvent?.("Export Data", {
           source: `${pathname} page`,
           timestamp: new Date().toISOString(),
@@ -189,7 +174,6 @@ const Page = () => {
           route: pathname,
           status: "Successful"
         });
-    
       } catch (error) {
         console.error("CSV export failed", error);
         trackEvent?.("Export Data", {
@@ -201,9 +185,6 @@ const Page = () => {
         });
       }
     };
-    
-
-          
     if (!orders) {
         return (
             <Container>
@@ -235,7 +216,7 @@ const Page = () => {
                         id="orders-page-heading"
                         className="text-2xl font-general font-bold text-[#111827]"
                         >
-                            Order details
+                            Order detail
                         </h4>
                         {/* Right: Export */}
                         <div id="table-export" className="w-[90.71px] h-[37px] md:w-auto">
@@ -243,7 +224,7 @@ const Page = () => {
                         onClick={() => orders && exportToCSV(orders)}
                         className="w-full h-full flex items-center justify-center gap-1 bg-[#FFFFFF] rounded-[12px] px-3 py-1.5 text-sm text-[#718096] font-medium shadow-sm">
                             <HiOutlineDocumentDownload size={16} />
-                            Export 
+                            Export
                             {/* <MdOutlineKeyboardArrowDown className="w-6 h-6 text-[#718096]"/> */}
                         </button>
                         </div>
@@ -263,7 +244,6 @@ const Page = () => {
                         </span>
                     </div>
                     <div id="status-divider" className="border-t border-[#EEEFF2] my-3"></div>
-                    
                     {orders.items.map((item: { _id: React.Key | null | undefined; packageId: { packageImgUrls: any[]; packageTitle: string; }; packageImgUrls: any[]; packageTitle: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; packagePriceCurrency: string; packagePrice: { toLocaleString: () => any; }; quantity: string | number | bigint | boolean | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | React.ReactPortal | Promise<string | number | bigint | boolean | React.ReactPortal | React.ReactElement<unknown, string | React.JSXElementConstructor<any>> | Iterable<React.ReactNode> | null | undefined> | null | undefined; }, index: any) => (
                         <div 
                             key={item._id} 
