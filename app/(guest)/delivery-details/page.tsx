@@ -283,7 +283,7 @@ const submissionData = {
 
   // Guest InfoModal state and handlers
   const [showGuestInfoModal, setShowGuestInfoModal] = useState(false);
-  const [guestInfoModalData] = useState<any>(null);
+  const [guestInfoModalData, setGuestInfoModalData] = useState<any>(null);
 
   // Initialize deliveryType based on packageDelivery contents
   useEffect(() => {
@@ -626,12 +626,27 @@ const submissionData = {
                               key={state.value}
                               className="px-3 py-3 cursor-pointer hover:bg-gray-100 text-sm"
                               onClick={() => {
+                                const coveredStates = ["Lagos", "Oyo", "Fct", "Osun", "Ogun", "FCT - Abuja"];
+                                const isStateCovered = coveredStates.includes(state.value);
+                                
                                 setStateSearch(state.value);
                                 setFormData((prev) => ({
                                   ...prev,
                                   state: state.value
                                 }));
                                 setStateDropdownOpen(false);
+                                
+                                // Show modal if state is not covered for platform delivery
+                                if (!isStateCovered && deliveryType === "home") {
+                                  setGuestInfoModalData({
+                                    title: "Platform delivery not available",
+                                    des: `Platform delivery is currently not available in ${state.value}. Please choose pickup or choose another address in our covered states: Lagos, Oyo, Abuja, Osun, and Ogun.`,
+                                    actionBtnTxt: "Proceed",
+                                    isCovered: false,
+                                    context: "unavailable",
+                                  });
+                                  setShowGuestInfoModal(true);
+                                }
                               }}
                             >
                               {state.value}
