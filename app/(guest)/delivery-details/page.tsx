@@ -24,23 +24,35 @@ function DeliveryDetailsForm() {
   const eventData = searchParams.get("eventData");
   const parsedCartItems = cartItems ? JSON.parse(cartItems) : [];
   const parsedEventData = eventData ? JSON.parse(eventData) : [];
+  
+  // Fallback delivery options when no cart data is present - Platform, Self-managed and Pickup
+  const fallbackDeliveryOptions = [
+    "homeDelivery:platformDelivery", 
+    "homeDelivery:selfManaged",
+    "pickUp"
+  ];
   const [showMapPickerModal, setShowMapPickerModal] = useState(false);
 
   // Extract the packageDelivery array
-  const packageDelivery = parsedCartItems
-    ?.map((item: any) => item.packageDelivery)
-    .flat();
+  const packageDelivery = parsedCartItems?.length > 0 
+    ? parsedCartItems.map((item: any) => item.packageDelivery).flat().filter(Boolean)
+    : fallbackDeliveryOptions; // Use fallback when no cart items
 
   console.log("Package Delivery Options:", packageDelivery);
+  console.log("Has Cart Items:", parsedCartItems?.length > 0);
+  console.log("Using Fallback:", parsedCartItems?.length === 0);
 
   const [debouncedAddress, setDebouncedAddress] = useState("");
-  const [deliveryType, setDeliveryType] = useState("");
+  const [selectedDeliveryTypes, setSelectedDeliveryTypes] = useState<string[]>([]);
+  
+  // Debug log for selectedDeliveryTypes state
+  console.log("Selected Delivery Types State:", selectedDeliveryTypes);
   const [stateSearch, setStateSearch] = useState("");
   const [citySearch, setCitySearch] = useState("");
   const [stateDropdownOpen, setStateDropdownOpen] = useState(false);
   const [cityDropdownOpen, setCityDropdownOpen] = useState(false);
   const [formData, setFormData] = useState({
-    deliveryType,
+    selectedDeliveryTypes: [] as string[],
     guestFirstName: "",
     guestLastName: "",
     guestEmail: "",
@@ -120,35 +132,62 @@ function DeliveryDetailsForm() {
 
   // Map UI selection to backend submission strings (component scope)
   // Backend requires camelCase, no-space strings: pickUp, platformDelivery, selfManagedDelivery
-  const mapSelectionToSubmission = (sel: string) => {
-    if (!sel) return "";
-    if (sel === "pickup") return "pickUp";
-    if (sel === "platformDelivery") return "platformDelivery";
-    if (sel === "selfManaged") return "selfManagedDelivery";
-    if (sel === "home") {
-      const needsPlatform = packageDelivery?.some((pd: string) => pd === "homeDelivery:platformDelivery" || pd === "platformDelivery");
-      const needsSelf = packageDelivery?.some((pd: string) => pd === "homeDelivery:selfManaged" || pd === "selfManaged");
-      if (needsPlatform) return "platformDelivery";
-      if (needsSelf) return "selfManagedDelivery";
-      // default home fallback — prefer platformDelivery
-      return "platformDelivery";
-    }
-    return "";
+  const mapSelectionToSubmission = (selections: string[]) => {
+    return selections.map(sel => {
+      if (sel === "pickup") return "pickUp";
+      if (sel === "platform") return "platformDelivery";
+      if (sel === "selfManaged") return "selfManagedDelivery";
+      return "";
+    }).filter(Boolean);
   };
 
-  const perItemMethodFromSelection = (sel: string) => {
-    const submission = mapSelectionToSubmission(sel);
-    // For per-item deliveryMethod, backend expects camelCase no-space keys too
-    if (submission === "pickUp") return "pickUp";
-    if (submission === "platformDelivery") return "platformDelivery";
-    if (submission === "selfManagedDelivery") return "selfManagedDelivery";
+  const perItemMethodFromSelection = (selections: string[]) => {
+    // For multiple selections, we need to determine primary delivery method
+    // Priority: platform > selfManaged > pickup
+    if (selections.includes("platform")) return "platformDelivery";
+    if (selections.includes("selfManaged")) return "selfManagedDelivery";
+    if (selections.includes("pickup")) return "pickUp";
     return "pickUp";
   };
 
-  // When guest clicks Platform Delivery, set selection directly (no coverage modal)
-  const handlePlatformDeliveryClick = () => {
-    setDeliveryType("platformDelivery");
-    setFormData((prev) => ({ ...prev, deliveryType: "platformDelivery" }));
+  // Handle delivery type selection with validation rules
+  const handleDeliveryTypeSelection = (type: string) => {
+    console.log(`[CLICK] Attempting to select: ${type}`);
+    console.log(`[CLICK] Current selections before:`, selectedDeliveryTypes);
+    
+    setSelectedDeliveryTypes(prev => {
+      const newSelections = [...prev];
+      const isCurrentlySelected = newSelections.includes(type);
+      
+      console.log(`[LOGIC] Is ${type} currently selected?`, isCurrentlySelected);
+      
+      if (isCurrentlySelected) {
+        // Remove if already selected
+        const filtered = newSelections.filter(t => t !== type);
+        console.log(`[LOGIC] Removing ${type}, new selections:`, filtered);
+        return filtered;
+      } else {
+        // Add with validation rules
+        if (type === "platform") {
+          // Platform cannot be with selfManaged - remove selfManaged if exists
+          const filtered = newSelections.filter(t => t !== "selfManaged");
+          const result = [...filtered, "platform"];
+          console.log(`[LOGIC] Adding platform (removed selfManaged), new selections:`, result);
+          return result;
+        } else if (type === "selfManaged") {
+          // SelfManaged cannot be with platform - remove platform if exists
+          const filtered = newSelections.filter(t => t !== "platform");
+          const result = [...filtered, "selfManaged"];
+          console.log(`[LOGIC] Adding selfManaged (removed platform), new selections:`, result);
+          return result;
+        } else {
+          // Pickup can be added with any other option
+          const result = [...newSelections, type];
+          console.log(`[LOGIC] Adding ${type}, new selections:`, result);
+          return result;
+        }
+      }
+    });
   };
 
   //validate form
@@ -166,13 +205,17 @@ function DeliveryDetailsForm() {
       errors.guestEmail = "Invalid email format";
     }
 
-    // Home delivery specific validations
-    if (deliveryType === "home") {
+    // Address validations for platform and self-managed delivery
+    if (selectedDeliveryTypes.includes("platform") || selectedDeliveryTypes.includes("selfManaged")) {
       if (!formData.shippingAddress)
         errors.shippingAddress = "Address is required";
       if (!formData.state) errors.state = "State is required";
       if (!formData.city) errors.city = "City is required";
+    }
 
+    // Ensure at least one delivery type is selected
+    if (selectedDeliveryTypes.length === 0) {
+      errors.deliveryType = "Please select at least one delivery option";
     }
 
     return errors;
@@ -203,10 +246,10 @@ function DeliveryDetailsForm() {
     }
 
     try {
-      const { deliveryType } = formData;
-
       // Validate required fields based on delivery type
-      if (deliveryType === "home") {
+      const requiresAddress = selectedDeliveryTypes.includes("platform") || selectedDeliveryTypes.includes("selfManaged");
+      
+      if (requiresAddress) {
         if (
           !formData.guestFirstName ||
           !formData.guestLastName ||
@@ -229,6 +272,10 @@ function DeliveryDetailsForm() {
         }
       }
 
+      if (selectedDeliveryTypes.length === 0) {
+        throw new Error("Please select at least one delivery option");
+      }
+
       // Remove empty or null fields
       const cleanedFormData = Object.fromEntries(
         Object.entries(formData).filter(
@@ -239,16 +286,17 @@ function DeliveryDetailsForm() {
 // Use the component-scope mapping helpers (mapSelectionToSubmission and perItemMethodFromSelection)
 // so the submission payload uses the backend-expected labels.
 
-// Construct payload
-const submissionDeliveryType = mapSelectionToSubmission(deliveryType || formData.deliveryType || "");
+// Construct payload with multiple delivery types
+const submissionDeliveryTypes = mapSelectionToSubmission(selectedDeliveryTypes);
 const submissionData = {
   ...cleanedFormData,
   items: parsedCartItems.map((item: any) => ({
     packageId: item._id,
     quantity: item.quantity,
-    deliveryMethod: perItemMethodFromSelection(deliveryType || formData.deliveryType || "")
+    deliveryMethod: perItemMethodFromSelection(selectedDeliveryTypes)
   })),
-  deliveryType: submissionDeliveryType
+  deliveryTypes: submissionDeliveryTypes, // Array of delivery types
+  deliveryType: submissionDeliveryTypes[0] || "pickUp" // Primary delivery type for backward compatibility
 };
 
 
@@ -285,35 +333,48 @@ const submissionData = {
   const [showGuestInfoModal, setShowGuestInfoModal] = useState(false);
   const [guestInfoModalData, setGuestInfoModalData] = useState<any>(null);
 
-  // Initialize deliveryType based on packageDelivery contents
+  // Initialize deliveryTypes based on packageDelivery contents
+  const [isInitialized, setIsInitialized] = useState(false);
+  
   useEffect(() => {
-    console.log("Initializing delivery type with:", packageDelivery);
+    if (isInitialized) return; // Only initialize once
     
-    const hasHomeDelivery = 
+    console.log("Initializing delivery types with:", packageDelivery);
+
+    const hasPlatform = 
       packageDelivery.includes("homeDelivery:platformDelivery") ||
+      packageDelivery.includes("platformDelivery");
+    
+    const hasSelfManaged = 
       packageDelivery.includes("homeDelivery:selfManaged") ||
-      packageDelivery.includes("platformDelivery") ||
       packageDelivery.includes("selfManaged");
     
     const hasPickup = packageDelivery.includes("pickUp");
 
-    if (hasHomeDelivery && hasPickup) {
-      setDeliveryType((prevType) => prevType || "home");
-    } else if (hasHomeDelivery) {
-      setDeliveryType((prevType) => prevType || "home");
-    } else if (hasPickup) {
-      setDeliveryType("pickup");
-    } else {
-      setDeliveryType("");
-    }
-  }, [packageDelivery]);
+    const initialTypes = [];
+    if (hasPlatform) initialTypes.push("platform");
+    if (hasSelfManaged && !hasPlatform) initialTypes.push("selfManaged"); // Only if platform not selected
+    if (hasPickup && initialTypes.length === 0) initialTypes.push("pickup"); // Default to pickup if nothing else
 
+    if (initialTypes.length > 0) {
+      setSelectedDeliveryTypes(initialTypes);
+    } else {
+      // Default to platform delivery as fallback
+      setSelectedDeliveryTypes(["platform"]);
+    }
+    
+    setIsInitialized(true);
+    console.log("Initialized with:", initialTypes.length > 0 ? initialTypes : ["platform"]);
+  }, [packageDelivery, isInitialized]);
+
+  // Sync selectedDeliveryTypes to formData
   useEffect(() => {
     setFormData((prev) => ({
       ...prev,
-      deliveryType: deliveryType
+      selectedDeliveryTypes: selectedDeliveryTypes
     }));
-  }, [deliveryType]);
+    console.log("Updated formData with selectedDeliveryTypes:", selectedDeliveryTypes);
+  }, [selectedDeliveryTypes]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -367,111 +428,111 @@ const submissionData = {
             <h2 className="font-bold text-xl text-[#111827]">
               Delivery Details
             </h2>
+            {/* Warning when no cart data */}
+            {parsedCartItems?.length === 0 && (
+              <div className="mb-4 p-3 bg-yellow-100 border border-yellow-400 rounded-lg">
+                <p className="text-yellow-800 text-sm">
+                  ⚠️ <strong>Demo Mode:</strong> This page is typically accessed through the cart checkout flow.
+                  Showing default delivery options for testing.
+                </p>
+              </div>
+            )}
 
             <form onSubmit={handleSubmit}>
-              <div className="w-[311px]">
-                <label className="text-base font-medium text-[#718096] mt-6 mb-3 block">
+              <div className="w-full max-w-2xl">
+                <label className="text-base font-medium text-[#718096] mt-6 mb-1 block">
                   Delivery Types
                 </label>
-                <div className="flex justify-between gap-3">
-                  {/* Home Delivery Button */}
+                <p className="text-sm text-[#9CA3AF] mb-3">
+                  Select one or more delivery options. Platform and Self-managed cannot be selected together.
+                </p>
+                <div className="flex flex-wrap gap-3 justify-start">
+                  {/* Platform Delivery Button */}
                   {(packageDelivery.includes("homeDelivery:platformDelivery") ||
-                    packageDelivery.includes("homeDelivery:selfManaged")) && (
+                    packageDelivery.includes("platformDelivery")) && (
                     <button
                       type="button"
-                      onClick={() => setDeliveryType("home")}
-                      className={`w-[147.5px] h-[45px] flex items-center gap-2 border rounded-[8px] p-1.5 text-[#111827] font-general text-sm ${
-                        deliveryType === "home"
+                      onClick={() => handleDeliveryTypeSelection("platform")}
+                      className={`flex-1 min-w-[160px] h-[60px] flex items-center gap-3 border rounded-[8px] p-3 text-[#111827] font-general text-sm ${
+                        selectedDeliveryTypes.includes("platform")
                           ? "border-[#7A1626] bg-[#FDF4F5]"
                           : "border-[#EEEFF2]"
                       }`}
                     >
                       <Image
-                        src={deliveryType === "home" ? check : uncheck}
+                        src={selectedDeliveryTypes.includes("platform") ? check : uncheck}
                         alt="check status"
                         className="w-5 h-5"
                       />
-                      Home Delivery
+                      <div className="flex flex-col items-start">
+                        <span>Platform Delivery</span>
+                        <span className="text-xs text-[#718096]">We handle delivery for you</span>
+                      </div>
                     </button>
                   )}
                   
-                  {/* Platform Delivery Button */}
-                  {(packageDelivery.includes("platformDelivery") || 
-                    packageDelivery.includes("homeDelivery:platformDelivery")) && (
+                  {/* Self-Managed Delivery Button */}
+                  {(packageDelivery.includes("homeDelivery:selfManaged") ||
+                    packageDelivery.includes("selfManaged")) && (
                     <button
                       type="button"
-                      onClick={handlePlatformDeliveryClick}
-                      className={`w-[147.5px] h-[45px] flex items-center gap-2 border rounded-[8px] p-1.5 text-[#111827] font-general text-sm ${
-                        deliveryType === "platformDelivery"
+                      onClick={() => handleDeliveryTypeSelection("selfManaged")}
+                      className={`flex-1 min-w-[160px] h-[60px] flex items-center gap-3 border rounded-[8px] p-3 text-[#111827] font-general text-sm ${
+                        selectedDeliveryTypes.includes("selfManaged")
                           ? "border-[#7A1626] bg-[#FDF4F5]"
                           : "border-[#EEEFF2]"
                       }`}
                     >
                       <Image
-                        src={deliveryType === "platformDelivery" ? check : uncheck}
+                        src={selectedDeliveryTypes.includes("selfManaged") ? check : uncheck}
                         alt="check status"
                         className="w-5 h-5"
                       />
-                      Platform Delivery
+                      <div className="flex flex-col items-start">
+                        <span>Self-Managed</span>
+                        <span className="text-xs text-[#718096]">You handle delivery yourself</span>
+                      </div>
                     </button>
                   )}
-
-                  {/* Self Managed Button */}
-                  {(packageDelivery.includes("selfManaged") || 
-                    packageDelivery.includes("homeDelivery:selfManaged")) && (
-                    <button
-                      type="button"
-                      onClick={() => setDeliveryType("selfManaged")}
-                      className={`w-[147.5px] h-[45px] flex items-center gap-2 border rounded-[8px] p-1.5 text-[#111827] font-general text-sm ${
-                        deliveryType === "selfManaged"
-                          ? "border-[#7A1626] bg-[#FDF4F5]"
-                          : "border-[#EEEFF2]"
-                      }`}
-                    >
-                      <Image
-                        src={deliveryType === "selfManaged" ? check : uncheck}
-                        alt="check status"
-                        className="w-5 h-5"
-                      />
-                      Self Managed
-                    </button>
-                  )}
-
+                  
                   {/* Pickup Button */}
                   {packageDelivery.includes("pickUp") && (
                     <button
                       type="button"
-                      onClick={() => setDeliveryType("pickup")}
-                      className={`w-[147.5px] h-[45px] flex items-center gap-2 border rounded-[8px] p-1.5 text-[#111827] font-general text-sm ${
-                        deliveryType === "pickup"
+                      onClick={() => handleDeliveryTypeSelection("pickup")}
+                      className={`flex-1 min-w-[160px] h-[60px] flex items-center gap-3 border rounded-[8px] p-3 text-[#111827] font-general text-sm ${
+                        selectedDeliveryTypes.includes("pickup")
                           ? "border-[#7A1626] bg-[#FDF4F5]"
                           : "border-[#EEEFF2]"
                       }`}
                     >
                       <Image
-                        src={deliveryType === "pickup" ? check : uncheck}
+                        src={selectedDeliveryTypes.includes("pickup") ? check : uncheck}
                         alt="check status"
                         className="w-5 h-5"
                       />
-                      Pickup
+                      <div className="flex flex-col items-start">
+                        <span>Pickup</span>
+                        <span className="text-xs text-[#718096]">Collect from designated location</span>
+                      </div>
                     </button>
                   )}
                 </div>
               </div>
 
-              {/* Show home delivery form for both "home" and specific home delivery types */}
-              {(deliveryType === "home" || deliveryType === "platformDelivery" || deliveryType === "selfManaged") ? (
-                /* Home Delivery Form */
+              {/* Show address form for platform/self-managed, show contact form for pickup only */}
+              {(selectedDeliveryTypes.includes("platform") || selectedDeliveryTypes.includes("selfManaged")) ? (
+                /* Address Delivery Form (Platform & Self-Managed) */
                 <div className="grid gap-4 mt-4">
                   <div>
                     <label
-                      htmlFor="home-first-name"
+                      htmlFor="delivery-first-name"
                       className="font-general font-medium text-base block mb-1 text-[#718096]"
                     >
                       First Name
                     </label>
                     <input
-                      id="home-first-name"
+                      id="delivery-first-name"
                       name="guestFirstName"
                       required
                       value={formData.guestFirstName}
@@ -491,13 +552,13 @@ const submissionData = {
                   </div>
                   <div>
                     <label
-                      htmlFor="home-last-name"
+                      htmlFor="delivery-last-name"
                       className="font-general font-medium text-base block mb-1 text-[#718096]"
                     >
                       Last Name
                     </label>
                     <input
-                      id="home-last-name"
+                      id="delivery-last-name"
                       name="guestLastName"
                       required
                       value={formData.guestLastName}
@@ -517,13 +578,13 @@ const submissionData = {
                   </div>
                   <div>
                     <label
-                      htmlFor="home-email"
+                      htmlFor="delivery-email"
                       className="font-general font-medium text-base block mb-1 text-[#718096]"
                     >
                       Email
                     </label>
                     <input
-                      id="home-email"
+                      id="delivery-email"
                       name="guestEmail"
                       type="email"
                       required
@@ -637,13 +698,49 @@ const submissionData = {
                                 setStateDropdownOpen(false);
                                 
                                 // Show modal if state is not covered for platform delivery
-                                if (!isStateCovered && deliveryType === "home") {
+                                  if (!isStateCovered && selectedDeliveryTypes.includes("platform")) {
                                   setGuestInfoModalData({
-                                    title: "Platform delivery not available",
-                                    des: `Platform delivery is currently not available in ${state.value}. Please choose pickup or choose another address in our covered states: Lagos, Oyo, Abuja, Osun, and Ogun.`,
-                                    actionBtnTxt: "Proceed",
+                                    title: "The delivery address provided is outside our delivery partner’s service area.",
+                                    des: `We’ve moved your order to the Host Delivery option. Our team will coordinate with your host to ensure your Aso Ebi reaches you. Please proceed.`,
+                                    actionBtnTxt: "Continue",
                                     isCovered: false,
                                     context: "unavailable",
+                                  });
+                                  setShowGuestInfoModal(true);
+                                }
+                                
+                                // Show modal if state is not covered for self-managed delivery
+                                if (!isStateCovered && selectedDeliveryTypes.includes("selfManaged")) {
+                                  setGuestInfoModalData({
+                                    title: "The delivery address provided is outside our delivery partner’s service area.",
+                                    des: `We’ve moved your order to the Host Delivery option. Our team will coordinate with your host to ensure your Aso Ebi reaches you. Please proceed.`,
+                                    actionBtnTxt: "Continue",
+                                    isCovered: false,
+                                    context: "unavailable",
+                                  });
+                                  setShowGuestInfoModal(true);
+                                }
+                                
+                                // Show modal if state is covered for platform delivery  
+                                if (isStateCovered && selectedDeliveryTypes.includes("platform")) {
+                                  setGuestInfoModalData({
+                                    title: "Doorstep delivery might not cover some remote locations",
+                                    des: `In such instance, we will contact you to ensure that we manage the item delivery from you without hassles.`,
+                                    actionBtnTxt: "Continue",
+                                    isCovered: true,
+                                    context: "available",
+                                  });
+                                  setShowGuestInfoModal(true);
+                                }
+                                
+                                // Show modal if state is covered for self-managed delivery
+                                if (isStateCovered && selectedDeliveryTypes.includes("selfManaged")) {
+                                  setGuestInfoModalData({
+                                    title: "Doorstep delivery might not cover some remote locations",
+                                    des: `In such instance, we will contact you to ensure that we manage the item delivery from you without hassles.`,
+                                    actionBtnTxt: "Continue",
+                                    isCovered: true,
+                                    context: "available",
                                   });
                                   setShowGuestInfoModal(true);
                                 }
@@ -703,7 +800,7 @@ const submissionData = {
                   </div>
 
                 </div>
-              ) : (
+              ) : selectedDeliveryTypes.includes("pickup") ? (
                 /* Pickup Form */
                 <div className="grid gap-4 mt-4">
                   <div className="w-[311px] h-[60px] bg-[#FFF7F2] px-3 py-2 rounded-[12px]">
@@ -809,6 +906,22 @@ const submissionData = {
                     )}
                   </div>
                 </div>
+              ) : (
+                /* No delivery type selected */
+                <div className="grid gap-4 mt-4">
+                  <div className="w-full h-[60px] bg-[#FEF2F2] border border-[#FCA5A5] px-3 py-2 rounded-[12px] flex items-center">
+                    <span className="font-general font-medium text-[13px] text-[#B91C1C]">
+                      Please select at least one delivery option above
+                    </span>
+                  </div>
+                </div>
+              )}
+
+              {/* Delivery type validation error */}
+              {errors.deliveryType && (
+                <div className="mt-2">
+                  <p className="text-red-500 text-sm">{errors.deliveryType}</p>
+                </div>
               )}
 
               <button
@@ -853,9 +966,19 @@ const submissionData = {
                   if (isSelection) {
                     // Finalize selection if covered
                     if (guestInfoModalData.isCovered) {
-                      setDeliveryType("platformDelivery");
-                      setFormData((prev) => ({ ...prev, deliveryType: "platformDelivery" }));
+                      setSelectedDeliveryTypes(prev => {
+                        const filtered = prev.filter(t => t !== "selfManaged");
+                        if (!filtered.includes("platform")) {
+                          return [...filtered, "platform"];
+                        }
+                        return filtered;
+                      });
                     }
+                    return;
+                  }
+
+                  // For available states (covered), just close modal and return to form
+                  if (guestInfoModalData.context === "available") {
                     return;
                   }
 
@@ -878,9 +1001,10 @@ const submissionData = {
                       items: parsedCartItems.map((item: any) => ({
                         packageId: item._id,
                         quantity: item.quantity,
-                        deliveryMethod: perItemMethodFromSelection(deliveryType || formData.deliveryType || "")
+                        deliveryMethod: perItemMethodFromSelection(selectedDeliveryTypes)
                       })),
-                      deliveryType: mapSelectionToSubmission(deliveryType || formData.deliveryType || "")
+                      deliveryTypes: mapSelectionToSubmission(selectedDeliveryTypes),
+                      deliveryType: mapSelectionToSubmission(selectedDeliveryTypes)[0] || "pickUp"
                     };
 
                     const res = await axiosInstance.post(
