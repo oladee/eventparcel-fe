@@ -365,7 +365,7 @@ function DeliveryDetailsForm() {
 // Use the component-scope mapping helpers (mapSelectionToSubmission and perItemMethodFromSelection)
 // so the submission payload uses the backend-expected labels.
 
-// Construct payload with multiple delivery types
+// Construct payload with delivery type
 const submissionDeliveryTypes = mapSelectionToSubmission(selectedDeliveryTypes);
 const submissionData: any = {
   ...cleanedFormData,
@@ -374,8 +374,7 @@ const submissionData: any = {
     quantity: item.quantity,
     deliveryMethod: perItemMethodFromSelection(selectedDeliveryTypes)
   })),
-  deliveryTypes: submissionDeliveryTypes, // Array of delivery types
-  deliveryType: submissionDeliveryTypes[0] || "pickUp" // Primary delivery type for backward compatibility
+  deliveryType: submissionDeliveryTypes[0] || "pickUp"
 };
 
       if ("selectedDeliveryTypes" in submissionData) {
@@ -1011,6 +1010,7 @@ const submissionData: any = {
                       )
                     );
 
+                    const submissionDeliveryTypes = mapSelectionToSubmission(selectedDeliveryTypes);
                     const submissionData: any = {
                       ...cleanedFormData,
                       items: parsedCartItems.map((item: any) => ({
@@ -1018,8 +1018,7 @@ const submissionData: any = {
                         quantity: item.quantity,
                         deliveryMethod: perItemMethodFromSelection(selectedDeliveryTypes)
                       })),
-                      deliveryTypes: mapSelectionToSubmission(selectedDeliveryTypes),
-                      deliveryType: mapSelectionToSubmission(selectedDeliveryTypes)[0] || "pickUp"
+                      deliveryType: submissionDeliveryTypes[0] || "pickUp"
                     };
 
                     if ("selectedDeliveryTypes" in submissionData) {
