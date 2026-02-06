@@ -52,7 +52,6 @@ function DeliveryDetailsForm() {
   const [stateDropdownOpen, setStateDropdownOpen] = useState(false);
   const [cityDropdownOpen, setCityDropdownOpen] = useState(false);
   const [formData, setFormData] = useState({
-    selectedDeliveryTypes: [] as string[],
     guestFirstName: "",
     guestLastName: "",
     guestEmail: "",
@@ -128,6 +127,15 @@ function DeliveryDetailsForm() {
       ...prev,
       [name]: value
     }));
+    
+    // Clear error for this field when user types
+    if (errors[name]) {
+      setErrors((prev) => {
+        const updated = { ...prev };
+        delete updated[name];
+        return updated;
+      });
+    }
   };
 
   // Map UI selection to backend submission strings (component scope)
@@ -231,6 +239,13 @@ function DeliveryDetailsForm() {
     const { id, value } = e.target;
     if (!value.trim()) {
       setErrors((prev) => ({ ...prev, [id]: "This field is required" }));
+    } else {
+      // Clear error if field has value
+      setErrors((prev) => {
+        const updated = { ...prev };
+        delete updated[id];
+        return updated;
+      });
     }
   };
 
@@ -352,7 +367,7 @@ function DeliveryDetailsForm() {
 
 // Construct payload with multiple delivery types
 const submissionDeliveryTypes = mapSelectionToSubmission(selectedDeliveryTypes);
-const submissionData = {
+const submissionData: any = {
   ...cleanedFormData,
   items: parsedCartItems.map((item: any) => ({
     packageId: item._id,
@@ -362,6 +377,10 @@ const submissionData = {
   deliveryTypes: submissionDeliveryTypes, // Array of delivery types
   deliveryType: submissionDeliveryTypes[0] || "pickUp" // Primary delivery type for backward compatibility
 };
+
+      if ("selectedDeliveryTypes" in submissionData) {
+        delete submissionData.selectedDeliveryTypes;
+      }
 
 
 
@@ -430,15 +449,6 @@ const submissionData = {
     setIsInitialized(true);
     console.log("Initialized with:", initialTypes.length > 0 ? initialTypes : ["platform"]);
   }, [packageDelivery, isInitialized]);
-
-  // Sync selectedDeliveryTypes to formData
-  useEffect(() => {
-    setFormData((prev) => ({
-      ...prev,
-      selectedDeliveryTypes: selectedDeliveryTypes
-    }));
-    console.log("Updated formData with selectedDeliveryTypes:", selectedDeliveryTypes);
-  }, [selectedDeliveryTypes]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -1001,7 +1011,7 @@ const submissionData = {
                       )
                     );
 
-                    const submissionData = {
+                    const submissionData: any = {
                       ...cleanedFormData,
                       items: parsedCartItems.map((item: any) => ({
                         packageId: item._id,
@@ -1011,6 +1021,10 @@ const submissionData = {
                       deliveryTypes: mapSelectionToSubmission(selectedDeliveryTypes),
                       deliveryType: mapSelectionToSubmission(selectedDeliveryTypes)[0] || "pickUp"
                     };
+
+                    if ("selectedDeliveryTypes" in submissionData) {
+                      delete submissionData.selectedDeliveryTypes;
+                    }
 
                     const res = await axiosInstance.post(
                       `/guest-checkout/${parsedEventData?.eventId}/${parsedEventData?.eventGroupId}`,
