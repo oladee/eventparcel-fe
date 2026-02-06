@@ -276,10 +276,74 @@ function DeliveryDetailsForm() {
         throw new Error("Please select at least one delivery option");
       }
 
+      // Check if modal should be shown before proceeding
+      const coveredStates = ["Lagos", "Oyo", "Fct", "Osun", "Ogun", "FCT - Abuja"];
+      const isStateCovered = formData.state ? coveredStates.includes(formData.state) : false;
+      
+      // Show modal if delivery requires address and state is selected
+      if (requiresAddress && formData.state) {
+        // Show modal if state is not covered for platform delivery
+        if (!isStateCovered && selectedDeliveryTypes.includes("platform")) {
+          setGuestInfoModalData({
+            title: "The delivery address provided is outside our delivery partner's service area.",
+            des: `We've moved your order to the Host Delivery option. Our team will coordinate with your host to ensure your Aso Ebi reaches you. Please proceed.`,
+            actionBtnTxt: "Continue",
+            isCovered: false,
+            context: "unavailable",
+          });
+          setShowGuestInfoModal(true);
+          setIsSubmitting(false);
+          return;
+        }
+        
+        // Show modal if state is not covered for self-managed delivery
+        if (!isStateCovered && selectedDeliveryTypes.includes("selfManaged")) {
+          setGuestInfoModalData({
+            title: "The delivery address provided is outside our delivery partner's service area.",
+            des: `We've moved your order to the Host Delivery option. Our team will coordinate with your host to ensure your Aso Ebi reaches you. Please proceed.`,
+            actionBtnTxt: "Continue",
+            isCovered: false,
+            context: "unavailable",
+          });
+          setShowGuestInfoModal(true);
+          setIsSubmitting(false);
+          return;
+        }
+        
+        // Show modal if state is covered for platform delivery  
+        if (isStateCovered && selectedDeliveryTypes.includes("platform")) {
+          setGuestInfoModalData({
+            title: "Doorstep delivery might not cover some remote locations",
+            des: `In such instance, we will contact you to ensure that we manage the item delivery from you without hassles.`,
+            actionBtnTxt: "Continue",
+            isCovered: true,
+            context: "submission",
+          });
+          setShowGuestInfoModal(true);
+          setIsSubmitting(false);
+          return;
+        }
+        
+        // Show modal if state is covered for self-managed delivery
+        if (isStateCovered && selectedDeliveryTypes.includes("selfManaged")) {
+          setGuestInfoModalData({
+            title: "Doorstep delivery might not cover some remote locations",
+            des: `In such instance, we will contact you to ensure that we manage the item delivery from you without hassles.`,
+            actionBtnTxt: "Continue",
+            isCovered: true,
+            context: "submission",
+          });
+          setShowGuestInfoModal(true);
+          setIsSubmitting(false);
+          return;
+        }
+      }
+
       // Remove empty or null fields
       const cleanedFormData = Object.fromEntries(
         Object.entries(formData).filter(
-          ([_key, value]) =>
+          ([key, value]) =>
+            key !== "selectedDeliveryTypes" && // Exclude selectedDeliveryTypes from submission
             value !== null && value !== "" && value !== undefined
         )
       );
@@ -443,9 +507,6 @@ const submissionData = {
                 <label className="text-base font-medium text-[#718096] mt-6 mb-1 block">
                   Delivery Types
                 </label>
-                <p className="text-sm text-[#9CA3AF] mb-3">
-                  Select one or more delivery options. Platform and Self-managed cannot be selected together.
-                </p>
                 <div className="flex flex-wrap gap-3 justify-start">
                   {/* Platform Delivery Button */}
                   {(packageDelivery.includes("homeDelivery:platformDelivery") ||
@@ -687,63 +748,12 @@ const submissionData = {
                               key={state.value}
                               className="px-3 py-3 cursor-pointer hover:bg-gray-100 text-sm"
                               onClick={() => {
-                                const coveredStates = ["Lagos", "Oyo", "Fct", "Osun", "Ogun", "FCT - Abuja"];
-                                const isStateCovered = coveredStates.includes(state.value);
-                                
                                 setStateSearch(state.value);
                                 setFormData((prev) => ({
                                   ...prev,
                                   state: state.value
                                 }));
                                 setStateDropdownOpen(false);
-                                
-                                // Show modal if state is not covered for platform delivery
-                                  if (!isStateCovered && selectedDeliveryTypes.includes("platform")) {
-                                  setGuestInfoModalData({
-                                    title: "The delivery address provided is outside our delivery partner’s service area.",
-                                    des: `We’ve moved your order to the Host Delivery option. Our team will coordinate with your host to ensure your Aso Ebi reaches you. Please proceed.`,
-                                    actionBtnTxt: "Continue",
-                                    isCovered: false,
-                                    context: "unavailable",
-                                  });
-                                  setShowGuestInfoModal(true);
-                                }
-                                
-                                // Show modal if state is not covered for self-managed delivery
-                                if (!isStateCovered && selectedDeliveryTypes.includes("selfManaged")) {
-                                  setGuestInfoModalData({
-                                    title: "The delivery address provided is outside our delivery partner’s service area.",
-                                    des: `We’ve moved your order to the Host Delivery option. Our team will coordinate with your host to ensure your Aso Ebi reaches you. Please proceed.`,
-                                    actionBtnTxt: "Continue",
-                                    isCovered: false,
-                                    context: "unavailable",
-                                  });
-                                  setShowGuestInfoModal(true);
-                                }
-                                
-                                // Show modal if state is covered for platform delivery  
-                                if (isStateCovered && selectedDeliveryTypes.includes("platform")) {
-                                  setGuestInfoModalData({
-                                    title: "Doorstep delivery might not cover some remote locations",
-                                    des: `In such instance, we will contact you to ensure that we manage the item delivery from you without hassles.`,
-                                    actionBtnTxt: "Continue",
-                                    isCovered: true,
-                                    context: "available",
-                                  });
-                                  setShowGuestInfoModal(true);
-                                }
-                                
-                                // Show modal if state is covered for self-managed delivery
-                                if (isStateCovered && selectedDeliveryTypes.includes("selfManaged")) {
-                                  setGuestInfoModalData({
-                                    title: "Doorstep delivery might not cover some remote locations",
-                                    des: `In such instance, we will contact you to ensure that we manage the item delivery from you without hassles.`,
-                                    actionBtnTxt: "Continue",
-                                    isCovered: true,
-                                    context: "available",
-                                  });
-                                  setShowGuestInfoModal(true);
-                                }
                               }}
                             >
                               {state.value}
@@ -982,16 +992,11 @@ const submissionData = {
                     return;
                   }
 
-                  // Otherwise, run the original submission retry flow
-                  if (!guestInfoModalData.isCovered) {
-                    // Go back: simply return user to the form (modal closed)
-                    return;
-                  }
-
                   try {
                     setIsSubmitting(true);
                     const cleanedFormData = Object.fromEntries(
-                      Object.entries(formData).filter(([_key, value]) =>
+                      Object.entries(formData).filter(([key, value]) =>
+                        key !== "selectedDeliveryTypes" && // Exclude selectedDeliveryTypes from submission
                         value !== null && value !== "" && value !== undefined
                       )
                     );
