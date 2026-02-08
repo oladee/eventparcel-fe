@@ -52,6 +52,7 @@ function DeliveryDetailsForm() {
   const [stateDropdownOpen, setStateDropdownOpen] = useState(false);
   const [cityDropdownOpen, setCityDropdownOpen] = useState(false);
   const [formData, setFormData] = useState({
+    selectedDeliveryTypes: [] as string[],
     guestFirstName: "",
     guestLastName: "",
     guestEmail: "",
@@ -127,15 +128,6 @@ function DeliveryDetailsForm() {
       ...prev,
       [name]: value
     }));
-    
-    // Clear error for this field when user types
-    if (errors[name]) {
-      setErrors((prev) => {
-        const updated = { ...prev };
-        delete updated[name];
-        return updated;
-      });
-    }
   };
 
   // Map UI selection to backend submission strings (component scope)
@@ -239,13 +231,6 @@ function DeliveryDetailsForm() {
     const { id, value } = e.target;
     if (!value.trim()) {
       setErrors((prev) => ({ ...prev, [id]: "This field is required" }));
-    } else {
-      // Clear error if field has value
-      setErrors((prev) => {
-        const updated = { ...prev };
-        delete updated[id];
-        return updated;
-      });
     }
   };
 
@@ -260,6 +245,42 @@ function DeliveryDetailsForm() {
       return;
     }
 
+    // Check if we need to show delivery area modal for platform/self-managed delivery
+    if ((selectedDeliveryTypes.includes("platform") || selectedDeliveryTypes.includes("selfManaged")) && formData.state) {
+      const coveredStates = ["Lagos", "Oyo", "Fct", "Osun", "Ogun", "FCT - Abuja"];
+      const isStateCovered = coveredStates.includes(formData.state);
+      
+      // Show modal for both covered and uncovered states
+      if (!isStateCovered) {
+        setGuestInfoModalData({
+          title: "Delivery Location Update Required",
+          des: `Your selected state (${formData.state}) is outside our standard delivery zone. Your order will be processed as Host Delivery - our team will coordinate with your host to ensure your items reach you safely. You can proceed with checkout.`,
+          actionBtnTxt: "Proceed to Payment",
+          isCovered: false,
+          context: "checkout",
+        });
+        setShowGuestInfoModal(true);
+        setIsSubmitting(false);
+        return;
+      } else {
+        setGuestInfoModalData({
+          title: "Doorstep delivery might not cover some remote locations",
+          des: `In such instance, we will contact you to ensure that we manage the item delivery from you without hassles.`,
+          actionBtnTxt: "Proceed to Payment",
+          isCovered: true,
+          context: "checkout",
+        });
+        setShowGuestInfoModal(true);
+        setIsSubmitting(false);
+        return;
+      }
+    }
+
+    // Continue with normal submission
+    await processCheckout();
+  };
+
+  const processCheckout = async () => {
     try {
       // Validate required fields based on delivery type
       const requiresAddress = selectedDeliveryTypes.includes("platform") || selectedDeliveryTypes.includes("selfManaged");
@@ -291,67 +312,14 @@ function DeliveryDetailsForm() {
         throw new Error("Please select at least one delivery option");
       }
 
-      // Check if modal should be shown before proceeding
+      // Check if state is uncovered and adjust delivery method accordingly
       const coveredStates = ["Lagos", "Oyo", "Fct", "Osun", "Ogun", "FCT - Abuja"];
-      const isStateCovered = formData.state ? coveredStates.includes(formData.state) : false;
+      const isStateCovered = formData.state ? coveredStates.includes(formData.state) : true;
       
-      // Show modal if delivery requires address and state is selected
-      if (requiresAddress && formData.state) {
-        // Show modal if state is not covered for platform delivery
-        if (!isStateCovered && selectedDeliveryTypes.includes("platform")) {
-          setGuestInfoModalData({
-            title: "The delivery address provided is outside our delivery partner's service area.",
-            des: `We've moved your order to the Host Delivery option. Our team will coordinate with your host to ensure your Aso Ebi reaches you. Please proceed.`,
-            actionBtnTxt: "Continue",
-            isCovered: false,
-            context: "unavailable",
-          });
-          setShowGuestInfoModal(true);
-          setIsSubmitting(false);
-          return;
-        }
-        
-        // Show modal if state is not covered for self-managed delivery
-        if (!isStateCovered && selectedDeliveryTypes.includes("selfManaged")) {
-          setGuestInfoModalData({
-            title: "The delivery address provided is outside our delivery partner's service area.",
-            des: `We've moved your order to the Host Delivery option. Our team will coordinate with your host to ensure your Aso Ebi reaches you. Please proceed.`,
-            actionBtnTxt: "Continue",
-            isCovered: false,
-            context: "unavailable",
-          });
-          setShowGuestInfoModal(true);
-          setIsSubmitting(false);
-          return;
-        }
-        
-        // Show modal if state is covered for platform delivery  
-        if (isStateCovered && selectedDeliveryTypes.includes("platform")) {
-          setGuestInfoModalData({
-            title: "Doorstep delivery might not cover some remote locations",
-            des: `In such instance, we will contact you to ensure that we manage the item delivery from you without hassles.`,
-            actionBtnTxt: "Continue",
-            isCovered: true,
-            context: "submission",
-          });
-          setShowGuestInfoModal(true);
-          setIsSubmitting(false);
-          return;
-        }
-        
-        // Show modal if state is covered for self-managed delivery
-        if (isStateCovered && selectedDeliveryTypes.includes("selfManaged")) {
-          setGuestInfoModalData({
-            title: "Doorstep delivery might not cover some remote locations",
-            des: `In such instance, we will contact you to ensure that we manage the item delivery from you without hassles.`,
-            actionBtnTxt: "Continue",
-            isCovered: true,
-            context: "submission",
-          });
-          setShowGuestInfoModal(true);
-          setIsSubmitting(false);
-          return;
-        }
+      // For uncovered states, force delivery method to pickup to bypass backend validation
+      let finalDeliveryTypes = [...selectedDeliveryTypes];
+      if (!isStateCovered && (selectedDeliveryTypes.includes("platform") || selectedDeliveryTypes.includes("selfManaged"))) {
+        finalDeliveryTypes = ["pickup"]; // Force to pickup for uncovered states
       }
 
       // Remove empty or null fields
@@ -362,24 +330,33 @@ function DeliveryDetailsForm() {
             value !== null && value !== "" && value !== undefined
         )
       );
+
 // Use the component-scope mapping helpers (mapSelectionToSubmission and perItemMethodFromSelection)
 // so the submission payload uses the backend-expected labels.
 
-// Construct payload with delivery type
-const submissionDeliveryTypes = mapSelectionToSubmission(selectedDeliveryTypes);
-const submissionData: any = {
+// Construct payload with multiple delivery types
+const submissionDeliveryTypes = mapSelectionToSubmission(finalDeliveryTypes);
+
+// Determine the correct deliveryType for payment page compatibility
+let paymentDeliveryType;
+if (selectedDeliveryTypes.includes("platform") || selectedDeliveryTypes.includes("selfManaged")) {
+  // Always use "homeDelivery" for payment page if user originally selected platform/self-managed
+  // This ensures delivery fees are calculated and displayed, even for uncovered states
+  paymentDeliveryType = "homeDelivery"; 
+} else {
+  paymentDeliveryType = "pickUp";
+}
+
+const submissionData = {
   ...cleanedFormData,
   items: parsedCartItems.map((item: any) => ({
     packageId: item._id,
     quantity: item.quantity,
-    deliveryMethod: perItemMethodFromSelection(selectedDeliveryTypes)
+    deliveryMethod: perItemMethodFromSelection(finalDeliveryTypes)
   })),
-  deliveryType: submissionDeliveryTypes[0] || "pickUp"
+  deliveryTypes: submissionDeliveryTypes, // Array of delivery types
+  deliveryType: paymentDeliveryType // Use compatible delivery type for payment page
 };
-
-      if ("selectedDeliveryTypes" in submissionData) {
-        delete submissionData.selectedDeliveryTypes;
-      }
 
 
 
@@ -448,6 +425,15 @@ const submissionData: any = {
     setIsInitialized(true);
     console.log("Initialized with:", initialTypes.length > 0 ? initialTypes : ["platform"]);
   }, [packageDelivery, isInitialized]);
+
+  // Sync selectedDeliveryTypes to formData
+  useEffect(() => {
+    setFormData((prev) => ({
+      ...prev,
+      selectedDeliveryTypes: selectedDeliveryTypes
+    }));
+    console.log("Updated formData with selectedDeliveryTypes:", selectedDeliveryTypes);
+  }, [selectedDeliveryTypes]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -757,12 +743,63 @@ const submissionData: any = {
                               key={state.value}
                               className="px-3 py-3 cursor-pointer hover:bg-gray-100 text-sm"
                               onClick={() => {
+                                const coveredStates = ["Lagos", "Oyo", "Fct", "Osun", "Ogun", "FCT - Abuja"];
+                                const isStateCovered = coveredStates.includes(state.value);
+                                
                                 setStateSearch(state.value);
                                 setFormData((prev) => ({
                                   ...prev,
                                   state: state.value
                                 }));
                                 setStateDropdownOpen(false);
+                                
+                                // Show modal if state is not covered for platform delivery
+                                  if (!isStateCovered && selectedDeliveryTypes.includes("platform")) {
+                                  setGuestInfoModalData({
+                                    title: "The delivery address provided is outside our delivery partner’s service area.",
+                                    des: `We’ve moved your order to the Host Delivery option. Our team will coordinate with your host to ensure your Aso Ebi reaches you. Please proceed.`,
+                                    actionBtnTxt: "Continue",
+                                    isCovered: false,
+                                    context: "unavailable",
+                                  });
+                                  setShowGuestInfoModal(true);
+                                }
+                                
+                                // Show modal if state is not covered for self-managed delivery
+                                if (!isStateCovered && selectedDeliveryTypes.includes("selfManaged")) {
+                                  setGuestInfoModalData({
+                                    title: "The delivery address provided is outside our delivery partner’s service area.",
+                                    des: `We’ve moved your order to the Host Delivery option. Our team will coordinate with your host to ensure your Aso Ebi reaches you. Please proceed.`,
+                                    actionBtnTxt: "Continue",
+                                    isCovered: false,
+                                    context: "unavailable",
+                                  });
+                                  setShowGuestInfoModal(true);
+                                }
+                                
+                                // Show modal if state is covered for platform delivery  
+                                if (isStateCovered && selectedDeliveryTypes.includes("platform")) {
+                                  setGuestInfoModalData({
+                                    title: "Doorstep delivery might not cover some remote locations",
+                                    des: `In such instance, we will contact you to ensure that we manage the item delivery from you without hassles.`,
+                                    actionBtnTxt: "Continue",
+                                    isCovered: true,
+                                    context: "available",
+                                  });
+                                  setShowGuestInfoModal(true);
+                                }
+                                
+                                // Show modal if state is covered for self-managed delivery
+                                if (isStateCovered && selectedDeliveryTypes.includes("selfManaged")) {
+                                  setGuestInfoModalData({
+                                    title: "Doorstep delivery might not cover some remote locations",
+                                    des: `In such instance, we will contact you to ensure that we manage the item delivery from you without hassles.`,
+                                    actionBtnTxt: "Continue",
+                                    isCovered: true,
+                                    context: "available",
+                                  });
+                                  setShowGuestInfoModal(true);
+                                }
                               }}
                             >
                               {state.value}
@@ -965,88 +1002,21 @@ const submissionData: any = {
                 actionBtnTxt={guestInfoModalData.actionBtnTxt}
                 loading={false}
                 handleActionBtn={async () => {
-                  const isSelection = guestInfoModalData?.context === "selection";
-
                   // Track user action
                   trackEvent(
-                    guestInfoModalData.isCovered
-                      ? isSelection
-                        ? "Guest Delivery Disclaimer - Continue"
-                        : "Guest Delivery Disclaimer - Continue"
-                      : "Guest Delivery Disclaimer - Go Back",
+                    "Guest Delivery Disclaimer - Proceed",
                     {
                       state: formData.state,
                       city: formData.city,
+                      isCovered: guestInfoModalData.isCovered
                     }
                   );
 
                   setShowGuestInfoModal(false);
-
-                  if (isSelection) {
-                    // Finalize selection if covered
-                    if (guestInfoModalData.isCovered) {
-                      setSelectedDeliveryTypes(prev => {
-                        const filtered = prev.filter(t => t !== "selfManaged");
-                        if (!filtered.includes("platform")) {
-                          return [...filtered, "platform"];
-                        }
-                        return filtered;
-                      });
-                    }
-                    return;
-                  }
-
-                  // For available states (covered), just close modal and return to form
-                  if (guestInfoModalData.context === "available") {
-                    return;
-                  }
-
-                  try {
-                    setIsSubmitting(true);
-                    const cleanedFormData = Object.fromEntries(
-                      Object.entries(formData).filter(([key, value]) =>
-                        key !== "selectedDeliveryTypes" && // Exclude selectedDeliveryTypes from submission
-                        value !== null && value !== "" && value !== undefined
-                      )
-                    );
-
-                    const submissionDeliveryTypes = mapSelectionToSubmission(selectedDeliveryTypes);
-                    const submissionData: any = {
-                      ...cleanedFormData,
-                      items: parsedCartItems.map((item: any) => ({
-                        packageId: item._id,
-                        quantity: item.quantity,
-                        deliveryMethod: perItemMethodFromSelection(selectedDeliveryTypes)
-                      })),
-                      deliveryType: submissionDeliveryTypes[0] || "pickUp"
-                    };
-
-                    if ("selectedDeliveryTypes" in submissionData) {
-                      delete submissionData.selectedDeliveryTypes;
-                    }
-
-                    const res = await axiosInstance.post(
-                      `/guest-checkout/${parsedEventData?.eventId}/${parsedEventData?.eventGroupId}`,
-                      submissionData
-                    );
-
-                    const successCheckout = JSON.parse(localStorage.getItem('checkoutPackageOrder') || '{}');
-                    trackEvent("Checkout started", {
-                      ...successCheckout.data,
-                      guestFirstName: formData.guestFirstName,
-                      guestLastName: formData.guestLastName,
-                      guestEmail: formData.guestEmail,
-                      guestPhoneNumber: formData.guestPhoneNumber,
-                    });
-
-                    const query = new URLSearchParams({ orderData: JSON.stringify(res.data) }).toString();
-                    router.push(`/guest-payment-details?${query}`);
-                  } catch (err:any) {
-                    console.error("Submission error:", err);
-                    toast.error(err.response?.data?.message);
-                  } finally {
-                    setIsSubmitting(false);
-                  }
+                  
+                  // Proceed to checkout regardless of state coverage
+                  setIsSubmitting(true);
+                  await processCheckout();
                 }}
                 handleClose={() => setShowGuestInfoModal(false)}
               />
