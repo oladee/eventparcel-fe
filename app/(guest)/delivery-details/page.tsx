@@ -132,15 +132,6 @@ function DeliveryDetailsForm() {
 
   // Map UI selection to backend submission strings (component scope)
   // Backend requires camelCase, no-space strings: pickUp, platformDelivery, selfManagedDelivery
-  const mapSelectionToSubmission = (selections: string[]) => {
-    return selections.map(sel => {
-      if (sel === "pickup") return "pickUp";
-      if (sel === "platform") return "platformDelivery";
-      if (sel === "selfManaged") return "selfManagedDelivery";
-      return "";
-    }).filter(Boolean);
-  };
-
   const perItemMethodFromSelection = (selections: string[]) => {
     // For multiple selections, we need to determine primary delivery method
     // Priority: platform > selfManaged > pickup
@@ -334,9 +325,6 @@ function DeliveryDetailsForm() {
 // Use the component-scope mapping helpers (mapSelectionToSubmission and perItemMethodFromSelection)
 // so the submission payload uses the backend-expected labels.
 
-// Construct payload with multiple delivery types
-const submissionDeliveryTypes = mapSelectionToSubmission(finalDeliveryTypes);
-
 // Determine the correct deliveryType for payment page compatibility
 let paymentDeliveryType;
 if (selectedDeliveryTypes.includes("platform") || selectedDeliveryTypes.includes("selfManaged")) {
@@ -354,7 +342,6 @@ const submissionData = {
     quantity: item.quantity,
     deliveryMethod: perItemMethodFromSelection(finalDeliveryTypes)
   })),
-  deliveryTypes: submissionDeliveryTypes, // Array of delivery types
   deliveryType: paymentDeliveryType // Use compatible delivery type for payment page
 };
 
