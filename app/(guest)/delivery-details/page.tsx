@@ -325,11 +325,9 @@ function DeliveryDetailsForm() {
 // Use the component-scope mapping helpers (mapSelectionToSubmission and perItemMethodFromSelection)
 // so the submission payload uses the backend-expected labels.
 
-// Determine the correct deliveryType for payment page compatibility
+// Determine the correct deliveryType based on finalized delivery types (already adjusted for uncovered states)
 let paymentDeliveryType;
-if (selectedDeliveryTypes.includes("platform") || selectedDeliveryTypes.includes("selfManaged")) {
-  // Always use "homeDelivery" for payment page if user originally selected platform/self-managed
-  // This ensures delivery fees are calculated and displayed, even for uncovered states
+if (finalDeliveryTypes.includes("platform") || finalDeliveryTypes.includes("selfManaged")) {
   paymentDeliveryType = "homeDelivery"; 
 } else {
   paymentDeliveryType = "pickUp";
@@ -730,63 +728,12 @@ const submissionData = {
                               key={state.value}
                               className="px-3 py-3 cursor-pointer hover:bg-gray-100 text-sm"
                               onClick={() => {
-                                const coveredStates = ["Lagos", "Oyo", "Fct", "Osun", "Ogun", "FCT - Abuja"];
-                                const isStateCovered = coveredStates.includes(state.value);
-                                
                                 setStateSearch(state.value);
                                 setFormData((prev) => ({
                                   ...prev,
                                   state: state.value
                                 }));
                                 setStateDropdownOpen(false);
-                                
-                                // Show modal if state is not covered for platform delivery
-                                  if (!isStateCovered && selectedDeliveryTypes.includes("platform")) {
-                                  setGuestInfoModalData({
-                                    title: "The delivery address provided is outside our delivery partner’s service area.",
-                                    des: `We’ve moved your order to the Host Delivery option. Our team will coordinate with your host to ensure your Aso Ebi reaches you. Please proceed.`,
-                                    actionBtnTxt: "Continue",
-                                    isCovered: false,
-                                    context: "unavailable",
-                                  });
-                                  setShowGuestInfoModal(true);
-                                }
-                                
-                                // Show modal if state is not covered for self-managed delivery
-                                if (!isStateCovered && selectedDeliveryTypes.includes("selfManaged")) {
-                                  setGuestInfoModalData({
-                                    title: "The delivery address provided is outside our delivery partner’s service area.",
-                                    des: `We’ve moved your order to the Host Delivery option. Our team will coordinate with your host to ensure your Aso Ebi reaches you. Please proceed.`,
-                                    actionBtnTxt: "Continue",
-                                    isCovered: false,
-                                    context: "unavailable",
-                                  });
-                                  setShowGuestInfoModal(true);
-                                }
-                                
-                                // Show modal if state is covered for platform delivery  
-                                if (isStateCovered && selectedDeliveryTypes.includes("platform")) {
-                                  setGuestInfoModalData({
-                                    title: "Doorstep delivery might not cover some remote locations",
-                                    des: `In such instance, we will contact you to ensure that we manage the item delivery from you without hassles.`,
-                                    actionBtnTxt: "Continue",
-                                    isCovered: true,
-                                    context: "available",
-                                  });
-                                  setShowGuestInfoModal(true);
-                                }
-                                
-                                // Show modal if state is covered for self-managed delivery
-                                if (isStateCovered && selectedDeliveryTypes.includes("selfManaged")) {
-                                  setGuestInfoModalData({
-                                    title: "Doorstep delivery might not cover some remote locations",
-                                    des: `In such instance, we will contact you to ensure that we manage the item delivery from you without hassles.`,
-                                    actionBtnTxt: "Continue",
-                                    isCovered: true,
-                                    context: "available",
-                                  });
-                                  setShowGuestInfoModal(true);
-                                }
                               }}
                             >
                               {state.value}
@@ -1022,3 +969,4 @@ export default function DeliveryDetailsPage() {
     </Suspense>
   );
 }
+
