@@ -52,6 +52,11 @@ const PackagesSection: React.FC<PackagesSectionProps> = ({
   );
   const [warning, setWarning] = useState<string | null>(null);
 
+  const [isDesktop, setIsDesktop] = useState(false);
+  useEffect(() => {
+    setIsDesktop(window.innerWidth > 768);
+  }, []);
+
   const showWarning = (msg: string) => {
     setWarning(msg);
     setTimeout(() => setWarning(null), 4000); // Hide after 4 seconds
@@ -117,7 +122,7 @@ const handleShareGroupLink = async (group: Group) => {
   const fullMessageWithLink = `${text}${shareUrl}`;
 
   // Desktop detection (simple)
-  const isDesktop = window.innerWidth > 768;
+  // const isDesktop = window.innerWidth > 768;
 
   if (navigator.share && !isDesktop) {
     // Mobile: use native share

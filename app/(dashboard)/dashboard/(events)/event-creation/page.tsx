@@ -1,5 +1,5 @@
 "use client";
-import { Suspense, useState, useRef, useEffect } from "react";
+import {Suspense, useState, useRef, useEffect, useCallback} from "react";
 import EventSuccess from "@/components/EventSuccess";
 import ImagePickerModal from "@/components/aboutEvent/ImagePickerModal";
 import EventHeader from "@/components/aboutEvent/EventHeader";
@@ -435,7 +435,17 @@ const PageContent: React.FC = () => {
   };
 
   // Image file handling
-  const handleBrowseClick = () => {
+  // const handleBrowseClick = () => {
+  //   if (typeof window !== "undefined") {
+  //     if (window.innerWidth < 768) {
+  //       setShowImagePickerModal(true);
+  //     } else {
+  //       fileInputRef.current?.click();
+  //     }
+  //   }
+  // };
+
+  const handleBrowseClick = useCallback(() => {
     if (typeof window !== "undefined") {
       if (window.innerWidth < 768) {
         setShowImagePickerModal(true);
@@ -443,7 +453,7 @@ const PageContent: React.FC = () => {
         fileInputRef.current?.click();
       }
     }
-  };
+  }, [setShowImagePickerModal, fileInputRef]);
 
   const handleSelectGallery = () => {
     fileInputRef.current?.removeAttribute("capture");
