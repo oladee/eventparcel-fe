@@ -26,10 +26,11 @@ function PaymentDetailsCard() {
   const handleDiscountChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setDiscountCode(e.target.value);
   };
+  const [isClient, setIsClient] = useState(false);
 
   // Debounced discount validation using useEffect and setTimeout
   useEffect(() => {
-    
+    setIsClient(true);
     // Only proceed if discountCode length is exactly 8
     if (discountCode.length !== 8) {
       setDiscountResponse(null); // Clear any previous response
@@ -88,6 +89,7 @@ function PaymentDetailsCard() {
   // } else {
   //   tax = parsedCartItems?.data?.tax ?? 0;
   // }
+  console.log("guest-payment-details", parsedCartItems);
   const deliveryFee = parsedCartItems?.data?.homeDeliveryFee ?? 0;
 
   let grandTotal;
