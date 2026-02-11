@@ -27,6 +27,7 @@ function PaymentDetailsCard() {
     setDiscountCode(e.target.value);
   };
   const [isClient, setIsClient] = useState(false);
+  console.log("isClient", isClient);
 
   // Debounced discount validation using useEffect and setTimeout
   useEffect(() => {
