@@ -79,8 +79,6 @@ const Login: React.FC = () => {
       return;
     }
 
-    toast.info(`env : ${process.env}`)
-
     trackEvent("Started sign-in", {
       source: "login page",
       sign_in_method: "email_password",
