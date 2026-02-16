@@ -79,6 +79,8 @@ const Login: React.FC = () => {
       return;
     }
 
+    toast.info(`env : ${process.env}`)
+
     trackEvent("Started sign-in", {
       source: "login page",
       sign_in_method: "email_password",
@@ -90,7 +92,6 @@ const Login: React.FC = () => {
 
     try {
       setLoading(true);
-      toast.info(`env : ${process.env}`)
       const response = await axiosInstance.post(
         "/login",
         { email, password },
