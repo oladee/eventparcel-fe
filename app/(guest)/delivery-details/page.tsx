@@ -1,7 +1,7 @@
 "use client";
 
 import HeaderLayout from "@/components/layout/HeaderLayout";
-import { useState, useRef, useEffect, Suspense } from "react";
+import { useState, useRef, useEffect, Suspense, useMemo } from "react";
 import check from "../../../public/images/check.png";
 import uncheck from "../../../public/images/unchecked.png";
 import Image from "next/image";
@@ -38,21 +38,17 @@ function DeliveryDetailsForm() {
     ? parsedCartItems.map((item: any) => item.packageDelivery).flat().filter(Boolean)
     : fallbackDeliveryOptions; // Use fallback when no cart items
 
-  console.log("Package Delivery Options:", packageDelivery);
-  console.log("Has Cart Items:", parsedCartItems?.length > 0);
-  console.log("Using Fallback:", parsedCartItems?.length === 0);
-
   const [debouncedAddress, setDebouncedAddress] = useState("");
-  const [selectedDeliveryTypes, setSelectedDeliveryTypes] = useState<string[]>([]);
-  
-  // Debug log for selectedDeliveryTypes state
-  console.log("Selected Delivery Types State:", selectedDeliveryTypes);
+  type DeliveryType = "platform" | "selfManaged" | "pickup";
+
+  const [selectedDeliveryType, setSelectedDeliveryType] =
+    useState<DeliveryType>("pickup");
   const [stateSearch, setStateSearch] = useState("");
   const [citySearch, setCitySearch] = useState("");
   const [stateDropdownOpen, setStateDropdownOpen] = useState(false);
   const [cityDropdownOpen, setCityDropdownOpen] = useState(false);
   const [formData, setFormData] = useState({
-    selectedDeliveryTypes: [] as string[],
+    selectedDeliveryType: '',
     guestFirstName: "",
     guestLastName: "",
     guestEmail: "",
@@ -67,6 +63,30 @@ function DeliveryDetailsForm() {
   const [errors, setErrors] = useState<Record<string, string>>({});
   const stateInputRef = useRef<HTMLInputElement | null>(null);
   const cityInputRef = useRef<HTMLInputElement | null>(null);
+
+  const availableDeliveryOptions: DeliveryType[] = useMemo(() => {
+    const options: DeliveryType[] = [];
+
+    if (
+      packageDelivery.includes("platformDelivery") ||
+      packageDelivery.includes("homeDelivery:platformDelivery")
+    ) {
+      options.push("platform");
+    }
+
+    if (
+      packageDelivery.includes("selfManaged") ||
+      packageDelivery.includes("homeDelivery:selfManaged")
+    ) {
+      options.push("selfManaged");
+    }
+
+    if (packageDelivery.includes("pickUp")) {
+      options.push("pickup");
+    }
+
+    return options;
+  }, [packageDelivery]);
 
   const filteredStates = nigerianStates.filter((state) =>
     state.value.toLowerCase().includes(stateSearch.toLowerCase())
@@ -132,53 +152,20 @@ function DeliveryDetailsForm() {
 
   // Map UI selection to backend submission strings (component scope)
   // Backend requires camelCase, no-space strings: pickUp, platformDelivery, selfManagedDelivery
-  const perItemMethodFromSelection = (selections: string[]) => {
+  const perItemMethodFromSelection = (selection: string) => {
     // For multiple selections, we need to determine primary delivery method
     // Priority: platform > selfManaged > pickup
-    if (selections.includes("platform")) return "platformDelivery";
-    if (selections.includes("selfManaged")) return "selfManagedDelivery";
-    if (selections.includes("pickup")) return "pickUp";
+    if (selection =="platform") return "platformDelivery";
+    if (selection =="selfManaged") return "selfManagedDelivery";
+    if (selection =="pickup") return "pickUp";
     return "pickUp";
   };
 
   // Handle delivery type selection with validation rules
-  const handleDeliveryTypeSelection = (type: string) => {
-    console.log(`[CLICK] Attempting to select: ${type}`);
-    console.log(`[CLICK] Current selections before:`, selectedDeliveryTypes);
-    
-    setSelectedDeliveryTypes(prev => {
-      const newSelections = [...prev];
-      const isCurrentlySelected = newSelections.includes(type);
-      
-      console.log(`[LOGIC] Is ${type} currently selected?`, isCurrentlySelected);
-      
-      if (isCurrentlySelected) {
-        // Remove if already selected
-        const filtered = newSelections.filter(t => t !== type);
-        console.log(`[LOGIC] Removing ${type}, new selections:`, filtered);
-        return filtered;
-      } else {
-        // Add with validation rules
-        if (type === "platform") {
-          // Platform cannot be with selfManaged - remove selfManaged if exists
-          const filtered = newSelections.filter(t => t !== "selfManaged");
-          const result = [...filtered, "platform"];
-          console.log(`[LOGIC] Adding platform (removed selfManaged), new selections:`, result);
-          return result;
-        } else if (type === "selfManaged") {
-          // SelfManaged cannot be with platform - remove platform if exists
-          const filtered = newSelections.filter(t => t !== "platform");
-          const result = [...filtered, "selfManaged"];
-          console.log(`[LOGIC] Adding selfManaged (removed platform), new selections:`, result);
-          return result;
-        } else {
-          // Pickup can be added with any other option
-          const result = [...newSelections, type];
-          console.log(`[LOGIC] Adding ${type}, new selections:`, result);
-          return result;
-        }
-      }
-    });
+  const handleSelect = (type: DeliveryType) => {
+    console.log('type: ',type)
+    if (!availableDeliveryOptions.includes(type)) return;
+    setSelectedDeliveryType(type);
   };
 
   //validate form
@@ -197,7 +184,7 @@ function DeliveryDetailsForm() {
     }
 
     // Address validations for platform and self-managed delivery
-    if (selectedDeliveryTypes.includes("platform") || selectedDeliveryTypes.includes("selfManaged")) {
+    if (selectedDeliveryType == "platform" || selectedDeliveryType  == "selfManaged") {
       if (!formData.shippingAddress)
         errors.shippingAddress = "Address is required";
       if (!formData.state) errors.state = "State is required";
@@ -205,7 +192,7 @@ function DeliveryDetailsForm() {
     }
 
     // Ensure at least one delivery type is selected
-    if (selectedDeliveryTypes.length === 0) {
+    if (!selectedDeliveryType) {
       errors.deliveryType = "Please select at least one delivery option";
     }
 
@@ -237,7 +224,7 @@ function DeliveryDetailsForm() {
     }
 
     // Check if we need to show delivery area modal for platform/self-managed delivery
-    if ((selectedDeliveryTypes.includes("platform") || selectedDeliveryTypes.includes("selfManaged")) && formData.state) {
+    if ((selectedDeliveryType == "platform" || selectedDeliveryType == "selfManaged") && formData.state) {
       const coveredStates = ["Lagos", "Oyo", "Fct", "Osun", "Ogun", "FCT - Abuja"];
       const isStateCovered = coveredStates.includes(formData.state);
       
@@ -274,7 +261,7 @@ function DeliveryDetailsForm() {
   const processCheckout = async () => {
     try {
       // Validate required fields based on delivery type
-      const requiresAddress = selectedDeliveryTypes.includes("platform") || selectedDeliveryTypes.includes("selfManaged");
+      const requiresAddress = selectedDeliveryType == "platform" || selectedDeliveryType == "selfManaged";
       
       if (requiresAddress) {
         if (
@@ -299,7 +286,7 @@ function DeliveryDetailsForm() {
         }
       }
 
-      if (selectedDeliveryTypes.length === 0) {
+      if (!selectedDeliveryType) {
         throw new Error("Please select at least one delivery option");
       }
 
@@ -308,9 +295,9 @@ function DeliveryDetailsForm() {
       const isStateCovered = formData.state ? coveredStates.includes(formData.state) : true;
       
       // For uncovered states, force delivery method to pickup to bypass backend validation
-      let finalDeliveryTypes = [...selectedDeliveryTypes];
-      if (!isStateCovered && (selectedDeliveryTypes.includes("platform") || selectedDeliveryTypes.includes("selfManaged"))) {
-        finalDeliveryTypes = ["pickup"]; // Force to pickup for uncovered states
+      let finalDeliveryType = selectedDeliveryType;
+      if (!isStateCovered && (selectedDeliveryType == "platform" || selectedDeliveryType == "selfManaged")) {
+        finalDeliveryType = "pickup"  // Force to pickup for uncovered states
       }
 
       // Remove empty or null fields
@@ -327,7 +314,7 @@ function DeliveryDetailsForm() {
 
 // Determine the correct deliveryType based on finalized delivery types (already adjusted for uncovered states)
 let paymentDeliveryType;
-if (finalDeliveryTypes.includes("platform") || finalDeliveryTypes.includes("selfManaged")) {
+if (finalDeliveryType == "platform" || finalDeliveryType == "selfManaged") {
   paymentDeliveryType = "homeDelivery"; 
 } else {
   paymentDeliveryType = "pickUp";
@@ -338,7 +325,7 @@ const submissionData = {
   items: parsedCartItems.map((item: any) => ({
     packageId: item._id,
     quantity: item.quantity,
-    deliveryMethod: perItemMethodFromSelection(finalDeliveryTypes)
+    deliveryMethod: perItemMethodFromSelection(finalDeliveryType)
   })),
   deliveryType: paymentDeliveryType // Use compatible delivery type for payment page
 };
@@ -377,48 +364,14 @@ const submissionData = {
   const [showGuestInfoModal, setShowGuestInfoModal] = useState(false);
   const [guestInfoModalData, setGuestInfoModalData] = useState<any>(null);
 
-  // Initialize deliveryTypes based on packageDelivery contents
-  const [isInitialized, setIsInitialized] = useState(false);
-  
-  useEffect(() => {
-    if (isInitialized) return; // Only initialize once
-    
-    console.log("Initializing delivery types with:", packageDelivery);
-
-    const hasPlatform = 
-      packageDelivery.includes("homeDelivery:platformDelivery") ||
-      packageDelivery.includes("platformDelivery");
-    
-    const hasSelfManaged = 
-      packageDelivery.includes("homeDelivery:selfManaged") ||
-      packageDelivery.includes("selfManaged");
-    
-    const hasPickup = packageDelivery.includes("pickUp");
-
-    const initialTypes = [];
-    if (hasPlatform) initialTypes.push("platform");
-    if (hasSelfManaged && !hasPlatform) initialTypes.push("selfManaged"); // Only if platform not selected
-    if (hasPickup && initialTypes.length === 0) initialTypes.push("pickup"); // Default to pickup if nothing else
-
-    if (initialTypes.length > 0) {
-      setSelectedDeliveryTypes(initialTypes);
-    } else {
-      // Default to platform delivery as fallback
-      setSelectedDeliveryTypes(["platform"]);
-    }
-    
-    setIsInitialized(true);
-    console.log("Initialized with:", initialTypes.length > 0 ? initialTypes : ["platform"]);
-  }, [packageDelivery, isInitialized]);
-
   // Sync selectedDeliveryTypes to formData
-  useEffect(() => {
-    setFormData((prev) => ({
-      ...prev,
-      selectedDeliveryTypes: selectedDeliveryTypes
-    }));
-    console.log("Updated formData with selectedDeliveryTypes:", selectedDeliveryTypes);
-  }, [selectedDeliveryTypes]);
+  // useEffect(() => {
+  //   setFormData((prev) => ({
+  //     ...prev,
+  //     selectedDeliveryType: selectedDeliveryType!
+  //   }));
+  //   console.log("Updated formData with selectedDeliveryTypes:", selectedDeliveryType);
+  // }, [selectedDeliveryType]);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -440,6 +393,8 @@ const submissionData = {
   const handleMapLocationSelect = () => {
     setShowMapPickerModal(true);
   };
+
+
 
   return (
     <>
@@ -489,19 +444,18 @@ const submissionData = {
                 </label>
                 <div className="flex flex-wrap gap-3 justify-start">
                   {/* Platform Delivery Button */}
-                  {(packageDelivery.includes("homeDelivery:platformDelivery") ||
-                    packageDelivery.includes("platformDelivery")) && (
+                  {(packageDelivery.includes("platformDelivery")) && (
                     <button
                       type="button"
-                      onClick={() => handleDeliveryTypeSelection("platform")}
+                      onClick={() => handleSelect("platform")}
                       className={`flex-1 min-w-[160px] h-[60px] flex items-center gap-3 border rounded-[8px] p-3 text-[#111827] font-general text-sm ${
-                        selectedDeliveryTypes.includes("platform")
+                        selectedDeliveryType == "platform"
                           ? "border-[#7A1626] bg-[#FDF4F5]"
                           : "border-[#EEEFF2]"
                       }`}
                     >
                       <Image
-                        src={selectedDeliveryTypes.includes("platform") ? check : uncheck}
+                        src={selectedDeliveryType == "platform" ? check : uncheck}
                         alt="check status"
                         className="w-5 h-5"
                       />
@@ -513,19 +467,18 @@ const submissionData = {
                   )}
                   
                   {/* Self-Managed Delivery Button */}
-                  {(packageDelivery.includes("homeDelivery:selfManaged") ||
-                    packageDelivery.includes("selfManaged")) && (
+                  {(packageDelivery.includes("selfManaged")) && (
                     <button
                       type="button"
-                      onClick={() => handleDeliveryTypeSelection("selfManaged")}
+                      onClick={() => handleSelect("selfManaged")}
                       className={`flex-1 min-w-[160px] h-[60px] flex items-center gap-3 border rounded-[8px] p-3 text-[#111827] font-general text-sm ${
-                        selectedDeliveryTypes.includes("selfManaged")
+                        selectedDeliveryType =="selfManaged"
                           ? "border-[#7A1626] bg-[#FDF4F5]"
                           : "border-[#EEEFF2]"
                       }`}
                     >
                       <Image
-                        src={selectedDeliveryTypes.includes("selfManaged") ? check : uncheck}
+                        src={selectedDeliveryType =="selfManaged" ? check : uncheck}
                         alt="check status"
                         className="w-5 h-5"
                       />
@@ -540,15 +493,15 @@ const submissionData = {
                   {packageDelivery.includes("pickUp") && (
                     <button
                       type="button"
-                      onClick={() => handleDeliveryTypeSelection("pickup")}
+                      onClick={() => handleSelect("pickup")}
                       className={`flex-1 min-w-[160px] h-[60px] flex items-center gap-3 border rounded-[8px] p-3 text-[#111827] font-general text-sm ${
-                        selectedDeliveryTypes.includes("pickup")
+                        selectedDeliveryType == "pickup"
                           ? "border-[#7A1626] bg-[#FDF4F5]"
                           : "border-[#EEEFF2]"
                       }`}
                     >
                       <Image
-                        src={selectedDeliveryTypes.includes("pickup") ? check : uncheck}
+                        src={selectedDeliveryType == "pickup" ? check : uncheck}
                         alt="check status"
                         className="w-5 h-5"
                       />
@@ -562,7 +515,7 @@ const submissionData = {
               </div>
 
               {/* Show address form for platform/self-managed, show contact form for pickup only */}
-              {(selectedDeliveryTypes.includes("platform") || selectedDeliveryTypes.includes("selfManaged")) ? (
+              {(selectedDeliveryType == "platform" || selectedDeliveryType == "selfManaged") ? (
                 /* Address Delivery Form (Platform & Self-Managed) */
                 <div className="grid gap-4 mt-4">
                   <div>
@@ -790,7 +743,7 @@ const submissionData = {
                   </div>
 
                 </div>
-              ) : selectedDeliveryTypes.includes("pickup") ? (
+              ) : selectedDeliveryType == "pickup" ? (
                 /* Pickup Form */
                 <div className="grid gap-4 mt-4">
                   <div className="w-[311px] h-[60px] bg-[#FFF7F2] px-3 py-2 rounded-[12px]">
