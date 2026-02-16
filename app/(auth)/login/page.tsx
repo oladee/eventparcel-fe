@@ -90,6 +90,7 @@ const Login: React.FC = () => {
 
     try {
       setLoading(true);
+      toast.info(`env : ${process.env}`)
       const response = await axiosInstance.post(
         "/login",
         { email, password },
