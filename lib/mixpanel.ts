@@ -2,50 +2,63 @@
 import mixpanel from "mixpanel-browser";
 
 const isProd = process.env.NODE_ENV === "production";
-
-// Optional: enable debug mode in dev
 const MIXPANEL_TOKEN = process.env.NEXT_PUBLIC_MIXPANEL_TOKEN;
 
+let isInitialized = false;
+
 export const initMixpanel = () => {
-  if (typeof window !== "undefined" && MIXPANEL_TOKEN) {
-    console.log("Initializing Mixpanel with token:", MIXPANEL_TOKEN); 
-    mixpanel.init(MIXPANEL_TOKEN, {
-      debug: !isProd,
-    });
-  }else{
-    console.warn("mixpanel init failed")
-  }
-};
+  if (typeof window === "undefined") return;
 
-export const trackEvent = (event: string, properties?: Record<string, any>) => {
-  if (typeof window !== "undefined") {
-    mixpanel.track(event, properties);
-  }
-};
-
-export const identifyUser = (userIdOrEmail?: string, props?: Record<string, any>) => {
-  if (typeof window === "undefined" || !userIdOrEmail) return;
-
-  const currentDistinctId = mixpanel.get_distinct_id();
-  const storedId = localStorage.getItem("mixpanel_identified");
-
-  if (storedId === userIdOrEmail) {
-    // Already identified in this session
+  if (!MIXPANEL_TOKEN) {
+    console.warn("Mixpanel token missing");
     return;
   }
 
-  // Optional: alias if this is the first time seeing this user
-  if (currentDistinctId !== userIdOrEmail) {
-    mixpanel.alias(userIdOrEmail);
+  if (isInitialized) return;
+
+  mixpanel.init(MIXPANEL_TOKEN, {
+    debug: !isProd,
+  });
+
+  isInitialized = true;
+};
+
+
+export const trackEvent = (
+  event: string,
+  properties?: Record<string, any>
+) => {
+  try {
+    if (typeof window === "undefined") return;
+    if (!isInitialized) return;
+
+    mixpanel.track(event, properties);
+  } catch (err) {
+    console.warn("Mixpanel track failed:", err);
   }
+};
 
-  // Identify and set properties
-  mixpanel.identify(userIdOrEmail);
+export const identifyUser = (
+  userIdOrEmail?: string,
+  props?: Record<string, any>
+) => {
+  try {
+    if (typeof window === "undefined") return;
+    if (!isInitialized) return;
+    if (!userIdOrEmail) return;
 
-  if (props) {
-    mixpanel.people.set(props);
+    const storedId = localStorage.getItem("mixpanel_identified");
+
+    if (storedId === userIdOrEmail) return;
+
+    mixpanel.identify(userIdOrEmail);
+
+    if (props) {
+      mixpanel.people.set(props);
+    }
+
+    localStorage.setItem("mixpanel_identified", userIdOrEmail);
+  } catch (err) {
+    console.warn("Mixpanel identify failed:", err);
   }
-
-  // Prevent re-identification in the same session
-  localStorage.setItem("mixpanel_identified", userIdOrEmail);
 };
