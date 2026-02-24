@@ -1,0 +1,59 @@
+# Build and deploy Next.js app to Azure Web App (NO ARTIFACTS)
+
+on:
+  push:
+    branches:
+      - master
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
+    
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '20.x'
+
+      - name: Install dependencies
+        run: npm install
+
+      - name: Build Next.js app
+        run: npm run build
+        env:
+          NEXT_PUBLIC_API_BASE_URL: 'https://app-serv-eventparcel-backend-v2-prod-f3e2czagchhycwfq.uksouth-01.azurewebsites.net'
+
+      - name: Verify build output
+        run: |
+          echo "Checking .next folder..."
+          ls -la .next/
+          echo "Build successful!"
+
+      - name: Login to Azure
+        uses: azure/login@v2
+        with:
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_D74E8CA8CFED4CF49532B41784D9D0F6 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_B78D04CE82D04F33ABD72F681AB336F0 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_3F33911584DF425E84F4F22A79D98D9C }}
+
+      - name: Deploy to Azure Web App
+        id: deploy-to-webapp
+        uses: azure/webapps-deploy@v3
+        with:
+          app-name: 'app-serv-EventParcel-Frontend-V2-Prod'
+          slot-name: 'Production'
+          package: .
+          clean: false  # Keep existing files, including .next
+
+
+
+
+
+
+
