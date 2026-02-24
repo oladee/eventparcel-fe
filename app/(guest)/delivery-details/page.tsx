@@ -297,7 +297,7 @@ function DeliveryDetailsForm() {
       // For uncovered states, force delivery method to pickup to bypass backend validation
       let finalDeliveryType = selectedDeliveryType;
       if (!isStateCovered && (selectedDeliveryType == "platform" || selectedDeliveryType == "selfManaged")) {
-        finalDeliveryType = "pickup"  // Force to pickup for uncovered states
+        finalDeliveryType = "selfManaged"  // Force to pickup for uncovered states
       }
 
       // Remove empty or null fields
