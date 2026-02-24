@@ -232,7 +232,8 @@ function DeliveryDetailsForm() {
       if (!isStateCovered) {
         setGuestInfoModalData({
           title: "Delivery Location Update Required",
-          des: `Your selected state (${formData.state}) is outside our standard delivery zone. Your order will be processed as Host Delivery - our team will coordinate with your host to ensure your items reach you safely. You can proceed with checkout.`,
+          des: `
+          Your selected state (${formData.state}) is outside the standard delivery zone for our Logistics Partners. You will not be charged for delivery now. We will reach out to coordinate delivery with you to ensure your item reaches you safely`,
           actionBtnTxt: "Proceed to Payment",
           isCovered: false,
           context: "checkout",
@@ -469,7 +470,7 @@ const submissionData = {
                       />
                       <div className="flex flex-col items-start">
                         <span>Platform Delivery</span>
-                        <span className="text-xs text-[#718096]">We handle delivery for you</span>
+                        {/* <span className="text-xs text-[#718096]">We handle delivery for you</span> */}
                       </div>
                     </button>
                   )}
@@ -492,7 +493,7 @@ const submissionData = {
                       />
                       <div className="flex flex-col items-start">
                         <span>Self-Managed</span>
-                        <span className="text-xs text-[#718096]">You handle delivery yourself</span>
+                        {/* <span className="text-xs text-[#718096]">You handle delivery yourself</span> */}
                       </div>
                     </button>
                   )}
@@ -515,7 +516,7 @@ const submissionData = {
                       />
                       <div className="flex flex-col items-start">
                         <span>Pickup</span>
-                        <span className="text-xs text-[#718096]">Collect from designated location</span>
+                        {/* <span className="text-xs text-[#718096]">Collect from designated location</span> */}
                       </div>
                     </button>
                   )}

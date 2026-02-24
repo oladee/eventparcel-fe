@@ -203,7 +203,7 @@ const validateField = useCallback(
     const toggleDeliveryOption = (option: "pickUp" | "platformDelivery" | "selfManaged") => {
         // If platformDelivery is disabled for this group, block selection
         if (option === "platformDelivery" && groupCurrency === "USD") {
-            toast.info("Platform delivery is not available for USD groups. Please choose another delivery option.");
+            toast.info("For dollar-based deliveries, please select self-delivery. We will ensure we deliver for you, but will contact you to discuss shipping rates.");
             return;
         }
         // helper to get legacy key for homeDelivery variants
