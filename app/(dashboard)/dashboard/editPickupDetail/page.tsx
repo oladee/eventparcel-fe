@@ -368,7 +368,7 @@ const PickupDetails = () => {
       } catch (error: any) {
         if (axios.isAxiosError(error)) {
           const errorMessage =
-            error.response?.data?.message ||
+            error.response?.data?.message ||error?.message ||
             "An error occurred. Please try again.";
           toast.error(errorMessage);
         }
