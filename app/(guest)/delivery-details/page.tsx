@@ -322,8 +322,7 @@ if ( finalDeliveryType == "platform") {
 
 } else if (finalDeliveryType == "selfManaged" ){
   paymentDeliveryType = "selfManaged"; 
-}
-{
+}else{
 
   paymentDeliveryType = "pickUp";
 
