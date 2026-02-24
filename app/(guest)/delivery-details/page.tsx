@@ -296,7 +296,9 @@ function DeliveryDetailsForm() {
       
       // For uncovered states, force delivery method to pickup to bypass backend validation
       let finalDeliveryType = selectedDeliveryType;
-      if (!isStateCovered && (selectedDeliveryType == "platform" || selectedDeliveryType == "selfManaged")) {
+      if (!isStateCovered && (
+        selectedDeliveryType == "platform" || selectedDeliveryType == "selfManaged")
+      ){
         finalDeliveryType = "selfManaged"  // Force to pickup for uncovered states
       }
 
@@ -312,12 +314,18 @@ function DeliveryDetailsForm() {
 // Use the component-scope mapping helpers (mapSelectionToSubmission and perItemMethodFromSelection)
 // so the submission payload uses the backend-expected labels.
 
-// Determine the correct deliveryType based on finalized delivery types (already adjusted for uncovered states)
 let paymentDeliveryType;
-if (finalDeliveryType == "platform" || finalDeliveryType == "selfManaged") {
+if ( finalDeliveryType == "platform") {
+
   paymentDeliveryType = "homeDelivery"; 
-} else {
+
+} else if (finalDeliveryType == "selfManaged" ){
+  paymentDeliveryType = "selfManaged"; 
+}
+{
+
   paymentDeliveryType = "pickUp";
+
 }
 
 const submissionData = {
