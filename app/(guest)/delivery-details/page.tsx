@@ -452,7 +452,7 @@ const submissionData = {
                 </label>
                 <div className="flex flex-wrap gap-3 justify-start">
                   {/* Platform Delivery Button */}
-                  {(packageDelivery.includes("platformDelivery")) && (
+                  {(packageDelivery.includes("platformDelivery") || packageDelivery.includes("selfManaged")) && (
                     <button
                       type="button"
                       onClick={() => handleSelect("platform")}
@@ -475,7 +475,7 @@ const submissionData = {
                   )}
                   
                   {/* Self-Managed Delivery Button */}
-                  {(packageDelivery.includes("selfManaged")) && (
+                  {/* {(packageDelivery.includes("selfManaged")) && (
                     <button
                       type="button"
                       onClick={() => handleSelect("selfManaged")}
@@ -492,10 +492,9 @@ const submissionData = {
                       />
                       <div className="flex flex-col items-start">
                         <span>Self-Managed</span>
-                        {/* <span className="text-xs text-[#718096]">You handle delivery yourself</span> */}
                       </div>
                     </button>
-                  )}
+                  )} */}
                   
                   {/* Pickup Button */}
                   {packageDelivery.includes("pickUp") && (
