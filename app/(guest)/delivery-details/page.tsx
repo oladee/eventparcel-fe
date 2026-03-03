@@ -42,7 +42,7 @@ function DeliveryDetailsForm() {
   type DeliveryType = "platform" | "selfManaged" | "pickup";
 
   const [selectedDeliveryType, setSelectedDeliveryType] =
-    useState<DeliveryType>("pickup");
+    useState<DeliveryType>("platform");
   const [stateSearch, setStateSearch] = useState("");
   const [citySearch, setCitySearch] = useState("");
   const [stateDropdownOpen, setStateDropdownOpen] = useState(false);
@@ -231,7 +231,7 @@ function DeliveryDetailsForm() {
       // Show modal for both covered and uncovered states
       if (!isStateCovered) {
         setGuestInfoModalData({
-          title: "Delivery Location Update Required",
+          title: "Delivery Information",
           des: `
           Your selected state (${formData.state}) is outside the standard delivery zone for our Logistics Partners. You will not be charged for delivery now. We will reach out to coordinate delivery with you to ensure your item reaches you safely`,
           actionBtnTxt: "Proceed to Payment",
