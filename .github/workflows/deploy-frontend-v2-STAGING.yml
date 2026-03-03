@@ -1,9 +1,6 @@
 # Build and deploy Next.js app to Azure Web App (NO ARTIFACTS)
 
 on:
-  push:
-    branches:
-      - main
   workflow_dispatch:
 
 jobs:
@@ -50,6 +47,7 @@ jobs:
           slot-name: 'Production'
           package: .
           clean: false  # Keep existing files, including .next
+
 
 
 
