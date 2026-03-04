@@ -459,8 +459,8 @@ const Orders: React.FC = ({  }) => {
                         <p className="font-bold text-gray-900">
                         {order?.items[0]?.deliveryMethod
                           ? order.items[0].deliveryMethod === "homeDelivery"
-                            ? "Home Delivery"
-                            : "Pick Up"
+                            ? "Home Delivery" : order.items[0].deliveryMethod === "selfManaged"
+                            ? "Self-Managed Delivery" : "Pick Up"
                           : "N/A"}
                         </p>
 

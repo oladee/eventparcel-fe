@@ -297,10 +297,8 @@ function DeliveryDetailsForm() {
       
       // For uncovered states, force delivery method to pickup to bypass backend validation
       let finalDeliveryType = selectedDeliveryType;
-      if (!isStateCovered && (
-        selectedDeliveryType == "platform" || selectedDeliveryType == "selfManaged")
-      ){
-        finalDeliveryType = "selfManaged"  // Force to pickup for uncovered states
+      if (!isStateCovered && (selectedDeliveryType == "platform")){
+        finalDeliveryType = "selfManaged";
       }
 
       // Remove empty or null fields
@@ -312,21 +310,19 @@ function DeliveryDetailsForm() {
         )
       );
 
-// Use the component-scope mapping helpers (mapSelectionToSubmission and perItemMethodFromSelection)
-// so the submission payload uses the backend-expected labels.
+      // Use the component-scope mapping helpers (mapSelectionToSubmission and perItemMethodFromSelection)
+      // so the submission payload uses the backend-expected labels.
 
-let paymentDeliveryType;
-if ( finalDeliveryType == "platform") {
+      let paymentDeliveryType;
+      if ( finalDeliveryType == "platform") {
 
-  paymentDeliveryType = "homeDelivery"; 
+        paymentDeliveryType = "homeDelivery"; 
 
-} else if (finalDeliveryType == "selfManaged" ){
-  paymentDeliveryType = "selfManaged"; 
-}else{
-
-  paymentDeliveryType = "pickUp";
-
-}
+      } else if (finalDeliveryType == "selfManaged" ){
+        paymentDeliveryType = "selfManaged"; 
+      }else{
+        paymentDeliveryType = "pickUp";
+      }
 
 const submissionData = {
   ...cleanedFormData,
