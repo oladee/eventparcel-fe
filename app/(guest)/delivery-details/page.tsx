@@ -468,7 +468,7 @@ const submissionData = {
                         className="w-5 h-5"
                       />
                       <div className="flex flex-col items-start">
-                        <span>Platform Delivery</span>
+                        <span>Home Delivery</span>
                         {/* <span className="text-xs text-[#718096]">We handle delivery for you</span> */}
                       </div>
                     </button>
