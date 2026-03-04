@@ -1,9 +1,6 @@
 # Build and deploy Next.js app to Azure Web App (NO ARTIFACTS)
 
 on:
-  push:
-    branches:
-      - master
   workflow_dispatch:
 
 jobs:
@@ -27,7 +24,7 @@ jobs:
       - name: Build Next.js app
         run: npm run build
         env:
-          NEXT_PUBLIC_API_BASE_URL: 'https://api.eventparcel.com'
+          NEXT_PUBLIC_API_BASE_URL: 'https://app-serv-eventparcel-backend-v2-bndfhac5gzgne3dx.westeurope-01.azurewebsites.net'
 
       - name: Verify build output
         run: |
@@ -38,15 +35,15 @@ jobs:
       - name: Login to Azure
         uses: azure/login@v2
         with:
-          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_D74E8CA8CFED4CF49532B41784D9D0F6 }}
-          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_B78D04CE82D04F33ABD72F681AB336F0 }}
-          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_3F33911584DF425E84F4F22A79D98D9C }}
+          client-id: ${{ secrets.AZUREAPPSERVICE_CLIENTID_F73FC4D4FFED47C0A10F79D1579E03A3 }}
+          tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_29899A4C42244EB49F2FDA6691943D93 }}
+          subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_21401D13D843435CACE4E29957269148 }}
 
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'app-serv-EventParcel-Frontend-V2-Prod'
+          app-name: 'app-serv-EventParcel-frontend-V2'
           slot-name: 'Production'
           package: .
           clean: false  # Keep existing files, including .next
