@@ -34,9 +34,11 @@ function DeliveryDetailsForm() {
   const [showMapPickerModal, setShowMapPickerModal] = useState(false);
 
   // Extract the packageDelivery array
-  const packageDelivery = parsedCartItems?.length > 0 
+  let packageDelivery = parsedCartItems?.length > 0 
     ? parsedCartItems.map((item: any) => item.packageDelivery).flat().filter(Boolean)
-    : fallbackDeliveryOptions; // Use fallback when no cart items
+    : fallbackDeliveryOptions ;
+
+  packageDelivery = packageDelivery.length > 0 ? packageDelivery : fallbackDeliveryOptions; // Ensure we have options to show
 
   const [debouncedAddress, setDebouncedAddress] = useState("");
   type DeliveryType = "platform" | "selfManaged" | "pickup";
