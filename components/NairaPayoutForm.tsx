@@ -44,6 +44,14 @@ const NairaPayoutForm: React.FC<NairaPayoutFormProps> = ({
     message: string;
   }>({ status: 'idle', message: '' });
 
+  const normalizeAccountName = useCallback((value: string) => {
+    return value
+      .normalize("NFKC")
+      .replace(/[.,]/g, "")
+      .replace(/\s+/g, " ")
+      .trim();
+  }, []);
+
   const prevValues = useRef({
     accountNumber: "",
     bankCode: ""
@@ -86,11 +94,12 @@ const NairaPayoutForm: React.FC<NairaPayoutFormProps> = ({
       });
 
       if (response.data?.data?.account_name) {
+        const normalizedAccountName = normalizeAccountName(response.data.data.account_name);
         setFormData((prev: any) => ({
           ...prev,
           nairaAccount: {
             ...prev.nairaAccount,
-            accountName: response.data.data.account_name,
+            accountName: normalizedAccountName,
           },
         }));
         setErrors((prev) => ({ ...prev, accountName: '' }));
@@ -107,7 +116,7 @@ const NairaPayoutForm: React.FC<NairaPayoutFormProps> = ({
     } finally {
       prevValues.current = { accountNumber, bankCode };
     }
-  }, [setErrors, setFormData]);
+  }, [normalizeAccountName, setErrors, setFormData]);
 
   // Run validation when account number or bank changes
   useEffect(() => {
