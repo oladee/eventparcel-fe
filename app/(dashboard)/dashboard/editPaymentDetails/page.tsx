@@ -126,8 +126,8 @@ const PaymentSetupContent = () => {
         if (value.length !== 10) return "Account number must be 10 digits";
         return "";
       case "accountName":
-        if (!/^[A-Za-z\s]+$/.test(value))
-          return "Account name must only contain letters and spaces";
+        // if (!/^[A-Za-z\s]+$/.test(value))
+        //   return "Account name must only contain letters and spaces";
         if (value.length < 3 || value.length > 50)
           return "Account name must be between 3 and 50 characters";
         return "";
