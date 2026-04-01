@@ -476,7 +476,12 @@ const PickupDetails = () => {
                 toast.success("Details saved");
                 router.back();
               } catch (err) {
-                console.log(err);
+                if (axios.isAxiosError(err)) {
+                  const errMessage =
+                    err.response?.data?.message || err?.message ||
+                    "An error occurred. Please try again.";
+                  toast.error(errMessage);
+                }
               } finally {
                 setLoading(false);
               }

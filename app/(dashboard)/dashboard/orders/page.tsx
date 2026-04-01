@@ -651,11 +651,11 @@ const Page: React.FC = ({}) => {
                           </p>
                           <p className="font-medium">Delivery</p>
                           <p className="font-bold text-gray-900">
-                          {order?.items[0]?.deliveryMethod
-                            ? order.items[0].deliveryMethod === "homeDelivery"
-                              ? "Home Delivery"
-                              : "Pick Up"
-                            : "N/A"}
+                          {order?.deliveryType
+                          ? order.deliveryType === "homeDelivery"
+                            ? "Home Delivery" : order.deliveryType === "selfManaged"
+                            ? "Self-Managed Delivery" : "Pick Up"
+                          : "N/A"}
                           </p>
                           <p className="font-medium">Total Price</p>
                           <p className="font-bold text-gray-900">

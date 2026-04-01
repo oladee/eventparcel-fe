@@ -101,7 +101,7 @@ interface OrderGuest {
 }
 
 export interface Order extends BaseEntity {
-  deliveryType: ReactNode;
+  deliveryType: string;
   totalAmountCurrency: string;
   homeDeliveryFee: any;
   shippingAddress: ReactNode;
