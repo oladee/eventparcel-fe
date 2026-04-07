@@ -10,14 +10,13 @@ import "react-datepicker/dist/react-datepicker.css";
 import { FormEvent } from "react";
 import { PiCalendarMinus } from "react-icons/pi";
 import { AiOutlineClockCircle } from "react-icons/ai";
-// import HeaderLayout from "@/components/layout/HeaderLayout";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import NairaPayoutForm from "@/components/NairaPayoutForm";
 import DollarPayoutForm from "@/components/DollarPayoutForm";
 import axiosInstance from "@/lib/axiosInstance";
 import Container from "@/components/dashboard/Container";
 import { trackEvent } from "@/lib/mixpanel";
-import { ChevronLeft } from 'lucide-react';
+import { ChevronLeft } from "lucide-react";
 
 const LocationPickerModal = dynamic(
   () => import("@/components/aboutEvent/LocationPickerModal"),
@@ -63,19 +62,19 @@ const validTimeZones = [
   "KST",
   "AEST",
   "ACST",
-  "AWST"
+  "AWST",
 ];
 
 const PaymentSetupContent = () => {
-  const searchParams = useSearchParams();
-  const groupsString = searchParams.get("groups");
-  const groups = groupsString
-    ? JSON.parse(decodeURIComponent(groupsString))
-    : [];
-  const firstEventId =
-    groups.length > 0 && groups[0].event ? groups[0].event._id : "";
-  const firstGroup = groups.length > 0 && groups[0].event ? groups[0] : "";
-  // const [isRightBarOpen, setIsRightBarOpen] = useState(false);
+  const params = useParams();
+  const eventId = params.id as string;
+
+  const router = useRouter();
+
+  // Groups fetched from API
+  const [groups, setGroups] = useState<any[]>([]);
+  const [isLoadingGroups, setIsLoadingGroups] = useState(true);
+
   const [showMapPickerModal, setShowMapPickerModal] = useState(false);
   const [selectedBank, setSelectedBank] = useState<Bank | null>(null);
   const [selectedUSBank, setSelectedUSBank] = useState<USBank | null>(null);
@@ -86,37 +85,79 @@ const PaymentSetupContent = () => {
   const [eventTime, setEventTime] = useState<string | null>(null);
   const [showModalCancel, setShowModalCancel] = useState(false);
 
-  const router = useRouter();
-
   const [formData, setFormData] = useState({
-    event: firstEventId,
+    event: eventId,
     nairaAccount: {
       accountNumber: "",
       accountName: "",
       bankName: "",
-      bankCode: ""
+      bankCode: "",
     },
     dollarAccount: {
       usAccountNumber: "",
       routingNumber: "",
       usBankName: "",
-      usAccountName: ""
+      usAccountName: "",
     },
     isDraft: false,
     paymentDate: new Date(),
     paymentTime: new Date(),
-    paymentTimeZone: "WAT"
+    paymentTimeZone: "WAT",
   });
 
-  // Initialize error messages as strings, not dates.
   const [errors, setErrors] = useState<{ [key: string]: string }>({});
-
   const [isFormValid, setIsFormValid] = useState(false);
 
-  //Are all packages self-managed
+  // ── Fetch groups from the backend using the eventId slug ──
+  useEffect(() => {
+    if (!eventId) return;
+
+    const fetchGroups = async () => {
+      setIsLoadingGroups(true);
+      try {
+        const response = await axiosInstance.get(`/view-groups/${eventId}`);
+        setGroups(response.data.data);
+      } catch (error: any) {
+        console.error("Failed to fetch groups:", error);
+        toast.error(
+          error.response?.data?.message || "Failed to load groups. Please try again."
+        );
+      } finally {
+        setIsLoadingGroups(false);
+      }
+    };
+
+    fetchGroups();
+  }, [eventId]);
+
+  // ── Read event date/time from localStorage (set during event creation) ──
+  useEffect(() => {
+    const storedEventDetails = localStorage.getItem("eventDetails");
+
+    if (storedEventDetails) {
+      try {
+        const parsedDetail = JSON.parse(storedEventDetails);
+        setEventDate(parsedDetail?.data.date);
+        setEventTime(parsedDetail?.data.time);
+      } catch (error) {
+        console.error("Failed to parse event details:", error);
+      }
+    }
+  }, []);
+
+  // ── Derived values from fetched groups ──
+  const firstEventId = eventId;
+  const firstGroup = groups.length > 0 ? groups[0] : null;
+
+  const hasNGN = groups.some(
+    (group: { groupCurrency: string }) => group.groupCurrency === "NGN"
+  );
+  const hasUSD = groups.some(
+    (group: { groupCurrency: string }) => group.groupCurrency === "USD"
+  );
+
   const isAllSelfManaged = (groupList: any[]) => {
     if (groupList.length === 0) return false;
-
     return groupList.every((group) =>
       group.packages.every((pkg: any) =>
         pkg.packageDelivery.every((delivery: string) =>
@@ -128,33 +169,14 @@ const PaymentSetupContent = () => {
 
   const allSelfManaged = isAllSelfManaged(groups);
 
-  useEffect(() => {
-    const storedEventDetails = localStorage.getItem("eventDetails");
-    
-    if (storedEventDetails) {
-      try {
-        const parsedDetail = JSON.parse(storedEventDetails);
-
-        setEventDate(parsedDetail?.data.date);
-        setEventTime(parsedDetail?.data.time);
-      } catch (error) {
-        console.error("Failed to parse event details:", error);
-      }
-    }
-  }, []);
-
+  // ── Form validation ──
   useEffect(() => {
     const isAllFieldsFilled = Object.values(formData).every((value) => {
-      if (typeof value === "string") {
-        return value.trim() !== "";
-      } else if (value instanceof Date) {
-        return !isNaN(value.getTime());
-      }
+      if (typeof value === "string") return value.trim() !== "";
+      if (value instanceof Date) return !isNaN(value.getTime());
       return true;
     });
-    const isAllFieldsValid = Object.values(errors).every(
-      (error) => error === ""
-    );
+    const isAllFieldsValid = Object.values(errors).every((error) => error === "");
     setIsFormValid(isAllFieldsFilled && isAllFieldsValid);
   }, [formData, errors]);
 
@@ -210,8 +232,8 @@ const PaymentSetupContent = () => {
         ...prev,
         [parentKey]: {
           ...(prev[parentKey as keyof typeof formData] as object),
-          [childKey]: value
-        }
+          [childKey]: value,
+        },
       }));
     } else {
       setFormData((prev) => ({ ...prev, [id]: value }));
@@ -219,7 +241,7 @@ const PaymentSetupContent = () => {
 
     setErrors((prev) => ({
       ...prev,
-      [id]: validateField(id, value)
+      [id]: validateField(id, value),
     }));
   };
 
@@ -230,7 +252,7 @@ const PaymentSetupContent = () => {
     setErrors((prev) => ({ ...prev, [id]: validateField(id, value) }));
   };
 
-  // Helper function to format a Date object to a 12-hour time string.
+  // Helper: format Date → "HH:MM AM/PM"
   const formatTime12Hour = (date: Date): string => {
     let hours = date.getHours();
     const minutes = date.getMinutes();
@@ -241,131 +263,112 @@ const PaymentSetupContent = () => {
     return `${paddedHours}:${paddedMinutes} ${ampm}`;
   };
 
-    const checkEventDateTime = () => {
-      // First check if we have the required dates
-      if (!eventDate || !formData?.paymentDate) return true;
-    
-      // Mobile-friendly date parser
-      const parseDate = (dateInput: Date | string): Date | null => {
-        // If already a Date object and valid
-        if (dateInput instanceof Date && !isNaN(dateInput.getTime())) {
-          return dateInput;
-        }
-        
-        // Handle string input (for mobile compatibility)
-        if (typeof dateInput === 'string') {
-          // Try ISO format first
-          const isoDate = new Date(dateInput);
-          if (!isNaN(isoDate.getTime())) return isoDate;
-          
-          // Try splitting date parts (common mobile date string format)
-          const parts = dateInput.split(/[-/]/);
-          if (parts.length === 3) {
-            // Try different formats (YYYY-MM-DD, MM/DD/YYYY, etc.)
-            const formats = [
-              `${parts[0]}-${parts[1]}-${parts[2]}`, // YYYY-MM-DD
-              `${parts[2]}-${parts[0]}-${parts[1]}`, // MM-DD-YYYY
-              `${parts[2]}-${parts[1]}-${parts[0]}`  // DD-MM-YYYY
-            ];
-            
-            for (const format of formats) {
-              const testDate = new Date(format);
-              if (!isNaN(testDate.getTime())) return testDate;
-            }
+  // Helper: check if any field in an account object is filled
+  const isFilled = (obj: { [key: string]: string }) =>
+    Object.values(obj).some(
+      (val) => val && typeof val === "string" && val.trim() !== ""
+    );
+
+  const checkEventDateTime = () => {
+    if (!eventDate || !formData?.paymentDate) return true;
+
+    const parseDate = (dateInput: Date | string): Date | null => {
+      if (dateInput instanceof Date && !isNaN(dateInput.getTime())) {
+        return dateInput;
+      }
+      if (typeof dateInput === "string") {
+        const isoDate = new Date(dateInput);
+        if (!isNaN(isoDate.getTime())) return isoDate;
+
+        const parts = dateInput.split(/[-/]/);
+        if (parts.length === 3) {
+          const formats = [
+            `${parts[0]}-${parts[1]}-${parts[2]}`,
+            `${parts[2]}-${parts[0]}-${parts[1]}`,
+            `${parts[2]}-${parts[1]}-${parts[0]}`,
+          ];
+          for (const format of formats) {
+            const testDate = new Date(format);
+            if (!isNaN(testDate.getTime())) return testDate;
           }
         }
-        
-        return null;
-      };
-    
-      // Parse dates with mobile compatibility
-      const parsedEventDate = parseDate(eventDate);
-      const parsedPaymentDate = parseDate(formData.paymentDate);
-    
-      if (!parsedEventDate || !parsedPaymentDate) {
-        console.error('Invalid date format detected');
-        return true; // or false depending on your requirements
       }
-    
-      // Compare dates (ignoring time)
-      const eventDay = new Date(parsedEventDate.setHours(0, 0, 0, 0));
-      const paymentDay = new Date(parsedPaymentDate.setHours(0, 0, 0, 0));
-    
-      // Debug logs for mobile testing
-      console.log('Event Date:', eventDay);
-      console.log('Payment Date:', paymentDay);
-    
-      // 1. Check if payment is after event DATE
-      if (paymentDay > eventDay) {
-        toast.error("Payment date cannot be after the event date!");
+      return null;
+    };
+
+    const parsedEventDate = parseDate(eventDate);
+    const parsedPaymentDate = parseDate(formData.paymentDate);
+
+    if (!parsedEventDate || !parsedPaymentDate) {
+      console.error("Invalid date format detected");
+      return true;
+    }
+
+    const eventDay = new Date(parsedEventDate.setHours(0, 0, 0, 0));
+    const paymentDay = new Date(parsedPaymentDate.setHours(0, 0, 0, 0));
+
+    console.log("Event Date:", eventDay);
+    console.log("Payment Date:", paymentDay);
+
+    if (paymentDay > eventDay) {
+      toast.error("Payment date cannot be after the event date!");
+      return false;
+    }
+
+    if (
+      paymentDay.getTime() === eventDay.getTime() &&
+      formData.paymentTime &&
+      eventTime
+    ) {
+      const parseTime = (timeInput: Date | string): string => {
+        if (timeInput instanceof Date) {
+          return timeInput.toTimeString().split(" ")[0].slice(0, 5);
+        }
+        if (typeof timeInput === "string") {
+          if (/^\d{1,2}:\d{2}$/.test(timeInput)) {
+            const [hours, minutes] = timeInput.split(":");
+            return `${hours.padStart(2, "0")}:${minutes.padEnd(2, "0")}`;
+          }
+          if (/^\d{1,2}:\d{2}\s?[AP]M$/i.test(timeInput)) {
+            const [time, period] = timeInput.split(/(?=[AP]M)/i);
+            let hours = time.split(":")[0];
+            const minutes = time.split(":")[1];
+            hours =
+              period.toLowerCase() === "pm"
+                ? `${(parseInt(hours) % 12) + 12}`
+                : hours.padStart(2, "0");
+            return `${hours}:${minutes}`;
+          }
+        }
+        return "00:00";
+      };
+
+      const paymentTimeStr = parseTime(formData.paymentTime);
+      const eventTimeStr = parseTime(eventTime);
+
+      const paymentDateTime = new Date(paymentDay);
+      const [paymentHours, paymentMinutes] = paymentTimeStr.split(":").map(Number);
+      paymentDateTime.setHours(paymentHours, paymentMinutes);
+
+      const eventDateTime = new Date(eventDay);
+      const [eventHours, eventMinutes] = eventTimeStr.split(":").map(Number);
+      eventDateTime.setHours(eventHours, eventMinutes);
+
+      console.log("Payment DateTime:", paymentDateTime);
+      console.log("Event DateTime:", eventDateTime);
+
+      if (paymentDateTime > eventDateTime) {
+        toast.error("Payment time cannot be after the event time!");
         return false;
       }
-    
-      // 2. Only check times if same day AND both times exist
-      if (
-        paymentDay.getTime() === eventDay.getTime() &&
-        formData.paymentTime &&
-        eventTime
-      ) {
-        // Mobile-friendly time parser
-        const parseTime = (timeInput: Date | string): string => {
-          if (timeInput instanceof Date) {
-            return timeInput.toTimeString().split(' ')[0].slice(0, 5); // HH:mm
-          }
-          
-          // Handle string time formats
-          if (typeof timeInput === 'string') {
-            // Check for HH:mm format
-            if (/^\d{1,2}:\d{2}$/.test(timeInput)) {
-              const [hours, minutes] = timeInput.split(':');
-              return `${hours.padStart(2, '0')}:${minutes.padEnd(2, '0')}`;
-            }
-          // Check for HH:mm AM/PM format
-            if (/^\d{1,2}:\d{2}\s?[AP]M$/i.test(timeInput)) {
-              const [time, period] = timeInput.split(/(?=[AP]M)/i);
-              let hours = time.split(':')[0];
-              const minutes = time.split(':')[1]; 
-              
-              hours = period.toLowerCase() === 'pm' 
-                ? `${(parseInt(hours) % 12) + 12}`
-                : hours.padStart(2, '0');
-              
-              return `${hours}:${minutes}`;
-            }
-          }
-          
-          return '00:00'; // Default fallback
-        };
-    
-        // Create full datetime objects
-        const paymentTimeStr = parseTime(formData.paymentTime);
-        const eventTimeStr = parseTime(eventTime);
-    
-        const paymentDateTime = new Date(paymentDay);
-        const [paymentHours, paymentMinutes] = paymentTimeStr.split(':').map(Number);
-        paymentDateTime.setHours(paymentHours, paymentMinutes);
-    
-        const eventDateTime = new Date(eventDay);
-        const [eventHours, eventMinutes] = eventTimeStr.split(':').map(Number);
-        eventDateTime.setHours(eventHours, eventMinutes);
-    
-        // More debug logs
-        console.log('Payment DateTime:', paymentDateTime);
-        console.log('Event DateTime:', eventDateTime);
-    
-        if (paymentDateTime > eventDateTime) {
-          toast.error("Payment time cannot be after the event time!");
-          return false;
-        }
-      }
-    
-      return true;
-    };
-    
+    }
+
+    return true;
+  };
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
-  
+
     if (!isFormValid) {
       toast.error("Please fill out all required fields");
       return;
@@ -373,27 +376,21 @@ const PaymentSetupContent = () => {
 
     if (!checkEventDateTime()) {
       setLoading(false);
-      return; 
+      return;
     }
 
-  
     setLoading(true);
-  
+
     try {
       const { nairaAccount, dollarAccount, ...rest } = formData;
-  
-      // Check if nairaAccount or dollarAccount has values before including them in the payload
+
       const formattedData = {
         ...rest,
         ...(isFilled(nairaAccount) ? { nairaAccount } : {}),
         ...(isFilled(dollarAccount) ? { dollarAccount } : {}),
         paymentTime: formatTime12Hour(formData.paymentTime),
       };
-  
-      const queryString = new URLSearchParams({
-        data: JSON.stringify(formattedData),
-      }).toString();
-  
+
       if (allSelfManaged) {
         await axiosInstance.post("/add-payment", formattedData);
         toast.success("Payment details successfully submitted!");
@@ -402,32 +399,40 @@ const PaymentSetupContent = () => {
           source: "Dashboard Add Payment Page",
           timestamp: new Date().toISOString(),
           page_name: "dashboard add payment page",
-          event_id: firstGroup.event._id,
-          event_name: firstGroup.event.eventName,
+          event_id: firstEventId,
+          event_name: firstGroup?.event?.eventName,
           naira_bank_name: formData.nairaAccount.bankName,
           dollar_bank_name: formData.dollarAccount.usBankName,
-          status: "Successful"
+          status: "Successful",
         });
 
         router.push("/dashboard/events");
       } else {
         const parsedEventDetails = {
-          event_id: firstGroup.event._id,
-          event_name: firstGroup.event.eventName,
+          event_id: firstEventId,
+          event_name: firstGroup?.event?.eventName,
         };
-        
-        localStorage.setItem("parsedEventDetails", JSON.stringify(parsedEventDetails));
-        
+
+        localStorage.setItem(
+          "parsedEventDetails",
+          JSON.stringify(parsedEventDetails)
+        );
+
         trackEvent("Add Payment Information", {
           source: "Dashboard Add Payment Page",
           timestamp: new Date().toISOString(),
           page_name: "dashboard add payment page",
-          event_id: firstGroup.event._id,
-          event_name: firstGroup.event.eventName,
+          event_id: firstEventId,
+          event_name: firstGroup?.event?.eventName,
           naira_bank_name: formData.nairaAccount.bankName,
           dollar_bank_name: formData.dollarAccount.usBankName,
-          status: "Successful"
+          status: "Successful",
         });
+
+        const queryString = new URLSearchParams({
+          data: JSON.stringify(formattedData),
+        }).toString();
+
         router.push(`/dashboard/pickup-details?${queryString}`);
       }
     } catch (error: any) {
@@ -435,26 +440,22 @@ const PaymentSetupContent = () => {
         source: "Add Payment Page",
         timestamp: new Date().toISOString(),
         page_name: "Add Payment Page",
-        event_id: firstGroup.event._id,
-        event_name: firstGroup.event.eventName,
+        event_id: firstEventId,
+        event_name: firstGroup?.event?.eventName,
         naira_bank_name: formData.nairaAccount.bankName,
         dollar_bank_name: formData.dollarAccount.usBankName,
-        status: "Failed"
+        status: "Failed",
       });
 
       console.error("Error submitting payment details:", error);
-  
-      if (
-        error.response &&
-        error.response.data &&
-        error.response.data.message
-      ) {
+
+      if (error.response?.data?.message) {
         toast.error(`Error: ${error.response.data.message}`);
       } else {
         toast.error("Failed to submit payment details. Please try again.");
       }
     } finally {
-      setLoading(true); 
+      setLoading(false);
     }
   };
 
@@ -462,18 +463,18 @@ const PaymentSetupContent = () => {
 
   const handleSaveForLater = async () => {
     setIsSaveLoading(true);
-  
+
     try {
       const { nairaAccount, dollarAccount, ...rest } = formData;
-  
+
       const fullFormData = {
         ...rest,
         ...(isFilled(nairaAccount) ? { nairaAccount } : {}),
         ...(isFilled(dollarAccount) ? { dollarAccount } : {}),
         paymentTime: formatTime12Hour(formData.paymentTime),
-        isDraft: true
+        isDraft: true,
       };
-  
+
       await axiosInstance.post(`/payment-save-for-later`, fullFormData);
       toast.success("Saved! Continue from your dashboard.");
       router.push("/dashboard");
@@ -484,58 +485,28 @@ const PaymentSetupContent = () => {
       setIsSaveLoading(false);
     }
   };
-  
 
-  // const handleSaveForLater = async() => {
-  //   setIsSaveLoading(true);
-  //   const authToken = localStorage.getItem("authToken");
-  //   const storedEventId = localStorage.getItem("eventId");
-
-  
-  //   if (!authToken) {
-  //     Cookies.set("redirectAfterLogin", pathname); 
-  //     setShowSuccess2(true);
-  //     return;
-  //   }
-
-  //   try{
-  //     await axiosInstance.put(`/payment-save-for-later`, {
-  //       isDraft: true
-  //     });
-  //     toast.success("Saved! Continue from your dashboard.");
-  //     router.push("/dashboard");    
-  //   }catch(error: any) {
-  //     console.log(error)
-  //     toast.error(error.response?.data?.message || "Failed to save event");
-  //   }finally{
-  //     setIsSaveLoading(false);
-  //   }
-  // };
-  
-  // Helper function to check if account details are filled
-  const isFilled = (obj: { [key: string]: string }) =>
-    Object.values(obj).some((val) => val && typeof val === "string" && val.trim() !== "");
-  
-
-  const hasNGN = groups.some(
-    (group: { groupCurrency: string }) => group.groupCurrency === "NGN"
-  );
-  const hasUSD = groups.some(
-    (group: { groupCurrency: string }) => group.groupCurrency === "USD"
-  );
-
-  const today = new Date();
-
-    
   const callSaveForLater = () => {
     setShowModalCancel(false);
     handleSaveForLater();
   };
 
   const handleDiscard = () => {
-    // setShowModalCancel(false);
     router.push("/dashboard/events");
   };
+
+  const today = new Date();
+
+  if (isLoadingGroups) {
+    return (
+      <div className="flex flex-col justify-center items-center bg-white w-full h-screen">
+        <div className="w-12 h-12 border-4 border-[#751423] border-t-transparent rounded-full animate-spin"></div>
+        <p className="text-xl font-semibold text-[#751423] mt-4">
+          Loading payment setup...
+        </p>
+      </div>
+    );
+  }
 
   return (
     <Container>
@@ -543,7 +514,6 @@ const PaymentSetupContent = () => {
       {showMapPickerModal && (
         <LocationPickerModal
           onLocationSelect={() => {
-            //  setFormData((prev) => ({ ...prev, location }));
             setErrors((prev) => ({ ...prev, location: "" }));
             setShowMapPickerModal(false);
           }}
@@ -555,9 +525,14 @@ const PaymentSetupContent = () => {
           className="fixed top-16 w-[90%] md:w-[80%] h-auto py-3 bg-gray-100"
           id="back-button"
         >
-          <button className="w-[20%] md:w-[5%] cursor-pointer flex flex-row items-center" onClick={() => window.history.back()}>
-            <ChevronLeft className="w-6 h-6 " />
-            <span className="font-medium text-base text-[#111827] ml-1">Back</span>
+          <button
+            className="w-[20%] md:w-[5%] cursor-pointer flex flex-row items-center"
+            onClick={() => window.history.back()}
+          >
+            <ChevronLeft className="w-6 h-6" />
+            <span className="font-medium text-base text-[#111827] ml-1">
+              Back
+            </span>
           </button>
         </div>
         <div className="mt-4 pb-20 lg:py-24 px-3 sm:px-4 mx-auto max-w-screen-md h-[98vh] overflow-y-auto no-scrollbar">
@@ -573,7 +548,7 @@ const PaymentSetupContent = () => {
               className="flex justify-center items-center gap-3"
             >
               <div className="flex flex-col lg:flex-row w-full">
-              <span className="flex justify-start w-[313px] lg:w-[288px] whitespace-nowrap h-6 font-general font-medium text-sm text-[#718096]">
+                <span className="flex justify-start w-[313px] lg:w-[288px] whitespace-nowrap h-6 font-general font-medium text-sm text-[#718096]">
                   Let&apos;s setup your payout process and payment
                 </span>
                 <span className="flex justify-start w-[313px] h-11 font-general font-medium text-sm text-[#718096]">
@@ -603,8 +578,7 @@ const PaymentSetupContent = () => {
                 </span>
               </div>
 
-              {/* NAIRA PAYOUT */}
-              <div className=" rounded-[10px]">
+              <div className="rounded-[10px]">
                 {hasNGN && (
                   <div className="border border-[#CBD5E0] mb-7 p-4 rounded-[10px]">
                     <NairaPayoutForm
@@ -620,7 +594,6 @@ const PaymentSetupContent = () => {
                   </div>
                 )}
 
-                {/* DOLLAR PAYOUT */}
                 {hasUSD && (
                   <div className="border border-[#CBD5E0] p-4 rounded-[10px]">
                     <DollarPayoutForm
@@ -637,6 +610,7 @@ const PaymentSetupContent = () => {
                 )}
               </div>
             </div>
+
             <div className="mt-8">
               <div className="mb-5">
                 <h2
@@ -728,7 +702,7 @@ const PaymentSetupContent = () => {
 
             <div className="bg-[#FFFF] py-4 flex justify-center fixed z-10 left-0 bottom-0 w-full">
               <div className="max-w-3xl flex gap-4 items-center justify-center sm:justify-end w-full px-4">
-               <button
+                <button
                   id="save"
                   type="button"
                   className="p-3 border border-[#111827] rounded-[12px] font-manrope font-extrabold text-base text-[#111827] w-[142.24px]"
@@ -752,10 +726,9 @@ const PaymentSetupContent = () => {
               </div>
             </div>
           </form>
-
-          {/* <RightBar isOpen={isRightBarOpen} setIsOpen={setIsRightBarOpen} /> */}
         </div>
       </section>
+
       {showModal && (
         <ReusuableSuccess
           title="You've successfully uploaded your details"
@@ -764,13 +737,13 @@ const PaymentSetupContent = () => {
           buttonText="continue"
         />
       )}
-       {showModalCancel && (
-        <div
-          // onClick={handleCloseModal}
-          className="fixed inset-0 px-6 bg-black bg-opacity-40 flex items-center justify-center z-[999]"
-        >
-          <div onClick={(e) => e.stopPropagation()} className="relative bg-white rounded-[8px] p-8 shadow-lg max-w-md w-full">
-               {/* Close icon */}
+
+      {showModalCancel && (
+        <div className="fixed inset-0 px-6 bg-black bg-opacity-40 flex items-center justify-center z-[999]">
+          <div
+            onClick={(e) => e.stopPropagation()}
+            className="relative bg-white rounded-[8px] p-8 shadow-lg max-w-md w-full"
+          >
             <button
               onClick={() => setShowModalCancel(false)}
               className="absolute top-3 right-4 text-xl text-black-100 hover:text-gray-800"
@@ -781,7 +754,6 @@ const PaymentSetupContent = () => {
               What would you like to do?
             </h2>
             <p className="mb-6 text-gray-600 hidden md:block">
-              {" "}
               You can save your progress and come back later, or discard this
               event creation.
             </p>
@@ -806,8 +778,6 @@ const PaymentSetupContent = () => {
     </Container>
   );
 };
-
-// export default PaymentSetupContent;
 
 export default function Page() {
   return (

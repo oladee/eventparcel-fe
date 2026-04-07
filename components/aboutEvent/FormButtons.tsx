@@ -51,29 +51,31 @@ const FormButtons: React.FC<FormButtonsProps> = ({ isFormValid, groups, fromDash
       Cookies.set("redirectAfterLogin", pathname); 
       setTimeout(() => {
         router.push("/login");
-      },1000);
+      }, 1000);
     }
 
     if (!isFormValid || loading) return;
-  
+
     setLoading(true);
-  
-    const groupQuery = encodeURIComponent(JSON.stringify(groups));
-  
+
     try {
       if (fromDashboard) {
-        const authToken = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
-        
-        if (authToken) {
-          router.push(`/dashboard/payment-setup?groups=${groupQuery}`);
+        const token = typeof window !== "undefined" ? localStorage.getItem("authToken") : null;
+        const eventId = typeof window !== "undefined" ? localStorage.getItem("eventId") : null;
+
+        if (token && eventId) {
+          router.push(`/dashboard/payment-setup/${eventId}`);
+        } else if (token) {
+          router.push("/dashboard/events");
         } else {
           router.push("/signup");
         }
       } else {
+        const groupQuery = encodeURIComponent(JSON.stringify(groups));
         router.push(`/payment-setup?groups=${groupQuery}`);
       }
     } finally {
-      setLoading(false); 
+      setLoading(false);
     }
   };
   
