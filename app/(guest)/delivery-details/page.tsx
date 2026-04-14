@@ -227,7 +227,7 @@ function DeliveryDetailsForm() {
 
     // Check if we need to show delivery area modal for platform/self-managed delivery
     if ((selectedDeliveryType == "platform" || selectedDeliveryType == "selfManaged") && formData.state) {
-      const coveredStates = ["Lagos", "Oyo", "Fct", "Osun", "Ogun", "FCT - Abuja"];
+      const coveredStates = ["Lagos", "Oyo", "Fct", "Osun", "Ogun", "FCT - Abuja","Ondo"];
       const isStateCovered = coveredStates.includes(formData.state);
       
       // Show modal for both covered and uncovered states
