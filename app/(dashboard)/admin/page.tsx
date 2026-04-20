@@ -7,7 +7,7 @@ import LineChartSection from '@/components/admin/dashboard/LineChartSection'
 import RecentEventsSection from '@/components/admin/dashboard/RecentEventsSection'
 import axiosInstance from '@/lib/adminAxiosInterceptor/axiosInstance'
 import { ToastContainer, toast } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
+//import 'react-toastify/dist/ReactToastify.min.css'
 import { BiLoaderCircle } from 'react-icons/bi'
 
 // Local skeleton for page-level loading
@@ -134,7 +134,7 @@ const DashboardPage: React.FC = () => {
           </div>
           <RecentEventsSection events={data.recentEvents} />
         </div>
-      </div>  
+      </div>
     </AdminContainer>
   )
 }
