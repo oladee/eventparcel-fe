@@ -232,6 +232,13 @@ export const AdminSidebar: React.FC = () => {
         exact: true
       },
       {
+        label: "Delivery Pricing",
+        path: "/admin/admin-deliveryPricing",
+        // Using FiCreditCard as a placeholder icon
+        icon: VscSettings,
+        exact: true
+      },
+      {
         label: "Admin Users",
         path: "/admin/admin-users",
         // Using FiCreditCard as a placeholder icon
