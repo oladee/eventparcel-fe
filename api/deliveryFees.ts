@@ -199,74 +199,109 @@ export async function confirmDeliveryFeesImport(
 
 // ─── Audit / Change History ─────────────────────────────────────────────────
 
-export type ChangeAction = "create" | "update" | "delete" | "bulk_import";
+export type AuditAction = "create" | "update" | "delete";
+export type AuditResource =
+  | "state"
+  | "city"
+  | "delivery_fee"
+  | "delivery_fee_import";
 
-export interface ChangeLogRouteRef {
-  pickupState: string;
-  pickupCity: string;
-  destinationState: string;
-  destinationCity: string;
-}
-
-export interface ChangeLogEntry {
+export interface AuditActor {
   _id: string;
-  action: ChangeAction;
-  adminId: string;
-  adminName?: string;
-  adminEmail?: string;
-  route?: ChangeLogRouteRef;
-  before?: Record<string, unknown>;
-  after?: Record<string, unknown>;
-  note?: string;           // e.g. "bulk import: 14 rows merged"
-  createdAt: string;       // ISO timestamp
+  firstName?: string;
+  lastName?: string;
+  email?: string;
 }
 
-export interface FetchHistoryParams {
-  startDate?: string;   // ISO date string
-  endDate?: string;
-  route?: string;       // free-text search on pickup/destination
-  action?: ChangeAction;
+export interface DeliveryFeeAuditLogEntry {
+  _id: string;
+  action: AuditAction;
+  resource: AuditResource;
+  resourceId: string;
+  performedBy?: AuditActor;
+  details?: Record<string, unknown>;
+  createdAt: string;
+}
+
+export interface FetchAuditLogParams {
+  resource?: AuditResource;
+  action?: AuditAction;
+  from?: string;
+  to?: string;
   page?: number;
   limit?: number;
 }
 
-export interface ChangeHistoryResponse {
-  entries: ChangeLogEntry[];
+export interface DeliveryFeeAuditLogResponse {
+  logs: DeliveryFeeAuditLogEntry[];
   total: number;
   page: number;
-  pages: number;
+  limit: number;
+  totalPages: number;
 }
 
-export async function fetchDeliveryFeeHistory(
-  params: FetchHistoryParams = {}
-): Promise<ChangeHistoryResponse> {
-  try {
-    const query = new URLSearchParams();
-    if (params.startDate) query.set("startDate", params.startDate);
-    if (params.endDate) query.set("endDate", params.endDate);
-    if (params.route) query.set("route", params.route);
-    if (params.action) query.set("action", params.action);
-    if (params.page) query.set("page", String(params.page));
-    if (params.limit) query.set("limit", String(params.limit));
-
-    const response = await axiosInstance.get(
-      `/admin/delivery-fees/history?${query.toString()}`
-    );
-
-    if (response.data.success) {
-      const d = response.data.data;
-      return {
-        entries: d.entries ?? d.logs ?? d ?? [],
-        total: d.total ?? 0,
-        page: d.page ?? 1,
-        pages: d.pages ?? 1,
-      };
-    }
-    throw new Error(response.data.message || "Failed to fetch change history");
-  } catch (error) {
-    console.error("Error fetching delivery fee history:", error);
-    throw error;
+export async function fetchDeliveryFeeAuditLogs(
+  params: FetchAuditLogParams = {}
+): Promise<DeliveryFeeAuditLogResponse> {
+  const query = new URLSearchParams();
+  if (params.resource) query.set("resource", params.resource);
+  if (params.action) query.set("action", params.action);
+  if (params.from) {
+    query.set("from", params.from);
+    // Compatibility for legacy history-style endpoints.
+    query.set("startDate", params.from);
   }
+  if (params.to) {
+    query.set("to", params.to);
+    query.set("endDate", params.to);
+  }
+  if (params.page) query.set("page", String(params.page));
+  if (params.limit) query.set("limit", String(params.limit));
+
+  const endpoints = [
+    "/admin/delivery-fee-audit-logs",
+    "/admin/delivery-fees/audit-logs",
+    "/admin/delivery-fees/history",
+  ];
+
+  let lastError: any = null;
+
+  for (const endpoint of endpoints) {
+    try {
+      const response = await axiosInstance.get(`${endpoint}?${query.toString()}`);
+
+      if (response.data.success) {
+        const data = response.data.data ?? {};
+        return {
+          logs: data.logs ?? data.entries ?? [],
+          total: data.total ?? 0,
+          page: data.page ?? 1,
+          limit: data.limit ?? params.limit ?? 20,
+          totalPages: data.totalPages ?? data.pages ?? 1,
+        };
+      }
+
+      throw new Error(response.data.message || "Failed to fetch audit logs");
+    } catch (error: any) {
+      lastError = error;
+      const message = String(
+        error?.response?.data?.message || error?.message || ""
+      ).toLowerCase();
+
+      const isRouteMissing =
+        error?.response?.status === 404 || message.includes("route not found");
+
+      if (isRouteMissing) {
+        continue;
+      }
+
+      console.error("Error fetching delivery fee audit logs:", error);
+      throw error;
+    }
+  }
+
+  console.error("Error fetching delivery fee audit logs:", lastError);
+  throw lastError || new Error("Failed to fetch audit logs");
 }
 
 // Download Excel template for bulk import

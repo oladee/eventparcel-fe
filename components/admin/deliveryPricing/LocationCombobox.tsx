@@ -123,7 +123,6 @@ const LocationCombobox: React.FC<LocationComboboxProps> = ({
 
               // If user edits a previously selected option, clear stale selection.
               if (
-                !allowFreeText &&
                 selectedItem &&
                 nextValue.trim().toLowerCase() !==
                   selectedItem.name.trim().toLowerCase()

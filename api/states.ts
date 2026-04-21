@@ -62,10 +62,20 @@ export async function fetchAllStates(): Promise<State[]> {
 export async function fetchCitiesByState(stateId: string): Promise<City[]> {
   try {
     const response = await axiosInstance.get(
-      `/admin/states/${stateId}/cities`
+      `/admin/states/${stateId}/cities?limit=1000`
     );
     if (response.data.success) {
-      return response.data.data.cities || [];
+      const payload = response.data.data;
+      if (Array.isArray(payload)) {
+        return payload;
+      }
+      if (Array.isArray(payload?.cities)) {
+        return payload.cities;
+      }
+      if (Array.isArray(payload?.items)) {
+        return payload.items;
+      }
+      return [];
     }
     throw new Error(response.data.message || "Failed to fetch cities");
   } catch (error) {
