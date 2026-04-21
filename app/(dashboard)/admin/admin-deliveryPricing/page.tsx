@@ -6,7 +6,7 @@ import RoutesTable from "@/components/admin/deliveryPricing/RoutesTable";
 import AddRouteModal from "@/components/admin/deliveryPricing/AddRouteModal";
 import DeleteRouteModal from "@/components/admin/deliveryPricing/DeleteRouteModal";
 import UploadCsvModal from "@/components/admin/deliveryPricing/UploadCsvModal";
-//import ChangeHistorySection from "@/components/admin/deliveryPricing/ChangeHistorySection";
+import ChangeHistorySection from "@/components/admin/deliveryPricing/ChangeHistorySection";
 import { DeliveryRouteDisplay } from "@/components/admin/deliveryPricing/types";
 import { HiOutlineUpload } from "react-icons/hi";
 import {
@@ -304,15 +304,16 @@ const DeliveryPricingPage = () => {
             />
           )
         ) : (
-            <div className="flex items-center justify-center py-16">
-              <p className="text-[#718096]">No change history available.</p>
-            </div>
-
+          <ChangeHistorySection />
         )}
       </div>
 
       {showAddModal && (
-        <AddRouteModal onClose={() => setShowAddModal(false)} onAdd={handleAddRoute} />
+        <AddRouteModal
+          onClose={() => setShowAddModal(false)}
+          onAdd={handleAddRoute}
+          existingRoutes={displayRoutes}
+        />
       )}
 
       {showCsvModal && (

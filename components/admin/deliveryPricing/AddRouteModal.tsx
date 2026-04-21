@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { IoClose } from "react-icons/io5";
 import { CreateDeliveryFeePayload } from "@/api/deliveryFees";
 import {
@@ -13,10 +13,12 @@ import {
   City,
 } from "@/api/states";
 import LocationCombobox from "./LocationCombobox";
+import { DeliveryRouteDisplay } from "./types";
 
 interface AddRouteModalProps {
   onClose: () => void;
   onAdd: (payload: CreateDeliveryFeePayload) => Promise<void> | void;
+  existingRoutes: DeliveryRouteDisplay[];
 }
 
 interface FormState {
@@ -54,7 +56,11 @@ const initialForm: FormState = {
   multiplier: "",
 };
 
-const AddRouteModal: React.FC<AddRouteModalProps> = ({ onClose, onAdd }) => {
+const AddRouteModal: React.FC<AddRouteModalProps> = ({
+  onClose,
+  onAdd,
+  existingRoutes,
+}) => {
   const [form, setForm] = useState<FormState>(initialForm);
   const [errors, setErrors] = useState<FormErrors>({});
   const [statesLoading, setStatesLoading] = useState(true);
@@ -78,16 +84,23 @@ const AddRouteModal: React.FC<AddRouteModalProps> = ({ onClose, onAdd }) => {
     const message = String(err?.response?.data?.message || err?.message || "").toLowerCase();
     return (
       message.includes("already exists") ||
+      err?.response?.data?.code === "BAD_USER_INPUT" ||
       err?.response?.status === 409 ||
       err?.response?.data?.code === "CONFLICT"
     );
   };
 
-  const resolveStateId = (stateIdOrName: string, stateName?: string) => {
-    if (isObjectId(stateIdOrName)) return stateIdOrName;
-    const fromName = findStateByName(stateName || stateIdOrName);
-    return fromName?._id || "";
-  };
+  const resolveStateId = useCallback(
+    (stateIdOrName: string, stateName?: string) => {
+      if (isObjectId(stateIdOrName)) return stateIdOrName;
+      const target = (stateName || stateIdOrName || "").trim().toLowerCase();
+      const fromName = allStates.find(
+        (s) => s.name.trim().toLowerCase() === target
+      );
+      return fromName?._id || "";
+    },
+    [allStates]
+  );
 
   // Fetch states on mount
   useEffect(() => {
@@ -137,7 +150,7 @@ const AddRouteModal: React.FC<AddRouteModalProps> = ({ onClose, onAdd }) => {
     };
     setForm((prev) => ({ ...prev, pickupCityId: "", pickupCityName: "" }));
     loadCities();
-  }, [form.pickupStateId, form.pickupStateName, allStates]);
+  }, [form.pickupStateId, form.pickupStateName, resolveStateId]);
 
   // Fetch cities when destination state changes
   useEffect(() => {
@@ -160,17 +173,51 @@ const AddRouteModal: React.FC<AddRouteModalProps> = ({ onClose, onAdd }) => {
     };
     setForm((prev) => ({ ...prev, destCityId: "", destCityName: "" }));
     loadCities();
-  }, [form.destStateId, form.destStateName, allStates]);
+  }, [form.destStateId, form.destStateName, resolveStateId]);
 
   const clearError = (field: keyof FormErrors) =>
     setErrors((prev) => ({ ...prev, [field]: undefined }));
 
+  const normalizeText = (value: string) => value.trim().toLowerCase();
+
+  const resolveCityIdFromKnownRoutes = (
+    stateId: string,
+    stateName: string,
+    cityName: string
+  ) => {
+    const normalizedStateName = normalizeText(stateName);
+    const normalizedCityName = normalizeText(cityName);
+
+    for (const route of existingRoutes) {
+      const pickupStateMatch =
+        route.pickupStateId === stateId ||
+        normalizeText(route.pickupState) === normalizedStateName;
+      const pickupCityMatch =
+        normalizeText(route.pickupCity) === normalizedCityName;
+
+      if (pickupStateMatch && pickupCityMatch) {
+        return route.pickupCityId;
+      }
+
+      const destStateMatch =
+        route.destStateId === stateId ||
+        normalizeText(route.destState) === normalizedStateName;
+      const destCityMatch = normalizeText(route.destCity) === normalizedCityName;
+
+      if (destStateMatch && destCityMatch) {
+        return route.destCityId;
+      }
+    }
+
+    return "";
+  };
+
   const validate = (): FormErrors => {
     const e: FormErrors = {};
-    if (!form.pickupStateId) e.pickupStateId = "Required";
-    if (!form.pickupCityId) e.pickupCityId = "Required";
-    if (!form.destStateId) e.destStateId = "Required";
-    if (!form.destCityId) e.destCityId = "Required";
+    if (!form.pickupStateId && !form.pickupStateName) e.pickupStateId = "Required";
+    if (!form.pickupCityId && !form.pickupCityName) e.pickupCityId = "Required";
+    if (!form.destStateId && !form.destStateName) e.destStateId = "Required";
+    if (!form.destCityId && !form.destCityName) e.destCityId = "Required";
     if (!form.baseFee) {
       e.baseFee = "Required";
     } else if (isNaN(Number(form.baseFee)) || Number(form.baseFee) < 0) {
@@ -192,6 +239,18 @@ const AddRouteModal: React.FC<AddRouteModalProps> = ({ onClose, onAdd }) => {
 
     const existing = findStateByName(candidateName);
     if (existing) return existing._id;
+
+    // Always re-check backend first so we reuse existing states instead of creating duplicates.
+    try {
+      const freshStates = await fetchAllStates();
+      setAllStates(freshStates);
+      const resolved = freshStates.find(
+        (s) => s.name.trim().toLowerCase() === candidateName.toLowerCase()
+      );
+      if (resolved) return resolved._id;
+    } catch {
+      // Continue to create attempt below.
+    }
 
     try {
       const created = await createState({ name: candidateName });
@@ -219,6 +278,7 @@ const AddRouteModal: React.FC<AddRouteModalProps> = ({ onClose, onAdd }) => {
     cityIdOrName: string,
     cityName: string | undefined,
     stateId: string,
+    stateName: string,
     existingCities: City[],
     setCities: React.Dispatch<React.SetStateAction<City[]>>
   ) => {
@@ -229,6 +289,25 @@ const AddRouteModal: React.FC<AddRouteModalProps> = ({ onClose, onAdd }) => {
 
     const existing = findCityByName(existingCities, candidateName);
     if (existing) return existing._id;
+
+    const fromKnownRoutes = resolveCityIdFromKnownRoutes(
+      stateId,
+      stateName,
+      candidateName
+    );
+    if (fromKnownRoutes) return fromKnownRoutes;
+
+    // Always re-check backend first so we reuse existing cities in the selected state.
+    try {
+      const freshCities = await fetchCitiesByState(stateId);
+      setCities(freshCities);
+      const resolved = freshCities.find(
+        (c) => c.name.trim().toLowerCase() === candidateName.toLowerCase()
+      );
+      if (resolved) return resolved._id;
+    } catch {
+      // Continue to create attempt below.
+    }
 
     try {
       const created = await createCity(stateId, { name: candidateName });
@@ -248,6 +327,15 @@ const AddRouteModal: React.FC<AddRouteModalProps> = ({ onClose, onAdd }) => {
         (c) => c.name.trim().toLowerCase() === candidateName.toLowerCase()
       );
       if (resolved) return resolved._id;
+
+      // Last fallback: resolve from already loaded delivery routes.
+      const fallbackFromRoutes = resolveCityIdFromKnownRoutes(
+        stateId,
+        stateName,
+        candidateName
+      );
+      if (fallbackFromRoutes) return fallbackFromRoutes;
+
       throw err;
     }
   };
@@ -303,6 +391,7 @@ const AddRouteModal: React.FC<AddRouteModalProps> = ({ onClose, onAdd }) => {
         form.pickupCityId,
         form.pickupCityName,
         pickupStateResolved,
+        form.pickupStateName || form.pickupStateId,
         currentPickupCities,
         setPickupCities
       );
@@ -310,12 +399,43 @@ const AddRouteModal: React.FC<AddRouteModalProps> = ({ onClose, onAdd }) => {
         form.destCityId,
         form.destCityName,
         destStateResolved,
+        form.destStateName || form.destStateId,
         currentDestCities,
         setDestCities
       );
 
       if (!pickupCityResolved || !destCityResolved) {
         setSubmitError("Pickup and destination cities are required.");
+        return;
+      }
+
+      const duplicateRoute = existingRoutes.some((route) => {
+        if (
+          route.pickupStateId === pickupStateResolved &&
+          route.pickupCityId === pickupCityResolved &&
+          route.destStateId === destStateResolved &&
+          route.destCityId === destCityResolved
+        ) {
+          return true;
+        }
+
+        // Fallback by names if IDs are not available in local state for any reason.
+        return (
+          normalizeText(route.pickupState) ===
+            normalizeText(form.pickupStateName || form.pickupStateId) &&
+          normalizeText(route.pickupCity) ===
+            normalizeText(form.pickupCityName || form.pickupCityId) &&
+          normalizeText(route.destState) ===
+            normalizeText(form.destStateName || form.destStateId) &&
+          normalizeText(route.destCity) ===
+            normalizeText(form.destCityName || form.destCityId)
+        );
+      });
+
+      if (duplicateRoute) {
+        setSubmitError(
+          "This route already exists. Please edit the existing route instead of creating a duplicate."
+        );
         return;
       }
 
@@ -391,7 +511,7 @@ const AddRouteModal: React.FC<AddRouteModalProps> = ({ onClose, onAdd }) => {
                 clearError("pickupCityId");
               }}
               loading={pickupCitiesLoading}
-              disabled={!form.pickupStateId}
+              disabled={!form.pickupStateId && !form.pickupStateName}
               placeholder="Search city..."
               error={errors.pickupCityId}
               allowFreeText
@@ -422,7 +542,7 @@ const AddRouteModal: React.FC<AddRouteModalProps> = ({ onClose, onAdd }) => {
                 clearError("destCityId");
               }}
               loading={destCitiesLoading}
-              disabled={!form.destStateId}
+              disabled={!form.destStateId && !form.destStateName}
               placeholder="Search city..."
               error={errors.destCityId}
               allowFreeText
