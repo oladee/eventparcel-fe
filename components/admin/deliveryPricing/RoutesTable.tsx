@@ -43,6 +43,8 @@ const RoutesTable: React.FC<RoutesTableProps> = ({
   const [sortDir, setSortDir] = useState<SortDir>("asc");
   const [page, setPage] = useState(1);
   const [limit, setLimit] = useState(6);
+  const [baseFeeDrafts, setBaseFeeDrafts] = useState<Record<string, string>>({});
+  const [multiplierDrafts, setMultiplierDrafts] = useState<Record<string, string>>({});
 
   const pickupDropRef = useRef<HTMLDivElement | null>(null);
   const destDropRef = useRef<HTMLDivElement | null>(null);
@@ -108,6 +110,54 @@ const RoutesTable: React.FC<RoutesTableProps> = ({
     setPage(1);
   }, [search, pickupStateFilter, destStateFilter, limit]);
 
+  useEffect(() => {
+    setBaseFeeDrafts((prev) => {
+      const next = { ...prev };
+      let changed = false;
+
+      editingIds.forEach((id) => {
+        if (next[id] !== undefined) return;
+        const editedRoute = editedValues.get(id);
+        const route = routes.find((r) => r._id === id);
+        const value = editedRoute?.baseFee ?? route?.baseFee ?? 0;
+        next[id] = String(value);
+        changed = true;
+      });
+
+      Object.keys(next).forEach((id) => {
+        if (!editingIds.has(id)) {
+          delete next[id];
+          changed = true;
+        }
+      });
+
+      return changed ? next : prev;
+    });
+
+    setMultiplierDrafts((prev) => {
+      const next = { ...prev };
+      let changed = false;
+
+      editingIds.forEach((id) => {
+        if (next[id] !== undefined) return;
+        const editedRoute = editedValues.get(id);
+        const route = routes.find((r) => r._id === id);
+        const value = editedRoute?.multiplier ?? route?.multiplier ?? 0;
+        next[id] = String(value);
+        changed = true;
+      });
+
+      Object.keys(next).forEach((id) => {
+        if (!editingIds.has(id)) {
+          delete next[id];
+          changed = true;
+        }
+      });
+
+      return changed ? next : prev;
+    });
+  }, [editingIds, editedValues, routes]);
+
   const totalPages = Math.max(1, Math.ceil(sorted.length / limit));
   const paginated = sorted.slice((page - 1) * limit, page * limit);
 
@@ -118,6 +168,70 @@ const RoutesTable: React.FC<RoutesTableProps> = ({
       setSortField(field);
       setSortDir("asc");
     }
+  };
+
+  const handleMultiplierInputChange = (id: string, rawValue: string) => {
+    if (!/^\d*(\.\d{0,2})?$/.test(rawValue)) {
+      return;
+    }
+
+    setMultiplierDrafts((prev) => ({ ...prev, [id]: rawValue }));
+
+    if (rawValue === "") {
+      onEditFieldChange(id, "multiplier", 0);
+      return;
+    }
+
+    const parsed = Number(rawValue);
+    if (Number.isNaN(parsed) || parsed < 0) {
+      return;
+    }
+
+    onEditFieldChange(id, "multiplier", parsed);
+  };
+
+  const handleBaseFeeInputChange = (id: string, rawValue: string) => {
+    if (!/^\d*(\.\d{0,2})?$/.test(rawValue)) {
+      return;
+    }
+
+    setBaseFeeDrafts((prev) => ({ ...prev, [id]: rawValue }));
+
+    if (rawValue === "") {
+      onEditFieldChange(id, "baseFee", 0);
+      return;
+    }
+
+    const parsed = Number(rawValue);
+    if (Number.isNaN(parsed) || parsed < 0) {
+      return;
+    }
+
+    onEditFieldChange(id, "baseFee", parsed);
+  };
+
+  const handleBaseFeeBlur = (id: string) => {
+    const rawValue = baseFeeDrafts[id] ?? "";
+    if (rawValue === "") {
+      setBaseFeeDrafts((prev) => ({ ...prev, [id]: "0" }));
+      onEditFieldChange(id, "baseFee", 0);
+      return;
+    }
+
+    const normalized = String(Number(rawValue));
+    setBaseFeeDrafts((prev) => ({ ...prev, [id]: normalized }));
+  };
+
+  const handleMultiplierBlur = (id: string) => {
+    const rawValue = multiplierDrafts[id] ?? "";
+    if (rawValue === "") {
+      setMultiplierDrafts((prev) => ({ ...prev, [id]: "0" }));
+      onEditFieldChange(id, "multiplier", 0);
+      return;
+    }
+
+    const normalized = String(Number(rawValue));
+    setMultiplierDrafts((prev) => ({ ...prev, [id]: normalized }));
   };
 
   const getPageNumbers = (current: number, total: number) => {
@@ -269,15 +383,21 @@ const RoutesTable: React.FC<RoutesTableProps> = ({
               {/* Base Fee */}
               <div className="w-[160px]">
                 {isEditing ? (
-                  <input
-                    type="number"
-                    min="0"
-                    value={displayRoute.baseFee}
-                    onChange={(e) =>
-                      onEditFieldChange(route._id, "baseFee", Number(e.target.value) || 0)
-                    }
-                    className="h-[36px] w-full px-3 rounded-[8px] border border-[#EEEFF2] text-sm font-semibold text-[#111827] focus:outline-none focus:ring-1 focus:ring-[#7A1626]"
-                  />
+                  <div className="relative w-full">
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      placeholder="0"
+                      value={baseFeeDrafts[route._id] ?? String(displayRoute.baseFee ?? 0)}
+                      onChange={(e) => handleBaseFeeInputChange(route._id, e.target.value)}
+                      onBlur={() => handleBaseFeeBlur(route._id)}
+                      onFocus={(e) => e.currentTarget.select()}
+                      className="h-[36px] w-full pr-8 px-3 rounded-[8px] border border-[#EEEFF2] text-sm font-semibold text-[#111827] focus:outline-none focus:ring-1 focus:ring-[#7A1626]"
+                    />
+                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-[#718096]">
+                      ₦
+                    </span>
+                  </div>
                 ) : (
                   <span className="inline-block bg-[#F3F4F6] text-[#111827] font-semibold rounded-[8px] px-3 py-1 text-sm">
                     ₦{(route.baseFee ?? 0).toLocaleString()}
@@ -288,18 +408,24 @@ const RoutesTable: React.FC<RoutesTableProps> = ({
               {/* Multiplier */}
               <div className="flex-1">
                 {isEditing ? (
-                  <input
-                    type="number"
-                    min="0"
-                    value={displayRoute.multiplier}
-                    onChange={(e) =>
-                      onEditFieldChange(route._id, "multiplier", Number(e.target.value) || 0)
-                    }
-                    className="h-[36px] w-full px-3 rounded-[8px] border border-[#EEEFF2] text-sm font-semibold text-[#111827] focus:outline-none focus:ring-1 focus:ring-[#7A1626]"
-                  />
+                  <div className="relative w-full">
+                    <input
+                      type="text"
+                      inputMode="decimal"
+                      placeholder="0"
+                      value={multiplierDrafts[route._id] ?? String(displayRoute.multiplier ?? 0)}
+                      onChange={(e) => handleMultiplierInputChange(route._id, e.target.value)}
+                      onBlur={() => handleMultiplierBlur(route._id)}
+                      onFocus={(e) => e.currentTarget.select()}
+                      className="h-[36px] w-full pr-8 px-3 rounded-[8px] border border-[#EEEFF2] text-sm font-semibold text-[#111827] focus:outline-none focus:ring-1 focus:ring-[#7A1626]"
+                    />
+                    <span className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-xs font-semibold text-[#718096]">
+                      %
+                    </span>
+                  </div>
                 ) : (
                   <span className="inline-block bg-[#F3F4F6] text-[#111827] font-semibold rounded-[8px] px-3 py-1 text-sm">
-                    {route.multiplier}
+                    {route.multiplier}%
                   </span>
                 )}
               </div>

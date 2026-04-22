@@ -49,6 +49,35 @@ function isObjectIdLike(value: string): boolean {
   return /^[a-fA-F0-9]{24}$/.test(value.trim());
 }
 
+function extractNameFromSerializedObject(value: string): string {
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+
+  // Handles backend strings like:
+  // { _id: new ObjectId('...'), name: 'Lagos' }
+  const singleQuotedMatch = trimmed.match(/name\s*:\s*'([^']+)'/i);
+  if (singleQuotedMatch?.[1]) {
+    return singleQuotedMatch[1].trim();
+  }
+
+  const doubleQuotedMatch = trimmed.match(/name\s*:\s*"([^"]+)"/i);
+  if (doubleQuotedMatch?.[1]) {
+    return doubleQuotedMatch[1].trim();
+  }
+
+  // Handles JSON-ish serialized object strings
+  try {
+    const parsed = JSON.parse(trimmed);
+    if (isRecord(parsed) && typeof parsed.name === "string") {
+      return parsed.name.trim();
+    }
+  } catch {
+    // Not valid JSON, ignore.
+  }
+
+  return "";
+}
+
 function normalizeDisplayValue(value: unknown): string {
   if (value === null || value === undefined) return "";
 
@@ -57,6 +86,9 @@ function normalizeDisplayValue(value: unknown): string {
   }
 
   if (typeof value === "string") {
+    const extractedName = extractNameFromSerializedObject(value);
+    if (extractedName) return extractedName;
+
     return isObjectIdLike(value) ? "" : value;
   }
 
@@ -151,6 +183,10 @@ function getRouteLabel(details?: Record<string, unknown>): string {
     "pickupStateLabel",
     "pickupState.name",
     "pickupState",
+    "before.pickupState.name",
+    "before.pickupState",
+    "after.pickupState.name",
+    "after.pickupState",
     "before.pickupStateName",
     "after.pickupStateName",
   ]);
@@ -159,6 +195,10 @@ function getRouteLabel(details?: Record<string, unknown>): string {
     "pickupCityLabel",
     "pickupCity.name",
     "pickupCity",
+    "before.pickupCity.name",
+    "before.pickupCity",
+    "after.pickupCity.name",
+    "after.pickupCity",
     "before.pickupCityName",
     "after.pickupCityName",
   ]);
@@ -167,6 +207,10 @@ function getRouteLabel(details?: Record<string, unknown>): string {
     "destinationStateLabel",
     "destinationState.name",
     "destinationState",
+    "before.destinationState.name",
+    "before.destinationState",
+    "after.destinationState.name",
+    "after.destinationState",
     "before.destinationStateName",
     "after.destinationStateName",
   ]);
@@ -175,6 +219,10 @@ function getRouteLabel(details?: Record<string, unknown>): string {
     "destinationCityLabel",
     "destinationCity.name",
     "destinationCity",
+    "before.destinationCity.name",
+    "before.destinationCity",
+    "after.destinationCity.name",
+    "after.destinationCity",
     "before.destinationCityName",
     "after.destinationCityName",
   ]);
